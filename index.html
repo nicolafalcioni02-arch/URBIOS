@@ -392,23 +392,18 @@
         function confirmLegal() {
             closeLegal();
             
-            // Se è il link per l'app online, lo apre in una nuova scheda
-            if(currentTarget.startsWith('http')) {
-                window.open(currentTarget, '_blank');
+            // Se il target è il nostro file URBIOS.html
+            if (currentTarget === 'URBIOS.html') {
+                window.open('URBIOS.html', '_blank'); // Lo apre in una nuova scheda online
             } 
-            // Se l'utente ha cliccato "Scarica Software"
+            // Lasciamo invariato il resto (es. per i download)
             else if (currentTarget === 'dl_software') {
-                // Crea un link invisibile e forza il download
-                const a = document.createElement('a');
-                a.href = 'URBIOS.html';      // Il file da cercare nella stessa cartella
-                a.download = 'URBIOS.html';  // Il nome con cui verrà salvato sul pc dell'utente
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            } 
-            // Se l'utente clicca "Scarica Database"
-            else if (currentTarget === 'dl_db') {
-                alert("Funzione scarica database da implementare.");
+                 const a = document.createElement('a');
+                 a.href = 'URBIOS.zip';      
+                 a.download = 'URBIOS.zip';  
+                 document.body.appendChild(a);
+                 a.click();
+                 document.body.removeChild(a);
             }
         }
 
