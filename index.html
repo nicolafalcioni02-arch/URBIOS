@@ -391,8 +391,25 @@
         }
         function confirmLegal() {
             closeLegal();
-            if(currentTarget.startsWith('http')) window.open(currentTarget, '_blank');
-            else alert("Download confermato e avviato per: " + currentTarget);
+            
+            // Se è il link per l'app online, lo apre in una nuova scheda
+            if(currentTarget.startsWith('http')) {
+                window.open(currentTarget, '_blank');
+            } 
+            // Se l'utente ha cliccato "Scarica Software"
+            else if (currentTarget === 'dl_software') {
+                // Crea un link invisibile e forza il download
+                const a = document.createElement('a');
+                a.href = 'URBIOS.html';      // Il file da cercare nella stessa cartella
+                a.download = 'URBIOS.html';  // Il nome con cui verrà salvato sul pc dell'utente
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } 
+            // Se l'utente clicca "Scarica Database"
+            else if (currentTarget === 'dl_db') {
+                alert("Funzione scarica database da implementare.");
+            }
         }
 
         function createRenderer(canvasId, vs, fs, isBG) {
