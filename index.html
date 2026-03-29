@@ -35,7 +35,7 @@
             font-family: 'Inter', sans-serif; 
             background-color: var(--bg-color); 
             color: var(--text-color); 
-            transition: background-color 0.8s ease, color 0.8s ease;
+            transition: background-color 0.2s ease, color 0.2s ease;
             overflow-x: hidden; 
         }
         
@@ -121,31 +121,48 @@
     </style>
 </head>
 <body class="hide-scrollbar">
+    
+        
+    <div id="scroll-indicator" class="fixed left-10 top-1/2 -translate-y-1/2 h-48 w-1 z-[1500] hidden md:block">
+        <div class="h-full w-px relative" style="background-color: var(--border-color); transition: background-color 0.8s ease;">
+            <div id="scroll-dot" class="absolute -left-[3.5px] top-0 w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-colors"></div>
+        </div>
+    </div>
 
     <canvas id="bg-canvas"></canvas>
 
     <div id="sphere-wrapper"><canvas id="sphere-canvas"></canvas></div>
+<nav class="fixed top-0 w-full z-[1000] glass-nav border-b px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-2 cursor-pointer" onclick="gsap.to(window, {scrollTo: 0})">
+        <span class="text-xl font-extrabold tracking-tighter uppercase" style="color: var(--text-color)">
+            Urbios<span class="text-blue-500 italic"></span>
+        </span>
+    </div>
 
-    <nav class="fixed top-0 w-full z-[1000] glass-nav border-b px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-2 cursor-pointer" onclick="gsap.to(window, {scrollTo: 0})">
-            <span class="text-xl font-extrabold tracking-tighter uppercase" style="color: var(--text-color)">Urbios<span class="text-blue-500 italic"></span></span>
-        </div>
-        <div class="hidden md:flex gap-8 text-[11px] font-bold uppercase tracking-[0.2em]">
-            <a href="#download" class="transition">Software</a>
-            <a href="#about" class="transition">Team</a>
-        </div>
+    <div class="hidden md:flex gap-8 text-[11px] font-bold uppercase tracking-[0.2em]">
+        <a href="#download" class="transition">Software</a>
+        <a href="#about" class="transition">Team</a>
+    </div>
+
+    <div class="flex items-center gap-3">
+        <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-full border border-zinc-800 dark:border-zinc-200 transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center">
+            <i data-lucide="sun" id="sun-icon" class="w-4 h-4 text-yellow-500 block"></i>
+            <i data-lucide="moon" id="moon-icon" class="w-4 h-4 text-blue-600 hidden"></i>
+        </button>
+        
         <button onclick="checkLegal('URBIOS.html')" class="btn-ai px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider">
             Usa Online
         </button>
-    </nav>
+    </div>
+</nav>
 
     <section id="hero" class="items-center text-center">
         <div class="w-full mt-20">
             <h1 class="hero-title text-[clamp(4rem,10vw,12rem)] font-extrabold" id="main-title">
-                URBIOS<br><span class="text-blue-600">HEALTH OS.</span>
+                URBIOS<br><span class="text-blue-600"></span>
             </h1>
             <p class="text-[clamp(1rem,2vw,1.5rem)] dynamic-text-muted mt-6 max-w-3xl mx-auto font-light">
-                Il primo sistema operativo plasmabile per la salute. <br>
+                Il primo sistema operativo gratuito e plasmabile per la salute. <br>
                 Creato per l'eccellenza clinica, protetto dalla privacy locale.
             </p>
         </div>
@@ -683,14 +700,6 @@
                     <div class="text-black text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                         <i class="ph-fill ph-file-text text-lg"></i> Anteprima Lettera
                     </div>
-                    <div class="flex gap-3">
-                        <button class="bg-black text-white hover:bg-gray-900 text-[10px] md:text-xs font-bold uppercase tracking-wide px-4 py-2 rounded shadow-sm transition-colors flex items-center gap-2">
-                            <i class="ph-fill ph-printer text-sm"></i> Stampa / Salva PDF
-                        </button>
-                        <button class="bg-zinc-100 hover:bg-zinc-200 text-black text-[10px] md:text-xs font-bold uppercase tracking-wide px-4 py-2 rounded transition-colors">
-                            Chiudi
-                        </button>
-                    </div>
                 </div>
 
                 <div class="flex-1 bg-white p-4 md:p-8 overflow-y-auto relative flex justify-center [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-zinc-300 [&::-webkit-scrollbar-track]:bg-transparent">
@@ -838,11 +847,6 @@
                 <div class="h-14 bg-gray-50 border-b border-gray-200 flex justify-between items-center px-6 flex-none z-20">
                     <div class="text-black text-sm font-bold flex items-center gap-2">
                         <i class="ph-fill ph-chart-polar text-blue-500 text-lg"></i> Analisi BIVA Avanzata
-                    </div>
-                    <div class="flex gap-3 items-center">
-                        <div class="bg-white border border-gray-200 text-gray-700 text-[10px] md:text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded shadow-sm flex items-center gap-2">
-                            Maschi (Sani) <i class="ph ph-caret-down"></i>
-                        </div>
                     </div>
                 </div>
 
@@ -1111,7 +1115,196 @@
     </div>
 </section>
 
+
+
+
+<section id="faq" class="relative w-full py-24 overflow-hidden flex flex-col items-center" style="background-color: var(--bg-color);">
+    <div class="w-full max-w-4xl px-6 relative z-10">
+        
+        <div class="text-center mb-16">
+            <span class="text-blue-500 font-bold uppercase text-xs tracking-widest anim-faq">FAQ</span>
+            <h2 class="text-[clamp(2.5rem,4vw,4rem)] font-extrabold mt-4 anim-faq" style="color: var(--text-color);">
+                Domande frequenti.
+            </h2>
+        </div>
+
+        <div class="space-y-4">
+            <div class="faq-item group border-b border-zinc-200 dark:border-zinc-800 pb-6 anim-faq">
+                <button class="w-full flex justify-between items-center text-left py-4 focus:outline-none" onclick="toggleFaq(this)">
+                    <span class="text-lg md:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-500 transition-colors">
+                        Ma è davvero gratuito per sempre?
+                    </span>
+                    <i data-lucide="plus" class="w-5 h-5 text-blue-500 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-answer hidden overflow-hidden text-zinc-600 dark:text-zinc-400 text-sm md:text-base leading-relaxed pr-8">
+                    Sì. URBIOS è nato nelle aule universitarie di Urbino per abbattere le barriere economiche che i giovani biologi affrontano all'inizio della carriera. Non ci sono costi nascosti, né versioni premium. La nostra ricompensa è la diffusione di uno strumento scientifico libero.
+                </div>
+            </div>
+
+            <div class="faq-item group border-b border-zinc-200 dark:border-zinc-800 pb-6 anim-faq">
+                <button class="w-full flex justify-between items-center text-left py-4 focus:outline-none" onclick="toggleFaq(this)">
+                    <span class="text-lg md:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-500 transition-colors">
+                        Perché non salva i dati in automatico?
+                    </span>
+                    <i data-lucide="plus" class="w-5 h-5 text-blue-500 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-answer hidden overflow-hidden text-zinc-600 dark:text-zinc-400 text-sm md:text-base leading-relaxed pr-8">
+                    Perché URBIOS non ha un server. Per garantirti la privacy totale, il software lavora solo nella RAM (memoria volatile) del tuo computer. Il salvataggio automatico richiederebbe l'accesso costante al tuo disco o a un database remoto. Noi preferiamo lasciarti il controllo totale: clicchi su "Ho finito" e sei tu a decidere di salvare.
+                </div>
+            </div>
+
+            <div class="faq-item group border-b border-zinc-200 dark:border-zinc-800 pb-6 anim-faq">
+                <button class="w-full flex justify-between items-center text-left py-4 focus:outline-none" onclick="toggleFaq(this)">
+                    <span class="text-lg md:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-500 transition-colors">
+                        Cos'è un file JSON e perché dovrebbe importarmi?
+                    </span>
+                    <i data-lucide="plus" class="w-5 h-5 text-blue-500 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-answer hidden overflow-hidden text-zinc-600 dark:text-zinc-400 text-sm md:text-base leading-relaxed pr-8">
+                    Il JSON è un formato di testo universale. A differenza dei database dei software commerciali, un file JSON può essere letto da qualsiasi computer oggi e tra 50 anni. Significa che i tuoi dati sono "immortali" e non sarai mai prigioniero di un abbonamento o di un'azienda.
+                </div>
+            </div>
+
+            <div class="faq-item group border-b border-zinc-200 dark:border-zinc-800 pb-6 anim-faq">
+                <button class="w-full flex justify-between items-center text-left py-4 focus:outline-none" onclick="toggleFaq(this)">
+                    <span class="text-lg md:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-500 transition-colors">
+                        Funziona su Mac, Windows o Linux?
+                    </span>
+                    <i data-lucide="plus" class="w-5 h-5 text-blue-500 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-answer hidden overflow-hidden text-zinc-600 dark:text-zinc-400 text-sm md:text-base leading-relaxed pr-8">
+                    Sì, ovunque ci sia un browser. URBIOS è un "single-file HTML": non si installa, si apre semplicemente. È agnostico rispetto al sistema operativo. Se hai un browser moderno, hai URBIOS.
+                </div>
+            </div>
+
+            <div class="faq-item group border-b border-zinc-200 dark:border-zinc-800 pb-6 anim-faq">
+                <button class="w-full flex justify-between items-center text-left py-4 focus:outline-none" onclick="toggleFaq(this)">
+                    <span class="text-lg md:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-500 transition-colors">
+                        Posso fidarmi della sicurezza del file?
+                    </span>
+                    <i data-lucide="plus" class="w-5 h-5 text-blue-500 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-answer hidden overflow-hidden text-zinc-600 dark:text-zinc-400 text-sm md:text-base leading-relaxed pr-8">
+                    Il codice di URBIOS è aperto e trasparente: chiunque sappia leggere l'HTML può verificare che non ci siano funzioni dannose. Però attenzione: scaricalo solo dalla fonte ufficiale. Essendo un codice "libero", qualcuno potrebbe alterarlo e diffonderlo su canali non autorizzati. La sicurezza dei tuoi pazienti dipende anche da dove scarichi lo strumento.
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full flex flex-col">
+            <div class="faq-item border-b border-zinc-200 dark:border-zinc-800 pb-4 anim-faq w-full">
+                <button class="w-full flex justify-between items-center text-left py-5 group focus:outline-none" onclick="toggleFaq(this)">
+                    <span class="text-lg md:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-500 transition-colors pr-4">
+                        Come si aggiorna il software se esce una nuova versione?
+                    </span>
+                    <i data-lucide="plus" class="w-5 h-5 text-blue-500 flex-shrink-0 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-answer hidden overflow-hidden w-full">
+                    <p class="text-zinc-600 dark:text-zinc-400 text-sm md:text-base leading-relaxed pb-6">
+                        È semplicissimo: scarichi il nuovo file HTML dal sito ufficiale e lo apri. Quando il software ti chiede di caricare i dati, selezioni il tuo ultimo file JSON salvato. URBIOS popolerà automaticamente la nuova versione con tutto il tuo storico. Non perdi mai nulla, il "motore" cambia ma il tuo "archivio" resta intatto.
+                    </p>
+                </div>
+            </div>
+
+            <div class="w-full flex flex-col">
+            <div class="faq-item border-b border-zinc-200 dark:border-zinc-800 pb-4 anim-faq w-full">
+                <button class="w-full flex justify-between items-center text-left py-5 group focus:outline-none" onclick="toggleFaq(this)">
+                    <span class="text-lg md:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-500 transition-colors pr-4">
+                Funziona su Tablet e Smartphone?
+            </span>
+            <i data-lucide="plus" class="w-6 h-6 text-blue-500 flex-shrink-0 transition-transform duration-300 mt-1"></i>
+        </button>
+        <div class="faq-answer hidden overflow-hidden w-full">
+            <div class="text-zinc-600 dark:text-zinc-400 text-sm md:text-base leading-relaxed pb-8 space-y-4">
+                <p>
+                    Tecnicamente sì, URBIOS gira su qualsiasi browser moderno. Tuttavia, su iPhone e dispositivi iOS, il sistema operativo spesso impedisce l'apertura diretta di file .html salvati in locale. In questi casi è necessario accedere alla versione online, assicurandosi di avere un metodo per caricare e scaricare i file .json dal proprio dispositivo. Nota sulla User Experience: Sebbene il codice sia responsive, URBIOS è uno strumento denso di dati. Su schermi piccoli come quelli degli smartphone, l'esperienza d'uso è attualmente sconsigliata poiché l'interfaccia risulterebbe troppo compressa. Per una gestione professionale e fluida della visita, raccomandiamo l'uso di Tablet o Laptop.
+                </p>
+            </div>
+        </div>
+    </div>
+
+            <div class="faq-item border-b border-zinc-200 dark:border-zinc-800 pb-4 anim-faq w-full">
+                <button class="w-full flex justify-between items-center text-left py-5 group focus:outline-none" onclick="toggleFaq(this)">
+                    <span class="text-lg md:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-500 transition-colors pr-4">
+                        C'è un limite al numero di pazienti che posso inserire?
+                    </span>
+                    <i data-lucide="plus" class="w-5 h-5 text-blue-500 flex-shrink-0 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-answer hidden overflow-hidden w-full">
+                    <p class="text-zinc-600 dark:text-zinc-400 text-sm md:text-base leading-relaxed pb-6">
+                        No. L'unico limite è lo spazio fisico sul tuo computer o la memoria RAM del browser, ma parliamo di file JSON che pesano pochissimi KB. Anche con migliaia di pazienti, il file risulterà più leggero di una singola fotografia scattata con il tuo smartphone.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item border-b border-zinc-200 dark:border-zinc-800 pb-4 anim-faq w-full">
+                <button class="w-full flex justify-between items-center text-left py-5 group focus:outline-none" onclick="toggleFaq(this)">
+                    <span class="text-lg md:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-500 transition-colors pr-4">
+                        Se non c'è internet in studio, URBIOS funziona?
+                    </span>
+                    <i data-lucide="plus" class="w-5 h-5 text-blue-500 flex-shrink-0 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-answer hidden overflow-hidden w-full">
+                    <p class="text-zinc-600 dark:text-zinc-400 text-sm md:text-base leading-relaxed pb-6">
+                        Sì, al 100%. Una volta scaricato il file HTML sul tuo PC, non hai più bisogno di internet. URBIOS non deve inviare o ricevere nulla dalla rete per funzionare. È lo strumento perfetto per chi lavora in zone con scarsa copertura o preferisce restare offline per massima sicurezza.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item border-b border-zinc-200 dark:border-zinc-800 pb-4  w-full">
+                <button class="w-full flex justify-between items-center text-left py-5 group focus:outline-none" onclick="toggleFaq(this)">
+                    <span class="text-lg md:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-blue-500 transition-colors pr-4">
+                        Cosa succede se smettete di supportare il progetto?
+                    </span>
+                    <i data-lucide="plus" class="w-5 h-5 text-blue-500 flex-shrink-0 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-answer hidden overflow-hidden w-full">
+                    <p class="text-zinc-600 dark:text-zinc-400 text-sm md:text-base leading-relaxed pb-6">
+                        Nulla. Ed è questo il bello. Anche se un giorno smettessimo di aggiornare URBIOS, il file in tuo possesso continuerà a funzionare per sempre. I tuoi dati resteranno leggibili perché sono in un formato standard (JSON). Non sei legato a noi, sei padrone del tuo strumento.
+                    </p>
+                </div>
+            </div>
+
+    </div>
+</section>
+
+
+
+
     <script>
+
+        function toggleTheme() {
+    const body = document.body;
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    
+    // Switch della classe principale
+    body.classList.toggle('light-theme');
+    
+    // Switch delle icone
+    if (body.classList.contains('light-theme')) {
+        sunIcon.classList.replace('block', 'hidden');
+        moonIcon.classList.replace('hidden', 'block');
+    } else {
+        sunIcon.classList.replace('hidden', 'block');
+        moonIcon.classList.replace('block', 'hidden');
+    }
+}
+        // --- LOGICA SCROLL INDICATOR LATERALE ---
+        gsap.to("#scroll-dot", {
+            scrollTrigger: {
+                trigger: "body",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 0.3, // Rende il movimento fluido e leggermente ritardato
+            },
+            // Muove il pallino lungo la retta (100% dell'altezza meno la dimensione del pallino)
+            top: "calc(100% - 8px)", 
+            ease: "none"
+        });
+
+
+
+
         lucide.createIcons();
         gsap.registerPlugin(ScrollTrigger);
 
@@ -1147,12 +1340,55 @@
         marqueeContainer.addEventListener("mouseenter", () => { gsap.to(marqueeAnim, { timeScale: 0.15, duration: 0.8, ease: "power2.out" }); });
         marqueeContainer.addEventListener("mouseleave", () => { gsap.to(marqueeAnim, { timeScale: 1, duration: 0.8, ease: "power2.inOut" }); });
 
-        ScrollTrigger.create({
-            trigger: "#about",
-            start: "top 60%", end: "bottom bottom",
-            onEnter: () => document.body.classList.add("light-theme"),
-            onLeaveBack: () => document.body.classList.remove("light-theme"),
-        });
+let manualTheme = 'dark'; // La scelta dell'utente per la parte alta del sito
+
+function toggleTheme() {
+    const body = document.body;
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+
+    // Cambia la preferenza manuale
+    manualTheme = manualTheme === 'dark' ? 'light' : 'dark';
+
+    // Applica il tema SOLO se non siamo nella zona forzata (sopra #about)
+    // Usiamo ScrollTrigger.isInViewport o controlliamo la posizione
+    if (gsap.getProperty(window, "scrollY") < document.getElementById('about').offsetTop - 200) {
+        if (manualTheme === 'light') {
+            body.classList.add('light-theme');
+            sunIcon.classList.replace('block', 'hidden');
+            moonIcon.classList.replace('hidden', 'block');
+        } else {
+            body.classList.remove('light-theme');
+            sunIcon.classList.replace('hidden', 'block');
+            moonIcon.classList.replace('block', 'hidden');
+        }
+    }
+}
+
+ScrollTrigger.create({
+    trigger: "#about",
+    start: "top 60%", 
+    end: "bottom bottom",
+    onEnter: () => {
+        // Forza sempre il Light Theme quando si entra in About
+        document.body.classList.add("light-theme");
+        // Aggiorna le icone del tasto per coerenza
+        document.getElementById('moon-icon').classList.replace('block', 'hidden');
+        document.getElementById('sun-icon').classList.replace('hidden', 'block');
+    },
+    onLeaveBack: () => {
+        // Quando si torna su, ripristina la scelta manuale dell'utente
+        if (manualTheme === 'dark') {
+            document.body.classList.remove("light-theme");
+            document.getElementById('sun-icon').classList.replace('hidden', 'block');
+            document.getElementById('moon-icon').classList.replace('block', 'hidden');
+        } else {
+            document.body.classList.add("light-theme");
+            document.getElementById('sun-icon').classList.replace('block', 'hidden');
+            document.getElementById('moon-icon').classList.replace('hidden', 'block');
+        }
+    }
+});
 
         let currentTarget = "";
         function checkLegal(target) {
@@ -1682,6 +1918,47 @@ window.addEventListener('load', initMockupSphere1);
           ease: "power2.out"
       });
   });
+
+  // Funzione per l'Accordion delle FAQ
+function toggleFaq(button) {
+    const item = button.parentElement;
+    const answer = item.querySelector('.faq-answer');
+    const icon = button.querySelector('i');
+    const isOpen = !answer.classList.contains('hidden');
+
+    // Chiudi tutte le altre FAQ (opzionale, se vuoi che ne rimanga aperta solo una)
+    /*
+    document.querySelectorAll('.faq-answer').forEach(el => {
+        if (el !== answer) {
+            el.classList.add('hidden');
+            el.parentElement.querySelector('i').style.transform = 'rotate(0deg)';
+        }
+    });
+    */
+
+    if (isOpen) {
+        gsap.to(answer, { height: 0, opacity: 0, duration: 0.3, onComplete: () => answer.classList.add('hidden') });
+        gsap.to(icon, { rotation: 0, duration: 0.3 });
+    } else {
+        answer.classList.remove('hidden');
+        gsap.fromTo(answer, { height: 0, opacity: 0 }, { height: "auto", opacity: 1, duration: 0.3, ease: "power2.out" });
+        gsap.to(icon, { rotation: 60, duration: 0.3 }); // La "più" diventa una "x"
+    }
+}
+
+// Animazione GSAP per l'ingresso della sezione FAQ
+gsap.utils.toArray('.anim-faq').forEach(el => {
+    gsap.from(el, {
+        scrollTrigger: {
+            trigger: el,
+            start: "top 90%",
+        },
+        y: 20,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out"
+    });
+});
 
 
 
