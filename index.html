@@ -9,7 +9,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+ 
 
     <style>
         :root { 
@@ -129,8 +131,6 @@
             <span class="text-xl font-extrabold tracking-tighter uppercase" style="color: var(--text-color)">Urbios<span class="text-blue-500 italic"></span></span>
         </div>
         <div class="hidden md:flex gap-8 text-[11px] font-bold uppercase tracking-[0.2em]">
-            <a href="#vision" class="transition">Bio-Logic</a>
-            <a href="#features" class="transition">Health-360</a>
             <a href="#download" class="transition">Software</a>
             <a href="#about" class="transition">Team</a>
         </div>
@@ -267,11 +267,22 @@
         </div>
     </section>
 
+
+
+
+
+
+
+
+
+
+    
+
     <section id="download" class="text-center items-center">
         <h2 class="text-[clamp(3rem,6vw,6rem)] font-extrabold mb-12">Pronto per l'evoluzione?</h2>
         <div class="flex flex-col md:flex-row gap-6 w-full max-w-2xl mx-auto relative z-20">
             <button onclick="checkLegal('dl_software')" class="btn-solid-dynamic flex-1 py-6 rounded-2xl text-[clamp(1rem,1.5vw,1.25rem)] font-bold flex items-center justify-center gap-3">
-                Scarica Software <i data-lucide="download"></i>
+                Scarica URBIOS <i data-lucide="download"></i>
             </button>
             <button onclick="checkLegal('dl_db')" class="btn-outline-dynamic flex-1 py-6 rounded-2xl text-[clamp(1rem,1.5vw,1.25rem)] font-bold flex items-center justify-center gap-3">
                 Scarica Database <i data-lucide="database"></i>
@@ -279,6 +290,648 @@
         </div>
         <p class="mt-8 dynamic-text-muted text-xs md:text-sm uppercase tracking-widest font-bold">Multipiattaforma • 100% Offline • Gratuito</p>
     </section>
+
+    
+    
+    
+    
+    
+    
+<div class="w-full h-32 bg-gradient-to-b from-blue-600 to-transparent" style="background: linear-gradient(to bottom, var(--bg-color, #1e3a8a), transparent);"></div>
+
+<section id="mockup-presentation" class="relative w-full py-16 overflow-hidden">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12 relative z-10">
+        
+        <div class="md:w-1/3 space-y-6 text-left">
+            <span class="text-blue-600 font-bold uppercase text-xs tracking-widest anim-text">Step 1</span>
+            <h2 class="text-[clamp(2rem,3.5vw,3rem)] font-extrabold leading-tight text-white dark:text-white anim-text">
+                Il tuo lavoro,<br>subito pronto.
+            </h2>
+            <p class="dynamic-text-muted text-sm md:text-base anim-text">
+                Per iniziare clicca su <strong>CARICA JSON</strong>, che sarà il tuo ultimo salvataggio. Nessuna configurazione complessa, riprendi esattamente da dove avevi interrotto.
+            </p>
+        </div>
+
+        <div class="md:w-2/3 w-full perspective-1000">
+            <div class="anim-window relative bg-white/90 dark:bg-black/90 backdrop-blur-md rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-200 dark:border-gray-800 overflow-hidden aspect-[4/3] flex flex-col">
+                
+                <div class="h-8 bg-gray-100/50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 flex items-center px-4 gap-2 backdrop-blur-md">
+                    <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                    <div class="mx-auto text-[10px] font-medium text-gray-400 select-none">URBIOS</div>
+                </div>
+
+                <div class="relative flex-1 flex flex-col items-center justify-center overflow-hidden">
+                    
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                        <canvas id="sphere-mockup-1" class="w-[250px] h-[250px] md:w-[350px] md:h-[350px] rounded-full"></canvas>
+                    </div>
+
+                    <div class="relative z-10 text-center flex flex-col items-center">
+                        <h1 class="anim-app-title font-['Times'] font-extrabold text-[2rem] md:text-[5rem] leading-none tracking-tighter text-black dark:text-white select-none mix-blend-overlay">
+                            Hello
+                        </h1>
+                        <h2 class="anim-app-subtitle text-black/60 dark:text-white/60 text-[9px] font-bold tracking-[0.4em] uppercase mb-6 mt-2">
+                            U R B I O S
+                        </h2>
+                        
+                        <div class="anim-app-btn">
+                            <button class="relative px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-full shadow-lg hover:scale-105 transition-all cursor-default">
+                                <span class="font-medium text-xs tracking-wide">Carica .JSON</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<div class="w-full h-32 bg-gradient-to-b from-blue-600 to-transparent" style="background: linear-gradient(to bottom, var(--bg-color, #1e3a8a), transparent);"></div>
+
+<section id="mockup-step-2" class="relative w-full py-16 overflow-hidden">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12 relative z-10">
+        
+        <div class="md:w-2/3 w-full perspective-1000">
+            <div class="anim2-window relative bg-[#f8f9fa] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-gray-200 overflow-hidden aspect-[4/3] flex flex-col">
+                
+                <div class="h-8 border-b border-gray-200 flex items-center px-4 gap-2 z-30 relative bg-white/50 backdrop-blur-md">
+                    <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                </div>
+
+                <div class="relative flex-1 overflow-hidden font-sans">
+                    
+                    <div class="absolute inset-0 bg-[#f8f9fa] flex flex-col items-center pt-8 px-6">
+                        <div class="w-full max-w-4xl">
+                            
+                            <div class="flex justify-between items-end mb-6">
+                                <div class="flex items-center gap-4">
+                                    <div class="anim2-dash-el">
+                                        <h1 className="font-semibold text-3xl text-zinc-900 tracking-tight leading-none" style="font-family: sans-serif; font-weight: 600; color: #18181b;">URBIOS</h1>
+                                        <p class="text-gray-400 uppercase tracking-[0.2em] text-[8px] font-bold mt-1">SOFTWARE</p>
+                                    </div>
+                                    <div class="anim2-dash-el w-8 h-8 rounded-full bg-white border border-gray-200 text-gray-400 flex items-center justify-center shadow-sm mb-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    </div>
+                                </div>
+                                <div class="flex flex-nowrap gap-2 anim2-dash-el">
+                                    <div class="px-6 py-1.5 w-30 bg-black border border-gray-200 rounded-full text-white text-xs font-medium flex items-center gap-1">
+                                        + Nuovo Paziente
+                                    </div>
+                                    <div class="px-3 py-1.5 w-auto bg-black border border-gray-200 rounded-full text-white text-xs font-medium flex items-center gap-1">
+                                        Ho finito di lavorare!
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="anim2-table bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="grid grid-cols-12 bg-gray-50 p-3 border-b border-gray-200 text-[9px] uppercase font-bold text-gray-500 tracking-wider">
+                                    <div class="col-span-5">Paziente</div>
+                                    <div class="col-span-3">Ultima Attività</div>
+                                    <div class="col-span-3">Status</div>
+                                    <div class="col-span-1 text-right"></div>
+                                </div>
+                                <div class="divide-y divide-gray-100">
+                                    <div class="anim2-patient grid grid-cols-12 p-3 items-center">
+                                        <div class="col-span-5 flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold text-[10px]">MR</div>
+                                            <div>
+                                                <div class="font-bold text-gray-900 text-xs">Nicole Bellanova</div>
+                                                <div class="text-[9px] text-gray-400">ID: a7b8c9</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-span-3 text-[10px] text-gray-500">22/03/2026</div>
+                                        <div class="col-span-3">
+                                            <span class="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wide border bg-green-50 text-green-700 border-green-100">Attivo</span>
+                                        </div>
+                                    </div>
+                                    <div class="anim2-patient grid grid-cols-12 p-3 items-center">
+                                        <div class="col-span-5 flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold text-[10px]">LB</div>
+                                            <div>
+                                                <div class="font-bold text-gray-900 text-xs">Ilaria Berardi</div>
+                                                <div class="text-[9px] text-gray-400">ID: f4e3d2</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-span-3 text-[10px] text-gray-500">15/03/2026</div>
+                                        <div class="col-span-3">
+                                            <span class="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wide border bg-green-50 text-green-700 border-green-100">Attivo</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="anim2-welcome-overlay absolute inset-0 z-20 flex items-center justify-center bg-white">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30 blur-2xl scale-[1.2]">
+                             <div class="w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-gray-200 to-gray-300"></div>
+                        </div>
+                        <div class="relative z-10 text-center flex flex-col items-center space-y-6">
+                            <div class="border-b border-gray-200 pb-2 mb-2 anim2-welcome-el">
+                                 <span class="text-[9px] font-bold tracking-[0.4em] uppercase text-gray-400">U R B I O S</span>
+                            </div>
+                            <div class="space-y-1 anim2-welcome-el">
+                                <p class="text-[10px] text-gray-500 font-medium tracking-wide">Bentornato</p>
+                                <h1 class="text-2xl md:text-2xl font-bold text-gray-900 leading-none">
+                                    Dott. Falcioni Nicola
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="md:w-1/3 space-y-6 text-left pl-0 md:pl-8">
+            <span class="text-blue-500 font-bold uppercase text-xs tracking-widest anim2-text">Step 2</span>
+            <h2 class="text-[clamp(2rem,3.5vw,3rem)] font-extrabold leading-tight anim2-text" style="color: var(--text-color);">
+                Tutti i pazienti,<br>in un istante.
+            </h2>
+            <p class="anim2-text text-sm md:text-base" style="color: var(--text-muted);">
+                Subito dopo il caricamento, la dashboard si configura automaticamente. Hai immediatamente accesso all'elenco completo dei tuoi pazienti, pronto per l'analisi o l'inserimento di nuovi dati.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+<div class="w-full h-32 bg-gradient-to-b from-blue-600 to-transparent" style="background: linear-gradient(to bottom, var(--bg-color, #1e3a8a), transparent);"></div>
+
+<section id="mockup-step-3" class="relative w-full py-16 overflow-hidden">
+    <div class="w-full px-4 md:px-8 relative z-10 flex flex-col items-center">
+        
+        <div class="w-full max-w-3xl text-center mb-12 space-y-4">
+            <span class="text-blue-500 font-bold uppercase text-xs tracking-widest anim3-text">Step 3</span>
+            <h2 class="text-[clamp(2rem,3vw,3rem)] font-extrabold leading-tight anim3-text" style="color: var(--text-color);">
+                L'anagrafica clinica,<br>completa e in ordine.
+            </h2>
+            <p class="anim3-text text-sm md:text-base" style="color: var(--text-muted);">
+                Gestisci una cartella clinica vera e propria. Dalla raccolta dettagliata dell'anamnesi fino alla generazione automatica dei documenti legali, tutto nella stessa schermata.
+            </p>
+        </div>
+
+        <div class="scale-[0.95] origin-top w-[100%] max-w-[1800px] perspective-1000 mx-auto" >
+            <div class="anim3-window relative bg-[#f8f9fa] rounded-xl shadow-[0_40px_80px_rgba(0,0,0,0.3)] border border-gray-200 overflow-hidden flex flex-col font-sans aspect-[4/3]">                
+                <div class="h-8 border-b border-gray-200 flex items-center px-4 gap-2 z-30 relative bg-white/50 backdrop-blur-md flex-none">
+                    <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                </div>
+
+                <div class="relative flex-1 flex flex-col overflow-hidden">
+                    
+                    <div class="anim3-topbar bg-white/90 backdrop-blur-xl border-b border-gray-200 px-8 py-4 flex justify-between items-center z-20 flex-none gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-black shadow-sm">
+                                <i class="ph ph-arrow-left text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-3">
+                                    <h2 class="text-2xl font-bold text-black leading-none">Nuovo Paziente</h2>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border flex items-center gap-1 bg-green-50 text-green-700 border-green-200">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>Attivo
+                                    </span>
+                                </div>
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1 block">ID: #------</span>
+                            </div>
+                        </div>
+                        <div class="flex bg-gray-100 p-1 rounded-full overflow-x-auto max-w-full">
+                            <div class="px-4 md:px-6 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wide flex items-center gap-2 bg-white shadow-sm text-black whitespace-nowrap">
+                                <i class="ph-fill ph-user text-lg"></i> Anagrafica
+                            </div>
+                            <div class="px-4 md:px-6 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wide flex items-center gap-2 text-gray-500 whitespace-nowrap">
+                                <i class="ph ph-clock-counter-clockwise text-lg"></i> Storico
+                            </div>
+                            <div class="px-4 md:px-6 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wide flex items-center gap-2 text-gray-500 whitespace-nowrap">
+                                <i class="ph ph-plus-circle text-lg"></i> Nuova Visita
+                            </div>
+                            <div class="px-4 md:px-6 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wide flex items-center gap-2 text-gray-500 whitespace-nowrap">
+                                <i class="ph ph-barbell text-lg"></i> Training
+                            </div>
+                            <div class="px-4 md:px-6 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wide flex items-center gap-2 text-gray-500 whitespace-nowrap">
+                                <i class="ph ph-carrot text-lg"></i> Diet
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 p-6 md:p-8 overflow-y-auto relative [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 pb-10">
+                            
+                            <div class="space-y-6">
+                                <div class="anim3-card bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                    <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+                                        <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600"><i class="ph-fill ph-identification-card text-xl"></i></div>
+                                        <h3 class="font-bold text-sm text-zinc-900 uppercase tracking-wide">Dati Amministrativi</h3>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="anim3-input space-y-1.5"><div class="text-[10px] font-bold text-gray-500 uppercase">Nome</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3"></div></div>
+                                        <div class="anim3-input space-y-1.5"><div class="text-[10px] font-bold text-gray-500 uppercase">Cognome</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3"></div></div>
+                                        <div class="anim3-input space-y-1.5"><div class="text-[10px] font-bold text-gray-500 uppercase">Sesso Biologico</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3 flex items-center text-sm text-gray-400">M/F <i class="ph ph-caret-down text-gray-400"></i></div></div>
+                                        <div class="anim3-input space-y-1.5"><div class="text-[10px] font-bold text-gray-500 uppercase">Data di Nascita</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3 flex items-center text-sm text-gray-400">gg/mm/aaaa</div></div>
+                                        <div class="anim3-input space-y-1.5"><div class="text-[10px] font-bold text-gray-500 uppercase">Luogo di Nascita</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3 flex items-center text-sm text-gray-400">Comune (PR)</div></div>
+                                        <div class="anim3-input space-y-1.5"><div class="text-[10px] font-bold text-gray-500 uppercase">Professione</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3 flex items-center text-sm text-gray-400">Es. Impiegato</div></div>
+                                        <div class="anim3-input space-y-1.5 col-span-2"><div class="text-[10px] font-bold text-gray-500 uppercase">Codice Fiscale</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3 flex items-center text-sm text-gray-400">16 caratteri</div></div>
+                                        <div class="anim3-input space-y-1.5 col-span-2 md:col-span-1"><div class="text-[10px] font-bold text-gray-500 uppercase">Stato Civile</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3 flex items-center text-sm text-gray-400 justify-between">Celibe/Nubile <i class="ph ph-caret-down text-gray-400"></i></div></div>
+                                    </div>
+                                </div>
+
+                                <div class="anim3-card bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                    <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+                                        <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-green-600"><i class="ph-fill ph-address-book text-xl"></i></div>
+                                        <h3 class="font-bold text-sm text-zinc-900 uppercase tracking-wide">Recapiti</h3>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="anim3-input space-y-1.5"><div class="text-[10px] font-bold text-gray-500 uppercase">Cellulare</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3 flex items-center text-sm text-gray-400">+39...</div></div>
+                                        <div class="anim3-input space-y-1.5 col-span-2"><div class="text-[10px] font-bold text-gray-500 uppercase">Email</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3"></div></div>
+                                        <div class="anim3-input space-y-1.5 col-span-2"><div class="text-[10px] font-bold text-gray-500 uppercase">Indirizzo</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3 flex items-center text-sm text-gray-400">Via...</div></div>
+                                        <div class="anim3-input space-y-1.5"><div class="text-[10px] font-bold text-gray-500 uppercase">CAP</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3 flex items-center text-sm text-gray-400">00000</div></div>
+                                        <div class="anim3-input space-y-1.5"><div class="text-[10px] font-bold text-gray-500 uppercase">Città</div><div class="h-10 bg-white border border-gray-200 rounded-md px-3 flex items-center text-sm text-gray-400">Milano</div></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div class="anim3-card bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                    <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+                                        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600"><i class="ph-fill ph-folder-lock text-xl"></i></div>
+                                        <h3 class="font-bold text-sm text-zinc-900 uppercase tracking-wide">Anamnesi Medica Remota</h3>
+                                    </div>
+                                    <div class="space-y-4">
+                                        <div class="anim3-input space-y-1.5">
+                                            <div class="text-[10px] font-bold text-gray-500 uppercase">Anamnesi Familiare</div>
+                                            <div class="h-16 bg-white border border-gray-200 rounded-md p-3 text-sm text-gray-400">Diabete, Ipertensione, Obesità in famiglia...</div>
+                                        </div>
+                                        <div class="anim3-input space-y-1.5">
+                                            <div class="text-[10px] font-bold text-gray-500 uppercase">Patologie Pregresse & Interventi</div>
+                                            <div class="h-16 bg-white border border-gray-200 rounded-md p-3 text-sm text-gray-400">Elenco patologie diagnosticate...</div>
+                                        </div>
+                                        <div class="anim3-input space-y-1.5">
+                                            <div class="text-[10px] font-bold text-gray-500 uppercase">Terapie Farmacologiche Croniche</div>
+                                            <div class="h-16 bg-white border border-gray-200 rounded-md p-3 text-sm text-gray-400">Farmaci assunti regolarmente...</div>
+                                        </div>
+                                        <div class="anim3-input space-y-1.5">
+                                            <div class="text-[10px] font-bold text-gray-500 uppercase">Allergie & Intolleranze</div>
+                                            <div class="h-16 bg-white border border-gray-200 rounded-md p-3 text-sm text-gray-400">Nichel, Glutine, Lattosio...</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="anim3-card bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                    <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+                                        <div class="w-8 h-8 rounded-lg bg-yellow-50 flex items-center justify-center text-yellow-600"><i class="ph-fill ph-note-pencil text-xl"></i></div>
+                                        <h3 class="font-bold text-sm text-zinc-900 uppercase tracking-wide">Note Generali</h3>
+                                    </div>
+                                    <div class="anim3-input space-y-1.5">
+                                        <div class="text-[10px] font-bold text-gray-500 uppercase">Obiettivo del Paziente</div>
+                                        <div class="h-24 bg-white border border-gray-200 rounded-md p-3 text-sm text-gray-400">Perdita peso, Performance, Ricomposizione...</div>
+                                    </div>
+                                </div>
+
+                                <div class="anim3-letter bg-gray-50 border border-gray-200 rounded-xl p-6 flex flex-col items-center justify-center text-center space-y-3">
+                                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-gray-200 shadow-sm">
+                                        <i class="ph-duotone ph-file-signature text-2xl text-black"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-base text-black">Contrattualistica</h4>
+                                        <p class="text-xs text-gray-500 max-w-sm mx-auto mt-1">Genera la Lettera di Incarico e Privacy precompilata con i dati del paziente e le tue impostazioni.</p>
+                                    </div>
+                                    <button class="w-full bg-black text-white rounded-lg text-sm font-bold py-3 mt-4 shadow-md hover:bg-gray-900 transition-all">
+                                        Genera Lettera di Incarico
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+
+
+
+<section id="mockup-step-4" class="relative w-full py-16 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-12 relative z-10">
+        
+        <div class="lg:w-1/3 space-y-6 text-left pr-0 lg:pr-8">
+            <span class="text-blue-500 font-bold uppercase text-xs tracking-widest anim4-text">Step 4</span>
+            <h2 class="text-[clamp(2rem,3.5vw,3rem)] font-extrabold leading-tight anim4-text" style="color: var(--text-color);">
+                Burocrazia azzerata.<br>Documenti pronti.
+            </h2>
+            <p class="anim4-text text-sm md:text-base" style="color: var(--text-muted);">
+                Genera Lettera d'Incarico e Informativa Privacy in un clic. Una volta configurati i tuoi template nelle impostazioni, URBIOS compila tutto automaticamente incrociando il tuo profilo professionale con l'anagrafica del paziente.
+            </p>
+            <p class="anim4-text text-sm md:text-base font-bold" style="color: var(--text-color);">
+                Dimentica la noia di compilare i moduli: tutto pronto per la stampa o l'esportazione in pdf con un solo click!
+            </p>
+        </div>
+
+        <div class="lg:w-2/3 w-full perspective-1000">
+            
+            <div class="anim4-window relative bg-white rounded-xl shadow-[0_30px_60px_rgba(0,0,0,0.5)] overflow-hidden w-full aspect-[4/3] md:aspect-[16/10] max-h-[700px] flex flex-col font-sans border border-zinc-200">
+                
+                <div class="h-14 bg-white border-b border-zinc-200 flex justify-between items-center px-6 flex-none z-20">
+                    <div class="text-black text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                        <i class="ph-fill ph-file-text text-lg"></i> Anteprima Lettera
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="bg-black text-white hover:bg-gray-900 text-[10px] md:text-xs font-bold uppercase tracking-wide px-4 py-2 rounded shadow-sm transition-colors flex items-center gap-2">
+                            <i class="ph-fill ph-printer text-sm"></i> Stampa / Salva PDF
+                        </button>
+                        <button class="bg-zinc-100 hover:bg-zinc-200 text-black text-[10px] md:text-xs font-bold uppercase tracking-wide px-4 py-2 rounded transition-colors">
+                            Chiudi
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-white p-4 md:p-8 overflow-y-auto relative flex justify-center [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-zinc-300 [&::-webkit-scrollbar-track]:bg-transparent">
+                    
+                <div class="anim4-paper w-full max-w-[650px] rounded-sm  md:py-16 text-black cursor-text" style="font-family: 'Times New Roman', Times, serif; line-height: 1.4;">                        
+                        <div style="text-align: center; margin-bottom: 30px">
+                            <h1 style="font-size: 16pt; margin: 0; text-transform: uppercase;">Lettera di Incarico Professionale</h1>
+                            <h2 style="font-size: 12pt; margin: 5px 0 0 0; font-weight: normal;">e Dichiarazione di Consenso Informato / Privacy</h2>
+                        </div>
+
+                        <div style="margin-bottom: 30px; font-size: 11pt;">
+                            <p style="margin: 5px 0;">Il/La sottoscritto/a <strong>Mario Rossi</strong></p>
+                            <p style="margin: 5px 0;">nato/a a <strong>Comune (PR)</strong> il <strong>00/00/1985</strong></p>
+                            <p style="margin: 5px 0;">C.F. <strong>0000000000000000</strong></p>
+                            <p style="margin: 5px 0;">residente in <strong>Urbino</strong> (61029) - <strong>Via Roma, 00</strong></p>
+                            <p style="margin: 5px 0;">tel. <strong>+39 000 0000000</strong> e-mail <strong>mario.rossi@urbios.it</strong></p>
+                        </div>
+
+                        <div style="margin-bottom: 30px; font-size: 11pt; text-align: justify;">
+                            Con la sottoscrizione della presente scrittura, il/la Paziente DICHIARA:<br><br>
+                            1. CONFERIMENTO INCARICO: Di voler affidare al Professionista l’incarico professionale per la valutazione del mio stato nutrizionale, del mio fabbisogno nutritivo ed energetico (ai sensi delle normative vigenti) e l’elaborazione di un profilo nutrizionale personalizzato. L'incarico decorre dalla firma del presente documento.<br><br>
+                            2. CONSAPEVOLEZZA E LIMITI (OBBLIGAZIONE DI MEZZI):<br>
+                            a) Di aver compreso che il piano nutrizionale non è una terapia medica e non sostituisce eventuali cure farmacologiche in atto.<br>
+                            b) Di essere consapevole che il Professionista potrà consigliare l'uso di integratori alimentari, specificandone utilità e limiti, che non hanno finalità curativa.<br>
+                            c) Di aver compreso che il risultato dipende dalla risposta biologica individuale e dalla rigorosa adesione al piano. Pertanto, trattandosi di un'obbligazione di mezzi e non di risultato, il Professionista non può garantire a priori il raggiungimento di specifici obiettivi (es. calo ponderale esatto) in tempi prefissati.<br>
+                            d) Di essere consapevole che il mancato rispetto delle indicazioni o dei controlli periodici può compromettere il risultato finale.<br><br>
+                            3. ANAMNESI E VERIDICITÀ:<br>
+                            a) Di aver riferito correttamente e senza omissioni la propria anamnesi, incluse patologie pregresse o attuali, interventi chirurgici, allergie/intolleranze e terapie farmacologiche in corso.<br>
+                            b) Di impegnarsi a comunicare tempestivamente al Professionista qualsiasi variazione dello stato di salute o l'inizio di nuove terapie mediche durante il percorso.<br><br>
+                            4. ESONERO RESPONSABILITÀ:<br>
+                            Esonera il Professionista da ogni responsabilità civile o penale derivante da omesse dichiarazioni sul proprio stato di salute, falsità nelle dichiarazioni o dalla mancata comunicazione di variazioni cliniche intervenute successivamente alla data odierna.<br><br>
+                            5. COLLABORAZIONE MEDICA:<br>
+                            Dichiara di essere stato informato della necessità di sottoporre il piano nutrizionale alla visione del proprio Medico Curante, unico titolato a valutarne la compatibilità con eventuali patologie in atto.<br><br>
+                            6. CONTROINDICAZIONI SPECIFICHE:<br>
+                            Dichiara di essere stato informato che regimi specifici (es. Chetogenica/VLCKD) hanno controindicazioni assolute in caso di: gravidanza/allattamento, insufficienza renale o epatica, diabete tipo I, infarto recente, disturbi psichiatrici. Dichiara di non rientrare in tali condizioni o di averlo comunicato.<br><br>
+                            7. COMPENSO E DISDETTA:<br>
+                            Accetta che il compenso per la prestazione è quello pattuito e indicato nel presente modulo. È consapevole che la disdetta degli appuntamenti deve avvenire con un preavviso di almeno 24 ore; in caso contrario potrà essere richiesto il pagamento della seduta.<br><br>
+                            8. COPERTURA ASSICURATIVA:<br>
+                            Prende atto che il Professionista è regolarmente assicurato per la responsabilità civile professionale (RC Professionale) con la polizza indicata negli appositi spazi di questo documento.
+                        </div>
+
+                        <div style="border: 1px solid #000; padding: 10px; margin-bottom: 30px; font-size: 10pt; background: #fdfdfd;">
+                            <p style="margin: 0 0 5px 0; font-weight: bold; text-decoration: underline;">SPECIFICHE CONTRATTUALI:</p>
+                            <ul style="margin: 5px 0 0 20px; padding: 0;">
+                                <li style="margin-bottom: 5px;">
+                                    <strong>Compenso Pattuito:</strong> euro 100,00 (cento/00)
+                                </li>
+                                <li>
+                                    <strong>Copertura Assicurativa Professionista:</strong><br>
+                                    Polizza n. <strong>EQ000000000</strong> Compagnia: <strong>URBIOS</strong>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div style="margin-bottom: 50px; display: flex; justify-content: space-between;">
+                            <div style="width: 45%;">
+                                <p style="font-size: 10pt; margin-bottom: 40px;">Luogo e Data<br><strong>Urbino, 29 Marzo 2026</strong></p>
+                            </div>
+                            <div style="width: 45%; text-align: center;">
+                                <p style="font-size: 10pt; margin-bottom: 40px;">Firma Leggibile del Paziente</p>
+                                <div style="border-bottom: 1px solid #000; width: 100%;"></div>
+                            </div>
+                        </div>
+
+                        <div style="width: 100%; height: 1px; border-top: 1px dashed #ccc; margin: 40px 0; position: relative;">
+                            <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 10px; color: #999; font-size: 10px; font-family: sans-serif;">PAGINA 2</span>
+                        </div>
+
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h1 style="font-size: 14pt; margin: 0; text-transform: uppercase;">Informativa e Consenso Privacy</h1>
+                            <h2 style="font-size: 10pt; margin: 5px 0 0 0; font-weight: normal;">(Regolamento UE 679/2016)</h2>
+                        </div>
+
+                        <div style="font-size: 9pt; text-align: justify; margin-bottom: 20px;">
+                            Gentile Signore/a, ai sensi dell’art. 13 del Regolamento UE 679/2016 (GDPR), in relazione ai dati personali e sensibili (particolari) che La riguardano, La informiamo di quanto segue:<br><br>
+                            1. FINALITÀ DEL TRATTAMENTO<br>
+                            I dati forniti, inclusi quelli idonei a rivelare lo stato di salute (dati sensibili/particolari), verranno trattati secondo i principi di liceità e correttezza esclusivamente per:<br>
+                            a) Finalità di diagnosi nutrizionale, elaborazione di piani alimentari e consulenza professionale;<br>
+                            b) Adempimenti fiscali, amministrativi e contabili obbligatori per legge.<br><br>
+                            2. MODALITÀ DI TRATTAMENTO<br>
+                            Il trattamento sarà effettuato sia manualmente (archivi cartacei) che avvalendosi di strumenti elettronici e software gestionali, adottando misure di sicurezza idonee a garantire la riservatezza e ad evitare l'accesso indebito a soggetti non autorizzati.<br><br>
+                            3. NATURA DEL CONFERIMENTO<br>
+                            Il conferimento dei dati è obbligatorio per l'espletamento dell'incarico professionale. L'eventuale rifiuto a fornire tali dati comporta l’impossibilità di erogare la prestazione sanitaria richiesta.<br><br>
+                            4. COMUNICAZIONE E DIFFUSIONE<br>
+                            I Suoi dati NON saranno oggetto di diffusione indiscriminata. Potranno essere comunicati esclusivamente a:<br>
+                            a) Soggetti autorizzati interni allo studio;<br>
+                            b) Al professionista esterno (Commercialista/Consulente del Lavoro) indicato in questo modulo che, in qualità di Responsabile del Trattamento o Titolare autonomo, cura la contabilità dello Studio per i soli adempimenti fiscali necessari;<br>
+                            c) Autorità competenti, qualora obbligatorio per legge.<br><br>
+                            5. INVIO DOCUMENTAZIONE<br>
+                            Le fatture, i report e i piani nutrizionali potranno essere inviati tramite strumenti elettronici (e-mail, messaggistica istantanea) all'indirizzo da Lei fornito, consapevole dei rischi connessi a tali mezzi di trasmissione.<br><br>
+                            6. CONSERVAZIONE<br>
+                            I dati verranno conservati per il tempo strettamente necessario al raggiungimento delle finalità di cui al punto 1 e, successivamente, per il tempo stabilito dalle vigenti normative fiscali e sanitarie (solitamente 10 anni).<br><br>
+                            7. DIRITTI DELL'INTERESSATO<br>
+                            In ogni momento potrà esercitare i Suoi diritti nei confronti del Titolare del trattamento ai sensi degli artt. 15-22 del Regolamento UE 679/2016, ovvero: diritto di accesso, rettifica, cancellazione (diritto all'oblio), limitazione, portabilità dei dati e opposizione al trattamento. Potrà inoltre proporre reclamo all’Autorità Garante per la Protezione dei dati personali.<br><br>
+                            8. TITOLARE DEL TRATTAMENTO<br>
+                            Il Titolare del trattamento è il Professionista identificato nell'intestazione e nella calce del presente documento.<br><br>
+                            9. CONSENSO<br>
+                            Il sottoscritto, letta la presente informativa, presta il consenso al trattamento dei propri dati personali e sensibili per le finalità sanitarie e amministrative sopra indicate.
+                        </div>
+
+                        <div style="border: 1px solid #000; padding: 10px; margin-bottom: 30px; font-size: 9pt; background: #fdfdfd;">
+                            <p style="margin: 0 0 5px 0; font-weight: bold; text-decoration: underline;">SPECIFICHE TRATTAMENTO DATI:</p>
+                            <ul style="margin: 5px 0 0 20px; padding: 0;">
+                                <li style="margin-bottom: 5px;">
+                                    <strong>Titolare del Trattamento:</strong><br> Dott. Nome Cognome, Via dello Studio 1
+                                </li>
+                                <li>
+                                    <strong>Responsabile Esterno / Consulente Fiscale:</strong><br>
+                                    Studio Commerciale di fiducia del Titolare
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div style="margin-bottom: 20px; font-size: 10pt;">
+                            <p>Il sottoscritto, letta l'informativa che precede, <strong>PRESTA IL CONSENSO</strong> al trattamento dei propri dati personali e sensibili per le finalità ivi indicate.</p>
+                        </div>
+
+                        <div style="margin-top: 30px; display: flex; justify-content: space-between;">
+                            <div style="width: 45%;">
+                                <p style="font-size: 10pt; margin-bottom: 40px;">Luogo e Data<br><strong>Roma, 29 Marzo 2026</strong></p>
+                            </div>
+                            <div style="width: 45%; text-align: center;">
+                                <p style="font-size: 10pt; margin-bottom: 40px;">Firma per Consenso Privacy</p>
+                                <div style="border-bottom: 1px solid #000; width: 100%;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<div class="w-full h-32"></div>
+
+<section id="mockup-step-6" class="relative w-full py-16 overflow-hidden" >
+    <div class="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-12 relative z-10">
+        
+
+        <div class="lg:w-2/3 w-full perspective-1000">
+            <div class="anim6-window relative bg-white rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.15)] overflow-hidden w-full border border-gray-200 flex flex-col font-sans">
+                
+                <div class="h-14 bg-gray-50 border-b border-gray-200 flex justify-between items-center px-6 flex-none z-20">
+                    <div class="text-black text-sm font-bold flex items-center gap-2">
+                        <i class="ph-fill ph-chart-polar text-blue-500 text-lg"></i> Analisi BIVA Avanzata
+                    </div>
+                    <div class="flex gap-3 items-center">
+                        <div class="bg-white border border-gray-200 text-gray-700 text-[10px] md:text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded shadow-sm flex items-center gap-2">
+                            Maschi (Sani) <i class="ph ph-caret-down"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full p-2" id="biva-plotly-container" style="height: 450px; min-height: 450px; display: block;">
+                    </div>
+
+            </div>
+        </div>
+
+        <div class="lg:w-1/3 space-y-6 text-left pr-0 lg:pr-8">
+            <span class="text-blue-500 font-bold uppercase text-xs tracking-widest anim6-text">Step 5</span>
+            <h2 class="text-[clamp(2rem,3.5vw,3rem)] font-extrabold leading-tight anim6-text" style="color: var(--text-color);">
+                La scienza dei dati,<br>in 3D.
+            </h2>
+            <p class="anim6-text text-sm md:text-base" style="color: var(--text-muted);">
+                URBIOS non si ferma alle basi. Integra un motore di calcolo avanzato per la Valutazione BIVA (Bioelectrical Impedance Vector Analysis).
+            </p>
+            <p class="anim6-text text-sm md:text-base" style="color: var(--text-muted);">
+                Confronta i vettori di impedenza del paziente con le popolazioni di riferimento attraverso grafici di tolleranza 2D e superfici di probabilità 3D interattive.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+
+
+<div class="w-full h-32"></div>
+
+<section id="mockup-step-5" class="relative w-full py-16 overflow-hidden">
+    
+    <div class="absolute inset-0 z-0 grid grid-cols-2 md:grid-cols-4 gap-6 p-4 md:p-12 opacity-80 scale-110 pointer-events-none origin-center transform-style-3d rotate-x-6 rotate-y-[-5deg]">
+        
+        <div class="anim5-float-1 bg-[#111] border border-zinc-700/50 rounded-2xl p-6 shadow-2xl flex flex-col gap-4">
+            <div class="w-1/2 h-4 bg-zinc-800 rounded"></div>
+            <div class="w-full aspect-square rounded-full border-4 border-dashed border-blue-500/30 flex items-center justify-center"><div class="w-1/2 h-1/2 bg-blue-500/40 rounded-full blur-[2px]"></div></div>
+        </div>
+        
+        <div class="anim5-float-2 bg-[#111] border border-zinc-700/50 rounded-2xl p-6 shadow-2xl flex flex-col justify-end gap-2 col-span-2">
+            <div class="w-1/3 h-4 bg-zinc-800 rounded mb-4"></div>
+            <div class="flex items-end gap-3 h-32">
+                <div class="w-full h-[40%] bg-zinc-700 rounded-t"></div>
+                <div class="w-full h-[70%] bg-blue-500/80 rounded-t shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
+                <div class="w-full h-[50%] bg-zinc-700 rounded-t"></div>
+                <div class="w-full h-[90%] bg-cyan-400/80 rounded-t shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
+                <div class="w-full h-[60%] bg-zinc-700 rounded-t"></div>
+            </div>
+        </div>
+        
+        <div class="anim5-float-3 bg-[#111] border border-zinc-700/50 rounded-2xl p-6 shadow-2xl space-y-3">
+            <div class="w-2/3 h-4 bg-zinc-800 rounded mb-2"></div>
+            <div class="w-full h-8 bg-zinc-800/80 rounded flex items-center px-3"><div class="w-1/2 h-2 bg-zinc-600 rounded"></div></div>
+            <div class="w-full h-8 bg-zinc-800/80 rounded flex items-center px-3"><div class="w-3/4 h-2 bg-blue-500/50 rounded"></div></div>
+            <div class="w-full h-8 bg-zinc-800/80 rounded flex items-center px-3"><div class="w-1/3 h-2 bg-zinc-600 rounded"></div></div>
+        </div>
+        
+        <div class="anim5-float-1 bg-[#111] border border-zinc-700/50 rounded-2xl p-6 shadow-2xl col-span-2 md:col-span-3 space-y-4">
+            <div class="w-1/4 h-4 bg-zinc-800 rounded"></div>
+            <div class="w-full h-24 bg-gradient-to-r from-zinc-900 to-zinc-800 rounded border border-zinc-700 flex items-center px-4">
+                <div class="w-full h-2 bg-zinc-700 rounded overflow-hidden"><div class="w-[85%] h-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="anim5-glass absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] md:w-[75%] h-[80%] z-10 backdrop-blur-[20px] bg-black/70 rounded-[4rem] shadow-[0_0_60px_rgba(0,0,0,0.8)] opacity-0"></div>
+
+    <div class="relative z-20 text-center max-w-4xl mx-auto px-6 flex flex-col items-center">
+        
+        <div class="overflow-hidden pb-2 mb-6">
+            <div class="anim5-badge inline-flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/80 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+                <div class="w-2 h-2 rounded-full bg-blue-500 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+                <div class="w-2 h-2 rounded-full bg-blue-400 absolute"></div>
+                <span class="text-[10px] md:text-xs uppercase tracking-[0.2em] font-bold text-white">Esplora l'Ecosistema</span>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center gap-2 mb-8">
+            <div class="overflow-hidden p-1">
+                <h2 class="anim5-title-line text-white text-[clamp(2.5rem,5vw,5rem)] font-extrabold tracking-tight leading-none drop-shadow-lg">
+                    Abbiamo scalfito
+                </h2>
+            </div>
+            <div class="overflow-hidden p-1">
+                <h2 class="anim5-title-line text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-zinc-400 text-[clamp(2.5rem,5vw,5rem)] font-extrabold tracking-tight leading-none drop-shadow-lg">
+                    solo la superficie.
+                </h2>
+            </div>
+        </div>
+        
+        <div class="overflow-hidden pb-4 mb-10 max-w-2xl">
+            <p class="anim5-text text-zinc-300 text-sm md:text-lg leading-relaxed font-medium">
+                Valutazione BIVA, Antropometria avanzata, Piani Nutrizionali dinamici e Training. C'è un intero software professionale che aspetta solo di essere messo alla prova.
+            </p>
+        </div>
+        
+        <div class="anim5-btn relative group">
+            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-full blur opacity-20 group-hover:opacity-70 transition duration-500 group-hover:duration-200"></div>
+            <button onclick="checkLegal('dl_software')" class="relative px-12 py-5 bg-white text-black font-extrabold rounded-full text-sm md:text-lg hover:scale-[1.03] transition-transform duration-300 flex items-center gap-3">
+                Scarica URBIOS <i data-lucide="download"></i>
+            </button>
+        </div>
+        
+        <div class="overflow-hidden mt-8">
+            <p class="anim5-text text-zinc-500 text-[10px] uppercase tracking-[0.3em] font-bold">
+                Multipiattaforma • 100% Offline • Gratuito
+            </p>
+        </div>
+
+    </div>
+</section>
+
+
+
+
+
+
 
     <section id="about">
         <div class="max-w-5xl mx-auto py-20 w-full relative z-20">
@@ -334,6 +987,84 @@
             </div>
         </div>
     </div>
+
+
+    <section id="philosophy-page" class="relative w-full py-24 bg-white overflow-hidden">
+    <div class="max-w-4xl mx-auto px-6">
+        
+        <header class="mb-20 text-center">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-[0.2em] mb-6 anim-phi">Il nostro Manifesto</span>
+            <h1 class="text-[clamp(2.5rem,5vw,4.5rem)] font-black text-zinc-900 leading-[1.1] tracking-tight mb-8 anim-phi">
+                Liberà.<br>Cultura.
+            </h1>
+            <div class="w-20 h-1.5 bg-blue-500 mx-auto rounded-full anim-phi"></div>
+        </header>
+
+        <div class="space-y-16 text-zinc-700 leading-relaxed text-lg md:text-xl font-light">
+            
+            <article class="anim-phi-scroll">
+                <p class="mb-6">
+                    URBIOS nasce da un’esigenza reale, vissuta in prima persona. Siamo studenti di Biologia e, prima ancora, futuri professionisti. Durante il nostro percorso ci siamo scontrati più volte con una difficoltà concreta: <strong class="text-zinc-900 font-semibold">la mancanza di strumenti accessibili, affidabili e immediatamente utilizzabili nella pratica quotidiana.</strong>
+                </p>
+                <p>
+                    Troppo spesso la ricerca e l’attività clinica vengono rallentate non dalla complessità dei problemi, ma dall’assenza di mezzi adeguati o dalla presenza di software costosi, chiusi o difficili da utilizzare.
+                </p>
+            </article>
+
+            <div class="bg-zinc-50 border-y border-zinc-200 py-12 px-8 md:-mx-12 md:px-12 rounded-xl anim-phi-scroll">
+                <h3 class="text-zinc-900 font-bold text-2xl mb-4">Un vuoto da colmare, non un mercato da conquistare.</h3>
+                <p class="mb-6">
+                    URBIOS non nasce con un obiettivo commerciale e non è stato progettato per generare profitto. Non ci sono abbonamenti, licenze o versioni “premium”. Allo stesso tempo, non vogliamo sostituirci ai software attualmente in commercio: crediamo profondamente che il buon lavoro debba essere riconosciuto e remunerato.
+                </p>
+                <p>
+                    <strong>URBIOS nasce per colmare un vuoto:</strong> offrire uno strumento a chi, in una fase iniziale o in condizioni di risorse limitate, non può permettersi soluzioni professionali a pagamento. La nostra ricompensa è culturale: sapere che qualcosa nato nelle aule universitarie possa essere utile a un collega.
+                </p>
+            </div>
+
+            <article class="anim-phi-scroll border-l-4 border-blue-500 pl-8">
+                <h4 class="text-blue-600 font-bold uppercase text-xs tracking-widest mb-4">Etimologia</h4>
+                <p class="italic text-2xl text-zinc-900 font-medium mb-6">
+                    "URBIOS non è un nome scelto a caso, ma una sintesi della sua identità."
+                </p>
+                <p>
+                    Nasce a <strong>Urbino</strong>, tra i corridoi dell’Università degli Studi, dall’iniziativa di studenti del corso di laurea magistrale in Biologia. In quel nome è racchiusa la biologia stessa, la vita (BIOS). La componente “OS” non è una scelta estetica, ma una definizione tecnica: un ambiente di lavoro strutturato (Operating System).
+                </p>
+            </article>
+
+            <article class="anim-phi-scroll">
+                <h3 class="text-zinc-900 font-bold text-2xl mb-4 text-center md:text-left">Il Browser come Laboratorio</h3>
+                <p class="mb-6">
+                    Volevamo qualcosa di immediato, portabile e indipendente. Per questo URBIOS non è un programma nel senso tradizionale: è un <strong>singolo file HTML</strong> che contiene al suo interno l’intero motore del software.
+                </p>
+                <p>
+                    Questo significa indipendenza totale. Non comunica con server, non invia dati, non dipende da internet. Una volta scaricato, può essere utilizzato ovunque. Il browser funge esclusivamente da ambiente di esecuzione locale.
+                </p>
+            </article>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 anim-phi-scroll">
+                <div class="p-6 border border-zinc-200 rounded-xl bg-white shadow-sm">
+                    <span class="text-blue-500 font-bold block mb-2">Memoria Volatile (RAM)</span>
+                    <p class="text-sm">Tutto ciò che avviene è confinato nella RAM del tuo PC. Privacy estrema, ma responsabilità diretta: se chiudi senza salvare, i dati svaniscono.</p>
+                </div>
+                <div class="p-6 border border-zinc-200 rounded-xl bg-white shadow-sm">
+                    <span class="text-blue-500 font-bold block mb-2">Formato Aperto (JSON)</span>
+                    <p class="text-sm">Esportare con "Ho finito di lavorare" significa creare un file JSON. Uno standard universale, un file di testo leggibile oggi e tra 50 anni.</p>
+                </div>
+            </div>
+
+            <article class="anim-phi-scroll pt-12 border-t border-zinc-100 opacity-80">
+                <p class="text-sm uppercase tracking-widest font-bold mb-4">Nota sulla Sicurezza</p>
+                <p class="text-sm mb-8">
+                    Essendo un file HTML leggibile, URBIOS può essere modificato. Versioni non ufficiali potrebbero compromettere l’integrità dei calcoli. È fondamentale utilizzare esclusivamente il file proveniente dalla fonte ufficiale. URBIOS è fornito "così com'è": la sua efficacia dipende dall’uso consapevole e dalla gestione responsabile delle informazioni.
+                </p>
+                <p class="text-zinc-900 font-bold text-xl text-center italic mt-12">
+                    "Noi abbiamo costruito la struttura. Il suo valore reale dipenderà da come verrà utilizzato."
+                </p>
+            </article>
+
+        </div>
+    </div>
+</section>
 
     <script>
         lucide.createIcons();
@@ -466,5 +1197,467 @@
 
         window.onload = () => { createRenderer("bg-canvas", bgVS, bgFS, true); createRenderer("sphere-canvas", sphereVS, sphereFS, false); };
     </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<script>
+  // Registra ScrollTrigger
+  gsap.registerPlugin(ScrollTrigger);
+
+  const tlMockup1 = gsap.timeline({
+      scrollTrigger: {
+          trigger: "#mockup-presentation",
+          start: "top 75%", // L'animazione parte un po' prima per dare fluidità
+          toggleActions: "play none none reverse", // Fa play scendendo, riavvolge salendo
+      }
+  });
+
+  // La finta finestra entra dal basso in 3D
+  tlMockup1.fromTo(".anim-window", 
+      { opacity: 0, y: 100, rotationX: 10, scale: 0.9 }, 
+      { opacity: 1, y: 0, rotationX: 0, scale: 1, duration: 1.2, ease: "power3.out", transformPerspective: 1200 }
+  )
+  // I testi descrittivi a sinistra appaiono a cascata
+  .fromTo(".anim-text",
+      { opacity: 0, x: -30 },
+      { opacity: 1, x: 0, duration: 0.8, stagger: 0.15, ease: "power2.out" },
+      "-=0.9"
+  )
+  // Dentro il mockup: Il testo Hello sale
+  .fromTo(".anim-app-title",
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" },
+      "-=0.5"
+  )
+  // Dentro il mockup: Il logo URBIOS si espande
+  .fromTo(".anim-app-subtitle",
+      { opacity: 0, letterSpacing: "0.1em" },
+      { opacity: 1, letterSpacing: "0.4em", duration: 0.8, ease: "power2.out" },
+      "-=0.6"
+  )
+  // Dentro il mockup: Il bottone Carica pop-up
+  .fromTo(".anim-app-btn",
+      { opacity: 0, scale: 0.5 },
+      { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.7)" },
+      "-=0.5"
+  );
+</script>
+
+<script>
+// Funzione isolata per non dare fastidio alla sfera principale del sito
+function initMockupSphere1() {
+    const canvas = document.getElementById('sphere-mockup-1');
+    if (!canvas) return;
+    const gl = canvas.getContext('webgl', { alpha: true, antialias: false });
+    if (!gl) return;
+
+    // Shader originali della tua app
+    const vsSource = "attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }";
+    const fsSource = `
+        precision highp float; uniform vec2 iResolution; uniform float iTime;
+        mat2 m(float a){float c=cos(a), s=sin(a);return mat2(c,-s,s,c);}
+        float map(vec3 p){ p.xz*= m(iTime*0.4); p.xy*= m(iTime*0.3); vec3 q = p*2.+iTime; return length(p+vec3(sin(iTime*0.7)))*log(length(p)+1.) + sin(q.x+sin(q.z+sin(q.y)))*0.5 - 1.; }
+        void main() {
+            vec2 uv = (gl_FragCoord.xy - 0.5 * iResolution.xy) / min(iResolution.y, iResolution.x); uv *= 1.2;
+            vec3 cl = vec3(0.); float d = 2.5;
+            for(int i=0; i<=5; i++) {
+                vec3 p3d = vec3(0,0,5.) + normalize(vec3(uv, -1.))*d;
+                float rz = map(p3d); float f = clamp((rz - map(p3d+.1))*0.5, -.1, 1.);
+                vec3 deepBase = vec3(0.9, 0.92, 0.95); 
+                vec3 iridescence = vec3(0.8 + 0.2 * sin(f * 3.0 + iTime), 0.8 + 0.1 * cos(f * 2.0), 1.0); 
+                vec3 pearl = vec3(1.0, 1.0, 1.0) * smoothstep(0.4, 1.0, f*f); 
+                vec3 baseColor = deepBase + iridescence * f * 1.2 + pearl;
+                cl = cl*baseColor + smoothstep(2.5, .0, rz)*.7*baseColor; d += min(rz, 1.);
+            }
+            // ... (codice precedente del for loop) ...
+            float dist = length(uv); 
+            float alpha = smoothstep(0.8, 0.5, dist) * 0.8; 
+            gl_FragColor = vec4(cl, alpha);
+        }
+    `;
+
+    function createShader(gl, type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        return shader;
+    }
+
+    const program = gl.createProgram();
+    gl.attachShader(program, createShader(gl, gl.VERTEX_SHADER, vsSource));
+    gl.attachShader(program, createShader(gl, gl.FRAGMENT_SHADER, fsSource));
+    gl.linkProgram(program);
+    gl.useProgram(program);
+
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+
+    const posLoc = gl.getAttribLocation(program, "a_position");
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+    const timeLoc = gl.getUniformLocation(program, "iTime");
+    const resLoc = gl.getUniformLocation(program, "iResolution");
+    const startTime = Date.now();
+
+    function render() {
+        // Usa IntersectionObserver o controlla se è visibile per ottimizzare le prestazioni, 
+        // ma per ora facciamola renderizzare sempre
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.uniform1f(timeLoc, 0.001 * (Date.now() - startTime));
+        gl.uniform2f(resLoc, canvas.width, canvas.height);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        requestAnimationFrame(render);
+    }
+    render();
+}
+
+// Fai partire la sfera quando la pagina ha finito di caricare
+window.addEventListener('load', initMockupSphere1);
+
+// --- TIMELINE STEP 2 ---
+  const tlMockup2 = gsap.timeline({
+      scrollTrigger: {
+          trigger: "#mockup-step-2",
+          start: "top 75%", 
+          toggleActions: "play none none reverse",
+      }
+  });
+
+  // 1. Il mockup entra da SINISTRA, i testi da DESTRA
+  tlMockup2.fromTo(".anim2-window", 
+      { opacity: 0, x: -50, rotationY: 5, scale: 0.95 }, 
+      { opacity: 1, x: 0, rotationY: 0, scale: 1, duration: 1.2, ease: "power3.out", transformPerspective: 1200 }
+  )
+  .fromTo(".anim2-text",
+      { opacity: 0, x: 50 },
+      { opacity: 1, x: 0, duration: 0.8, stagger: 0.15, ease: "power2.out" },
+      "-=1"
+  )
+  
+  // 2. Elementi della WelcomeView ("U R B I O S" e "Bentornato") appaiono
+  .fromTo(".anim2-welcome-el",
+      { y: 15, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, stagger: 0.15, ease: "power2.out" },
+      "-=0.5"
+  )
+  
+  // 3. LA TRANSIZIONE (Esattamente come nel tuo React dopo qualche secondo)
+  // L'overlay bianco svanisce dolcemente rivelando la Dashboard sotto
+  .to(".anim2-welcome-overlay",
+      { opacity: 0, duration: 0.8, ease: "power2.inOut", delay: 0.8, display: "none" }
+  )
+  
+  // 4. Elementi della Dashboard (Header e Bottoni) scendono leggermente
+  .fromTo(".anim2-dash-el",
+      { y: -10, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power2.out" },
+      "-=0.4"
+  )
+  
+  // 5. La tabella si compone
+  .fromTo(".anim2-table",
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" },
+      "-=0.3"
+  )
+  // E i pazienti compaiono a scatto uno dopo l'altro
+  .fromTo(".anim2-patient",
+      { x: -15, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.4, stagger: 0.15, ease: "power2.out" },
+      "-=0.2"
+  );
+
+
+ // --- TIMELINE STEP 3 (PROPORZIONI REALI) ---
+  const tlMockup3 = gsap.timeline({
+      scrollTrigger: {
+          trigger: "#mockup-step-3",
+          start: "top 75%", 
+          toggleActions: "play none none reverse",
+      }
+  });
+
+  // 1. I testi in alto appaiono dolcemente
+  tlMockup3.fromTo(".anim3-text",
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: "power2.out" }
+  )
+  
+  // 2. La finestra entra in scena pulita e proporzionata
+  .fromTo(".anim3-window", 
+      { opacity: 0, y: 50 }, 
+      { opacity: 1, y: 0, duration: 1, ease: "power3.out" },
+      "-=0.6"
+  )
+  
+  // 3. La Top Bar con i Tab
+  .fromTo(".anim3-topbar",
+      { y: -10, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" },
+      "-=0.3"
+  )
+  
+  // 4. Le Card (vuote e pronte da riempire) si svelano
+  .fromTo(".anim3-card",
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power2.out" },
+      "-=0.2"
+  )
+  
+  // 5. I finti input di testo fanno un piccolo fade-in
+  .fromTo(".anim3-input",
+      { opacity: 0 },
+      { opacity: 1, duration: 0.3, stagger: 0.02, ease: "power1.out" },
+      "-=0.3"
+  )
+  
+  // 6. Il bottone Lettera d'incarico
+  .fromTo(".anim3-letter",
+      { opacity: 0, scale: 0.98 },
+      { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" },
+      "-=0.1"
+  );
+
+  // --- TIMELINE STEP 4 (Anteprima Documento Puro) ---
+  const tlMockup4 = gsap.timeline({
+      scrollTrigger: {
+          trigger: "#mockup-step-4",
+          start: "top 70%", 
+          toggleActions: "play none none reverse",
+      }
+  });
+
+  // 1. I testi in alto appaiono
+  tlMockup4.fromTo(".anim4-text",
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: "power2.out" }
+  )
+  
+  // 2. La finestra scura del visualizzatore PDF entra in scena
+  .fromTo(".anim4-window", 
+      { opacity: 0, x: 50, rotationY: -5, scale: 0.95 }, 
+      { opacity: 1, x: 0, rotationY: 0, scale: 1, duration: 1, ease: "power3.out", transformPerspective: 1200 },
+      "-=0.6"
+  )
+  
+  // 3. Il foglio A4 appare dal basso
+  .fromTo(".anim4-paper",
+      { y: 60, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
+      "-=0.4"
+  );
+
+  // --- TIMELINE STEP 5 (Effetti Premium & Spoiler) ---
+  
+  // 1. ANIMAZIONI INFINITE FLUTTUANTI (Levitazione)
+  // Facciamo galleggiare i pannelli dello sfondo a velocità sfasate per dare realismo
+  gsap.to(".anim5-float-1", { y: -20, rotationZ: 1, duration: 4, ease: "sine.inOut", yoyo: true, repeat: -1 });
+  gsap.to(".anim5-float-2", { y: 15, rotationZ: -1, duration: 5, ease: "sine.inOut", yoyo: true, repeat: -1, delay: 1 });
+  gsap.to(".anim5-float-3", { y: -10, rotationX: 2, duration: 3.5, ease: "sine.inOut", yoyo: true, repeat: -1, delay: 0.5 });
+
+
+  // 2. TIMELINE DI INGRESSO (Lo "Snapshot Reveal")
+  const tlMockup5 = gsap.timeline({
+      scrollTrigger: {
+          trigger: "#mockup-step-5",
+          start: "top 75%", 
+          toggleActions: "play none none reverse",
+      }
+  });
+
+  // A. L'Effetto "Spoiler": Il vetro smerigliato entra in funzione dopo 0.3s
+  // All'inizio l'utente vede le card colorate nitide (opacity 0 del vetro), poi si sfoca tutto (opacity 1)
+  tlMockup5.to(".anim5-glass",
+      { opacity: 1, duration: 1.5, ease: "power2.out" },
+      0.3 // Aspetta un terzo di secondo prima di oscurare
+  )
+  
+  // Lo sfondo fa un lentissimo zoom-out 3D mentre viene coperto dal vetro
+  .fromTo(".anim5-bg",
+      { scale: 1.15, z: 50 },
+      { scale: 1, z: 0, duration: 2.5, ease: "power2.out" },
+      0
+  )
+  
+  // B. Il Badge piove dall'alto
+  .fromTo(".anim5-badge",
+      { y: -30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: "back.out(1.5)" },
+      "-=1.2"
+  )
+  
+  // C. Il Testo a Maschera: Le righe "sorgono" tagliando l'invisibile (Clip effect)
+  .fromTo(".anim5-title-line",
+      { y: "120%", rotation: 3 }, // Partono da sotto nascoste dal div overflow-hidden
+      { y: "0%", rotation: 0, duration: 0.9, stagger: 0.15, ease: "power4.out" },
+      "-=1"
+  )
+  
+  // D. Il Sottotitolo sorge dolcemente
+  .fromTo(".anim5-text",
+      { y: "100%", opacity: 0 },
+      { y: "0%", opacity: 1, duration: 0.8, stagger: 0.2, ease: "power3.out" },
+      "-=0.6"
+  )
+  
+  // E. Il Bottone con Aura si materializza
+  .fromTo(".anim5-btn",
+      { scale: 0.8, opacity: 0, y: 20 },
+      { scale: 1, opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.7)" },
+      "-=0.6"
+  );
+
+
+  // --- TIMELINE STEP 6 (BIVA 3D) ---
+  const tlMockup6 = gsap.timeline({
+      scrollTrigger: {
+          trigger: "#mockup-step-6",
+          start: "top 75%", 
+          toggleActions: "play none none reverse"
+      }
+  });
+
+  tlMockup6.fromTo(".anim6-text",
+      { opacity: 0, x: -30 },
+      { opacity: 1, x: 0, duration: 0.8, stagger: 0.15, ease: "power2.out" }
+  )
+  .fromTo(".anim6-window", 
+      { opacity: 0, x: 50, rotationY: -5, scale: 0.95 }, 
+      { opacity: 1, x: 0, rotationY: 0, scale: 1, duration: 1, ease: "power3.out", transformPerspective: 1200 },
+      "-=0.6"
+  );
+
+  // Inizializza il grafico dopo che la finestra si è animata
+  setTimeout(() => {
+      initBivaChart();
+  }, 1000);
+
+  // --- FUNZIONE PER GENERARE IL GRAFICO BIVA 3D ---
+  let bivaChartRendered = false;
+
+  function initBivaChart() {
+      if (bivaChartRendered) return;
+      
+      const container = document.getElementById('biva-plotly-container');
+      if (!container || typeof Plotly === 'undefined') {
+          console.error("Plotly o contenitore non trovati.");
+          return;
+      }
+      
+      bivaChartRendered = true;
+
+      // Dati reali (Maschi Sani)
+      const ref = { mx: 310, my: 42, sx: 45, sy: 8, r: 0.65 };
+      
+      function getZ(x, y) {
+          const zx = (x - ref.mx) / ref.sx;
+          const zy = (y - ref.my) / ref.sy;
+          const exponent = -1 / (2 * (1 - Math.pow(ref.r, 2))) * (Math.pow(zx, 2) - 2 * ref.r * zx * zy + Math.pow(zy, 2));
+          return Math.exp(exponent);
+      }
+
+      const steps = 30;
+      const rangeX = 3 * ref.sx; 
+      const rangeY = 4 * ref.sy;
+      let x_vals = [], y_vals = [], z_vals = [];
+      
+      for(let i=0; i<steps; i++) x_vals.push(ref.mx - rangeX + (2*rangeX * i/(steps-1)));
+      for(let i=0; i<steps; i++) y_vals.push(ref.my - rangeY + (2*rangeY * i/(steps-1)));
+      
+      for(let j=0; j<steps; j++) {
+          let row = [];
+          for(let i=0; i<steps; i++) row.push(getZ(x_vals[i], y_vals[j]));
+          z_vals.push(row);
+      }
+
+      const patR = 290, patXc = 35;
+      const patZ = getZ(patR, patXc);
+
+      const traceSurf = { 
+          type: 'surface', z: z_vals, x: x_vals, y: y_vals, 
+          opacity: 0.6, colorscale: 'Viridis', showscale: false,
+          contours: { z: {show:true, usecolormap:true, project:{z:true}} }
+      };
+
+      const patientPoint = {
+          type: 'scatter3d', mode: 'markers', x: [patR], y: [patXc], z: [patZ],
+          marker: {size: 8, color: 'white', line: {color: 'black', width: 2}},
+          name: 'Paziente'
+      };
+
+      const layout = {
+          paper_bgcolor: 'transparent',
+          plot_bgcolor: 'transparent',
+          margin: { l: 0, r: 0, b: 0, t: 0 },
+          scene: {
+              xaxis: { title: 'R/H', showgrid:true, gridcolor:'#e5e7eb', backgroundcolor: "rgba(255,255,255,0.5)", showbackground: true },
+              yaxis: { title: 'Xc/H', showgrid:true, gridcolor:'#e5e7eb', backgroundcolor: "rgba(255,255,255,0.5)", showbackground: true },
+              zaxis: { title: 'Probabilità', showgrid:true, gridcolor:'#e5e7eb', showbackground: false },
+              camera: { eye: {x: 1.5, y: -1.5, z: 0.8} },
+              aspectmode: 'cube'
+          }
+      };
+
+      Plotly.newPlot('biva-plotly-container', [traceSurf, patientPoint], layout, {displayModeBar: false, responsive: true});
+
+      
+  }
+
+
+// --- ANIMAZIONE MANIFESTO (FILOSOFIA) ---
+  
+  // 1. Ingresso Titolo
+  gsap.from(".anim-phi", {
+      y: 40,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.2,
+      ease: "power3.out"
+  });
+
+  // 2. Reveal dei blocchi di testo durante lo scroll
+  const textBlocks = document.querySelectorAll('.anim-phi-scroll');
+  
+  textBlocks.forEach(block => {
+      gsap.from(block, {
+          scrollTrigger: {
+              trigger: block,
+              start: "top 85%", // Inizia quando il blocco è quasi visibile
+              toggleActions: "play none none none"
+          },
+          y: 30,
+          opacity: 0,
+          duration: 1,
+          ease: "power2.out"
+      });
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
 </body>
 </html>
