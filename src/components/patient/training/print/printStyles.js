@@ -55,7 +55,9 @@ body.tp-open { overflow: hidden; }
 @media print {
   @page { size: A4 portrait; margin: 12mm 12mm 16mm; }
   html, body { background: #fff !important; overflow: visible !important; height: auto !important; margin: 0 !important; padding: 0 !important; }
-  body > *:not(.tp-overlay) { display: none !important; }
+  body > *:not(.tp-overlay), body > #root { display: none !important; height: 0 !important; overflow: hidden !important; }
+  /* index.css nasconde tutto (body * { visibility: hidden }) per la stampa dei report: qui va ripristinato */
+  .tp-overlay, .tp-overlay * { visibility: visible !important; }
   .tp-overlay { position: static !important; display: block !important; background: #fff !important; overflow: visible !important; }
   .tp-toolbar { display: none !important; }
   .tp-scroll { overflow: visible !important; padding: 0 !important; }
