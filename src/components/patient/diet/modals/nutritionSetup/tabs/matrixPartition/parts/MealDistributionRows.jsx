@@ -47,7 +47,7 @@ export const MealDistributionRows = ({
                         style={{ padding: '4px', margin: 0, cursor: 'text' }}
                     />
                 </td>
-                <td style={{ textAlign: 'center' }}>
+                <td data-label="% die" style={{ textAlign: 'center' }}>
                     <input
                         type="number"
                         className="matrix-input"
@@ -56,11 +56,11 @@ export const MealDistributionRows = ({
                     />{' '}
                     <span style={{ fontSize: '10px', color: '#6E6D69' }}>%</span>
                 </td>
-                <td style={{ textAlign: 'center', color: '#1F8A5B', fontWeight: 900 }}>{Math.round(tdee * pct)}</td>
-                <td style={{ textAlign: 'center' }}>{Math.round(totalC_g * pct)}</td>
-                <td style={{ textAlign: 'center' }}>{Math.round(totalP_g * pct)}</td>
-                <td style={{ textAlign: 'center' }}>{Math.round(totalF_g * pct)}</td>
-                <td style={{ textAlign: 'center' }}>
+                <td data-label="Kcal" style={{ textAlign: 'center', color: '#1F8A5B', fontWeight: 900 }}>{Math.round(tdee * pct)}</td>
+                <td data-label="Carbo g" style={{ textAlign: 'center' }}>{Math.round(totalC_g * pct)}</td>
+                <td data-label="Prot g" style={{ textAlign: 'center' }}>{Math.round(totalP_g * pct)}</td>
+                <td data-label="Grassi g" style={{ textAlign: 'center' }}>{Math.round(totalF_g * pct)}</td>
+                <td className="mx-act" style={{ textAlign: 'center' }}>
                     <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
                         <button
                             onClick={() => duplicateMatrixMeal(meal.id)}

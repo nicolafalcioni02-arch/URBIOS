@@ -13,6 +13,12 @@ export const usePatientVisitActions = ({ configA, configB, db, onUpdateDb, patie
         });
     };
 
+    // Scritture multiple in un colpo solo (usate da URBIOS AI)
+    const updateDraftMany = (fields) => setVisitDraft((prev) => ({ ...prev, ...fields }));
+    const updatePatientMany = (fields) => {
+        onUpdateDb((prevDb) => ({ ...prevDb, pazienti: prevDb.pazienti.map((p) => (p.id === patient.id ? { ...p, ...fields } : p)) }));
+    };
+
     // --- 3. SALVATAGGIO CON CALCOLI PROTETTI ---
     const handleFinalizeVisit = () => {
         console.log('Tentativo di salvataggio visita...'); // DEBUG
@@ -126,5 +132,5 @@ export const usePatientVisitActions = ({ configA, configB, db, onUpdateDb, patie
         }
     };
 
-    return { updateDraft, updatePatientInfo, handleFinalizeVisit };
+    return { updateDraft, updateDraftMany, updatePatientInfo, updatePatientMany, handleFinalizeVisit };
 };

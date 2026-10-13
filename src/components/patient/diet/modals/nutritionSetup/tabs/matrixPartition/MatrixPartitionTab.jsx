@@ -86,15 +86,15 @@ export const MatrixPartitionTab = ({
                                 color: calcData.macroTargets.c + calcData.macroTargets.p + calcData.macroTargets.f === 100 ? '#1F8A5B' : '#C2413A',
                             }}
                         >
-                            TOTALE: {currentMacroTargets.c + currentMacroTargets.p + currentMacroTargets.f}%
+                            Totale {currentMacroTargets.c + currentMacroTargets.p + currentMacroTargets.f}%
                         </span>
                     </div>
-                    <div style={{ display: 'flex', gap: '20px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                         {['c', 'p', 'f'].map((m) => (
                             <div
                                 key={m}
                                 style={{
-                                    flex: 1,
+                                    flex: '1 1 96px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '10px',
@@ -103,8 +103,8 @@ export const MatrixPartitionTab = ({
                                     borderRadius: '12px',
                                 }}
                             >
-                                <span style={{ fontWeight: 800, color: m === 'c' ? '#121317' : m === 'p' ? '#1F8A5B' : '#6E6D69', textTransform: '' }}>
-                                    {m}
+                                <span style={{ fontWeight: 800, color: m === 'c' ? '#121317' : m === 'p' ? '#1F8A5B' : '#6E6D69' }}>
+                                    {m === 'c' ? 'Carbo' : m === 'p' ? 'Prot' : 'Grassi'}
                                 </span>
                                 <input
                                     type="number"
@@ -144,7 +144,7 @@ export const MatrixPartitionTab = ({
                     <table className="matrix-table">
                         <thead>
                             <tr>
-                                <th>Nome Pasto</th>
+                                <th>Nome pasto</th>
                                 <th style={{ textAlign: 'center' }}>% Die</th>
                                 <th style={{ textAlign: 'center' }}>Kcal</th>
                                 <th style={{ textAlign: 'center' }}>C (g)</th>
@@ -175,7 +175,7 @@ export const MatrixPartitionTab = ({
 
                     {/* Contatore in tempo reale */}
                     <div style={{ textAlign: 'right', marginTop: '15px', fontSize: '14px', fontWeight: 900, color: totalDist === 100 ? '#1F8A5B' : '#C2413A' }}>
-                        SOMMA PASTI: {totalDist}%
+                        Somma dei pasti: {totalDist}%
                     </div>
                 </div>
             </div>

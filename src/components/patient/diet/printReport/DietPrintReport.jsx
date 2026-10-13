@@ -17,7 +17,7 @@ import { ShoppingListSheets } from './sheets/ShoppingListSheets';
 // --- COMPONENTE DI STAMPA DIRETTA (STEALTH PRINT PREMIUM - IMPAGINAZIONE AVANZATA) ---
 // --- COMPONENTE EDITOR A4 INTERATTIVO E STAMPA ---
 // --- COMPONENTE EDITOR A4 (IMPAGINAZIONE A FOGLI RIGIDI MULTIPLI) ---
-export const DietPrintReport = ({ patient, professionalData, dietDays, targets, savedReports, onClose }) => {
+export const DietPrintReport = ({ patient, professionalData, dietDays, targets, savedReports, issueDate, onClose }) => {
     // 2. Calcoli per Lista della Spesa
     const generateShoppingList = () => {
         const list = {};
@@ -44,7 +44,8 @@ export const DietPrintReport = ({ patient, professionalData, dietDays, targets, 
         f: targets?.isConfigured ? (targets.kcal * targets.f) / 900 : 0,
     };
 
-    const today = new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+    // data del piano scelta dal professionista; '' = senza data (non viene stampata)
+    const today = issueDate !== undefined ? issueDate : new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
     const prof = professionalData || {
         nome: 'Dott. Rossi',
         titolo_professionale: 'Biologo Nutrizionista',

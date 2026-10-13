@@ -19,17 +19,17 @@ export const FoodDatabaseModal = ({
 }) => {
     return (
         isDbOpen && (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col h-[90vh] overflow-hidden fade-enter border border-gray-100">
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm">
+                <div className="bg-white rounded-none sm:rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col h-full sm:h-[90vh] overflow-hidden fade-enter border border-gray-100">
                     {/* HEADER */}
-                    <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white shrink-0">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-800">
+                    <div className="p-4 sm:p-6 border-b border-gray-100 flex justify-between items-center bg-white shrink-0">
+                        <div className="flex items-center gap-4 min-w-0">
+                            <div className="hidden sm:flex w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-800">
                                 <i className="ph-bold ph-database text-2xl"></i>
                             </div>
                             <div>
-                                <h3 className="text-xl font-black text-gray-900 leading-tight">Database Nutrizionale CREA</h3>
-                                <span className="text-xs font-bold text-gray-400 ">{foodDB.length} alimenti in memoria</span>
+                                <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">Database alimenti</h3>
+                                <span className="text-[13px] text-gray-500">{foodDB.length} alimenti, fonte CREA</span>
                             </div>
                         </div>
                         <button
@@ -48,17 +48,18 @@ export const FoodDatabaseModal = ({
                         <div className="flex flex-col flex-1 overflow-hidden bg-gray-50/50">
                             {/* BARRA AZIONI (Ricerca, Aggiungi, Import/Export) */}
                             <div className="p-4 bg-white border-b border-gray-100 flex flex-wrap gap-4 items-center justify-between shrink-0">
-                                <div className="relative flex-1 min-w-[250px]">
+                                <div className="relative flex-1 min-w-[200px] basis-full sm:basis-auto">
                                     <i className="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
                                     <input
                                         type="text"
                                         placeholder="Cerca alimento o categoria..."
                                         value={dbSearch}
                                         onChange={(e) => setDbSearch(e.target.value)}
-                                        className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 text-sm font-bold text-gray-800 focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all bg-gray-50 focus:bg-white"
+                                        className="fld"
+                                        style={{ paddingLeft: 44 }}
                                     />
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                                     <button
                                         onClick={() => fileInputRef.current.click()}
                                         className="px-4 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors flex items-center gap-2"
@@ -76,7 +77,7 @@ export const FoodDatabaseModal = ({
 
                                     <button
                                         onClick={() => setEditingFood({ ...emptyFoodTemplate })}
-                                        className="px-5 py-3 bg-black text-white rounded-xl text-xs font-bold hover:bg-gray-800 transition-colors flex items-center gap-2 shadow-lg shadow-gray-200 ml-2"
+                                        className="px-5 py-3 bg-black text-white rounded-xl text-xs font-bold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-gray-200 sm:ml-2 w-full sm:w-auto order-first sm:order-none"
                                     >
                                         <i className="ph-bold ph-plus"></i> Nuovo Alimento
                                     </button>
@@ -84,9 +85,9 @@ export const FoodDatabaseModal = ({
                             </div>
 
                             {/* TABELLA DATI */}
-                            <div className="flex-1 overflow-y-auto p-6">
+                            <div className="flex-1 overflow-y-auto p-3 sm:p-6">
                                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                                    <table className="w-full text-left border-collapse">
+                                    <table className="fd-table w-full text-left border-collapse">
                                         <thead className="bg-gray-50 sticky top-0 z-10 border-b border-gray-200">
                                             <tr>
                                                 <th className="p-4 text-xs font-semibold text-gray-400 ">Alimento</th>
@@ -97,7 +98,7 @@ export const FoodDatabaseModal = ({
                                                 </th>
                                                 <th className="p-4 text-xs font-semibold text-gray-400 text-center">Car</th>
                                                 <th className="p-4 text-xs font-semibold text-gray-400 text-center">Fat</th>
-                                                <th className="p-4 text-xs font-semibold text-gray-400 text-center">Azioni</th>
+                                                <th className="p-4 text-xs font-semibold text-gray-400 text-center"></th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100">
@@ -109,29 +110,29 @@ export const FoodDatabaseModal = ({
                                                         f.category.toLowerCase().includes(dbSearch.toLowerCase())
                                                 )
                                                 .map((f, index) => (
-                                                    <tr key={index} className="hover:bg-gray-50 transition-colors group">
+                                                    <tr key={index} className="fd-row hover:bg-gray-50 transition-colors group">
                                                         <td className="p-4">
                                                             <div className="font-bold text-sm text-gray-900">{f.name}</div>
                                                             {f.scientific_name && <div className="text-[10px] text-gray-400 italic">{f.scientific_name}</div>}
                                                         </td>
-                                                        <td className="p-4 text-xs font-bold text-gray-500">{f.category}</td>
-                                                        <td className="p-4 text-sm font-black text-gray-800 text-center">{f.energy_kcal || f.kcal || 0}</td>
-                                                        <td className="p-4 text-sm font-black text-green-600 text-center">{f.proteins || f.p || 0}</td>
-                                                        <td className="p-4 text-sm font-black text-gray-800 text-center">
+                                                        <td className="fd-cat p-4 text-xs font-bold text-gray-500">{f.category}</td>
+                                                        <td data-label="Kcal" className="p-4 text-sm font-black text-gray-800 text-center">{f.energy_kcal || f.kcal || 0}</td>
+                                                        <td data-label="Prot" className="p-4 text-sm font-black text-green-600 text-center">{f.proteins || f.p || 0}</td>
+                                                        <td data-label="Carbo" className="p-4 text-sm font-black text-gray-800 text-center">
                                                             {f.available_carbohydrates || f.c || 0}
                                                         </td>
-                                                        <td className="p-4 text-sm font-black text-gray-800 text-center">{f.lipids || f.f || 0}</td>
-                                                        <td className="p-4 text-center">
-                                                            <div className="flex gap-2 justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <td data-label="Grassi" className="p-4 text-sm font-black text-gray-800 text-center">{f.lipids || f.f || 0}</td>
+                                                        <td className="fd-act p-4 text-center">
+                                                            <div className="flex gap-2 justify-center opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity">
                                                                 <button
                                                                     onClick={() => setEditingFood({ ...f, _editIndex: foodDB.indexOf(f) })}
-                                                                    className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition-colors"
+                                                                    className="w-10 h-10 sm:w-8 sm:h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors" aria-label="Modifica"
                                                                 >
                                                                     <i className="ph-bold ph-pencil-simple"></i>
                                                                 </button>
                                                                 <button
                                                                     onClick={() => deleteFoodDB(foodDB.indexOf(f))}
-                                                                    className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-red-100 hover:text-red-600 flex items-center justify-center transition-colors"
+                                                                    className="w-10 h-10 sm:w-8 sm:h-8 rounded-lg bg-gray-100 hover:bg-red-100 hover:text-red-600 flex items-center justify-center transition-colors" aria-label="Elimina"
                                                                 >
                                                                     <i className="ph-bold ph-trash"></i>
                                                                 </button>

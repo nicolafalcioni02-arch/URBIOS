@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { defaultFoodDB } from '../data/defaultFoodDB';
+import { defaultDrv } from '../data/defaultDrv';
 
 // Dati del piano: paziente/visita attiva, calcData, targets, giorni, report, database; autosave sul DB centrale
 export const useDietPlanData = ({ db, onUpdateDb, patient }) => {
@@ -83,9 +84,14 @@ export const useDietPlanData = ({ db, onUpdateDb, patient }) => {
         return visitaAttiva?.dettagli?.diet_saved_reports || [];
     });
 
+    // Quando si cambia piano il salvataggio automatico NON deve scrivere i dati del piano precedente dentro quello nuovo:
+    // il primo passaggio dopo il cambio viene saltato, il successivo salva già i dati ricaricati.
+    const skipAutosave = useRef(false);
+
     // Ricarica i dati se l'utente cambia la visita attiva dal menù storico
     useEffect(() => {
         if (!visitaAttiva) return;
+        skipAutosave.current = true;
         if (visitaAttiva.dettagli?.diet_calc_data) setCalcData(visitaAttiva.dettagli.diet_calc_data);
         setTargets(visitaAttiva.dettagli?.diet_targets || { kcal: 0, p: 0, c: 0, f: 0, isConfigured: false });
         setDietDays(visitaAttiva.dettagli?.diet_plan_data || []);
@@ -95,7 +101,8 @@ export const useDietPlanData = ({ db, onUpdateDb, patient }) => {
     // --- Inizializzazione Strutture Globali (Condivise fra tutti i pazienti) ---
     const [foodDB, setFoodDB] = useState(() => (db?.diet_food_db?.length ? db.diet_food_db : defaultFoodDB));
     const [mealLibrary, setMealLibrary] = useState(() => db?.diet_meal_library || []);
-    const [drvDB, setDrvDB] = useState(() => db?.diet_drv_db || []);
+    const [dietBook, setDietBook] = useState(() => db?.diet_book || []); // libro delle diete: piani già fatti, riutilizzabili
+    const [drvDB, setDrvDB] = useState(() => (db?.diet_drv_db?.length ? db.diet_drv_db : defaultDrv));
 
     const patientProfile = {
         name: currentPatient ? `${currentPatient.nome} ${currentPatient.cognome}` : 'Paziente Demo',
@@ -110,6 +117,10 @@ export const useDietPlanData = ({ db, onUpdateDb, patient }) => {
     // --- Autosave Reattivo sul Database Centrale ---
     useEffect(() => {
         if (!currentPatient?.id || !selectedVisitaId) return;
+        if (skipAutosave.current) {
+            skipAutosave.current = false;
+            return;
+        }
         onUpdateDb((prevDb) => {
             const updatedPazienti = prevDb.pazienti.map((p) => {
                 if (p.id !== currentPatient.id) return p;
@@ -117,7 +128,7 @@ export const useDietPlanData = ({ db, onUpdateDb, patient }) => {
                     if (v.id !== selectedVisitaId) return v;
                     return {
                         ...v,
-                        dietStatus: status,
+                        dietStatus: v.dietStatus, // (prima: `status`, non definita → azzerava lo stato scelto in "Salva e Gestisci", vedi BUGS.md)
                         dettagli: {
                             ...v.dettagli,
                             diet_calc_data: calcData,
@@ -146,10 +157,11 @@ export const useDietPlanData = ({ db, onUpdateDb, patient }) => {
             };
             sync('diet_food_db', foodDB, foodDB === defaultFoodDB);
             sync('diet_meal_library', mealLibrary, mealLibrary.length === 0);
-            sync('diet_drv_db', drvDB, drvDB.length === 0);
+            sync('diet_book', dietBook, dietBook.length === 0);
+            sync('diet_drv_db', drvDB, drvDB === defaultDrv || drvDB.length === 0);
             return changed ? next : prevDb;
         });
-    }, [foodDB, mealLibrary, drvDB]);
+    }, [foodDB, mealLibrary, drvDB, dietBook]);
 
     return {
         currentPatient,
@@ -171,6 +183,8 @@ export const useDietPlanData = ({ db, onUpdateDb, patient }) => {
         setMealLibrary,
         drvDB,
         setDrvDB,
+        dietBook,
+        setDietBook,
         patientProfile,
     };
 };

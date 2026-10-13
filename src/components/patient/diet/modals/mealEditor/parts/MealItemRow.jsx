@@ -18,19 +18,19 @@ export const MealItemRow = ({
     return (
         <div key={item.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
             {/* RIGA DELL'ALIMENTO PRINCIPALE */}
-            <div className="t-exercise-item" style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: 0 }}>
-                <div className="t-set-badge" style={{ flexShrink: 0 }}>
+            <div className="t-exercise-item dm-item" style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: 0 }}>
+                <div className="t-set-badge dm-badge" style={{ flexShrink: 0 }}>
                     {i + 1}
                 </div>
 
                 {/* Blocco Ricerca Alimento */}
-                <div style={{ flex: 2, position: 'relative' }}>
+                <div className="dm-name" style={{ flex: 2, position: 'relative' }}>
                     <input
                         type="text"
                         className="t-ex-input"
                         value={item.name}
                         onChange={(e) => updateFoodValue(currentDay.id, currentMeal.id, item.id, 'name', e.target.value)}
-                        placeholder="Cerca alimento dal database..."
+                        placeholder="Cerca alimento"
                     />
                     {suggestions[item.id] && (
                         <div className="t-suggestions-list">
@@ -49,6 +49,7 @@ export const MealItemRow = ({
 
                 {/* Input Grammatura */}
                 <div
+                    className="dm-weight"
                     style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -79,7 +80,7 @@ export const MealItemRow = ({
                 </div>
 
                 {/* Riepilogo Macro */}
-                <div style={{ width: '140px', textAlign: 'right', display: 'flex', flexDirection: 'column' }}>
+                <div className="dm-macros" style={{ width: '140px', textAlign: 'right', display: 'flex', flexDirection: 'column' }}>
                     <span style={{ fontSize: '15px', fontWeight: 800, color: '#121317' }}>{((item.kcal * item.weight) / 100).toFixed(0)} kcal</span>
                     <span style={{ fontSize: '11px', color: '#6E6D69', fontWeight: 600 }}>
                         C:{((item.c * item.weight) / 100).toFixed(1)} P:{((item.p * item.weight) / 100).toFixed(1)} F:
@@ -88,7 +89,7 @@ export const MealItemRow = ({
                 </div>
 
                 {/* NUOVO TASTO: Aggiungi Sostituzione */}
-                <button className="t-icon-btn" title="Aggiungi Sostituzione" onClick={() => addSubstitution(currentDay.id, currentMeal.id, item.id)}>
+                <button className="t-icon-btn dm-btn" title="Aggiungi Sostituzione" aria-label="Aggiungi una sostituzione" onClick={() => addSubstitution(currentDay.id, currentMeal.id, item.id)}>
                     <svg
                         width="16"
                         height="16"
@@ -105,8 +106,8 @@ export const MealItemRow = ({
                 </button>
 
                 {/* Tasto Rimuovi Riga */}
-                <button className="t-icon-btn danger" onClick={() => removeFoodItem(currentDay.id, currentMeal.id, item.id)}>
-                    Del
+                <button className="t-icon-btn danger dm-btn" aria-label="Elimina l'alimento" onClick={() => removeFoodItem(currentDay.id, currentMeal.id, item.id)}>
+                    <i className="ph ph-trash"></i>
                 </button>
             </div>
 
@@ -114,6 +115,7 @@ export const MealItemRow = ({
             {(item.subs || []).map((sub) => (
                 <div
                     key={sub.id}
+                    className="dm-sub"
                     style={{
                         display: 'flex',
                         gap: '12px',
@@ -130,13 +132,13 @@ export const MealItemRow = ({
                     <span style={{ fontSize: '11px', color: '#1F8A5B', fontWeight: 900, textTransform: '' }}>OR</span>
 
                     {/* Ricerca per la Sostituzione */}
-                    <div style={{ flex: 1, position: 'relative' }}>
+                    <div className="dm-sname" style={{ flex: 1, position: 'relative' }}>
                         <input
                             type="text"
                             className="t-ex-input"
                             value={sub.name}
                             onChange={(e) => updateSubstitutionValue(currentDay.id, currentMeal.id, item.id, sub.id, 'name', e.target.value)}
-                            placeholder="Cerca alternativa..."
+                            placeholder="Alternativa"
                             style={{ fontSize: '14px', padding: '8px 12px', background: 'white', border: '1px solid #E6E4DE' }}
                         />
                         {suggestions[sub.id] && (
@@ -159,7 +161,7 @@ export const MealItemRow = ({
                     </div>
 
                     {/* Bottoni Modalità: Isocalorica, ecc. */}
-                    <div style={{ display: 'flex', gap: '4px', background: 'white', padding: '4px', borderRadius: '10px', border: '1px solid #E6E4DE' }}>
+                    <div className="dm-modes" style={{ display: 'flex', gap: '4px', background: 'white', padding: '4px', borderRadius: '10px', border: '1px solid #E6E4DE' }}>
                         {[
                             { val: 'kcal', label: 'Iso-Kcal' },
                             { val: 'p', label: 'Iso-Pro' },
@@ -189,6 +191,7 @@ export const MealItemRow = ({
 
                     {/* Quantità calcolata automaticamente (ma modificabile) */}
                     <div
+                        className="dm-sweight"
                         style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -219,7 +222,7 @@ export const MealItemRow = ({
                     </div>
 
                     {/* Recap Macro Sostituzione */}
-                    <div style={{ width: '130px', textAlign: 'right', display: 'flex', flexDirection: 'column' }}>
+                    <div className="dm-smacros" style={{ width: '130px', textAlign: 'right', display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontSize: '14px', fontWeight: 800, color: '#121317' }}>{((sub.kcal * sub.weight) / 100).toFixed(0)} kcal</span>
                         <span style={{ fontSize: '10px', color: '#6E6D69', fontWeight: 700 }}>
                             C:{((sub.c * sub.weight) / 100).toFixed(1)} P:{((sub.p * sub.weight) / 100).toFixed(1)} F:{((sub.f * sub.weight) / 100).toFixed(1)}
@@ -228,7 +231,7 @@ export const MealItemRow = ({
 
                     {/* TASTO NUOVO: Scambia con Principale */}
                     <button
-                        className="t-icon-btn"
+                        className="t-icon-btn dm-sbtn"
                         title="Imposta come alimento principale"
                         style={{ width: '32px', height: '32px', border: 'none', background: '#F6F5F2', color: '#121317' }}
                         onClick={() => swapSubstitution(currentDay.id, currentMeal.id, item.id, sub.id)}
@@ -252,7 +255,8 @@ export const MealItemRow = ({
 
                     {/* Tasto Rimuovi Sostituzione */}
                     <button
-                        className="t-icon-btn danger"
+                        className="t-icon-btn danger dm-sbtn"
+                        aria-label="Elimina la sostituzione"
                         style={{ width: '32px', height: '32px', border: 'none', background: 'white' }}
                         onClick={() => removeSubstitution(currentDay.id, currentMeal.id, item.id, sub.id)}
                     >

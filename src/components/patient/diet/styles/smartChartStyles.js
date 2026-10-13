@@ -215,11 +215,11 @@ export const smartChartStyles = `
     padding: 9px 20px; border-radius: 10px; border: none;
     background: var(--ink); color: #FFFFFF;
     font-size: 12px; font-weight: 700; cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0,200,83,0.25);
+    box-shadow: 0 4px 14px rgba(18,19,23,0.22);
     transition: background 0.15s, box-shadow 0.15s, transform 0.12s;
   }
   .sc-btn-save:hover {
-    background: #00B548; box-shadow: 0 6px 18px rgba(0,200,83,0.32);
+    background: #2A2B31; box-shadow: 0 6px 18px rgba(18,19,23,0.3);
     transform: translateY(-1px);
   }
   .sc-btn-save:active { transform: translateY(0); }

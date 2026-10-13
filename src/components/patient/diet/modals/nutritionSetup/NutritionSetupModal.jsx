@@ -41,7 +41,7 @@ export const NutritionSetupModal = ({
             const grant = calcData.height / calcData.wrist;
 
             const rmr = calculateRMR(calcData);
-            const tdee = Math.round(rmr * calcData.laf);
+            const tdee = Math.round(rmr * calcData.laf * (1 + (Number(calcData.kcalAdjustPct) || 0) / 100)); // kcalAdjustPct: obiettivo (dimagrire/massa) dalla vista guidata
 
             // LOGICA PRO: Globale o Giorno per Giorno
             const isDailyMode = calcData.matrixMode === 'daily';
@@ -92,6 +92,7 @@ export const NutritionSetupModal = ({
                     <div className="modal-window" style={{ width: '900px', maxWidth: '95%', height: '90vh', display: 'flex', flexDirection: 'column' }}>
                         {/* HEADER (Bianco fisso) */}
                         <div
+                            className="ns-head"
                             style={{
                                 padding: '20px 40px',
                                 borderBottom: '1px solid #F0F0F2',
@@ -102,8 +103,8 @@ export const NutritionSetupModal = ({
                             }}
                         >
                             <div>
-                                <h3 style={{ fontSize: '22px', fontWeight: 900, margin: 0 }}>Clinical Setup Suite</h3>
-                                <span style={{ fontSize: '12px', color: '#6E6D69', fontWeight: 700 }}>Pannello Analitico Avanzato</span>
+                                <h3 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>Obiettivi nutrizionali</h3>
+                                <span style={{ fontSize: '13px', color: '#6E6D69', fontWeight: 500 }}>Pannello analitico avanzato</span>
                             </div>
                             <button
                                 onClick={() => setIsSetupOpen(false)}
@@ -123,7 +124,7 @@ export const NutritionSetupModal = ({
                         </div>
 
                         {/* NAV SCHEDE (Bianco/Grigio fisso) */}
-                        <div style={{ padding: '20px 40px 0 40px', background: '#FAFAFC' }}>
+                        <div className="ns-nav" style={{ padding: '20px 40px 0 40px', background: '#FAFAFC' }}>
                             <div className="setup-tab-nav">
                                 {['antropometria', 'metabolismo & energia', 'partizione matriciale'].map((t) => (
                                     <button key={t} className={`setup-tab-btn ${setupTab === t ? 'active' : ''}`} onClick={() => setSetupTab(t)}>
@@ -135,6 +136,7 @@ export const NutritionSetupModal = ({
 
                         {/* CORPO SCHEDE (Sfondo dinamico che cambia colore in base agli errori) */}
                         <div
+                            className="ns-body"
                             style={{
                                 flex: 1,
                                 overflowY: 'auto',
@@ -206,6 +208,7 @@ export const NutritionSetupModal = ({
 
                         {/* FOOTER INTELLIGENTE */}
                         <div
+                            className="ns-foot"
                             style={{
                                 padding: '20px 40px',
                                 borderTop: '1px solid #F0F0F2',
@@ -216,6 +219,7 @@ export const NutritionSetupModal = ({
                             }}
                         >
                             <button
+                                className="ns-apply"
                                 disabled={!isAllValid}
                                 onClick={() => {
                                     setTargets({
@@ -265,7 +269,7 @@ export const NutritionSetupModal = ({
                                     border: 'none',
                                     fontWeight: 900,
                                     cursor: totalDist === 100 ? 'pointer' : 'not-allowed',
-                                    boxShadow: totalDist === 100 ? '0 8px 20px rgba(0,200,83,0.3)' : 'none',
+                                    boxShadow: totalDist === 100 ? '0 8px 20px rgba(31,138,91,0.3)' : 'none',
                                     transition: 'all 0.3s ease',
                                 }}
                             >

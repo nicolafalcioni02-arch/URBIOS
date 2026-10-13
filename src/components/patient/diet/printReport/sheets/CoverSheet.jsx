@@ -35,9 +35,11 @@ export const CoverSheet = ({ a4Style, patient, prof, today }) => {
                     <div contentEditable suppressContentEditableWarning style={{ outline: 'none' }}>
                         Albo n. {prof.numero_albo} | P.IVA {prof.p_iva}
                     </div>
-                    <div>
-                        Data emissione: <strong>{today}</strong>
-                    </div>
+                    {today && (
+                        <div>
+                            Data emissione: <strong>{today}</strong>
+                        </div>
+                    )}
                 </div>
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>

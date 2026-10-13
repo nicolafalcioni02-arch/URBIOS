@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { METRIC_CATALOG } from '../data/metricCatalog';
-import { NUTRIENT_MAPPING } from '../data/nutrientMapping';
+import { legacyTargets } from '../analysis/drvEngine';
 import { calculateTotals } from '../logic/dietTotals';
 import { useSmartChartPlot } from './analysis/useSmartChartPlot';
 
@@ -21,60 +21,14 @@ export const useDietAnalysis = ({
     smartConfig,
     targets,
 }) => {
-    // Estrae il numero da stringhe come "80 mg/day"
-    const parseEFSAValue = (valStr) => {
-        if (!valStr || typeof valStr !== 'string') return parseFloat(valStr) || 0;
-        if (valStr.includes('ND') || valStr.includes('NA')) return 0;
-        return parseFloat(valStr.replace(/[^\d.-]/g, '')) || 0;
-    };
-
-    // Trova i target EFSA per il paziente corrente
-    // Calcola i Target per il Paziente Corrente (Incrocio EFSA)
-    // --- MATCHING ROBUSTO EFSA/LARN ---
-    // Calcola i Target per il Paziente Corrente (Incrocio EFSA)
-    const getPatientTargets = () => {
-        const targets = {};
-
-        drvDB.forEach((row) => {
-            // 1. MATCH DEL GENERE (A prova di EFSA/LARN)
-            const rowGender = (row.Gender || '').toLowerCase().trim();
-            const isMale = patientProfile.gender === 'Male';
-
-            // Riconosce automaticamente tutti i modi in cui i DB scrivono il sesso
-            const isGenderMatch =
-                rowGender === '' ||
-                rowGender === 'all' ||
-                rowGender === 'both' ||
-                (isMale && (rowGender === 'male' || rowGender === 'men' || rowGender === 'boys')) ||
-                (!isMale && (rowGender === 'female' || rowGender === 'women' || rowGender === 'girls'));
-
-            if (isGenderMatch) {
-                // 2. MATCH DEL NUTRIENTE (Case-Insensitive e senza spazi extra)
-                const rawNutrient = (row.Nutrient || '').toLowerCase().trim();
-                const foundKey = Object.keys(NUTRIENT_MAPPING).find((k) => k.toLowerCase() === rawNutrient);
-                const mappedKey = foundKey ? NUTRIENT_MAPPING[foundKey] : null;
-
-                if (mappedKey) {
-                    let targetVal = parseEFSAValue(row.PRI) || parseEFSAValue(row.AI) || parseEFSAValue(row.AR);
-                    let ulVal = parseEFSAValue(row.UL);
-
-                    if (targetVal > 0) {
-                        targets[mappedKey] = {
-                            name: row.Nutrient,
-                            target: targetVal,
-                            ul: ulVal > 0 ? ulVal : null,
-                            unit:
-                                String(row.PRI || row.AI || row.AR)
-                                    .replace(/[\d.\s]/g, '')
-                                    .replace('/day', '')
-                                    .trim() || 'mg',
-                        };
-                    }
-                }
-            }
+    // Target EFSA del paziente (per il grafico Smart): scelti per età e sesso dal motore di analisi
+    const getPatientTargets = () =>
+        legacyTargets(drvDB, {
+            age: patientProfile.age,
+            sex: patientProfile.gender === 'Female' ? 'F' : 'M',
+            weight: patientProfile.weight,
+            kcal: targets?.kcal,
         });
-        return targets;
-    };
 
     // --- HELPER PER CATEGORIE ---
     const categorizeNutrient = (key) => {

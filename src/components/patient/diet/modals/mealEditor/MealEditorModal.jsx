@@ -60,6 +60,7 @@ export const MealEditorModal = ({
                     <div className="modal-window">
                         {/* HEADER DEL MODALE (Titolo pasto e riga totali dal vivo) */}
                         <div
+                            className="dm-head"
                             style={{
                                 padding: '25px 40px',
                                 borderBottom: '1px solid #F0F0F2',
@@ -92,7 +93,7 @@ export const MealEditorModal = ({
                                 />
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                            <div className="dm-totals" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                                 <div style={{ textAlign: 'center' }}>
                                     <div style={{ fontSize: '10px', color: '#6E6D69', textTransform: '', fontWeight: 700 }}>Kcal</div>
                                     <div style={{ fontSize: '16px', fontWeight: 800 }}>{currentMealTotals.kcal.toFixed(0)}</div>
@@ -112,7 +113,8 @@ export const MealEditorModal = ({
 
                                 <button
                                     onClick={() => setActiveMealInfo(null)}
-                                    className="t-icon-btn"
+                                    aria-label="Chiudi"
+                                    className="t-icon-btn dm-x"
                                     style={{ width: '44px', height: '44px', background: '#F6F5F2', border: 'none', marginLeft: '10px' }}
                                 >
                                     X
@@ -122,6 +124,7 @@ export const MealEditorModal = ({
 
                         {/* NUOVA SEZIONE: BARRE DI PROGRESSO MACRO */}
                         <div
+                            className="dm-bars"
                             style={{
                                 padding: '15px 40px',
                                 background: '#FFFFFF',
@@ -141,7 +144,7 @@ export const MealEditorModal = ({
                         </div>
 
                         {/* CORPO DEL MODALE (Tabella di editing degli alimenti) */}
-                        <div style={{ flex: 1, padding: '40px', overflowY: 'auto', background: '#FAFAFC' }}>
+                        <div className="dm-body" style={{ flex: 1, padding: '40px', overflowY: 'auto', background: '#FAFAFC' }}>
                             <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
                                 {/* Mappatura delle righe degli alimenti */}
                                 {/* Mappatura delle righe degli alimenti con relative Sostituzioni */}
@@ -166,6 +169,7 @@ export const MealEditorModal = ({
 
                                 {/* Bottone per aggiungere un nuovo alimento vuoto in fondo al pasto */}
                                 <button
+                                    className="dm-add"
                                     onClick={() => addFoodItem(currentDay.id, currentMeal.id)}
                                     style={{
                                         width: '100%',
@@ -187,6 +191,7 @@ export const MealEditorModal = ({
 
                         {/* FOOTER DEL MODALE */}
                         <div
+                            className="dm-foot"
                             style={{
                                 padding: '20px 40px',
                                 borderTop: '1px solid #F0F0F2',
@@ -217,6 +222,7 @@ export const MealEditorModal = ({
 
                             {/* Tasto conferma a destra */}
                             <button
+                                className="dm-done"
                                 onClick={() => setActiveMealInfo(null)}
                                 style={{
                                     background: '#121317',

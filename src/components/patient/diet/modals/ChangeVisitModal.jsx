@@ -4,7 +4,7 @@ export const ChangeVisitModal = ({ isChangeVisitOpen, listaVisite, selectedVisit
     return (
         isChangeVisitOpen && (
             <div className="modal-backdrop" style={{ zIndex: 11000 }}>
-                <div className="modal-window" style={{ maxWidth: '500px', height: 'auto', padding: '30px', borderRadius: '24px' }}>
+                <div className="modal-window cv-win" style={{ maxWidth: '500px', height: 'auto', padding: '30px', borderRadius: '24px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <div>
                             <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>Seleziona Visita Clinica</h3>

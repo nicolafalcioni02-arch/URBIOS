@@ -51,14 +51,22 @@ export const HistoryView = ({ patient, onUpdateDb }) => {
         return Number(diff);
     };
 
+    // stessi stati di "Salva e Gestisci" (Dieta)
     const getDietBadge = (status) => {
         switch (status) {
             case 'created':
+            case 'active':
                 return { label: 'Piano Attivo', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' };
             case 'todo':
                 return { label: 'Da Creare', color: 'bg-red-50 text-red-600 border-red-200', dot: 'bg-red-500' };
+            case 'draft':
+                return { label: 'Da Finire', color: 'bg-amber-50 text-amber-700 border-amber-200', dot: 'bg-amber-500' };
+            case 'pending':
+                return { label: 'Da Inviare', color: 'bg-slate-100 text-slate-700 border-slate-300', dot: 'bg-slate-600' };
             case 'delivery':
-                return { label: 'Da Consegnare', color: 'bg-blue-50 text-blue-600 border-blue-200', dot: 'bg-blue-500' };
+                return { label: 'Consegnato', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' };
+            case 'edit':
+                return { label: 'Da Modificare', color: 'bg-rose-50 text-rose-700 border-rose-200', dot: 'bg-rose-500' };
             default:
                 return { label: 'Controllo', color: 'bg-gray-100 text-gray-500 border-gray-200', dot: 'bg-gray-400' };
         }

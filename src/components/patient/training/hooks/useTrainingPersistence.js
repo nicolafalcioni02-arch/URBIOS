@@ -15,7 +15,7 @@ import {
 } from '../logic/trainingModel';
 import { normName } from '../logic/exerciseMedia';
 
-const HEADER_KEYS = ['titolo', 'cliente', 'obiettivo', 'tipo', 'livello', 'extraMin', 'data'];
+const HEADER_KEYS = ['titolo', 'cliente', 'obiettivo', 'tipo', 'livello', 'extraMin', 'data', 'stato'];
 
 // La scheda aperta (weeks + intestazione) vive nello stato React per una modifica fluida; ogni modifica viene
 // riportata nell'archivio in `paziente.allenamento.schede`. I massimali (1RM) sono per cliente: `paziente.allenamento.massimali`.
@@ -29,6 +29,7 @@ export const useTrainingPersistence = ({ patient, onUpdateDb }) => {
         livello: s.livello || '',
         extraMin: s.extraMin ?? 10,
         data: s.data || '',
+        stato: s.stato || 'draft',
     });
 
     const initial = patient ? pickActiveScheda(patient) : null;
@@ -78,6 +79,7 @@ export const useTrainingPersistence = ({ patient, onUpdateDb }) => {
             livello: src.livello,
             extraMin: src.extraMin,
             data: src.data,
+            stato: 'draft',
             weeks: cloneWeeks(src.weeks),
             updatedAt: new Date().toISOString(),
         };
@@ -113,5 +115,8 @@ export const useTrainingPersistence = ({ patient, onUpdateDb }) => {
             });
     };
 
-    return { schedaId, weeks, setWeeks, header, setHeader, openScheda, newScheda, duplicateScheda, deleteScheda, massimali, saveMassimale, deleteMassimale };
+    // apre una scheda costruita altrove (libro schede, AI): si salva da sola nell'archivio come ogni modifica
+    const loadScheda = (s) => load({ id: genId(), titolo: '', ...s });
+
+    return { schedaId, weeks, setWeeks, header, setHeader, loadScheda, openScheda, newScheda, duplicateScheda, deleteScheda, massimali, saveMassimale, deleteMassimale };
 };

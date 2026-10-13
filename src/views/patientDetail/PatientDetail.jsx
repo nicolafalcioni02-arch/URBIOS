@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PatientHeader } from './parts/PatientHeader';
 import { PatientTabContent } from './parts/PatientTabContent';
+import { UrbiosAiModal } from '../../ai/UrbiosAiModal';
 import { usePatientVisitActions } from './hooks/usePatientVisitActions';
 
 export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = false }) => {
@@ -8,6 +9,7 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
     const [view, setView] = useState(patient?.visite?.length ? 'history' : 'info');
     const [status, setStatus] = useState(patient?.status || 'Attivo');
     const [dietViewMode, setDietViewMode] = useState('menu');
+    const [aiOpen, setAiOpen] = useState(false);
 
     useEffect(() => {
         setDietViewMode('menu');
@@ -145,7 +147,7 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
         valutazione_report: '',
     });
 
-    const { updateDraft, updatePatientInfo, handleFinalizeVisit } = usePatientVisitActions({
+    const { updateDraft, updateDraftMany, updatePatientInfo, updatePatientMany, handleFinalizeVisit } = usePatientVisitActions({
         configA,
         configB,
         db,
@@ -159,7 +161,7 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
     return (
         <div className="h-full flex flex-col bg-[var(--paper)] relative z-20">
             {/* HEADER */}
-            <PatientHeader onBack={onBack} patient={patient} setView={setView} status={status} view={view} readOnly={readOnly} />
+            <PatientHeader onBack={onBack} patient={patient} setView={setView} status={status} view={view} readOnly={readOnly} onAi={() => setAiOpen(true)} />
 
             <PatientTabContent
                 configA={configA}
@@ -177,6 +179,20 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
                 view={view}
                 visitDraft={visitDraft}
             />
+
+            {aiOpen && (
+                <UrbiosAiModal
+                    patient={patient}
+                    visitDraft={visitDraft}
+                    db={db}
+                    onClose={() => setAiOpen(false)}
+                    onApplyPatient={updatePatientMany}
+                    onApplyDraft={updateDraftMany}
+                    onGoVisit={() => setView('visit')}
+                    onGoTraining={() => setView('Allenamento')}
+                    onGoDiet={() => setView('diet')}
+                />
+            )}
         </div>
     );
 };

@@ -115,15 +115,15 @@ export const ClinicalAnalysisModal = ({
             }, {});
 
             return (
-                <div className="fixed inset-0 z-[13000] flex items-center justify-center p-4 lg:p-6 bg-black/60 backdrop-blur-xl fade-enter">
-                    <div className="bg-[#FAFAFC] rounded-[36px] shadow-2xl w-full max-w-7xl h-[95vh] flex flex-col overflow-hidden border border-white/20 relative">
+                <div className="fixed inset-0 z-[13000] flex items-center justify-center p-0 sm:p-4 lg:p-6 bg-black/60 backdrop-blur-xl fade-enter">
+                    <div className="bg-[#FAFAFC] rounded-none sm:rounded-[36px] shadow-2xl w-full max-w-7xl h-full sm:h-[95vh] flex flex-col overflow-hidden border border-white/20 relative">
                         {/* 1. HEADER SOSPESO "ISOLA" */}
-                        <div className="m-4 lg:m-6 bg-gray-900 rounded-[28px] text-white p-4 shrink-0 flex items-center justify-between shadow-xl shadow-black/20 z-20">
-                            <div className="flex items-center gap-4 lg:gap-6">
-                                <div className="w-12 h-12 rounded-full bg-[color:var(--ink)] flex items-center justify-center border border-gray-600 shadow-inner">
+                        <div className="m-2 sm:m-4 lg:m-6 bg-gray-900 rounded-[22px] sm:rounded-[28px] text-white p-3 sm:p-4 shrink-0 flex flex-wrap items-center justify-between gap-3 shadow-xl shadow-black/20 z-20">
+                            <div className="flex items-center gap-3 lg:gap-6 min-w-0">
+                                <div className="hidden sm:flex w-12 h-12 rounded-full bg-[color:var(--ink)] flex items-center justify-center border border-gray-600 shadow-inner">
                                     <i className="ph-fill ph-user-circle text-2xl text-gray-300"></i>
                                 </div>
-                                <div className="flex items-center gap-4 lg:gap-8 text-xs">
+                                <div className="flex items-center gap-3 lg:gap-8 text-xs min-w-0">
                                     <div>
                                         <span className="text-gray-400 block text-[11px] font-semibold mb-0.5">Paziente</span>
                                         <span className="font-bold text-sm text-white">{patientProfile.name}</span>
@@ -154,7 +154,7 @@ export const ClinicalAnalysisModal = ({
                                 </div>
                             </div>
                             {/* Nel Header nero, aggiungi il tasto Info prima del tasto X */}
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 ml-auto">
                                 <button
                                     onClick={() => setShowGlossary(!showGlossary)}
                                     className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all border ${showGlossary ? 'bg-blue-600 border-blue-500 text-white' : 'bg-white/10 border-white/20 text-gray-300 hover:bg-white/20'}`}
@@ -164,9 +164,9 @@ export const ClinicalAnalysisModal = ({
                                 </button>
                                 <button
                                     onClick={() => setIsDrvEditorOpen(true)}
-                                    className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold transition-colors flex items-center gap-2 border border-white/20 text-gray-200"
+                                    className="px-3 sm:px-4 h-10 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold transition-colors flex items-center gap-2 border border-white/20 text-gray-200"
                                 >
-                                    <i className="ph-bold ph-database"></i> Database EFSA
+                                    <i className="ph-bold ph-database"></i> <span className="hidden sm:inline">Database EFSA</span>
                                 </button>
                                 <button
                                     onClick={() => setIsAnalysisOpen(false)}
@@ -178,17 +178,17 @@ export const ClinicalAnalysisModal = ({
                         </div>
 
                         {/* 2. SUB-HEADER */}
-                        <div className="px-8 py-2 flex flex-col md:flex-row justify-between items-start md:items-end shrink-0 z-10 gap-4">
+                        <div className="px-4 sm:px-8 py-2 flex flex-col md:flex-row justify-between items-start md:items-end shrink-0 z-10 gap-4">
                             <div>
-                                <h3 className="text-2xl font-black text-gray-900 tracking-tight">Screening Molecolare (BETA)</h3>
+                                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Screening molecolare (beta)</h3>
                                 <p className="text-xs font-bold text-gray-400 mt-1 ">Incrocio con i DRV</p>
                             </div>
-                            <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-gray-100">
+                            <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-gray-100 w-full md:w-auto">
                                 {['meal', 'day', 'week'].map((tf) => (
                                     <button
                                         key={tf}
                                         onClick={() => setAnalysisTimeframe(tf)}
-                                        className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 ${analysisTimeframe === tf ? 'bg-black text-white shadow-md transform scale-100' : 'text-gray-500 hover:bg-gray-100'}`}
+                                        className={`flex-1 md:flex-none px-4 sm:px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 ${analysisTimeframe === tf ? 'bg-black text-white shadow-md transform scale-100' : 'text-gray-500 hover:bg-gray-100'}`}
                                     >
                                         {tf === 'meal' ? 'Stima Pasto' : tf === 'day' ? 'Media Die' : 'Settimana'}
                                     </button>

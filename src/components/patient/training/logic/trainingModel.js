@@ -26,6 +26,7 @@ export const defaultHeader = (patient) => ({
     livello: '', // principiante | intermedio | avanzato
     extraMin: 10, // minuti di riscaldamento generale + defaticamento per seduta
     data: todayIso(),
+    stato: 'draft', // da creare | da finire | pronta da inviare | consegnata | da modificare | attiva (come la Dieta)
 });
 
 // vero se la scheda è ancora quella "vuota" di partenza (così aprire la scheda Allenamento non segna modifiche)

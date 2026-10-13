@@ -8,6 +8,7 @@ export const DietMainContent = ({
     analysisTargetId,
     deleteReport,
     dietDays,
+    onBackToMenu,
     listaVisite,
     patient,
     savedReports,
@@ -59,25 +60,7 @@ export const DietMainContent = ({
 
                     {/* TASTO INDIETRO AGGIORNATO CON RESET DEL CONTESTO */}
                     <button
-                        onClick={() => {
-                            // 1. Trova l'ultima visita VERA (Non "Solo Dieta")
-                            const primaVisitaClinica = listaVisite.find((v) => v.dettagli && !v.note?.includes('Solo Dieta'));
-
-                            // 2. Ricarica istantaneamente i dati base in memoria per "spurgare" la Dieta Indipendente
-                            if (primaVisitaClinica) {
-                                if (primaVisitaClinica.dettagli?.diet_calc_data) setCalcData(primaVisitaClinica.dettagli.diet_calc_data);
-                                setTargets(primaVisitaClinica.dettagli?.diet_targets || { kcal: 0, p: 0, c: 0, f: 0, isConfigured: false });
-                                setDietDays(primaVisitaClinica.dettagli?.diet_plan_data || []);
-                                setSavedReports(primaVisitaClinica.dettagli?.diet_saved_reports || []);
-                                setSelectedVisitaId(primaVisitaClinica.id);
-                            } else {
-                                setSelectedVisitaId(null);
-                                setDietDays([]);
-                            }
-
-                            // 3. Torna al menu
-                            setTimeout(() => setDietViewMode('menu'), 50);
-                        }}
+                        onClick={onBackToMenu}
                         style={{
                             background: '#F6F5F2',
                             color: '#121317',

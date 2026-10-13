@@ -30,7 +30,7 @@ export const MetabolismTab = ({ adjustedW, calcData, idealW, rmr, setCalcData, s
                     </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div className="ns-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                     <div className="t-input-floating">
                         <label>Equazione Predittiva (RMR)</label>
                         <select value={calcData.formula} onChange={(e) => setCalcData({ ...calcData, formula: e.target.value })}>
@@ -74,7 +74,7 @@ export const MetabolismTab = ({ adjustedW, calcData, idealW, rmr, setCalcData, s
                     </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '10px' }}>
+                <div className="ns-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '10px' }}>
                     <div className="smart-card" style={{ background: '#121317', color: 'white', borderColor: '#121317' }}>
                         <span className="smart-title" style={{ color: '#6E6D69' }}>
                             Fabbisogno Energetico Totale (TDEE)

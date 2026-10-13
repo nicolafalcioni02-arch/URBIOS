@@ -8,7 +8,7 @@ const TABS = [
     { id: 'diet', label: 'Diet', icon: 'ph-carrot' },
 ];
 
-export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly = false }) => {
+export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly = false, onAi }) => {
     const wrap = useRef(null);
     const [pill, setPill] = useState({ left: 0, width: 0, ready: false });
 
@@ -89,6 +89,12 @@ export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly
                     </button>
                 ))}
             </div>
+
+            {onAi && !readOnly && (
+                <button onClick={onAi} className="vw-chip justify-center flex-none" style={{ background: 'var(--ink)', color: '#fff', borderColor: 'var(--ink)' }}>
+                    <i className="ph ph-sparkle"></i> URBIOS AI
+                </button>
+            )}
         </div>
     );
 };
