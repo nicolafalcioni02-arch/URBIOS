@@ -4,7 +4,8 @@ import { ReportPreviewModal } from '../../components/reports/reportPreview/Repor
 import { calculateEquation } from '../../logic/calculations';
 import { Analisi } from '../analisi/Analisi';
 import { DEFAULT_RANGE_EMATO } from '../../logic/db_defaults';
-import { VisitHeaderBar } from './layout/VisitHeaderBar';
+import { VisitWizard } from './layout/VisitWizard';
+import { StepContext } from '../../components/ui/Card';
 import { PendingChangeModal } from './modals/PendingChangeModal';
 import { AnthropometrySection } from './sections/AnthropometrySection';
 import { BioimpedanceSection } from './sections/BioimpedanceSection';
@@ -23,33 +24,10 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
     const formulePliche = useMemo(() => db.formule.filter((f) => f.categoria === 'Densità Corporea'), [db.formule]);
     const formuleConv = useMemo(() => db.formule.filter((f) => f.categoria === 'Conversione %FM' || f.titolo.includes('Siri')), [db.formule]);
 
-    const [activeSection, setActiveSection] = useState(null);
+    // Passo corrente della visita (indice in SECTIONS)
+    const [step, setStep] = useState(0);
     const sectionRefs = useRef({});
-
-    // Gestione Scroll Intelligente
-    const handleNavClick = (sectionId) => {
-        if (activeSection === sectionId) {
-            setActiveSection(null);
-            return;
-        }
-        setActiveSection(sectionId);
-
-        setTimeout(() => {
-            const element = sectionRefs.current[sectionId];
-            if (element) {
-                const MARGINE_SUPERIORE_MANUALE = 200;
-                const scrollContainer = element.closest('.overflow-y-auto');
-
-                if (scrollContainer) {
-                    const topPos = element.offsetTop - MARGINE_SUPERIORE_MANUALE;
-                    scrollContainer.scrollTo({ top: topPos, behavior: 'smooth' });
-                } else {
-                    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-                    window.scrollTo({ top: elementPosition - MARGINE_SUPERIORE_MANUALE, behavior: 'smooth' });
-                }
-            }
-        }, 350);
-    };
+    const noop = () => {};
 
     // Calcolo Età
     const oggi = new Date();
@@ -96,7 +74,7 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
         const calcolaMetodo = (cfg) => {
             const fDens = db.formule.find((f) => f.id === Number(cfg.densId));
             const fConv = db.formule.find((f) => f.id === Number(cfg.convId));
-            const dcVal = fDens ? calculateEquation(fDens.equazione, calculationContext) : 0;
+            const dcVal = fDens && calculationContext.sommaPliche > 0 ? calculateEquation(fDens.equazione, calculationContext) : 0;
             const ctxConDc = { ...calculationContext, dc: dcVal };
             const fmVal = fDens && fConv && dcVal !== null ? calculateEquation(fConv.equazione, ctxConDc) : 0;
             const peso = calculationContext.peso || 0;
@@ -194,106 +172,61 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
         );
     };
 
-    return (
-        <div className="max-w-[1600px] mx-auto pb-40 px-6 pt-0">
-            {/* Layer Blur per l'header fisso */}
-            <div
-                className="fixed left-0 right-0 z-20 pointer-events-none"
-                style={{
-                    top: '0px',
-                    height: '300px',
-                    backdropFilter: 'blur(100px)',
-                    WebkitBackdropFilter: 'blur(100px)',
-                    maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
-                    WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
-                }}
-            ></div>
+    const renderStep = (id) => {
+        const common = { activeSection: id, sectionRefs, setActiveSection: noop, updateDraft, visitDraft };
+        return (
+            <StepContext.Provider value={true}>
+                {id === 'antropometria' && <AnthropometrySection {...common} />}
+                {id === 'plicometria' && (
+                    <SkinfoldsSection
+                        {...common}
+                        calculationContext={calculationContext}
+                        configA={configA}
+                        configB={configB}
+                        formuleConv={formuleConv}
+                        formulePliche={formulePliche}
+                        setConfigA={setConfigA}
+                        setConfigB={setConfigB}
+                        sommaPliche={sommaPliche}
+                    />
+                )}
+                {id === 'bioimpedenza' && <BioimpedanceSection {...common} monoPhA={monoPhA} rawRz={rawRz} rawXc={rawXc} rzH={rzH} xcH={xcH} />}
+                {id === 'ematochimico' && <BloodTestsSection activeSection={id} renderBloodInput={renderBloodInput} sectionRefs={sectionRefs} setActiveSection={noop} />}
+                {id === 'generale' && <GeneralSection {...common} />}
+                {id === 'conclusioni' && <ConclusionsSection sectionRefs={sectionRefs} updateDraft={updateDraft} visitDraft={visitDraft} />}
+            </StepContext.Provider>
+        );
+    };
 
-            {/* Banner Superiore */}
-            <VisitHeaderBar
-                activeSection={activeSection}
-                handleFinalizeVisit={handleFinalizeVisit}
-                handleNavClick={handleNavClick}
-                setShowAnalisi={setShowAnalisi}
-                setShowReport={setShowReport}
+    return (
+        <>
+            <VisitWizard
+                patient={patient}
+                visitDraft={visitDraft}
+                step={step}
+                setStep={setStep}
+                onPreview={() => setShowReport(true)}
+                onAnalysis={() => setShowAnalisi(true)}
+                onSave={() => {
+                    // senza il peso non si puo' salvare: si torna al primo passo, dove va inserito
+                    if (!visitDraft.peso) setStep(0);
+                    handleFinalizeVisit();
+                }}
+                renderStep={renderStep}
             />
 
-            {/* Modale Anteprima Report */}
             {showReport && (
                 <ReportPreviewModal visitDraft={getLiveReportData()} patient={patient} professionalData={db.utente} onClose={() => setShowReport(false)} />
             )}
-            {/* --- MODALE ANALISI --- */}
             {showAnalisi && <Analisi patient={patient} visitData={visitDraft} updateDraft={updateDraft} onClose={() => setShowAnalisi(false)} />}
 
-            {/* SEZIONE 1: ANTROPOMETRIA */}
-            <AnthropometrySection
-                activeSection={activeSection}
-                sectionRefs={sectionRefs}
-                setActiveSection={setActiveSection}
-                updateDraft={updateDraft}
-                visitDraft={visitDraft}
+            <PendingChangeModal
+                confirmSettingsChange={confirmSettingsChange}
+                db={db}
+                pendingChange={pendingChange}
+                sessoPaziente={sessoPaziente}
+                setPendingChange={setPendingChange}
             />
-
-            {/* SEZIONE 2: PLICOMETRIA */}
-            <SkinfoldsSection
-                activeSection={activeSection}
-                calculationContext={calculationContext}
-                configA={configA}
-                configB={configB}
-                formuleConv={formuleConv}
-                formulePliche={formulePliche}
-                sectionRefs={sectionRefs}
-                setActiveSection={setActiveSection}
-                setConfigA={setConfigA}
-                setConfigB={setConfigB}
-                sommaPliche={sommaPliche}
-                updateDraft={updateDraft}
-                visitDraft={visitDraft}
-            />
-
-            {/* SEZIONE 3: BIVA */}
-            <BioimpedanceSection
-                activeSection={activeSection}
-                monoPhA={monoPhA}
-                rawRz={rawRz}
-                rawXc={rawXc}
-                rzH={rzH}
-                sectionRefs={sectionRefs}
-                setActiveSection={setActiveSection}
-                updateDraft={updateDraft}
-                visitDraft={visitDraft}
-                xcH={xcH}
-            />
-
-            {/* --- EMATOCHIMICO --- */}
-            <BloodTestsSection
-                activeSection={activeSection}
-                renderBloodInput={renderBloodInput}
-                sectionRefs={sectionRefs}
-                setActiveSection={setActiveSection}
-            />
-
-            {/* SEZIONE 5: GENERALE */}
-            <GeneralSection
-                activeSection={activeSection}
-                sectionRefs={sectionRefs}
-                setActiveSection={setActiveSection}
-                updateDraft={updateDraft}
-                visitDraft={visitDraft}
-            />
-
-            {/* SEZIONE 6: CONCLUSIONI */}
-            <ConclusionsSection sectionRefs={sectionRefs} updateDraft={updateDraft} visitDraft={visitDraft} />
-
-            {
-                <PendingChangeModal
-                    confirmSettingsChange={confirmSettingsChange}
-                    db={db}
-                    pendingChange={pendingChange}
-                    sessoPaziente={sessoPaziente}
-                    setPendingChange={setPendingChange}
-                />
-            }
-        </div>
+        </>
     );
 };

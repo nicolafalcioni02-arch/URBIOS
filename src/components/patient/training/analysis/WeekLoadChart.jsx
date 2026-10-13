@@ -13,7 +13,7 @@ export const WeekLoadChart = ({ weeks }) => {
                 const x = pad + i * ((W - pad) / weeks.length) + 6;
                 const h = (w.weekLoad / max) * (H - 30);
                 const col =
-                    w.kind === 'deload' ? '#FF9F0A' : w.acwr !== null && w.acwr > 1.5 ? '#FF3B30' : w.acwr !== null && w.acwr > 1.3 ? '#FFCC00' : '#007AFF';
+                    w.kind === 'deload' ? '#B7791F' : w.acwr !== null && w.acwr > 1.5 ? '#C2413A' : w.acwr !== null && w.acwr > 1.3 ? '#FFCC00' : '#2F54EB';
                 return (
                     <g key={w.id}>
                         <rect x={x} y={H - h} width={bw} height={Math.max(h, 1)} rx={5} fill={col} />

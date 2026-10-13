@@ -8,7 +8,7 @@ export const ArchiveStatusChip = () => {
 
     if (ephemeral) {
         return (
-            <div className="fixed bottom-3 left-3 z-[900] bg-amber-50 border border-amber-200 text-amber-700 rounded-full px-3 py-1.5 text-[11px] font-bold shadow-sm">
+            <div className="archive-chip fixed bottom-3 left-3 z-[900] bg-amber-50 border border-amber-200 text-amber-700 rounded-full px-3 py-1.5 text-[11px] font-bold shadow-sm">
                 Demo · nulla viene salvato
             </div>
         );
@@ -31,7 +31,7 @@ export const ArchiveStatusChip = () => {
             onClick={onSave}
             disabled={busy}
             title={dirty ? 'Modifiche non salvate nel file: clicca per salvare' : 'Tutto salvato nel file'}
-            className={`fixed bottom-3 left-3 z-[900] flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-bold shadow-md border transition-all print:hidden ${
+            className={`archive-chip fixed bottom-3 left-3 z-[900] flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-bold shadow-md border transition-all print:hidden ${
                 dirty ? 'bg-red-50 border-red-200 text-red-700 animate-pulse' : 'bg-white border-gray-200 text-gray-500'
             }`}
         >

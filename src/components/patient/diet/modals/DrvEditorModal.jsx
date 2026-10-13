@@ -19,12 +19,12 @@ export const DrvEditorModal = ({ drvDB, drvFileInputRef, drvSearch, isDrvEditorO
                         {/* HEADER FLUTTUANTE */}
                         <div className="p-6 bg-white border-b border-gray-100 shrink-0 flex flex-col md:flex-row justify-between items-center gap-4 z-10 shadow-sm rounded-t-[36px]">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 rounded-[18px] flex items-center justify-center shadow-inner border border-blue-200">
+                                <div className="w-12 h-12 bg-[color:var(--soft)] text-blue-600 rounded-[18px] flex items-center justify-center shadow-inner border border-blue-200">
                                     <i className="ph-bold ph-database text-2xl drop-shadow-sm"></i>
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-black text-gray-900 tracking-tight">Libreria DRV (EFSA)</h3>
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-md mt-1 inline-block">
+                                    <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md mt-1 inline-block">
                                         {drvDB.length} record nel database
                                     </span>
                                 </div>
@@ -111,13 +111,13 @@ export const DrvEditorModal = ({ drvDB, drvFileInputRef, drvSearch, isDrvEditorO
                                     <table className="w-full text-left text-xs border-collapse">
                                         <thead className="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-100">
                                             <tr>
-                                                <th className="p-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">Nutriente</th>
-                                                <th className="p-4 font-black text-gray-400 uppercase tracking-widest text-[10px]">Popolazione</th>
-                                                <th className="p-4 font-black text-gray-400 uppercase tracking-widest text-[10px] text-center">Età / Genere</th>
-                                                <th className="p-4 font-black text-green-500 uppercase tracking-widest text-[10px]">PRI / AR</th>
-                                                <th className="p-4 font-black text-blue-500 uppercase tracking-widest text-[10px]">AI</th>
-                                                <th className="p-4 font-black text-red-500 uppercase tracking-widest text-[10px]">UL (Max)</th>
-                                                <th className="p-4 font-black text-gray-400 uppercase tracking-widest text-[10px] text-center w-16"></th>
+                                                <th className="p-4 font-semibold text-gray-400 text-xs">Nutriente</th>
+                                                <th className="p-4 font-semibold text-gray-400 text-xs">Popolazione</th>
+                                                <th className="p-4 font-semibold text-gray-400 text-xs text-center">Età / Genere</th>
+                                                <th className="p-4 font-semibold text-green-500 text-xs">PRI / AR</th>
+                                                <th className="p-4 font-semibold text-blue-500 text-xs">AI</th>
+                                                <th className="p-4 font-semibold text-red-500 text-xs">UL (Max)</th>
+                                                <th className="p-4 font-semibold text-gray-400 text-xs text-center w-16"></th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-50">

@@ -2,7 +2,7 @@ import React from 'react';
 
 export const HistoryToolbar = ({ filteredVisits, searchTerm, setIsSearchCalendarOpen, setSearchTerm, setShowSmartPlot }) => {
     return (
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             {/* Search pill — shows active filter */}
             <div className="flex items-center gap-2">
                 {searchTerm && (
@@ -21,20 +21,20 @@ export const HistoryToolbar = ({ filteredVisits, searchTerm, setIsSearchCalendar
                 )}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
                 <button
                     onClick={() => setIsSearchCalendarOpen(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-full shadow-sm hover:border-gray-400 hover:shadow-md transition-all text-gray-700"
+                    className="flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-white border border-gray-200 rounded-full shadow-sm hover:border-gray-400 hover:shadow-md transition-all text-gray-700"
                 >
                     <i className="ph-bold ph-calendar-blank text-base"></i>
-                    <span className="text-[11px] font-bold uppercase tracking-widest">Filtra per data</span>
+                    <span className="text-[11px] font-bold ">Filtra per data</span>
                 </button>
                 <button
                     onClick={() => setShowSmartPlot(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all"
+                    className="flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-[color:var(--ink)] text-white rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all"
                 >
                     <i className="ph-fill ph-chart-line-up text-base"></i>
-                    <span className="text-[11px] font-bold uppercase tracking-widest">Smart Plot</span>
+                    <span className="text-[11px] font-bold ">Smart Plot</span>
                 </button>
             </div>
         </div>

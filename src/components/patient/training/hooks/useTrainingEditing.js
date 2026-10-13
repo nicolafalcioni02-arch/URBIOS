@@ -1,4 +1,4 @@
-import { blankExercise, blankSet, blankWeek, genId as newId } from '../logic/trainingModel';
+import { blankDay, blankExercise, blankSet, blankWeek, genId as newId } from '../logic/trainingModel';
 import { warmupSets } from '../logic/science/oneRm';
 
 // Settimane, giorni, esercizi e serie: tutte le modifiche alla scheda
@@ -72,33 +72,7 @@ export const useTrainingEditing = ({ exerciseDB, setSuggestions, setWeeks }) => 
     const updateWeekTitle = (id, title) => setWeeks((prev) => prev.map((w) => (w.id === id ? { ...w, title } : w)));
 
     // --- GIORNI ---
-    const addDay = (weekId) => {
-        setWeeks((prev) =>
-            prev.map((w) =>
-                w.id === weekId
-                    ? {
-                          ...w,
-                          days: [
-                              ...w.days,
-                              {
-                                  id: genId(),
-                                  title: '',
-                                  collapsed: false,
-                                  exercises: [
-                                      {
-                                          id: genId(),
-                                          name: '',
-                                          group: '',
-                                          sets: [blankSet(), blankSet(), blankSet()],
-                                      },
-                                  ],
-                              },
-                          ],
-                      }
-                    : w
-            )
-        );
-    };
+    const addDay = (weekId) => setWeeks((prev) => prev.map((w) => (w.id === weekId ? { ...w, days: [...w.days, blankDay()] } : w)));
 
     const duplicateDay = (weekId, dayId) => {
         setWeeks((prev) =>
@@ -251,6 +225,7 @@ export const useTrainingEditing = ({ exerciseDB, setSuggestions, setWeeks }) => 
 
     return {
         addNewWeek,
+        addDay,
         duplicateWeek,
         removeWeek,
         duplicateDay,

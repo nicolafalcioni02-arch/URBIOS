@@ -15,21 +15,21 @@ export const lafStyles = `
 
                 .laf-input:focus, .laf-input:hover {
                     background: #F2F2F7;
-                    border-color: #E5E5EA;
+                    border-color: var(--line);
                 }
 
                 .laf-input.number {
                     text-align: center;
                     font-weight: 900;
                     font-size: 14px;
-                    background: #F9F9FB;
-                    border: 1px solid #E5E5EA;
+                    background: #FBFAF8;
+                    border: 1px solid var(--line);
                 }
 
                 .laf-input.number:focus {
-                    border-color: #00C853;
-                    background: #F2FFF7;
-                    color: #00C853;
+                    border-color: var(--ink);
+                    background: var(--soft);
+                    color: var(--ink);
                 }
 
                 .laf-row {
@@ -53,8 +53,8 @@ export const lafStyles = `
                 .save-modal-icon {
                     width: 50px;
                     height: 50px;
-                    background: #E8F5E9;
-                    color: #00C853;
+                    background: var(--soft);
+                    color: var(--ink);
                     border-radius: 50%;
                     display: flex;
                     align-items: center;

@@ -9,7 +9,7 @@ export const POPULATIONS = [
 
 export const DEFAULT_RANGE_EMATO = {
     // GLUCIDICO
-    bg_glicemia: { label: 'Glicemia', unit: 'PROVA', minM: 70, maxM: 100, minF: 70, maxF: 100, icon: 'ph-drop-half', color: 'text-orange-500' },
+    bg_glicemia: { label: 'Glicemia', unit: 'mg/dL', minM: 70, maxM: 100, minF: 70, maxF: 100, icon: 'ph-drop-half', color: 'text-orange-500' },
     bg_insulina: { label: 'Insulina', unit: 'μU/mL', minM: 2.6, maxM: 24.9, minF: 2.6, maxF: 24.9, icon: 'ph-syringe', color: 'text-orange-600' },
     bg_hba1c: { label: 'HbA1c', unit: '%', minM: 4.0, maxM: 5.6, minF: 4.0, maxF: 5.6, icon: 'ph-chart-line-up', color: 'text-orange-400' },
     bg_homair: { label: 'HOMA-IR', unit: '', minM: 0.5, maxM: 2.0, minF: 0.5, maxF: 2.0, icon: 'ph-calculator', color: 'text-orange-300' },

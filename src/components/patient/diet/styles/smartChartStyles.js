@@ -41,15 +41,14 @@ export const smartChartStyles = `
   }
   .sc-header-title {
     font-size: 17px; font-weight: 700; color: #1D1D1F;
-    letter-spacing: -0.3px;
   }
   .sc-header-sub {
     font-size: 11px; font-weight: 500; color: #8E8E93;
-    margin-top: 1px; letter-spacing: 0.1px;
+    margin-top: 1px;
   }
   .sc-close-btn {
     width: 36px; height: 36px; border-radius: 12px;
-    border: 1px solid #E5E5EA; background: #F9F9FB;
+    border: 1px solid var(--line); background: #FBFAF8;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; color: #636366;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
@@ -77,7 +76,6 @@ export const smartChartStyles = `
  
   .sc-section-label {
     font-size: 9px; font-weight: 800; color: #8E8E93;
-    text-transform: uppercase; letter-spacing: 0.8px;
     margin-bottom: 8px;
   }
  
@@ -103,7 +101,7 @@ export const smartChartStyles = `
   .sc-type-btn {
     display: flex; align-items: center; gap: 7px;
     padding: 9px 12px; border-radius: 10px;
-    border: 1.5px solid #E5E5EA; background: #FFFFFF;
+    border: 1.5px solid var(--line); background: #FFFFFF;
     font-size: 11px; font-weight: 600; color: #636366;
     cursor: pointer;
     transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.12s;
@@ -117,7 +115,7 @@ export const smartChartStyles = `
   /* Metrica select */
   .sc-select {
     width: 100%; padding: 10px 12px;
-    border-radius: 10px; border: 1.5px solid #E5E5EA;
+    border-radius: 10px; border: 1.5px solid var(--line);
     background: #FFFFFF; font-size: 12px; font-weight: 600;
     color: #1D1D1F; outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
@@ -128,28 +126,28 @@ export const smartChartStyles = `
     padding-right: 32px;
     cursor: pointer;
   }
-  .sc-select:focus { border-color: #00C853; box-shadow: 0 0 0 3px rgba(0,200,83,0.1); }
+  .sc-select:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(18,19,23,0.08); }
  
   /* Toggle DRV */
   .sc-drv-toggle {
     display: flex; align-items: center; gap: 10px;
     padding: 10px 12px; border-radius: 10px;
-    border: 1.5px solid #E5E5EA; background: #FFFFFF;
+    border: 1.5px solid var(--line); background: #FFFFFF;
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
   }
-  .sc-drv-toggle.active { border-color: #00C853; background: #F2FFF7; }
+  .sc-drv-toggle.active { border-color: var(--ink); background: var(--soft); }
   .sc-drv-toggle-label {
     font-size: 11px; font-weight: 600; color: #636366; flex: 1; line-height: 1.3;
   }
-  .sc-drv-toggle.active .sc-drv-toggle-label { color: #009624; }
+  .sc-drv-toggle.active .sc-drv-toggle-label { color: #2A2B31; }
   .sc-toggle-pill {
     width: 32px; height: 18px; border-radius: 9px;
     background: #D1D1D6; position: relative;
     transition: background 0.2s;
     flex-shrink: 0;
   }
-  .sc-drv-toggle.active .sc-toggle-pill { background: #00C853; }
+  .sc-drv-toggle.active .sc-toggle-pill { background: var(--ink); }
   .sc-toggle-dot {
     position: absolute; top: 2px; left: 2px;
     width: 14px; height: 14px; border-radius: 50%; background: white;
@@ -161,14 +159,14 @@ export const smartChartStyles = `
   /* Note textarea */
   .sc-notes {
     width: 100%; padding: 10px 12px;
-    border-radius: 10px; border: 1.5px solid #E5E5EA;
+    border-radius: 10px; border: 1.5px solid var(--line);
     background: #FFFFFF; font-size: 11px; font-weight: 500;
     color: #1D1D1F; outline: none; resize: none;
     font-family: inherit; line-height: 1.5;
     transition: border-color 0.15s, box-shadow 0.15s;
     min-height: 72px;
   }
-  .sc-notes:focus { border-color: #00C853; box-shadow: 0 0 0 3px rgba(0,200,83,0.1); }
+  .sc-notes:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(18,19,23,0.08); }
   .sc-notes::placeholder { color: #C7C7CC; font-weight: 400; }
  
   /* AREA GRAFICO DESTRA */
@@ -183,10 +181,9 @@ export const smartChartStyles = `
     margin-bottom: 16px;
   }
   .sc-chart-tag {
-    font-size: 9px; font-weight: 800; color: #00C853;
-    text-transform: uppercase; letter-spacing: 0.8px;
-    background: #F2FFF7; padding: 3px 9px; border-radius: 6px;
-    border: 1px solid #C8E6C9;
+    font-size: 9px; font-weight: 800; color: var(--ink);
+    background: var(--soft); padding: 3px 9px; border-radius: 6px;
+    border: 1px solid var(--line);
   }
   .sc-chart-container {
     flex: 1; min-height: 0;
@@ -207,16 +204,16 @@ export const smartChartStyles = `
   }
   .sc-btn-reset {
     display: flex; align-items: center; gap: 6px;
-    padding: 8px 14px; border-radius: 9px; border: 1.5px solid #E5E5EA;
+    padding: 8px 14px; border-radius: 9px; border: 1.5px solid var(--line);
     background: transparent; font-size: 11px; font-weight: 600;
     color: #8E8E93; cursor: pointer;
     transition: border-color 0.15s, color 0.15s, background 0.15s;
   }
-  .sc-btn-reset:hover { border-color: #C7C7CC; color: #1D1D1F; background: #F9F9FB; }
+  .sc-btn-reset:hover { border-color: #C7C7CC; color: #1D1D1F; background: #FBFAF8; }
   .sc-btn-save {
     display: flex; align-items: center; gap: 7px;
     padding: 9px 20px; border-radius: 10px; border: none;
-    background: #00C853; color: #FFFFFF;
+    background: var(--ink); color: #FFFFFF;
     font-size: 12px; font-weight: 700; cursor: pointer;
     box-shadow: 0 4px 14px rgba(0,200,83,0.25);
     transition: background 0.15s, box-shadow 0.15s, transform 0.12s;
@@ -227,6 +224,6 @@ export const smartChartStyles = `
   }
   .sc-btn-save:active { transform: translateY(0); }
  
-  .sc-divider { width: 1px; height: 20px; background: #E5E5EA; margin: 0 4px; }
+  .sc-divider { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
 
 `;

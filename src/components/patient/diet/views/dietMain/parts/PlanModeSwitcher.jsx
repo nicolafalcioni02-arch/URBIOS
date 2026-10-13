@@ -4,20 +4,20 @@ export const PlanModeSwitcher = ({ setIsChangeVisitOpen, visitaAttiva }) => {
     return visitaAttiva?.note?.includes('Solo Dieta') ? (
         /* RAMO DIETA INDIPENDENTE: Ora avvolto in un div per ospitare futuri nodi in sicurezza */
         <div style={{ display: 'flex', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#007AFF', background: '#E6F0FF', padding: '6px 12px', borderRadius: '10px' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#121317', background: '#ECEDF1', padding: '6px 12px', borderRadius: '10px' }}>
                 Dieta Indipendente
             </span>
         </div>
     ) : (
         /* RAMO DIETA ASSOCIATA (CON INGRANAGGIO) */
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#00C853', background: '#E8F5E9', padding: '6px 12px', borderRadius: '10px' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#1F8A5B', background: '#E4EFE8', padding: '6px 12px', borderRadius: '10px' }}>
                 Dieta Associata a Visita ({visitaAttiva?.data || 'Nessuna data'})
             </span>
             <button
                 onClick={() => setIsChangeVisitOpen(true)}
                 className="t-icon-btn"
-                style={{ margin: 0, width: '32px', height: '32px', background: '#F5F5F7', border: 'none', borderRadius: '8px' }}
+                style={{ margin: 0, width: '32px', height: '32px', background: '#F6F5F2', border: 'none', borderRadius: '8px' }}
                 title="Cambia Visita Associata"
             >
                 <svg

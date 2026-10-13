@@ -24,12 +24,12 @@ export const modalAndPrintStyles = `
                     .t-sidebar, .t-fab-print, .t-icon-btn, .t-btn-sidebar-action, .t-suggestions-list, .modal-backdrop, .hover-actions { display: none !important; }
                     .t-main-content { padding: 0; margin: 0; width: 100%; overflow: visible; }
                     .t-container-wrapper { max-width: 100%; margin: 0; padding: 0; }
-                    .t-client-header-card { padding: 15px; margin-bottom: 20px; box-shadow: none; border: 1px solid #E5E5EA; background: white; grid-template-columns: 1fr 1fr 1fr; gap: 10px; border-radius: 12px; }
+                    .t-client-header-card { padding: 15px; margin-bottom: 20px; box-shadow: none; border: 1px solid var(--line); background: white; grid-template-columns: 1fr 1fr 1fr; gap: 10px; border-radius: 12px; }
                     .t-client-header-card input { border: none; padding: 0; font-weight: bold; font-size: 11pt; color: black; background: transparent; }
-                    .t-exercise-item { background-color: #FFFFFF !important; border: 1px solid #E5E5EA !important; border-radius: 8px !important; padding: 8px 12px !important; margin-bottom: 8px !important; box-shadow: none !important; transform: none !important; }
+                    .t-exercise-item { background-color: #FFFFFF !important; border: 1px solid var(--line) !important; border-radius: 8px !important; padding: 8px 12px !important; margin-bottom: 8px !important; box-shadow: none !important; transform: none !important; }
                     .t-ex-input { background: transparent; box-shadow: none; padding: 0; font-size: 11pt; color: black; font-weight: 700; }
-                    .t-sets-table th { color: #888; padding-bottom: 2px; border-bottom: 1px solid #E5E5EA; }
-                    .t-sets-table td { border-bottom: 1px solid #F5F5F7; padding: 4px; }
+                    .t-sets-table th { color: #888; padding-bottom: 2px; border-bottom: 1px solid var(--line); }
+                    .t-sets-table td { border-bottom: 1px solid var(--paper); padding: 4px; }
                     .t-sets-table input { border: none !important; background: transparent !important; color: #000; font-weight: 500; padding: 0; }
                 }
 

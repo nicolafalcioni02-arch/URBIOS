@@ -21,7 +21,7 @@ export const MassimaliTool = ({ massimali, exerciseDB, saveMassimale, deleteMass
                 title="Massimali del cliente (1RM)"
                 hint="Il massimale serve a trasformare le percentuali in chili e a calcolare l'intensità della scheda. Si salva per questo cliente e vale per tutte le sue schede."
             >
-                {list.length === 0 && <div style={{ fontSize: 13, color: '#86868B' }}>Nessun massimale salvato.</div>}
+                {list.length === 0 && <div style={{ fontSize: 13, color: '#6E6D69' }}>Nessun massimale salvato.</div>}
                 {list.length > 0 && (
                     <Table
                         head={['Esercizio', '1RM', 'Data', 'Come', '']}
@@ -33,7 +33,7 @@ export const MassimaliTool = ({ massimali, exerciseDB, saveMassimale, deleteMass
                             <button
                                 key={m.name}
                                 onClick={() => deleteMassimale(m.name)}
-                                style={{ border: 'none', background: 'none', color: '#FF3B30', cursor: 'pointer' }}
+                                style={{ border: 'none', background: 'none', color: '#C2413A', cursor: 'pointer' }}
                             >
                                 Elimina
                             </button>,
@@ -57,7 +57,7 @@ export const MassimaliTool = ({ massimali, exerciseDB, saveMassimale, deleteMass
                 {est && (
                     <Result>
                         <b>1RM stimato ≈ {n1(est.average)} kg</b> (media di {Object.keys(est.byFormula).length} formule)
-                        {!est.reliable && ' — attenzione: oltre 10 ripetizioni la stima è poco affidabile'}
+                        {!est.reliable && ' · attenzione: oltre 10 ripetizioni la stima è poco affidabile'}
                         <div style={{ marginTop: 6 }}>
                             <Table small head={Object.keys(est.byFormula)} rows={[Object.values(est.byFormula).map((v) => n1(v))]} />
                         </div>
@@ -86,7 +86,7 @@ export const MassimaliTool = ({ massimali, exerciseDB, saveMassimale, deleteMass
                 <Table
                     small
                     head={['Rip.', '% 1RM', 'Carico (kg)']}
-                    rows={repTable(rmN).map((r) => [r.reps, `${n1(r.pct, 0)}%`, r.load ? n1(Math.round(r.load * 2) / 2) : '—'])}
+                    rows={repTable(rmN).map((r) => [r.reps, `${n1(r.pct, 0)}%`, r.load ? n1(Math.round(r.load * 2) / 2) : '-'])}
                 />
             </Card>
 

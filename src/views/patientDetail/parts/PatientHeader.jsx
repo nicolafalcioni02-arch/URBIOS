@@ -1,44 +1,91 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
-export const PatientHeader = ({ onBack, patient, setView, status, view }) => {
+const TABS = [
+    { id: 'info', label: 'Anagrafica', icon: 'ph-user' },
+    { id: 'history', label: 'Storico', icon: 'ph-clock-counter-clockwise' },
+    { id: 'visit', label: 'Nuova visita', icon: 'ph-plus-circle' },
+    { id: 'Allenamento', label: 'Training', icon: 'ph-barbell' },
+    { id: 'diet', label: 'Diet', icon: 'ph-carrot' },
+];
+
+export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly = false }) => {
+    const wrap = useRef(null);
+    const [pill, setPill] = useState({ left: 0, width: 0, ready: false });
+
+    // la pillola scura scivola sotto la scheda attiva
+    useLayoutEffect(() => {
+        const measure = () => {
+            const el = wrap.current && wrap.current.querySelector(`[data-tab="${view}"]`);
+            if (el && el.offsetWidth > 0) setPill({ left: el.offsetLeft, width: el.offsetWidth, ready: true });
+        };
+        measure();
+        // si ricalcola quando cambia la misura dei bottoni (font caricati, finestra ridimensionata)
+        const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+        if (ro && wrap.current) {
+            ro.observe(wrap.current);
+            wrap.current.querySelectorAll('[data-tab]').forEach((b) => ro.observe(b));
+        }
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+        window.addEventListener('resize', measure);
+        return () => {
+            if (ro) ro.disconnect();
+            window.removeEventListener('resize', measure);
+        };
+    }, [view]);
+
+    // sui telefoni la scheda attiva resta visibile nella riga che scorre
+    useLayoutEffect(() => {
+        const el = wrap.current && wrap.current.querySelector(`[data-tab="${view}"]`);
+        if (el && el.scrollIntoView) el.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    }, [view]);
+
+    const active = status === 'Attivo';
+
     return (
-        <div className="bg-white/90 backdrop-blur-xl border-b border-gray-200 px-8 py-4 sticky top-0 z-30 flex flex-col md:flex-row justify-between items-center shadow-sm flex-none gap-4">
-            <div className="flex items-center gap-4 w-full md:w-auto">
-                <button
-                    onClick={onBack}
-                    className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-colors"
-                >
-                    <i className="ph ph-arrow-left text-xl"></i>
+        <div className="bg-[var(--paper)]/90 backdrop-blur-xl border-b border-[color:var(--line)] px-4 sm:px-8 py-3 sm:py-4 sticky top-0 z-30 flex flex-col lg:flex-row justify-between items-stretch lg:items-center flex-none gap-3 sm:gap-4">
+            <div className="flex items-center gap-3 w-full lg:w-auto min-w-0">
+                <button onClick={onBack} className="vw-chip !px-0 w-10 !h-10 justify-center flex-none" aria-label="Torna ai pazienti">
+                    <i className="ph ph-arrow-left"></i>
                 </button>
-                <div>
-                    <div className="flex items-center gap-3">
-                        <h2 className="text-2xl font-bold ">
-                            {patient.nome} {patient.cognome}
-                        </h2>
-                        <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border flex items-center gap-1 ${status === 'Attivo' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'}`}
-                        >
-                            <div className={`w-1.5 h-1.5 rounded-full ${status === 'Attivo' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                <div className="min-w-0">
+                    <h2 className="text-[19px] sm:text-[22px] font-semibold leading-tight text-[color:var(--ink)] truncate">
+                        {patient.nome} {patient.cognome}
+                    </h2>
+                    <p className="flex items-center gap-2 text-[13px] text-[color:var(--muted)]">
+                        <span className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full" style={{ background: active ? 'var(--ok)' : '#B5B3AE' }}></span>
                             {status}
                         </span>
-                    </div>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">ID: #{patient.id}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>n. {patient.id}</span>
+                        {readOnly && (
+                            <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'var(--ink)', color: '#fff' }}>
+                                Caso dimostrativo
+                            </span>
+                        )}
+                    </p>
                 </div>
             </div>
-            <div className="flex bg-gray-100 p-1 rounded-full overflow-x-auto max-w-full">
-                {[
-                    { id: 'info', label: 'Anagrafica', icon: 'ph-user' },
-                    { id: 'history', label: 'Storico', icon: 'ph-clock-counter-clockwise' },
-                    { id: 'visit', label: 'Nuova Visita', icon: 'ph-plus-circle' },
-                    { id: 'Allenamento', label: 'Training', icon: 'ph-barbell' }, // Ho messo icona bilanciere
-                    { id: 'diet', label: 'Diet', icon: 'ph-carrot' },
-                ].map((tab) => (
+
+            <div ref={wrap} className="relative flex p-1 rounded-full bg-[color:var(--soft)] overflow-x-auto max-w-full no-scrollbar">
+                <span
+                    className="absolute top-1 bottom-1 rounded-full bg-[color:var(--ink)]"
+                    style={{
+                        left: pill.left,
+                        width: pill.width,
+                        opacity: pill.ready ? 1 : 0,
+                        transition: 'left .45s var(--ease), width .45s var(--ease), opacity .2s',
+                    }}
+                />
+                {TABS.map((tab) => (
                     <button
                         key={tab.id}
+                        data-tab={tab.id}
                         onClick={() => setView(tab.id)}
-                        className={`px-4 md:px-6 py-2 rounded-full text-xs font-bold uppercase tracking-wide flex-row items-center flex items-center gap-2 transition-all whitespace-nowrap ${view === tab.id ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-black'}`}
+                        className={`relative z-10 flex flex-1 lg:flex-none items-center justify-center gap-2 px-3.5 sm:px-5 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-colors duration-300 ${view === tab.id ? 'text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--ink)]'}`}
                     >
-                        <i className={`ph ${tab.icon} text-lg`}></i> {tab.label}
+                        <i className={`ph ${tab.icon} text-[17px]`}></i>
+                        {tab.label}
                     </button>
                 ))}
             </div>

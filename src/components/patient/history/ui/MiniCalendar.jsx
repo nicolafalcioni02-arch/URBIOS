@@ -40,7 +40,7 @@ export const MiniCalendar = ({ visitDates, onSelectDate, onClose }) => {
                 <button onClick={prevMonth} className="w-7 h-7 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors">
                     <i className="ph-bold ph-caret-left text-xs"></i>
                 </button>
-                <span className="text-xs font-black uppercase tracking-widest text-gray-800">
+                <span className="text-xs font-semibold text-gray-800">
                     {monthNames[viewMonth]} {viewYear}
                 </span>
                 <button onClick={nextMonth} className="w-7 h-7 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors">
@@ -51,7 +51,7 @@ export const MiniCalendar = ({ visitDates, onSelectDate, onClose }) => {
             {/* Day labels */}
             <div className="grid grid-cols-7 mb-1">
                 {dayLabels.map((d) => (
-                    <div key={d} className="text-center text-[9px] font-bold text-gray-400 uppercase py-1">
+                    <div key={d} className="text-center text-[11px] font-bold text-gray-400 py-1">
                         {d}
                     </div>
                 ))}

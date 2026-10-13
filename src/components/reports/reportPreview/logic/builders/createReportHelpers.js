@@ -6,12 +6,12 @@ export const createReportHelpers = ({ d, patient }) => {
     const val = (v, u = '') =>
         v && v !== '-'
             ? `<span style="font-weight:600; color:#000;">${v}</span><span style="font-size:0.75em; color:#666; margin-left:2px;">${u}</span>`
-            : '<span style="color:#ccc;">—</span>';
+            : '<span style="color:#ccc;">-</span>';
 
     const txt = (t) => (t ? t.replace(/\n/g, '<br>') : '<span style="color:#ccc; font-style:italic;">Nessun dato</span>');
 
     const bi = (sx, dx) => {
-        if (!sx && !dx) return '<span style="color:#ccc;">—</span>';
+        if (!sx && !dx) return '<span style="color:#ccc;">-</span>';
         return `${sx ? `<b>${sx}</b><span style="font-size:0.7em">L</span>` : ''} <span style="color:#ccc">|</span> ${dx ? `<b>${dx}</b><span style="font-size:0.7em">R</span>` : ''}`;
     };
 
@@ -64,7 +64,7 @@ export const createReportHelpers = ({ d, patient }) => {
     // Helper per nascondere i pannelli vuoti (QUELLO CHE MANCAVA)
     const renderPanel = (title, items) => {
         const rows = items
-            .filter((i) => i.v && !i.v.includes('—'))
+            .filter((i) => i.v && !i.v.includes('color:#ccc;">-</span>'))
             .map(
                 (i) =>
                     `<tr><td style="padding: 4px 8px; color: #555; border-bottom: 1px solid #f0f0f0;">${i.l}</td><td style="padding: 4px 8px; text-align: right; font-weight: 600;">${i.v}</td></tr>`

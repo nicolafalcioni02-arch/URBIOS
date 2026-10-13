@@ -11,24 +11,24 @@ export const BioimpedanceSection = ({ activeSection, monoPhA, rawRz, rawXc, rzH,
                 isOpen={activeSection === 'bioimpedenza'}
                 onToggle={() => setActiveSection(activeSection === 'bioimpedenza' ? null : 'bioimpedenza')}
             >
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-8">
                     <div className="space-y-6">
-                        <Card title="Dati Bioelettrici" icon="ph-lightning-slash">
+                        <Card title="Dati bioelettrici" icon="ph-lightning-slash">
                             <div className="grid grid-cols-2 gap-4 mb-6">
                                 <InputGroup label="Rz (Resistenza)" placeholder="Ohm" name="biva_rz" value={rawRz || ''} onChange={updateDraft} />
                                 <InputGroup label="Xc (Reattanza)" placeholder="Ohm" name="biva_xc" value={rawXc || ''} onChange={updateDraft} />
                             </div>
-                            <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                <span className="text-xs font-bold text-gray-500 uppercase">Angolo di Fase</span>
-                                <span className="text-2xl font-bold ">{monoPhA ? monoPhA.toFixed(1) + '°' : '--'}</span>
+                            <div className="flex justify-between items-center rounded-xl p-4 bg-[color:var(--soft)]">
+                                <span className="text-sm font-medium text-[color:var(--muted)]">Angolo di fase</span>
+                                <span className="text-3xl font-bold tracking-tight">{monoPhA ? monoPhA.toFixed(1) + '°' : '--'}</span>
                             </div>
                             <div className="grid grid-cols-2 gap-4 mt-4">
-                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                    <span className="text-[10px] text-gray-400 font-bold block">Rz/H</span>
+                                <div className="rounded-xl p-3 bg-[color:var(--soft)]">
+                                    <span className="text-xs text-[color:var(--muted)] font-medium block">Rz/H</span>
                                     <span className="text-lg font-bold">{rzH}</span>
                                 </div>
-                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                    <span className="text-[10px] text-gray-400 font-bold block">Xc/H</span>
+                                <div className="rounded-xl p-3 bg-[color:var(--soft)]">
+                                    <span className="text-xs text-[color:var(--muted)] font-medium block">Xc/H</span>
                                     <span className="text-lg font-bold">{xcH}</span>
                                 </div>
                             </div>

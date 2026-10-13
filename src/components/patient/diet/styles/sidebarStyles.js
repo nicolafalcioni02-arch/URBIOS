@@ -39,10 +39,10 @@ export const sidebarStyles = `
                     justify-content: center;
                     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 }       
-                .t-btn-new { background: #00C853; color: white; }
-                .t-btn-new:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0, 200, 83, 0.2); }
-                .t-btn-settings { background: transparent; color: #86868B; border: 1px dashed #E5E5EA; }
-                .t-btn-settings:hover { background: #F5F5F7; color: #1D1D1F; transform: translateY(-2px); }
+                .t-btn-new { background: var(--ink); color: white; }
+                .t-btn-new:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(18, 19, 23, 0.16); }
+                .t-btn-settings { background: transparent; color: #86868B; border: 1px dashed var(--line); }
+                .t-btn-settings:hover { background: var(--paper); color: #1D1D1F; transform: translateY(-2px); }
 
                 /* LISTA GIORNI E PASTI (Effetti hover e attivi) */
                 .premium-item {
@@ -53,22 +53,22 @@ export const sidebarStyles = `
                 }
                 .premium-item:active { cursor: grabbing; transform: scale(0.96); opacity: 0.8; }
                 .premium-item:hover { 
-                    background: #F2FFF7; box-shadow: 0 4px 15px rgba(0,0,0,0.04); 
-                    transform: translateX(4px); border-color: #E8F5E9; color: #00C853; 
+                    background: var(--soft); box-shadow: 0 4px 15px rgba(0,0,0,0.04); 
+                    transform: translateX(4px); border-color: var(--soft); color: var(--ink); 
                 }
                 .premium-item.active-meal {
-                    background: #E8F5E9; color: #00C853; border-color: #C8E6C9;
+                    background: var(--soft); color: var(--ink); border-color: var(--line);
                 }
                 
-                .premium-subitem { margin-left: 15px; border-left: 2px solid #E5E5EA; padding-left: 10px; transition: border-color 0.3s ease; }
-                .premium-subitem:hover { border-color: #00C853; }
+                .premium-subitem { margin-left: 15px; border-left: 2px solid var(--line); padding-left: 10px; transition: border-color 0.3s ease; }
+                .premium-subitem:hover { border-color: var(--ink); }
 
                 /* AZIONI A SCOMPARSA (Copia, Elimina) */
                 .hover-actions { display: flex; gap: 8px; opacity: 0; transform: translateX(10px); transition: all 0.2s ease; margin-left: auto; }
                 .premium-item:hover .hover-actions { opacity: 1; transform: translateX(0); }
                 .mini-action { color: #86868B; transition: 0.2s; cursor: pointer; font-size: 13px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.05); }
-                .mini-action:hover { color: #00C853; background: #E8F5E9; transform: scale(1.05); }
+                .mini-action:hover { color: var(--ink); background: var(--soft); transform: scale(1.05); }
                 .mini-action.del:hover { color: #FF3B30; background: #FFF0F0; }
-                .drag-over-active { background: #E8F5E9 !important; border: 1px dashed #00C853 !important; transform: scale(1.02); }
+                .drag-over-active { background: var(--soft) !important; border: 1px dashed var(--ink) !important; transform: scale(1.02); }
 
 `;

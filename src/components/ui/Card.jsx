@@ -1,26 +1,18 @@
-import React, { useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+
+// Dentro Nuova Visita ogni sezione e' una schermata a se': niente intestazione a fisarmonica, solo il contenuto.
+export const StepContext = createContext(false);
 
 export const Card = ({ children, title, icon, colorTheme = 'gray', className = '' }) => {
-    const themes = {
-        red: { cardBg: 'bg-red-50', bg: 'bg-white', icon: 'text-red-500', border: 'border-red-100' },
-        blue: { cardBg: 'bg-blue-50', bg: 'bg-white', icon: 'text-blue-600', border: 'border-blue-100' },
-        green: { cardBg: 'bg-emerald-50', bg: 'bg-white', icon: 'text-emerald-600', border: 'border-emerald-100' },
-        orange: { cardBg: 'bg-orange-50', bg: 'bg-white', icon: 'text-orange-500', border: 'border-orange-100' },
-        gray: { cardBg: 'bg-white', bg: 'bg-gray-50', icon: 'text-black-600', border: 'border-gray-100' },
-    };
-
-    const activeTheme = themes[colorTheme] || themes.gray;
+    // il colore del tema resta come prop per compatibilita', ma lo stile e' unico: carta bianca, filo sottile
+    const tint = { red: '#C2413A', orange: '#B7791F', green: '#1F8A5B', blue: '#2F54EB' }[colorTheme];
 
     return (
-        <div className={`${activeTheme.cardBg} p-6 rounded-2xl shadow-sm border ${activeTheme.border} ${className}`}>
+        <div className={`panel ${className}`}>
             {title && (
-                <div className="flex items-center gap-2 mb-6 border-b border-black-100/50 pb-4">
-                    {icon && (
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activeTheme.bg} ${activeTheme.icon}`}>
-                            <i className={`ph ${icon} text-lg`}></i>
-                        </div>
-                    )}
-                    <h4 className="font-bold text-xs uppercase tracking-widest text-black-500">{title}</h4>
+                <div className="flex items-center gap-2 mb-4">
+                    {icon && <i className={`ph ${icon} text-[17px]`} style={{ color: tint || 'var(--muted)' }}></i>}
+                    <h4 className="font-semibold text-[15px] text-[color:var(--ink)]">{title}</h4>
                 </div>
             )}
             {children}
@@ -31,38 +23,28 @@ export const Card = ({ children, title, icon, colorTheme = 'gray', className = '
 export const CardCompattabile = ({ children, title, icon, colorTheme = 'gray', className = '' }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    const themes = {
-        red: { cardBg: 'bg-red-50', bg: 'bg-white', icon: 'text-red-500', border: 'border-red-100' },
-        blue: { cardBg: 'bg-blue-50', bg: 'bg-white', icon: 'text-blue-600', border: 'border-blue-100' },
-        green: { cardBg: 'bg-emerald-50', bg: 'bg-white', icon: 'text-emerald-600', border: 'border-emerald-100' },
-        orange: { cardBg: 'bg-orange-50', bg: 'bg-white', icon: 'text-orange-500', border: 'border-orange-100' },
-        purple: { cardBg: 'bg-purple-50', bg: 'bg-white', icon: 'text-purple-600', border: 'border-purple-100' },
-        pink: { cardBg: 'bg-pink-50', bg: 'bg-white', icon: 'text-pink-400', border: 'border-pink-100' },
-        gray: { cardBg: 'bg-white', bg: 'bg-gray-50', icon: 'text-gray-600', border: 'border-gray-100' },
-        yellow: { cardBg: 'bg-yellow-200', bg: 'bg-white', icon: 'text-yellow-600', border: 'border-yellow-400' },
-    };
-
-    const activeTheme = themes[colorTheme] || themes.gray;
-
     return (
-        <div className={`${activeTheme.cardBg} p-6 rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.02)] border ${activeTheme.border} ${className} h-fit`}>
+        <div className={`panel h-fit !p-0 overflow-hidden ${className}`}>
             {title && (
-                <div
-                    className={`flex items-center justify-between cursor-pointer select-none ${isOpen ? 'mb-6 border-b border-gray-100 pb-4' : 'mb-0 border-none'}`}
+                <button
+                    type="button"
+                    className="w-full flex items-center justify-between gap-3 text-left select-none px-4 py-3.5 transition-colors hover:bg-[color:var(--soft)]"
                     onClick={() => setIsOpen(!isOpen)}
+                    aria-expanded={isOpen}
                 >
-                    <div className="flex items-center gap-2">
-                        {icon && (
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activeTheme.bg} ${activeTheme.icon}`}>
-                                <i className={`ph ${icon} text-lg`}></i>
-                            </div>
-                        )}
-                        <h4 className="font-bold text-xs uppercase tracking-widest text-black-500">{title}</h4>
-                    </div>
-                    <i className={`ph ph-caret-down text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`}></i>
-                </div>
+                    <span className="flex items-center gap-2.5 min-w-0">
+                        {icon && <i className={`ph ${icon} text-[18px] text-[color:var(--muted)]`}></i>}
+                        <span className="font-semibold text-[15px] text-[color:var(--ink)] truncate">{title}</span>
+                    </span>
+                    <i className={`ph ph-plus text-[color:var(--muted)] transition-transform duration-300 ${isOpen ? 'rotate-45' : ''}`}></i>
+                </button>
             )}
-            {isOpen && <div className="animate-fade-in-down">{children}</div>}
+            {/* apertura morbida: la riga della griglia passa da 0 a tutta l'altezza */}
+            <div className="grid transition-[grid-template-rows] duration-500" style={{ gridTemplateRows: isOpen ? '1fr' : '0fr', transitionTimingFunction: 'var(--ease)' }}>
+                <div className="overflow-hidden">
+                    <div className="px-4 pb-4 pt-1">{children}</div>
+                </div>
+            </div>
         </div>
     );
 };
@@ -70,11 +52,14 @@ export const CardCompattabile = ({ children, title, icon, colorTheme = 'gray', c
 export const CollapsibleSection = ({ title, children, defaultOpen = false, isOpen, onToggle }) => {
     const [internalOpen, setInternalOpen] = useState(defaultOpen);
     const isExpanded = isOpen !== undefined ? isOpen : internalOpen;
+    const bare = useContext(StepContext);
 
     const handleToggle = () => {
         if (onToggle) onToggle();
         else setInternalOpen(!internalOpen);
     };
+
+    if (bare) return <div className="stagger">{children}</div>;
 
     return (
         <div className="border border-gray-200 rounded-xl bg-white shadow-sm mb-6 overflow-hidden">

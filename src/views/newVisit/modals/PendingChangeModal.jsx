@@ -26,12 +26,12 @@ export const PendingChangeModal = ({ confirmSettingsChange, db, pendingChange, s
 
                     <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6 flex items-center justify-between">
                         <div className="text-center">
-                            <span className="block text-[10px] font-bold uppercase text-gray-400">Attuale</span>
+                            <span className="block text-xs font-bold text-gray-400">Attuale</span>
                             <span className="text-lg font-bold text-gray-500 line-through">{pendingChange.oldVal}</span>
                         </div>
                         <i className="ph-bold ph-arrow-right text-gray-300"></i>
                         <div className="text-center">
-                            <span className="block text-[10px] font-bold uppercase text-blue-600">Nuovo</span>
+                            <span className="block text-xs font-bold text-blue-600">Nuovo</span>
                             <span className="text-xl font-bold text-blue-600">{pendingChange.newVal}</span>
                         </div>
                     </div>

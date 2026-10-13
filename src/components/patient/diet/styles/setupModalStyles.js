@@ -40,21 +40,19 @@ export const setupModalStyles = `
                 /* Box dei Risultati (Metriche) */
                 .metric-box {
                     background: #FFFFFF; padding: 16px; border-radius: 18px; 
-                    border: 1px solid #E5E5EA; text-align: center;
+                    border: 1px solid var(--line); text-align: center;
                     display: flex; flex-direction: column; justify-content: center;
                     transition: transform 0.2s;
                 }
 
-                .metric-box:hover { transform: scale(1.02); border-color: #00C853; }
+                .metric-box:hover { transform: scale(1.02); border-color: var(--ink); }
 
                 .metric-value {
                     font-size: 22px; font-weight: 900; color: #1D1D1F; display: block;
-                    letter-spacing: -0.5px;
                 }
 
                 .metric-label {
-                    font-size: 9px; font-weight: 800; color: #86868B; 
-                    text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px;
+                    font-size: 9px; font-weight: 800; color: #86868B; margin-top: 4px;
                 }
 
                 /* Input flottanti all'interno del modale */
@@ -63,30 +61,30 @@ export const setupModalStyles = `
                 }
 
                 .t-input-floating label {
-                    font-size: 10px; font-weight: 800; color: #86868B; text-transform: uppercase;
+                    font-size: 10px; font-weight: 800; color: #86868B;
                 }
 
                 .t-input-floating input, .t-input-floating select {
                     width: 100%; padding: 12px 16px; border-radius: 12px; 
-                    border: 1px solid #E5E5EA; background: #FFFFFF; 
+                    border: 1px solid var(--line); background: #FFFFFF; 
                     font-size: 15px; font-weight: 600; outline: none;
                 }
 
-                .t-input-floating input:focus { border-color: #00C853; background: #F2FFF7; }
+                .t-input-floating input:focus { border-color: var(--ink); background: var(--soft); }
 
                 /* --- STILI PER LE SMART CARD CLINICHE --- */
                 .smart-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
                 .smart-card { 
-                    background: #FFFFFF; border-radius: 20px; border: 1px solid #E5E5EA; 
+                    background: #FFFFFF; border-radius: 20px; border: 1px solid var(--line); 
                     padding: 20px; display: flex; flex-direction: column; position: relative;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.02);
                 }
                 .smart-badge { 
                     position: absolute; top: 16px; right: 16px; padding: 4px 10px; 
-                    border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase;
+                    border-radius: 8px; font-size: 10px; font-weight: 800;
                     color: #FFFFFF;
                 }
-                .smart-title { font-size: 11px; font-weight: 800; color: #86868B; text-transform: uppercase; margin-bottom: 8px; }
+                .smart-title { font-size: 11px; font-weight: 800; color: #86868B; margin-bottom: 8px; }
                 .smart-value { font-size: 26px; font-weight: 900; color: #1D1D1F; line-height: 1; }
                 .smart-sub { font-size: 11px; font-weight: 600; color: #86868B; margin-top: 8px; }
 
@@ -100,8 +98,8 @@ export const setupModalStyles = `
 
                 /* Tabella Matrice Pasti */
                 .matrix-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
-                .matrix-table th { text-align: left; padding: 10px; color: #86868B; border-bottom: 1px solid #E5E5EA; font-weight: 800; }
-                .matrix-table td { padding: 10px; border-bottom: 1px solid #F5F5F7; font-weight: 700; color: #1D1D1F; }
-                .matrix-input { width: 50px; padding: 6px; border-radius: 8px; border: 1px solid #E5E5EA; text-align: center; font-weight: 800; }
+                .matrix-table th { text-align: left; padding: 10px; color: #86868B; border-bottom: 1px solid var(--line); font-weight: 800; }
+                .matrix-table td { padding: 10px; border-bottom: 1px solid var(--paper); font-weight: 700; color: #1D1D1F; }
+                .matrix-input { width: 50px; padding: 6px; border-radius: 8px; border: 1px solid var(--line); text-align: center; font-weight: 800; }
 
 `;

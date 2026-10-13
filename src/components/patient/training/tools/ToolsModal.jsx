@@ -28,14 +28,14 @@ export const ToolsModal = ({ profile, massimali, exerciseDB, saveMassimale, dele
                     <div>
                         <h2 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Calcolatori e massimali</h2>
                         {profile && (
-                            <div style={{ fontSize: 12, color: '#86868B', marginTop: 2 }}>
+                            <div style={{ fontSize: 12, color: '#6E6D69', marginTop: 2 }}>
                                 Dati del cliente: {profile.weightKg ? `${profile.weightKg} kg` : 'peso n.d.'} ·{' '}
                                 {profile.heightCm ? `${profile.heightCm} cm` : 'altezza n.d.'} · {profile.age ? `${profile.age} anni` : 'età n.d.'} ·{' '}
                                 {profile.sex === 'F' ? 'donna' : 'uomo'}
                             </div>
                         )}
                     </div>
-                    <button onClick={onClose} className="t-icon-btn" style={{ width: 40, height: 40, background: '#F5F5F7', border: 'none' }}>
+                    <button onClick={onClose} className="t-icon-btn" style={{ width: 40, height: 40, background: '#F6F5F2', border: 'none' }}>
                         <i className="ph-bold ph-x"></i>
                     </button>
                 </div>
@@ -51,7 +51,7 @@ export const ToolsModal = ({ profile, massimali, exerciseDB, saveMassimale, dele
                                 fontSize: 13,
                                 fontWeight: 700,
                                 cursor: 'pointer',
-                                background: tab === id ? '#1D1D1F' : '#F0F0F3',
+                                background: tab === id ? '#121317' : '#F0F0F3',
                                 color: tab === id ? '#fff' : '#444',
                                 display: 'flex',
                                 alignItems: 'center',

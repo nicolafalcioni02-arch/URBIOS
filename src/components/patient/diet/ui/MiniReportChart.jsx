@@ -35,17 +35,17 @@ export const MiniReportChart = ({ report, allDays }) => {
             });
         }
 
-        const cColor = '#1D1D1F';
-        const pColor = '#00C853';
-        const fColor = '#86868B';
-        const accColor = '#007AFF';
+        const cColor = '#121317';
+        const pColor = '#1F8A5B';
+        const fColor = '#6E6D69';
+        const accColor = '#2F54EB';
         let plotData = [];
         let layout = {
             autosize: true,
             margin: { t: 10, l: 30, r: 30, b: 30 },
             paper_bgcolor: 'transparent',
             plot_bgcolor: 'transparent',
-            font: { family: '-apple-system, BlinkMacSystemFont, sans-serif', color: '#86868B', size: 10 },
+            font: { family: '-apple-system, BlinkMacSystemFont, sans-serif', color: '#6E6D69', size: 10 },
             showlegend: false, // Legenda nascosta per le card compatte
         };
 

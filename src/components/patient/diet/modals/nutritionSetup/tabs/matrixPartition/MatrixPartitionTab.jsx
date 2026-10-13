@@ -32,7 +32,7 @@ export const MatrixPartitionTab = ({
         setupTab === 'partizione matriciale' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
                 {/* TOGGLE MODALITÀ GLOBALE vs DAILY */}
-                <div style={{ display: 'flex', gap: '10px', background: '#FFFFFF', padding: '8px', borderRadius: '16px', border: '1px solid #E5E5EA' }}>
+                <div style={{ display: 'flex', gap: '10px', background: '#FFFFFF', padding: '8px', borderRadius: '16px', border: '1px solid #E6E4DE' }}>
                     <button
                         className={`segmented-btn ${!isDailyMode ? 'active' : ''}`}
                         onClick={() => setCalcData({ ...calcData, matrixMode: 'global' })}
@@ -83,7 +83,7 @@ export const MatrixPartitionTab = ({
                             style={{
                                 fontSize: '12px',
                                 fontWeight: 800,
-                                color: calcData.macroTargets.c + calcData.macroTargets.p + calcData.macroTargets.f === 100 ? '#00C853' : '#FF3B30',
+                                color: calcData.macroTargets.c + calcData.macroTargets.p + calcData.macroTargets.f === 100 ? '#1F8A5B' : '#C2413A',
                             }}
                         >
                             TOTALE: {currentMacroTargets.c + currentMacroTargets.p + currentMacroTargets.f}%
@@ -103,7 +103,7 @@ export const MatrixPartitionTab = ({
                                     borderRadius: '12px',
                                 }}
                             >
-                                <span style={{ fontWeight: 800, color: m === 'c' ? '#1D1D1F' : m === 'p' ? '#00C853' : '#86868B', textTransform: 'uppercase' }}>
+                                <span style={{ fontWeight: 800, color: m === 'c' ? '#121317' : m === 'p' ? '#1F8A5B' : '#6E6D69', textTransform: '' }}>
                                     {m}
                                 </span>
                                 <input
@@ -112,7 +112,7 @@ export const MatrixPartitionTab = ({
                                     value={currentMacroTargets[m]}
                                     onChange={(e) => updateMatrixMacro(m, e.target.value)}
                                 />
-                                <span style={{ fontWeight: 800, color: '#86868B' }}>%</span>
+                                <span style={{ fontWeight: 800, color: '#6E6D69' }}>%</span>
                             </div>
                         ))}
                     </div>
@@ -128,7 +128,7 @@ export const MatrixPartitionTab = ({
                             onClick={addMatrixMeal}
                             style={{
                                 background: '#F2F2F7',
-                                color: '#1D1D1F',
+                                color: '#121317',
                                 border: 'none',
                                 padding: '6px 12px',
                                 borderRadius: '8px',
@@ -174,7 +174,7 @@ export const MatrixPartitionTab = ({
                     </table>
 
                     {/* Contatore in tempo reale */}
-                    <div style={{ textAlign: 'right', marginTop: '15px', fontSize: '14px', fontWeight: 900, color: totalDist === 100 ? '#00C853' : '#FF3B30' }}>
+                    <div style={{ textAlign: 'right', marginTop: '15px', fontSize: '14px', fontWeight: 900, color: totalDist === 100 ? '#1F8A5B' : '#C2413A' }}>
                         SOMMA PASTI: {totalDist}%
                     </div>
                 </div>

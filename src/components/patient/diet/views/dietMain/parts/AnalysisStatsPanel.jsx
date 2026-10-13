@@ -44,23 +44,23 @@ export const AnalysisStatsPanel = ({ analysisTargetId, dietDays }) => {
                         <div
                             className="pie-chart"
                             style={{
-                                background: `conic-gradient(#00C853 ${(totals.p / totalMacro) * 100}%, #1D1D1F 0 ${((totals.p + totals.c) / totalMacro) * 100}%, #86868B 0 100%)`,
+                                background: `conic-gradient(#1F8A5B ${(totals.p / totalMacro) * 100}%, #121317 0 ${((totals.p + totals.c) / totalMacro) * 100}%, #6E6D69 0 100%)`,
                             }}
                         >
                             <div className="pie-hole">
                                 <span style={{ fontSize: '18px', fontWeight: 900 }}>{Math.round(totals.kcal)}</span>
-                                <span style={{ fontSize: '8px', fontWeight: 800, color: '#86868B' }}>KCAL</span>
+                                <span style={{ fontSize: '8px', fontWeight: 800, color: '#6E6D69' }}>KCAL</span>
                             </div>
                         </div>
                         <div className="chart-legend">
                             <div className="legend-item">
-                                <div className="legend-dot" style={{ background: '#1D1D1F' }}></div> CAR {Math.round((totals.c / totalMacro) * 100)}%
+                                <div className="legend-dot" style={{ background: '#121317' }}></div> CAR {Math.round((totals.c / totalMacro) * 100)}%
                             </div>
                             <div className="legend-item">
-                                <div className="legend-dot" style={{ background: '#00C853' }}></div> PRO {Math.round((totals.p / totalMacro) * 100)}%
+                                <div className="legend-dot" style={{ background: '#1F8A5B' }}></div> PRO {Math.round((totals.p / totalMacro) * 100)}%
                             </div>
                             <div className="legend-item">
-                                <div className="legend-dot" style={{ background: '#86868B' }}></div> FAT {Math.round((totals.f / totalMacro) * 100)}%
+                                <div className="legend-dot" style={{ background: '#6E6D69' }}></div> FAT {Math.round((totals.f / totalMacro) * 100)}%
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,7 @@ export const AnalysisStatsPanel = ({ analysisTargetId, dietDays }) => {
 
                 {/* Istogramma Calorie con Valori Esposti */}
                 <div className="chart-card">
-                    <span className="scope-indicator">ANDAMENTO ENERGETICO</span>
+                    <span className="scope-indicator">Andamento energetico</span>
                     <div className="chart-title">Kcal per {isAll ? 'Giorno' : 'Pasto'}</div>
                     <div className="bar-container" style={{ paddingBottom: '10px' }}>
                         {stats.map((s, i) => (
@@ -76,20 +76,20 @@ export const AnalysisStatsPanel = ({ analysisTargetId, dietDays }) => {
                                 <div className="bar-value-top">{Math.round(s.totals.kcal)}</div>
                                 <div
                                     className="bar-fill"
-                                    style={{ height: `${(s.totals.kcal / maxKcal) * 75}%`, background: '#1D1D1F', borderRadius: '4px' }}
+                                    style={{ height: `${(s.totals.kcal / maxKcal) * 75}%`, background: '#121317', borderRadius: '4px' }}
                                 ></div>
                                 <div className="bar-label-sigla">{s.sigla}</div>
                             </div>
                         ))}
                     </div>
                     <div className="chart-legend">
-                        <span style={{ fontSize: '9px', color: '#86868B', fontWeight: 800 }}>{isAll ? 'G = GIORNO' : 'P = PASTO'}</span>
+                        <span style={{ fontSize: '9px', color: '#6E6D69', fontWeight: 800 }}>{isAll ? 'G = GIORNO' : 'P = PASTO'}</span>
                     </div>
                 </div>
 
                 {/* Bilanciamento Macro con Legenda Colori */}
                 <div className="chart-card">
-                    <span className="scope-indicator">SCOMPOSIZIONE INTERNA</span>
+                    <span className="scope-indicator">Scomposizione interna</span>
                     <div className="chart-title">Rapporto Nutrienti</div>
                     <div className="bar-container">
                         {stats.map((s, i) => {
@@ -107,15 +107,15 @@ export const AnalysisStatsPanel = ({ analysisTargetId, dietDays }) => {
                                         }}
                                     >
                                         <div
-                                            style={{ height: `${(s.totals.p / mTotal) * 100}%`, background: '#00C853' }}
+                                            style={{ height: `${(s.totals.p / mTotal) * 100}%`, background: '#1F8A5B' }}
                                             title={`Pro: ${s.totals.p.toFixed(1)}g`}
                                         ></div>
                                         <div
-                                            style={{ height: `${(s.totals.c / mTotal) * 100}%`, background: '#1D1D1F' }}
+                                            style={{ height: `${(s.totals.c / mTotal) * 100}%`, background: '#121317' }}
                                             title={`Car: ${s.totals.c.toFixed(1)}g`}
                                         ></div>
                                         <div
-                                            style={{ height: `${(s.totals.f / mTotal) * 100}%`, background: '#86868B' }}
+                                            style={{ height: `${(s.totals.f / mTotal) * 100}%`, background: '#6E6D69' }}
                                             title={`Fat: ${s.totals.f.toFixed(1)}g`}
                                         ></div>
                                     </div>
@@ -126,13 +126,13 @@ export const AnalysisStatsPanel = ({ analysisTargetId, dietDays }) => {
                     </div>
                     <div className="chart-legend">
                         <div className="legend-item">
-                            <div className="legend-dot" style={{ background: '#1D1D1F' }}></div> C
+                            <div className="legend-dot" style={{ background: '#121317' }}></div> C
                         </div>
                         <div className="legend-item">
-                            <div className="legend-dot" style={{ background: '#00C853' }}></div> P
+                            <div className="legend-dot" style={{ background: '#1F8A5B' }}></div> P
                         </div>
                         <div className="legend-item">
-                            <div className="legend-dot" style={{ background: '#86868B' }}></div> F
+                            <div className="legend-dot" style={{ background: '#6E6D69' }}></div> F
                         </div>
                     </div>
                 </div>

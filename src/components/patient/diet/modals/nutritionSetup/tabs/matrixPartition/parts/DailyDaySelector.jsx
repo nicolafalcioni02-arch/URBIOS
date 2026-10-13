@@ -44,8 +44,7 @@ export const DailyDaySelector = ({ calcData, dietDays, isDailyMode, removeDay, s
                                     color: isActive ? '#FFFFFF' : '#636366',
                                     width: `${Math.max((day.title || '').length, 6)}ch`,
                                     cursor: 'text',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.5px',
+                                    textTransform: '',
                                     minWidth: '50px',
                                     maxWidth: '120px',
                                 }}
@@ -86,7 +85,7 @@ export const DailyDaySelector = ({ calcData, dietDays, isDailyMode, removeDay, s
                                         transition: 'all 0.15s',
                                         flexShrink: 0,
                                     }}
-                                    onMouseOver={(e) => (e.currentTarget.style.color = isActive ? 'white' : '#FF3B30')}
+                                    onMouseOver={(e) => (e.currentTarget.style.color = isActive ? 'white' : '#C2413A')}
                                     onMouseOut={(e) => (e.currentTarget.style.color = isActive ? 'rgba(255,255,255,0.6)' : '#C7C7CC')}
                                 >
                                     ✕
@@ -101,8 +100,8 @@ export const DailyDaySelector = ({ calcData, dietDays, isDailyMode, removeDay, s
                     className="analysis-chip"
                     style={{
                         borderStyle: 'dashed',
-                        color: '#00C853',
-                        borderColor: '#00C853',
+                        color: '#1F8A5B',
+                        borderColor: '#1F8A5B',
                         cursor: 'pointer',
                         flexShrink: 0,
                     }}

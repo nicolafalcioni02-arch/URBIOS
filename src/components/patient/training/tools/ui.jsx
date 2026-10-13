@@ -1,20 +1,20 @@
 import React from 'react';
 
 export const Card = ({ title, hint, children }) => (
-    <div style={{ background: '#F9F9FB', border: '1px solid #EEE', borderRadius: 16, padding: 16, marginBottom: 14 }}>
+    <div style={{ background: '#FBFAF8', border: '1px solid #EEE', borderRadius: 16, padding: 16, marginBottom: 14 }}>
         {title && (
-            <div style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.8, color: '#1D1D1F', marginBottom: hint ? 2 : 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, textTransform: '', color: '#121317', marginBottom: hint ? 2 : 10 }}>
                 {title}
             </div>
         )}
-        {hint && <div style={{ fontSize: 12, color: '#86868B', marginBottom: 10, lineHeight: 1.45 }}>{hint}</div>}
+        {hint && <div style={{ fontSize: 12, color: '#6E6D69', marginBottom: 10, lineHeight: 1.45 }}>{hint}</div>}
         {children}
     </div>
 );
 
 export const Field = ({ label, value, onChange, unit, placeholder, width = 120, type = 'text', list }) => (
     <label style={{ display: 'inline-block', marginRight: 10, marginBottom: 8 }}>
-        <span style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#86868B', textTransform: 'uppercase', marginBottom: 3 }}>{label}</span>
+        <span style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#6E6D69', textTransform: '', marginBottom: 3 }}>{label}</span>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
             <input
                 type={type}
@@ -24,14 +24,14 @@ export const Field = ({ label, value, onChange, unit, placeholder, width = 120, 
                 onChange={(e) => onChange(e.target.value)}
                 style={{ width, padding: '9px 10px', borderRadius: 10, border: '1px solid #E0E0E5', fontSize: 14, background: '#fff', outline: 'none' }}
             />
-            {unit && <span style={{ fontSize: 12, color: '#86868B' }}>{unit}</span>}
+            {unit && <span style={{ fontSize: 12, color: '#6E6D69' }}>{unit}</span>}
         </span>
     </label>
 );
 
 export const Pick = ({ label, value, onChange, options, width = 220 }) => (
     <label style={{ display: 'inline-block', marginRight: 10, marginBottom: 8 }}>
-        <span style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#86868B', textTransform: 'uppercase', marginBottom: 3 }}>{label}</span>
+        <span style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#6E6D69', textTransform: '', marginBottom: 3 }}>{label}</span>
         <select
             value={value}
             onChange={(e) => onChange(e.target.value)}
@@ -50,7 +50,7 @@ export const Result = ({ children, tone = 'blue' }) => (
     <div
         style={{
             background: tone === 'blue' ? '#EAF3FF' : tone === 'green' ? '#EAF8EE' : '#FFF4DD',
-            color: '#1D1D1F',
+            color: '#121317',
             borderRadius: 12,
             padding: '10px 14px',
             fontSize: 14,
@@ -67,8 +67,8 @@ export const Btn = ({ children, onClick, disabled, dark = true }) => (
         disabled={disabled}
         onClick={onClick}
         style={{
-            background: dark ? '#1D1D1F' : '#fff',
-            color: dark ? '#fff' : '#1D1D1F',
+            background: dark ? '#121317' : '#fff',
+            color: dark ? '#fff' : '#121317',
             border: dark ? 'none' : '1px solid #DDD',
             borderRadius: 10,
             padding: '9px 14px',
@@ -96,8 +96,8 @@ export const Table = ({ head, rows, small }) => (
                                 padding: '6px 8px',
                                 borderBottom: '2px solid #DDD',
                                 fontSize: 11,
-                                textTransform: 'uppercase',
-                                color: '#86868B',
+                                textTransform: '',
+                                color: '#6E6D69',
                             }}
                         >
                             {h}
@@ -120,7 +120,7 @@ export const Table = ({ head, rows, small }) => (
     </div>
 );
 
-export const n1 = (x, d = 1) => (Number.isFinite(x) ? String(Math.round(x * 10 ** d) / 10 ** d).replace('.', ',') : '—');
+export const n1 = (x, d = 1) => (Number.isFinite(x) ? String(Math.round(x * 10 ** d) / 10 ** d).replace('.', ',') : '-');
 export const toNum = (v) => {
     const n = parseFloat(String(v ?? '').replace(',', '.'));
     return Number.isFinite(n) ? n : NaN;

@@ -9,14 +9,14 @@ Formato: `[ ]` aperto · `[x]` risolto. Ogni voce: dove, cosa succede, fix propo
   `status` non è definita in quello scope: nel browser risolve a `window.status` (stringa vuota) e sovrascrive lo stato scelto in "Salva e Gestisci" al primo autosave successivo.
   Fix proposto: `dietStatus: v.dietStatus`.
 - [ ] **File duplicati vuoti** — `src/components/charts/ReportPreviewModal.jsx` e `src/components/charts/LetteraIncaricoModal.jsx` (0 righe). Gli originali sono in `components/reports/`. Eliminare.
-- [ ] **`prompt()` per creare un paziente** — `src/views/ProfessionalSuite.jsx` (`handleAddPatient`). Non funziona in webview/browser embedded e non è testabile; sostituire con un modale.
+- [x] **`prompt()` per creare un paziente** (risolto: ora c'è un pannello con nome, cognome e sesso) — `src/views/ProfessionalSuite.jsx` (`handleAddPatient`). Non funziona in webview/browser embedded e non è testabile; sostituire con un modale.
 - [ ] **`status` non definita nell'autosave** → vedi primo punto (stessa voce, non duplicata).
 - [ ] **Navigazione "Scarica Database" (sito web) non fa nulla** — solo sito, fuori da questo progetto: `sito web.html`, `confirmLegal()` gestisce `dl_software` e `URBIOS.html` ma non `dl_db`. Il logo nav usa `gsap.to(window,{scrollTo:0})` ma il plugin ScrollTo non è caricato (non scrolla). Il tag `<h1 className=...>` nel mockup step 2 è sintassi React dentro HTML (`class`).
 
-- [ ] **4× `console.error "Errore nella formula:"` all'apertura di "Nuova Visita"** — compare (anche nell'originale) quando nel paziente esiste già una visita "Solo Dieta". `src/logic/calculations.js` (`calculateEquation`): le formule vengono valutate con un `draft` privo di alcune variabili e finiscono nel catch. Verificare quali formule/chiavi mancano.
+- [x] **`console.error "Errore nella formula:"` in "Nuova Visita"** (risolto: le formule predefinite usano `data.logSomma` ma `calculateEquation` non passava `data`, quindi densità e massa grassa dalle pliche restavano a zero; ora `data` è disponibile). Nota originale: — compare (anche nell'originale) quando nel paziente esiste già una visita "Solo Dieta". `src/logic/calculations.js` (`calculateEquation`): le formule vengono valutate con un `draft` privo di alcune variabili e finiscono nel catch. Verificare quali formule/chiavi mancano.
 - [ ] **Storico: variazione peso tra visite dello stesso giorno** — `history/HistoryView.jsx` (`getWeightDelta`): se due visite hanno la stessa data l'ordinamento è instabile e il delta può risultare di segno opposto (visto: 80 kg "+10 kg" rispetto a una visita "Solo Dieta" con peso di default 70). Da verificare con dati reali.
 
-- [ ] **Unità "PROVA" nei range ematici** — `src/logic/db_defaults.js` (`DEFAULT_RANGE_EMATO.bg_glicemia.unit: 'PROVA'`): resto di un test, compare come unità della glicemia (anche negli export `range_ematici.csv`). Dovrebbe essere `mg/dL`.
+- [x] **Unità "PROVA" nei range ematici** (risolto: ora mg/dL) — `src/logic/db_defaults.js` (`DEFAULT_RANGE_EMATO.bg_glicemia.unit: 'PROVA'`): resto di un test, compare come unità della glicemia (anche negli export `range_ematici.csv`). Dovrebbe essere `mg/dL`.
 - [ ] **Dati demo incoerenti** — `src/components/Pazienti_demo/casiDemo.js`: i valori nutrizionali degli alimenti sono per 100 g nell'app, ma alcuni sono per porzione (es. "Olio EVO" 10 g con kcal 90 invece di ~899): i totali del piano demo risultano sbagliati.
 - [ ] **Import archivio: il conteggio "formule" include quelle di default** — `import/analyze.js`: `normalizeDb` aggiunge le formule di default anche se il file non le contiene, e l'anteprima le conta come "4 formule" (non vengono comunque duplicate).
 
@@ -30,7 +30,7 @@ Formato: `[ ]` aperto · `[x]` risolto. Ogni voce: dove, cosa succede, fix propo
 - [ ] **Blocco automatico dopo inattività** (es. 10 min) per gli archivi cifrati: oggi c'è solo "Blocca ora" nelle Impostazioni.
 - [ ] **Safari/Firefox/telefono**: il browser non permette di sovrascrivere il file, a ogni "Salva" viene scaricata una nuova copia (`URBIOS_data_cifrato.json`). Valutare nome file con ora o promemoria "elimina le vecchie copie".
 - [ ] **Promemoria di salvataggio periodico** (es. ogni 15 minuti se ci sono modifiche) oltre alla pastiglia rossa e all'avviso del browser.
-- [ ] **"Nuovo Paziente" usa `prompt()`** (vedi sopra): sostituire con un modulo, ora anche per validare i dati.
+- [x] **"Nuovo Paziente" usa `prompt()`**: risolto, vedi sopra.
 
 ## Codice morto (dichiarato ma mai usato) — da eliminare con calma
 Rilevato con analisi automatica dei riferimenti. Non rimosso nel riordino per non cambiare nulla.

@@ -7,7 +7,7 @@ const f1 = (x) => String(Math.round(x * 10) / 10).replace('.', ',');
 export const MuscleBars = ({ muscles, goal, level, deload }) => {
     const range = goal && level ? weeklySetsRange(goal.id, level) : null;
     const rows = Object.entries(muscles).sort((a, b) => b[1].weighted - a[1].weighted);
-    if (!rows.length) return <div style={{ fontSize: 13, color: '#86868B' }}>Nessuna serie di lavoro pianificata in questa settimana.</div>;
+    if (!rows.length) return <div style={{ fontSize: 13, color: '#6E6D69' }}>Nessuna serie di lavoro pianificata in questa settimana.</div>;
     const scale = Math.max(range ? range[1] * 1.25 : 0, ...rows.map(([, v]) => v.weighted), 6);
     return (
         <div>
@@ -64,7 +64,7 @@ export const MuscleBars = ({ muscles, goal, level, deload }) => {
                     </div>
                 );
             })}
-            <div style={{ fontSize: 11, color: '#86868B', marginTop: 4 }}>
+            <div style={{ fontSize: 11, color: '#6E6D69', marginTop: 4 }}>
                 Barra colorata = serie dirette · grigio = serie ponderate (secondari al 50%) · banda verde = fascia indicata per obiettivo e livello.
             </div>
         </div>

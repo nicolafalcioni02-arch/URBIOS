@@ -7,7 +7,7 @@ export const GlossaryPanel = ({ showGlossary }) => {
                 <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* DEFINIZIONI */}
                     <div>
-                        <h5 className="text-[10px] font-black uppercase text-blue-500 tracking-widest mb-4 flex items-center gap-2">
+                        <h5 className="text-xs font-semibold text-blue-500 mb-4 flex items-center gap-2">
                             <i className="ph-fill ph-book-open text-lg"></i> Glossary & Definitions
                         </h5>
                         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
@@ -45,7 +45,7 @@ export const GlossaryPanel = ({ showGlossary }) => {
 
                     {/* ABBREVIAZIONI */}
                     <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
-                        <h5 className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-4 flex items-center gap-2">
+                        <h5 className="text-xs font-semibold text-gray-400 mb-4 flex items-center gap-2">
                             <i className="ph-fill ph-text-aa text-lg"></i> Abbreviations
                         </h5>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-4">

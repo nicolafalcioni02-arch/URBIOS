@@ -8,7 +8,7 @@ export const ChangeVisitModal = ({ isChangeVisitOpen, listaVisite, selectedVisit
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <div>
                             <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>Seleziona Visita Clinica</h3>
-                            <span style={{ fontSize: '11px', color: '#86868B', fontWeight: 600 }}>
+                            <span style={{ fontSize: '11px', color: '#6E6D69', fontWeight: 600 }}>
                                 Associa il piano nutrizionale a una misurazione in storico
                             </span>
                         </div>
@@ -22,7 +22,7 @@ export const ChangeVisitModal = ({ isChangeVisitOpen, listaVisite, selectedVisit
 
                     <div style={{ maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '4px' }}>
                         {listaVisite.filter((v) => v.dettagli && !v.note?.includes('Solo Dieta')).length === 0 ? (
-                            <div style={{ padding: '30px', textAlign: 'center', color: '#86868B', fontSize: '13px', fontWeight: 600, fontStyle: 'italic' }}>
+                            <div style={{ padding: '30px', textAlign: 'center', color: '#6E6D69', fontSize: '13px', fontWeight: 600, fontStyle: 'italic' }}>
                                 Nessuna visita clinica (antropometrica) registrata per questo paziente.
                             </div>
                         ) : (
@@ -40,8 +40,8 @@ export const ChangeVisitModal = ({ isChangeVisitOpen, listaVisite, selectedVisit
                                             style={{
                                                 padding: '12px 16px',
                                                 borderRadius: '14px',
-                                                border: `1px solid ${isCurrent ? '#00C853' : '#E5E5EA'}`,
-                                                background: isCurrent ? '#F2FFF7' : '#FFFFFF',
+                                                border: `1px solid ${isCurrent ? '#1F8A5B' : '#E6E4DE'}`,
+                                                background: isCurrent ? '#F1F8F4' : '#FFFFFF',
                                                 cursor: 'pointer',
                                                 display: 'flex',
                                                 justifyContent: 'space-between',
@@ -51,8 +51,8 @@ export const ChangeVisitModal = ({ isChangeVisitOpen, listaVisite, selectedVisit
                                             className="laf-row"
                                         >
                                             <div>
-                                                <div style={{ fontWeight: 800, fontSize: '14px', color: '#1D1D1F' }}>Visita del {v.data}</div>
-                                                <div style={{ fontSize: '11px', color: '#86868B', marginTop: '2px', fontWeight: 600 }}>
+                                                <div style={{ fontWeight: 800, fontSize: '14px', color: '#121317' }}>Visita del {v.data}</div>
+                                                <div style={{ fontSize: '11px', color: '#6E6D69', marginTop: '2px', fontWeight: 600 }}>
                                                     Peso rilevato: {v.peso} kg
                                                 </div>
                                             </div>
@@ -61,7 +61,7 @@ export const ChangeVisitModal = ({ isChangeVisitOpen, listaVisite, selectedVisit
                                                     style={{
                                                         fontSize: '10px',
                                                         fontWeight: 900,
-                                                        color: '#00C853',
+                                                        color: '#1F8A5B',
                                                         background: '#C8E6C9',
                                                         padding: '3px 8px',
                                                         borderRadius: '6px',
@@ -80,7 +80,7 @@ export const ChangeVisitModal = ({ isChangeVisitOpen, listaVisite, selectedVisit
                         style={{
                             width: '100%',
                             padding: '12px',
-                            background: '#1D1D1F',
+                            background: '#121317',
                             color: 'white',
                             borderRadius: '12px',
                             border: 'none',

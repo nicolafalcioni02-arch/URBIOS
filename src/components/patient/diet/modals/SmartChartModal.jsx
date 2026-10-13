@@ -124,8 +124,8 @@ export const SmartChartModal = ({ activeDay, isSmartOpen, plotRef, saveSmartRepo
                                 <span className="sc-chart-tag">
                                     {smartConfig.scope === 'activeDay' ? activeDay?.title || 'Giorno corrente' : 'Piano completo'}
                                 </span>
-                                <span style={{ fontSize: '10px', fontWeight: 600, color: '#C7C7CC', letterSpacing: '0.3px' }}>
-                                    {METRIC_CATALOG[smartConfig.metric]?.label || '—'}
+                                <span style={{ fontSize: '12px', fontWeight: 600, color: '#C7C7CC', }}>
+                                    {METRIC_CATALOG[smartConfig.metric]?.label || '-'}
                                     {' · '}
                                     {smartConfig.type.toUpperCase()}
                                 </span>

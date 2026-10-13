@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import Plot from 'react-plotly.js';
 import { POPULATIONS } from '../../logic/db_defaults';
 import { getBivariateZ, getEllipsePoints } from '../../logic/calculations';
@@ -7,6 +8,13 @@ export const BivaChart = ({ rz, xc, h }) => {
     const chartRef = useRef(null);
     const [selectedPopId, setSelectedPopId] = useState(1);
     const [isExpanded, setIsExpanded] = useState(false);
+    // larghezza della finestra: in modalita' espansa, se e' stretta i due grafici vanno uno sopra l'altro
+    const [winW, setWinW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+    useEffect(() => {
+        const onResize = () => setWinW(window.innerWidth);
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
 
     // STATO PER I VALORI DI RIFERIMENTO
     const [customRef, setCustomRef] = useState({
@@ -166,11 +174,12 @@ export const BivaChart = ({ rz, xc, h }) => {
     const maxX = ref.mx + 4 * ref.sx;
     const maxY = ref.my + 4 * ref.sy;
 
-    const gridConfig = isExpanded ? { rows: 1, columns: 2, pattern: 'independent' } : { rows: 2, columns: 1, pattern: 'independent' };
+    const sideBySide = isExpanded && winW >= 760;
+    const gridConfig = sideBySide ? { rows: 1, columns: 2, pattern: 'independent' } : { rows: 2, columns: 1, pattern: 'independent' };
 
-    const sceneDomain = isExpanded ? { x: [0, 0.48], y: [0, 1] } : { row: 0, column: 0 };
-    const axes2D_DomainX = isExpanded ? [0.52, 1] : [0, 1];
-    const axes2D_DomainY = isExpanded ? [0, 1] : [0, 0.45];
+    const sceneDomain = sideBySide ? { x: [0, 0.48], y: [0, 1] } : { row: 0, column: 0 };
+    const axes2D_DomainX = sideBySide ? [0.52, 1] : [0, 1];
+    const axes2D_DomainY = sideBySide ? [0, 1] : [0, 0.45];
 
     const layout = {
         paper_bgcolor: 'transparent',
@@ -179,7 +188,9 @@ export const BivaChart = ({ rz, xc, h }) => {
         showlegend: false,
         margin: isExpanded ? { l: 50, r: 50, b: 50, t: 50 } : { l: 40, r: 10, b: 40, t: 10 },
         grid: gridConfig,
-        height: isExpanded ? window.innerHeight - 150 : 550,
+        // espanso: nessuna altezza fissa, il grafico riempie lo spazio e segue il ridimensionamento della finestra
+        height: isExpanded ? undefined : 550,
+        autosize: true,
 
         scene1: {
             domain: sceneDomain,
@@ -217,16 +228,16 @@ export const BivaChart = ({ rz, xc, h }) => {
     // --- RENDER COMPONENTE ---
     // Usiamo una funzione interna per il contenuto grafico per gestire il "Fullscreen"
     const GraphContent = (
-        <div className={`w-full h-full ${isExpanded ? 'fixed inset-0 z-50 bg-white p-4 flex flex-col' : ''}`}>
+        <div className={`w-full h-full ${isExpanded ? 'bg-white p-4 flex flex-col' : ''}`}>
             {isExpanded && (
-                <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
-                    <h3 className="font-bold text-xl">Analisi BIVA Avanzata</h3>
-                    <div className="flex gap-4">
+                <div className="flex flex-wrap justify-between items-center gap-3 mb-3 pb-3 border-b border-gray-100 flex-none">
+                    <h3 className="font-bold text-lg sm:text-xl">Analisi BIVA avanzata</h3>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                         {/* Selettore Popolazione nel Fullscreen */}
                         <select
                             value={selectedPopId}
                             onChange={(e) => setSelectedPopId(e.target.value)}
-                            className="bg-gray-100 border-none rounded-full px-4 py-2 text-sm font-bold text-gray-700 cursor-pointer outline-none"
+                            className="bg-gray-100 border-none rounded-full px-4 py-2 text-sm font-bold text-gray-700 cursor-pointer outline-none max-w-[16rem] sm:max-w-sm truncate"
                         >
                             {POPULATIONS.map((pop) => (
                                 <option key={pop.id} value={pop.id}>
@@ -237,18 +248,19 @@ export const BivaChart = ({ rz, xc, h }) => {
                         {/* Box Input Rapidi nel Fullscreen */}
                         {['mx', 'my', 'sx', 'sy', 'r'].map((k) => (
                             <div key={k} className="flex items-center gap-1">
-                                <span className="text-[10px] font-bold text-gray-400 uppercase">{k}</span>
+                                <span className="text-xs font-bold text-gray-400 ">{k}</span>
                                 <input
                                     type="number"
                                     value={customRef[k]}
                                     onChange={(e) => handleRefChange(k, e.target.value)}
-                                    className="w-12 text-center text-xs font-bold border-b bg-transparent"
+                                    className="w-16 text-center text-xs font-bold border-b bg-transparent"
                                 />
                             </div>
                         ))}
                         <button
                             onClick={() => setIsExpanded(false)}
-                            className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200"
+                            className="w-10 h-10 flex-none bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200"
+                            aria-label="Chiudi"
                         >
                             <i className="ph ph-x"></i>
                         </button>
@@ -260,7 +272,7 @@ export const BivaChart = ({ rz, xc, h }) => {
             {!isExpanded && (
                 <div className="mb-3 border-b border-gray-100 pb-3">
                     <div className="flex justify-between items-center mb-2">
-                        <label className="text-[10px] uppercase font-bold text-gray-400">Riferimento BIVA</label>
+                        <label className="text-xs font-bold text-gray-400">Riferimento BIVA</label>
                         <select
                             value={selectedPopId}
                             onChange={(e) => setSelectedPopId(e.target.value)}
@@ -279,7 +291,7 @@ export const BivaChart = ({ rz, xc, h }) => {
                 </div>
             )}
 
-            <div className="flex-1 w-full min-h-[450px]">
+            <div className={`flex-1 w-full ${isExpanded ? 'min-h-0' : 'min-h-[450px]'}`}>
                 <Plot
                     data={plotData}
                     layout={layout}
@@ -290,6 +302,9 @@ export const BivaChart = ({ rz, xc, h }) => {
             </div>
         </div>
     );
+
+    // A schermo intero il grafico va sul body: dentro un genitore animato/trasformato `fixed` non coprirebbe lo schermo
+    if (isExpanded) return ReactDOM.createPortal(<div className="fixed inset-0 z-[10000] bg-white">{GraphContent}</div>, document.body);
 
     return <div className="bg-white rounded-xl border border-gray-200 p-4 h-full flex flex-col shadow-sm relative">{GraphContent}</div>;
 };

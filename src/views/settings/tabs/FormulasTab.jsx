@@ -22,10 +22,10 @@ export const FormulasTab = ({ db, handleAddFormula, handleDeleteFormula, newForm
                 {/* FORM AGGIUNTA */}
                 {showAddFormula && (
                     <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-8 fade-enter shadow-inner">
-                        <h4 className="text-sm font-bold uppercase tracking-widest mb-4 text-black">Nuova Equazione</h4>
+                        <h4 className="text-sm font-bold mb-4 text-black">Nuova Equazione</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div className="space-y-1">
-                                <label className="text-[10px] uppercase font-bold text-gray-400">Titolo Formula</label>
+                                <label className="text-xs font-bold text-gray-400">Titolo Formula</label>
                                 <input
                                     type="text"
                                     placeholder="Es. Formula di Katch-McArdle"
@@ -35,7 +35,7 @@ export const FormulasTab = ({ db, handleAddFormula, handleDeleteFormula, newForm
                                 />
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[10px] uppercase font-bold text-gray-400">Categoria</label>
+                                <label className="text-xs font-bold text-gray-400">Categoria</label>
                                 <select
                                     value={newFormula.categoria}
                                     onChange={(e) => setNewFormula({ ...newFormula, categoria: e.target.value })}
@@ -50,7 +50,7 @@ export const FormulasTab = ({ db, handleAddFormula, handleDeleteFormula, newForm
                                 </select>
                             </div>
                             <div className="col-span-full space-y-1">
-                                <label className="text-[10px] uppercase font-bold text-gray-400">Equazione (Testo)</label>
+                                <label className="text-xs font-bold text-gray-400">Equazione (Testo)</label>
                                 <input
                                     type="text"
                                     placeholder="Es. BMR = 370 + (21.6 * LBM)"
@@ -60,7 +60,7 @@ export const FormulasTab = ({ db, handleAddFormula, handleDeleteFormula, newForm
                                 />
                             </div>
                             <div className="col-span-full space-y-1">
-                                <label className="text-[10px] uppercase font-bold text-gray-400">Note / Descrizione</label>
+                                <label className="text-xs font-bold text-gray-400">Note / Descrizione</label>
                                 <input
                                     type="text"
                                     placeholder="Note aggiuntive..."
@@ -150,7 +150,7 @@ GENERA LA FORMULA PER: [INSERIRE NOME FORMULA QUI]`);
                                 </button>
 
                                 <div className="flex items-center gap-3 mb-2">
-                                    <span className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-[10px] font-bold uppercase tracking-wide">
+                                    <span className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-xs font-bold ">
                                         {f.categoria}
                                     </span>
                                 </div>

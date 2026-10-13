@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { TrainingCompact } from './views/TrainingCompact';
 import { defaultDB } from './data/defaultExerciseDB';
 import { ExerciseDatabaseModal } from './modals/ExerciseDatabaseModal';
 import { ExercisePhotosModal } from './modals/ExercisePhotosModal';
@@ -25,6 +26,15 @@ export const TrainingPlan = ({ patient, db, onUpdateDb }) => {
             patient,
             onUpdateDb,
         });
+    // Schermo piccolo (telefono e tablet in verticale): vista pensata per il pollice invece dell'indice laterale
+    const [compact, setCompact] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches);
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 900px)');
+        const on = (e) => setCompact(e.matches);
+        mq.addEventListener('change', on);
+        return () => mq.removeEventListener('change', on);
+    }, []);
+    const [navOpen, setNavOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isPrintOpen, setIsPrintOpen] = useState(false);
     const [isSchedeOpen, setIsSchedeOpen] = useState(false);
@@ -111,24 +121,45 @@ export const TrainingPlan = ({ patient, db, onUpdateDb }) => {
     };
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                height: '100%',
-                minHeight: '80vh',
-                backgroundColor: '#F5F5F7',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif',
-                color: '#1D1D1F',
-                margin: '-16px',
-                textAlign: 'left', // margin compensa padding genitore
-            }}
-        >
+        <div className="t-root">
             {/* CSS INIETTATO E MIGLIORATO (Premium Motion & Sticky Sidebar) */}
             <style>{trainingCss}</style>
 
+            {compact ? (
+                <TrainingCompact
+                    weeks={weeks}
+                    header={header}
+                    setHeader={setHeader}
+                    activeDayInfo={activeDayInfo}
+                    setActiveDayInfo={setActiveDayInfo}
+                    ops={ops}
+                    analysisCtx={analysisCtx}
+                    exerciseDB={exerciseDB}
+                    suggestions={suggestions}
+                    massimali={massimali}
+                    onOpenAnalysis={() => setIsAnalysisOpen(true)}
+                    onOpenTools={() => setIsToolsOpen(true)}
+                    onOpenProgression={() => setIsProgressionOpen(true)}
+                    onPrint={() => setIsPrintOpen(true)}
+                    onOpenSchede={() => setIsSchedeOpen(true)}
+                    onOpenExercises={() => setIsSettingsOpen(true)}
+                />
+            ) : (
+                <>
+
+            <div className="t-mobile-bar">
+                <button onClick={() => setNavOpen(true)}>
+                    <i className="ph ph-list"></i> Indice scheda
+                </button>
+                <span className="t-mobile-where">{header.titolo || header.cliente || ''}</span>
+            </div>
+            <div className={`t-nav-backdrop${navOpen ? ' open' : ''}`} onClick={() => setNavOpen(false)} />
+
             <TrainingSidebar
+                open={navOpen}
                 activeDayInfo={activeDayInfo}
                 addNewWeek={addNewWeek}
+                addDay={editing.addDay}
                 dragOverId={dragOverId}
                 duplicateDay={duplicateDay}
                 duplicateWeek={duplicateWeek}
@@ -138,7 +169,10 @@ export const TrainingPlan = ({ patient, db, onUpdateDb }) => {
                 handleDrop={handleDrop}
                 removeDay={removeDay}
                 removeWeek={removeWeek}
-                setActiveDayInfo={setActiveDayInfo}
+                setActiveDayInfo={(v) => {
+                    setActiveDayInfo(v);
+                    setNavOpen(false);
+                }}
                 setDragOverId={setDragOverId}
                 setIsSettingsOpen={setIsSettingsOpen}
                 setIsSchedeOpen={setIsSchedeOpen}
@@ -163,9 +197,14 @@ export const TrainingPlan = ({ patient, db, onUpdateDb }) => {
                 onPrint={() => setIsPrintOpen(true)}
             />
 
-            <button className="t-fab-print" title="Stampa la scheda" onClick={() => setIsPrintOpen(true)}>
-                <i className="ph ph-printer" style={{ fontSize: '28px' }}></i>
-            </button>
+                </>
+            )}
+
+            {!compact && (
+                <button className="t-fab-print" title="Stampa la scheda" onClick={() => setIsPrintOpen(true)}>
+                    <i className="ph ph-printer" style={{ fontSize: '28px' }}></i>
+                </button>
+            )}
 
             {isPrintOpen && (
                 <TrainingPrintView

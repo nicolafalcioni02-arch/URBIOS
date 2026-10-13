@@ -9,7 +9,7 @@ export const buildMacroChart = ({ PALETTE, labels, layout, plotData, smartConfig
     // (nel file originale era una riassegnazione di plotData: qui si riempie lo stesso array, che parte vuoto)
     plotData.push(
         ...[
-            { x: labels, y: cVals, type, mode, name: 'Carbo (g)', marker: { color: '#1D1D1F' }, line: { color: '#1D1D1F', width: 2 } },
+            { x: labels, y: cVals, type, mode, name: 'Carbo (g)', marker: { color: '#121317' }, line: { color: '#121317', width: 2 } },
             { x: labels, y: pVals, type, mode, name: 'Pro (g)', marker: { color: PALETTE.green }, line: { color: PALETTE.green, width: 2 } },
             { x: labels, y: fVals, type, mode, name: 'Fat (g)', marker: { color: PALETTE.gray }, line: { color: PALETTE.gray, width: 2 } },
         ]

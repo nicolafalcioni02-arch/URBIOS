@@ -38,7 +38,7 @@ export const MealItemRow = ({
                                 <div key={sIdx} className="t-suggestion-item" onClick={() => applyFoodSuggestion(currentDay.id, currentMeal.id, item.id, sugg)}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                                         <span>{sugg.name}</span>
-                                        <span style={{ fontWeight: 700, color: '#1D1D1F' }}>{sugg.kcal} kcal/100g</span>
+                                        <span style={{ fontWeight: 700, color: '#121317' }}>{sugg.kcal} kcal/100g</span>
                                     </div>
                                     <span className="t-suggestion-tag">{sugg.category}</span>
                                 </div>
@@ -55,7 +55,7 @@ export const MealItemRow = ({
                         background: '#FFFFFF',
                         borderRadius: '8px',
                         padding: '0 10px',
-                        border: '1px solid #E5E5EA',
+                        border: '1px solid #E6E4DE',
                         width: '100px',
                     }}
                 >
@@ -71,17 +71,17 @@ export const MealItemRow = ({
                             fontWeight: 700,
                             textAlign: 'right',
                             fontSize: '15px',
-                            color: '#00C853',
+                            color: '#1F8A5B',
                             padding: '10px 0',
                         }}
                     />
-                    <span style={{ fontSize: '13px', color: '#86868B', marginLeft: '4px', fontWeight: 600 }}>g</span>
+                    <span style={{ fontSize: '13px', color: '#6E6D69', marginLeft: '4px', fontWeight: 600 }}>g</span>
                 </div>
 
                 {/* Riepilogo Macro */}
                 <div style={{ width: '140px', textAlign: 'right', display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: '15px', fontWeight: 800, color: '#1D1D1F' }}>{((item.kcal * item.weight) / 100).toFixed(0)} kcal</span>
-                    <span style={{ fontSize: '11px', color: '#86868B', fontWeight: 600 }}>
+                    <span style={{ fontSize: '15px', fontWeight: 800, color: '#121317' }}>{((item.kcal * item.weight) / 100).toFixed(0)} kcal</span>
+                    <span style={{ fontSize: '11px', color: '#6E6D69', fontWeight: 600 }}>
                         C:{((item.c * item.weight) / 100).toFixed(1)} P:{((item.p * item.weight) / 100).toFixed(1)} F:
                         {((item.f * item.weight) / 100).toFixed(1)}
                     </span>
@@ -120,14 +120,14 @@ export const MealItemRow = ({
                         alignItems: 'center',
                         marginLeft: '46px',
                         padding: '12px 18px',
-                        background: '#F2FFF7',
+                        background: '#F1F8F4',
                         borderRadius: '16px',
-                        borderLeft: '4px solid #00C853',
-                        border: '1px solid #E8F5E9',
+                        borderLeft: '4px solid #1F8A5B',
+                        border: '1px solid #E4EFE8',
                         position: 'relative',
                     }}
                 >
-                    <span style={{ fontSize: '11px', color: '#00C853', fontWeight: 900, textTransform: 'uppercase' }}>OR</span>
+                    <span style={{ fontSize: '11px', color: '#1F8A5B', fontWeight: 900, textTransform: '' }}>OR</span>
 
                     {/* Ricerca per la Sostituzione */}
                     <div style={{ flex: 1, position: 'relative' }}>
@@ -137,7 +137,7 @@ export const MealItemRow = ({
                             value={sub.name}
                             onChange={(e) => updateSubstitutionValue(currentDay.id, currentMeal.id, item.id, sub.id, 'name', e.target.value)}
                             placeholder="Cerca alternativa..."
-                            style={{ fontSize: '14px', padding: '8px 12px', background: 'white', border: '1px solid #E5E5EA' }}
+                            style={{ fontSize: '14px', padding: '8px 12px', background: 'white', border: '1px solid #E6E4DE' }}
                         />
                         {suggestions[sub.id] && (
                             <div className="t-suggestions-list">
@@ -149,7 +149,7 @@ export const MealItemRow = ({
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                                             <span>{sugg.name}</span>
-                                            <span style={{ fontWeight: 700, color: '#1D1D1F' }}>{sugg.kcal} kcal/100g</span>
+                                            <span style={{ fontWeight: 700, color: '#121317' }}>{sugg.kcal} kcal/100g</span>
                                         </div>
                                         <span className="t-suggestion-tag">{sugg.category}</span>
                                     </div>
@@ -159,7 +159,7 @@ export const MealItemRow = ({
                     </div>
 
                     {/* Bottoni Modalità: Isocalorica, ecc. */}
-                    <div style={{ display: 'flex', gap: '4px', background: 'white', padding: '4px', borderRadius: '10px', border: '1px solid #E5E5EA' }}>
+                    <div style={{ display: 'flex', gap: '4px', background: 'white', padding: '4px', borderRadius: '10px', border: '1px solid #E6E4DE' }}>
                         {[
                             { val: 'kcal', label: 'Iso-Kcal' },
                             { val: 'p', label: 'Iso-Pro' },
@@ -177,8 +177,8 @@ export const MealItemRow = ({
                                     borderRadius: '8px',
                                     cursor: 'pointer',
                                     transition: '0.2s',
-                                    background: sub.mode === m.val ? '#00C853' : 'transparent',
-                                    color: sub.mode === m.val ? 'white' : '#86868B',
+                                    background: sub.mode === m.val ? '#1F8A5B' : 'transparent',
+                                    color: sub.mode === m.val ? 'white' : '#6E6D69',
                                     boxShadow: sub.mode === m.val ? '0 2px 6px rgba(0,200,83,0.3)' : 'none',
                                 }}
                             >
@@ -195,7 +195,7 @@ export const MealItemRow = ({
                             background: '#FFFFFF',
                             borderRadius: '10px',
                             padding: '0 10px',
-                            border: '1px solid #E5E5EA',
+                            border: '1px solid #E6E4DE',
                             width: '90px',
                         }}
                     >
@@ -211,17 +211,17 @@ export const MealItemRow = ({
                                 fontWeight: 800,
                                 textAlign: 'right',
                                 fontSize: '15px',
-                                color: '#1D1D1F',
+                                color: '#121317',
                                 padding: '8px 0',
                             }}
                         />
-                        <span style={{ fontSize: '12px', color: '#86868B', marginLeft: '4px', fontWeight: 600 }}>g</span>
+                        <span style={{ fontSize: '12px', color: '#6E6D69', marginLeft: '4px', fontWeight: 600 }}>g</span>
                     </div>
 
                     {/* Recap Macro Sostituzione */}
                     <div style={{ width: '130px', textAlign: 'right', display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#1D1D1F' }}>{((sub.kcal * sub.weight) / 100).toFixed(0)} kcal</span>
-                        <span style={{ fontSize: '10px', color: '#86868B', fontWeight: 700 }}>
+                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#121317' }}>{((sub.kcal * sub.weight) / 100).toFixed(0)} kcal</span>
+                        <span style={{ fontSize: '10px', color: '#6E6D69', fontWeight: 700 }}>
                             C:{((sub.c * sub.weight) / 100).toFixed(1)} P:{((sub.p * sub.weight) / 100).toFixed(1)} F:{((sub.f * sub.weight) / 100).toFixed(1)}
                         </span>
                     </div>
@@ -230,7 +230,7 @@ export const MealItemRow = ({
                     <button
                         className="t-icon-btn"
                         title="Imposta come alimento principale"
-                        style={{ width: '32px', height: '32px', border: 'none', background: '#F5F5F7', color: '#007AFF' }}
+                        style={{ width: '32px', height: '32px', border: 'none', background: '#F6F5F2', color: '#121317' }}
                         onClick={() => swapSubstitution(currentDay.id, currentMeal.id, item.id, sub.id)}
                     >
                         <svg

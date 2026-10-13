@@ -8,19 +8,19 @@ export const HistoryStatsCards = ({ stats }) => {
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                     <i className="ph-fill ph-scales text-7xl"></i>
                 </div>
-                <p className="text-[10px] uppercase font-bold tracking-widest opacity-50 mb-1">Peso Attuale</p>
+                <p className="text-xs font-bold opacity-50 mb-1">Peso Attuale</p>
                 <div className="flex items-baseline gap-2">
                     <span className="text-5xl font-medium">{stats.currentWeight}</span>
                     <span className="text-lg opacity-50">kg</span>
                 </div>
-                <p className="text-[10px] opacity-40 mt-2 uppercase tracking-wider">
+                <p className="text-xs opacity-40 mt-2 ">
                     Ultimo aggiornamento · {new Date(stats.lastDate).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </p>
             </div>
 
             {/* Delta totale */}
             <div className="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm flex flex-col justify-between">
-                <p className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Andamento Totale</p>
+                <p className="text-xs font-bold text-gray-400 ">Andamento Totale</p>
                 <div>
                     <div className="flex items-baseline gap-1">
                         <span className={`text-3xl font-bold ${Number(stats.deltaPeso) <= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
@@ -35,7 +35,7 @@ export const HistoryStatsCards = ({ stats }) => {
 
             {/* Visite totali */}
             <div className="bg-gray-50 border border-gray-200 p-5 rounded-2xl flex flex-col justify-between">
-                <p className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Visite Totali</p>
+                <p className="text-xs font-bold text-gray-400 ">Visite Totali</p>
                 <div>
                     <span className="text-3xl font-bold text-gray-700">{stats.totalVisits}</span>
                     {stats.avgDelta && (

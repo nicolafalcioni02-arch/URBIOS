@@ -25,7 +25,7 @@ export const RecoveryTool = () => {
                 ))}
                 {h && (
                     <Result tone={h.level === 'buono' ? 'green' : 'yellow'}>
-                        <b>Totale {h.total}/28</b> —{' '}
+                        <b>Totale {h.total}/28</b> -{' '}
                         {h.level === 'buono'
                             ? 'buona prontezza'
                             : h.level === 'attenzione'

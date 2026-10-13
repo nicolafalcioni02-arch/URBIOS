@@ -7,7 +7,7 @@ export const FloatingActions = ({ setIsAnalysisOpen, setIsPrintReportOpen, setIs
             <button
                 className="t-fab-print"
                 onClick={() => setIsAnalysisOpen(true)}
-                style={{ position: 'relative', bottom: 'auto', right: 'auto', background: 'linear-gradient(135deg, #1D1D1F 0%, #434345 100%)' }}
+                style={{ position: 'relative', bottom: 'auto', right: 'auto', background: 'linear-gradient(135deg, #121317 0%, #434345 100%)' }}
                 title="Analisi Nutrizionale Avanzata"
             >
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -24,7 +24,7 @@ export const FloatingActions = ({ setIsAnalysisOpen, setIsPrintReportOpen, setIs
             <button
                 className="t-fab-print"
                 onClick={() => setIsSmartOpen(true)}
-                style={{ position: 'relative', bottom: 'auto', right: 'auto', background: 'linear-gradient(135deg, #00C853 0%, #009624 100%)' }}
+                style={{ position: 'relative', bottom: 'auto', right: 'auto', background: 'linear-gradient(135deg, #1F8A5B 0%, #16694A 100%)' }}
                 title="Smart Chart Maker"
             >
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -41,7 +41,7 @@ export const FloatingActions = ({ setIsAnalysisOpen, setIsPrintReportOpen, setIs
             <button
                 className="t-fab-print"
                 onClick={() => setIsPrintReportOpen(true)}
-                style={{ position: 'relative', bottom: 'auto', right: 'auto', background: '#FFFFFF', color: '#1D1D1F', border: '1px solid #E5E5EA' }}
+                style={{ position: 'relative', bottom: 'auto', right: 'auto', background: '#FFFFFF', color: '#121317', border: '1px solid #E6E4DE' }}
                 title="Stampa Documento"
             >
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -29,7 +29,7 @@ export const FoodDatabaseModal = ({
                             </div>
                             <div>
                                 <h3 className="text-xl font-black text-gray-900 leading-tight">Database Nutrizionale CREA</h3>
-                                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{foodDB.length} alimenti in memoria</span>
+                                <span className="text-xs font-bold text-gray-400 ">{foodDB.length} alimenti in memoria</span>
                             </div>
                         </div>
                         <button
@@ -89,15 +89,15 @@ export const FoodDatabaseModal = ({
                                     <table className="w-full text-left border-collapse">
                                         <thead className="bg-gray-50 sticky top-0 z-10 border-b border-gray-200">
                                             <tr>
-                                                <th className="p-4 text-[10px] font-black uppercase text-gray-400 tracking-wider">Alimento</th>
-                                                <th className="p-4 text-[10px] font-black uppercase text-gray-400 tracking-wider">Categoria</th>
-                                                <th className="p-4 text-[10px] font-black uppercase text-gray-400 tracking-wider text-center">Kcal</th>
-                                                <th className="p-4 text-[10px] font-black uppercase text-gray-400 tracking-wider text-center text-green-600">
+                                                <th className="p-4 text-xs font-semibold text-gray-400 ">Alimento</th>
+                                                <th className="p-4 text-xs font-semibold text-gray-400 ">Categoria</th>
+                                                <th className="p-4 text-xs font-semibold text-gray-400 text-center">Kcal</th>
+                                                <th className="p-4 text-xs font-semibold text-gray-400 text-center text-green-600">
                                                     Pro
                                                 </th>
-                                                <th className="p-4 text-[10px] font-black uppercase text-gray-400 tracking-wider text-center">Car</th>
-                                                <th className="p-4 text-[10px] font-black uppercase text-gray-400 tracking-wider text-center">Fat</th>
-                                                <th className="p-4 text-[10px] font-black uppercase text-gray-400 tracking-wider text-center">Azioni</th>
+                                                <th className="p-4 text-xs font-semibold text-gray-400 text-center">Car</th>
+                                                <th className="p-4 text-xs font-semibold text-gray-400 text-center">Fat</th>
+                                                <th className="p-4 text-xs font-semibold text-gray-400 text-center">Azioni</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100">
@@ -199,7 +199,7 @@ export const FoodDatabaseModal = ({
                                         <>
                                             {['name', 'category', 'food_code', 'scientific_name', 'english_name'].map((key) => (
                                                 <div key={key}>
-                                                    <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">{key.replace(/_/g, ' ')}</label>
+                                                    <label className="block text-xs font-bold text-gray-400 mb-1">{key.replace(/_/g, ' ')}</label>
                                                     <input
                                                         type="text"
                                                         value={editingFood[key] || ''}
@@ -210,7 +210,7 @@ export const FoodDatabaseModal = ({
                                             ))}
                                             {['portion', 'edible_part'].map((key) => (
                                                 <div key={key}>
-                                                    <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">{key.replace(/_/g, ' ')}</label>
+                                                    <label className="block text-xs font-bold text-gray-400 mb-1">{key.replace(/_/g, ' ')}</label>
                                                     <input
                                                         type="number"
                                                         step="0.1"
@@ -238,7 +238,7 @@ export const FoodDatabaseModal = ({
                                                 'alcohol',
                                             ].map((key) => (
                                                 <div key={key}>
-                                                    <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">{key.replace(/_/g, ' ')}</label>
+                                                    <label className="block text-xs font-bold text-gray-400 mb-1">{key.replace(/_/g, ' ')}</label>
                                                     <input
                                                         type="number"
                                                         step="0.1"
@@ -264,7 +264,7 @@ export const FoodDatabaseModal = ({
                                                 'insoluble_fiber',
                                             ].map((key) => (
                                                 <div key={key}>
-                                                    <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">{key.replace(/_/g, ' ')}</label>
+                                                    <label className="block text-xs font-bold text-gray-400 mb-1">{key.replace(/_/g, ' ')}</label>
                                                     <input
                                                         type="number"
                                                         step="0.1"
@@ -304,7 +304,7 @@ export const FoodDatabaseModal = ({
                                             'vitamin_k',
                                         ].map((key) => (
                                             <div key={key}>
-                                                <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">{key.replace(/_/g, ' ')}</label>
+                                                <label className="block text-xs font-bold text-gray-400 mb-1">{key.replace(/_/g, ' ')}</label>
                                                 <input
                                                     type="number"
                                                     step="0.01"
@@ -330,7 +330,7 @@ export const FoodDatabaseModal = ({
                                             'C22:6_docosahexaenoic_acid_DHA',
                                         ].map((key) => (
                                             <div key={key}>
-                                                <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1 truncate" title={key}>
+                                                <label className="block text-xs font-bold text-gray-400 mb-1 truncate" title={key}>
                                                     {key.replace(/_/g, ' ')}
                                                 </label>
                                                 <input
@@ -366,7 +366,7 @@ export const FoodDatabaseModal = ({
                                             'chemical_index',
                                         ].map((key) => (
                                             <div key={key}>
-                                                <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1 truncate">
+                                                <label className="block text-xs font-bold text-gray-400 mb-1 truncate">
                                                     {key.replace(/_/g, ' ')}
                                                 </label>
                                                 <input
@@ -395,7 +395,7 @@ export const FoodDatabaseModal = ({
                                             'quercetin',
                                         ].map((key) => (
                                             <div key={key}>
-                                                <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1 truncate">
+                                                <label className="block text-xs font-bold text-gray-400 mb-1 truncate">
                                                     {key.replace(/_/g, ' ')}
                                                 </label>
                                                 <input

@@ -120,32 +120,32 @@ export const ClinicalAnalysisModal = ({
                         {/* 1. HEADER SOSPESO "ISOLA" */}
                         <div className="m-4 lg:m-6 bg-gray-900 rounded-[28px] text-white p-4 shrink-0 flex items-center justify-between shadow-xl shadow-black/20 z-20">
                             <div className="flex items-center gap-4 lg:gap-6">
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center border border-gray-600 shadow-inner">
+                                <div className="w-12 h-12 rounded-full bg-[color:var(--ink)] flex items-center justify-center border border-gray-600 shadow-inner">
                                     <i className="ph-fill ph-user-circle text-2xl text-gray-300"></i>
                                 </div>
                                 <div className="flex items-center gap-4 lg:gap-8 text-xs">
                                     <div>
-                                        <span className="text-gray-400 block text-[9px] uppercase font-black tracking-widest mb-0.5">Paziente</span>
+                                        <span className="text-gray-400 block text-[11px] font-semibold mb-0.5">Paziente</span>
                                         <span className="font-bold text-sm text-white">{patientProfile.name}</span>
                                     </div>
                                     <div className="w-px h-8 bg-gray-700"></div>
                                     <div>
-                                        <span className="text-gray-400 block text-[9px] uppercase font-black tracking-widest mb-0.5">Biometria</span>
+                                        <span className="text-gray-400 block text-[11px] font-semibold mb-0.5">Biometria</span>
                                         <span className="font-medium text-gray-200">
                                             {patientProfile.age}y • {patientProfile.gender === 'Male' ? 'Uomo' : 'Donna'} • {patientProfile.weight}kg
                                         </span>
                                     </div>
                                     <div className="w-px h-8 bg-gray-700 hidden lg:block"></div>
                                     <div className="hidden lg:block">
-                                        <span className="text-gray-400 block text-[9px] uppercase font-black tracking-widest mb-1">Clinica</span>
+                                        <span className="text-gray-400 block text-[11px] font-semibold mb-1">Clinica</span>
                                         <div className="flex gap-1.5">
                                             {patientProfile.allergies.map((a) => (
-                                                <span key={a} className="bg-red-500/20 text-red-400 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase">
+                                                <span key={a} className="bg-red-500/20 text-red-400 px-2 py-0.5 rounded-md text-[11px] font-bold ">
                                                     {a}
                                                 </span>
                                             ))}
                                             {patientProfile.pathologies.map((p) => (
-                                                <span key={p} className="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase">
+                                                <span key={p} className="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-md text-[11px] font-bold ">
                                                     {p}
                                                 </span>
                                             ))}
@@ -181,7 +181,7 @@ export const ClinicalAnalysisModal = ({
                         <div className="px-8 py-2 flex flex-col md:flex-row justify-between items-start md:items-end shrink-0 z-10 gap-4">
                             <div>
                                 <h3 className="text-2xl font-black text-gray-900 tracking-tight">Screening Molecolare (BETA)</h3>
-                                <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">Incrocio con i DRV</p>
+                                <p className="text-xs font-bold text-gray-400 mt-1 ">Incrocio con i DRV</p>
                             </div>
                             <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-gray-100">
                                 {['meal', 'day', 'week'].map((tf) => (

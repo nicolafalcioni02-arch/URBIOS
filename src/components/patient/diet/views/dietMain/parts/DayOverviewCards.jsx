@@ -31,10 +31,10 @@ export const DayOverviewCards = ({ dietDays, setActiveMealInfo, updateDayTitle, 
                         placeholder="Nome Giornata..."
                     />
                     <div className="day-macro-summary no-print">
-                        <span style={{ color: '#1D1D1F' }}>{currentDayTotals.kcal.toFixed(0)} kcal</span>
-                        <span style={{ color: '#1D1D1F' }}>C: {currentDayTotals.c.toFixed(0)}g</span>
-                        <span style={{ color: '#00C853' }}>P: {currentDayTotals.p.toFixed(0)}g</span>
-                        <span style={{ color: '#86868B' }}>F: {currentDayTotals.f.toFixed(0)}g</span>
+                        <span style={{ color: '#121317' }}>{currentDayTotals.kcal.toFixed(0)} kcal</span>
+                        <span style={{ color: '#121317' }}>C: {currentDayTotals.c.toFixed(0)}g</span>
+                        <span style={{ color: '#1F8A5B' }}>P: {currentDayTotals.p.toFixed(0)}g</span>
+                        <span style={{ color: '#6E6D69' }}>F: {currentDayTotals.f.toFixed(0)}g</span>
                     </div>
                 </div>
 
@@ -51,16 +51,16 @@ export const DayOverviewCards = ({ dietDays, setActiveMealInfo, updateDayTitle, 
                             <div className="meal-rect-stats">
                                 <div className="meal-macro-col">
                                     <span>
-                                        <span style={{ color: '#1D1D1F' }}>C:</span> {m.totals.c.toFixed(0)}g
+                                        <span style={{ color: '#121317' }}>C:</span> {m.totals.c.toFixed(0)}g
                                     </span>
                                     <span>
-                                        <span style={{ color: '#00C853' }}>P:</span> {m.totals.p.toFixed(0)}g
+                                        <span style={{ color: '#1F8A5B' }}>P:</span> {m.totals.p.toFixed(0)}g
                                     </span>
                                     <span>
-                                        <span style={{ color: '#86868B' }}>F:</span> {m.totals.f.toFixed(0)}g
+                                        <span style={{ color: '#6E6D69' }}>F:</span> {m.totals.f.toFixed(0)}g
                                     </span>
                                 </div>
-                                <div style={{ fontSize: '20px', fontWeight: 800, color: '#00C853', lineHeight: '1' }}>{m.totals.kcal.toFixed(0)}</div>
+                                <div style={{ fontSize: '20px', fontWeight: 800, color: '#1F8A5B', lineHeight: '1' }}>{m.totals.kcal.toFixed(0)}</div>
                             </div>
                         </div>
                     ))}

@@ -8,7 +8,8 @@ import { analysisStyles } from './styles/analysisStyles';
 import { setupModalStyles } from './styles/setupModalStyles';
 import { lafStyles } from './styles/lafStyles';
 import { smartChartStyles } from './styles/smartChartStyles';
+import { responsiveStyles } from './styles/responsiveStyles';
 
-export const dietCss = [sidebarStyles, contentStyles, modalAndPrintStyles, dashboardStyles, analysisStyles, setupModalStyles, lafStyles, smartChartStyles].join(
+export const dietCss = [sidebarStyles, contentStyles, modalAndPrintStyles, dashboardStyles, analysisStyles, setupModalStyles, lafStyles, smartChartStyles, responsiveStyles].join(
     '\n'
 );

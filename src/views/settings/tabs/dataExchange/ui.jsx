@@ -2,7 +2,7 @@ import React from 'react';
 
 export const Section = ({ title, hint, children }) => (
     <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-4">
-        <h4 className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-1">{title}</h4>
+        <h4 className="text-xs font-bold text-gray-700 mb-1">{title}</h4>
         {hint && <p className="text-xs text-gray-500 mb-3">{hint}</p>}
         {!hint && <div className="mb-3" />}
         {children}

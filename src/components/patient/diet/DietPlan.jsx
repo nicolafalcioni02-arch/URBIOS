@@ -80,6 +80,7 @@ export const DietPlan = ({ patient, onUpdateDb, db, dietViewMode, setDietViewMod
     };
 
     // Stati per la ricerca e l'inserimento nel database
+    const [navOpen, setNavOpen] = useState(false);
     const [dbSearch, setDbSearch] = useState('');
     const [newFood, setNewFood] = useState({ name: '', category: '', kcal: '', p: '', c: '', f: '' });
 
@@ -354,19 +355,19 @@ export const DietPlan = ({ patient, onUpdateDb, db, dietViewMode, setDietViewMod
                         justifyContent: 'space-between',
                         fontSize: '10px',
                         fontWeight: 700,
-                        color: '#86868B',
-                        textTransform: 'uppercase',
+                        color: '#6E6D69',
+                        textTransform: '',
                         marginBottom: '4px',
                     }}
                 >
                     <span>{label}</span>
-                    <span style={{ color: isOver ? '#FF3B30' : '#1D1D1F' }}>
+                    <span style={{ color: isOver ? '#C2413A' : '#121317' }}>
                         {current.toFixed(0)} / {max}
                     </span>
                 </div>
-                <div style={{ width: '100%', height: '6px', background: '#E5E5EA', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '6px', background: '#E6E4DE', borderRadius: '3px', overflow: 'hidden' }}>
                     <div
-                        style={{ width: `${pct}%`, height: '100%', borderRadius: '3px', background: isOver ? '#FF3B30' : color, transition: 'width 0.4s ease' }}
+                        style={{ width: `${pct}%`, height: '100%', borderRadius: '3px', background: isOver ? '#C2413A' : color, transition: 'width 0.4s ease' }}
                     />
                 </div>
             </div>
@@ -440,24 +441,21 @@ export const DietPlan = ({ patient, onUpdateDb, db, dietViewMode, setDietViewMod
 
     // --- INIZIO RENDER COMPONENTE ---
     return (
-        <div
-            style={{
-                display: 'flex',
-                height: '88vh' /* Blocca l'altezza alla finestra del browser */,
-                width: '100%',
-                overflow: 'hidden' /* Impedisce lo scroll dell'intera pagina */,
-                backgroundColor: '#F5F5F7',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif',
-                color: '#1D1D1F',
-                margin: '-16px' /* Compensa i margini di default del body se presenti */,
-                textAlign: 'left',
-            }}
-        >
-            {/* STILI CSS INIETTATI E ADATTATI AL TEMA NUTRIZIONE (VERDE #00C853) */}
+        <div className="d-root">
+            {/* STILI CSS INIETTATI E ADATTATI AL TEMA NUTRIZIONE (VERDE #1F8A5B) */}
             <style>{dietCss}</style>
 
             {/* --- SIDEBAR DI NAVIGAZIONE --- */}
+            {/* barra per telefono/tablet: apre l'indice dei giorni e dei pasti */}
+            <div className="d-mobile-bar no-print">
+                <button onClick={() => setNavOpen(true)}>
+                    <i className="ph ph-list"></i> Giorni e pasti
+                </button>
+            </div>
+            <div className={`d-nav-backdrop${navOpen ? ' open' : ''}`} onClick={() => setNavOpen(false)} />
+
             <DietSidebar
+                open={navOpen}
                 activeMealInfo={activeMealInfo}
                 addNewDay={addNewDay}
                 dietDays={dietDays}
@@ -468,7 +466,10 @@ export const DietPlan = ({ patient, onUpdateDb, db, dietViewMode, setDietViewMod
                 handleDragStart={handleDragStart}
                 handleDrop={handleDrop}
                 removeDay={removeDay}
-                setActiveMealInfo={setActiveMealInfo}
+                setActiveMealInfo={(v) => {
+                    setActiveMealInfo(v);
+                    setNavOpen(false);
+                }}
                 setDragOverId={setDragOverId}
                 setIsDbOpen={setIsDbOpen}
                 setIsSetupOpen={setIsSetupOpen}

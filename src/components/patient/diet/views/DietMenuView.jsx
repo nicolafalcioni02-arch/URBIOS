@@ -22,38 +22,42 @@ export const DietMenuView = ({
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: '80vh',
-                gap: '40px',
+                minHeight: '80vh',
+                padding: '24px 16px',
+                boxSizing: 'border-box',
+                gap: '32px',
                 background: '#F8F9FA',
                 fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
             }}
         >
             <div style={{ textAlign: 'center' }}>
-                <h2 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '10px', color: '#1D1D1F' }}>Inizia il Piano Alimentare</h2>
-                <p style={{ color: '#86868B', fontWeight: 600 }}>Cosa desideri fare oggi per il paziente {currentPatient.nome}?</p>
+                <h2 style={{ fontSize: 'clamp(1.5rem, 6vw, 2rem)', fontWeight: 900, marginBottom: '10px', color: '#121317' }}>Inizia il Piano Alimentare</h2>
+                <p style={{ color: '#6E6D69', fontWeight: 600 }}>Cosa desideri fare oggi per il paziente {currentPatient.nome}?</p>
             </div>
 
-            <div style={{ display: 'flex', gap: '20px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', width: '100%' }}>
                 {/* COLONNA A: DIETA ASSOCIATA A VISITA REALE */}
                 <div
                     style={{
-                        width: '300px',
+                        flex: '1 1 260px',
+                        maxWidth: '320px',
+                        boxSizing: 'border-box',
                         padding: '30px',
                         background: 'white',
                         borderRadius: '24px',
-                        border: '1px solid #E5E5EA',
+                        border: '1px solid #E6E4DE',
                         textAlign: 'center',
                         boxShadow: '0 4px 15px rgba(0,0,0,0.02)',
                     }}
                 >
-                    <i className="ph-bold ph-calendar-check" style={{ fontSize: '40px', color: '#00C853', marginBottom: '15px', display: 'block' }}></i>
+                    <i className="ph-bold ph-calendar-check" style={{ fontSize: '40px', color: '#1F8A5B', marginBottom: '15px', display: 'block' }}></i>
                     <h3 style={{ fontWeight: 800, fontSize: '16px', margin: '0 0 10px 0' }}>Dieta associata a visita</h3>
 
                     {!visitaOggi ? (
                         <div
                             style={{
                                 background: '#FFF0F0',
-                                color: '#FF3B30',
+                                color: '#C2413A',
                                 padding: '10px',
                                 borderRadius: '12px',
                                 fontSize: '11px',
@@ -79,7 +83,7 @@ export const DietMenuView = ({
                             style={{
                                 width: '100%',
                                 padding: '12px',
-                                background: '#1D1D1F',
+                                background: '#121317',
                                 color: 'white',
                                 borderRadius: '12px',
                                 border: 'none',
@@ -97,18 +101,20 @@ export const DietMenuView = ({
                 {/* COLONNA B: DIETA INDIPENDENTE */}
                 <div
                     style={{
-                        width: '300px',
+                        flex: '1 1 260px',
+                        maxWidth: '320px',
+                        boxSizing: 'border-box',
                         padding: '30px',
                         background: 'white',
                         borderRadius: '24px',
-                        border: '1px solid #E5E5EA',
+                        border: '1px solid #E6E4DE',
                         textAlign: 'center',
                         boxShadow: '0 4px 15px rgba(0,0,0,0.02)',
                     }}
                 >
-                    <i className="ph-bold ph-lightning" style={{ fontSize: '40px', color: '#007AFF', marginBottom: '15px', display: 'block' }}></i>
+                    <i className="ph-bold ph-lightning" style={{ fontSize: '40px', color: '#121317', marginBottom: '15px', display: 'block' }}></i>
                     <h3 style={{ fontWeight: 800, fontSize: '16px', margin: '0 0 10px 0' }}>Dieta indipendente</h3>
-                    <p style={{ fontSize: '12px', color: '#86868B', margin: '15px 0' }}>Crea un piano slegato dalla visita odierna.</p>
+                    <p style={{ fontSize: '12px', color: '#6E6D69', margin: '15px 0' }}>Crea un piano slegato dalla visita odierna.</p>
 
                     <button
                         onClick={() => {
@@ -148,7 +154,7 @@ export const DietMenuView = ({
                         style={{
                             width: '100%',
                             padding: '12px',
-                            background: '#007AFF',
+                            background: '#121317',
                             color: 'white',
                             borderRadius: '12px',
                             border: 'none',

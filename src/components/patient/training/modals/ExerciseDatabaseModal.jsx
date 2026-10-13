@@ -37,9 +37,9 @@ export const ExerciseDatabaseModal = ({
                             gap: '10px',
                             marginBottom: '10px',
                             padding: '10px',
-                            background: '#E0F0FF',
+                            background: '#ECEDF1',
                             borderRadius: '10px',
-                            border: '1px solid #007AFF',
+                            border: '1px solid #121317',
                         }}
                     >
                         <input
@@ -66,7 +66,7 @@ export const ExerciseDatabaseModal = ({
                         <button
                             onClick={addExerciseToDB}
                             style={{
-                                background: '#1D1D1F',
+                                background: '#121317',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '8px',
@@ -100,7 +100,7 @@ export const ExerciseDatabaseModal = ({
                         />
                     </div>
 
-                    <div style={{ flex: 1, overflowY: 'auto', border: '1px solid #E5E5EA', borderRadius: '12px' }}>
+                    <div style={{ flex: 1, overflowY: 'auto', border: '1px solid #E6E4DE', borderRadius: '12px' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr>
@@ -113,7 +113,7 @@ export const ExerciseDatabaseModal = ({
                                             padding: '10px',
                                             textAlign: 'left',
                                             fontSize: '11px',
-                                            textTransform: 'uppercase',
+                                            textTransform: '',
                                             color: '#888',
                                             borderBottom: '1px solid #ddd',
                                             zIndex: 2,
@@ -130,7 +130,7 @@ export const ExerciseDatabaseModal = ({
                                             padding: '10px',
                                             textAlign: 'left',
                                             fontSize: '11px',
-                                            textTransform: 'uppercase',
+                                            textTransform: '',
                                             color: '#888',
                                             borderBottom: '1px solid #ddd',
                                             zIndex: 2,
@@ -147,7 +147,7 @@ export const ExerciseDatabaseModal = ({
                                             padding: '10px',
                                             textAlign: 'left',
                                             fontSize: '11px',
-                                            textTransform: 'uppercase',
+                                            textTransform: '',
                                             color: '#888',
                                             borderBottom: '1px solid #ddd',
                                             zIndex: 2,
@@ -164,7 +164,7 @@ export const ExerciseDatabaseModal = ({
                                             padding: '10px',
                                             textAlign: 'left',
                                             fontSize: '11px',
-                                            textTransform: 'uppercase',
+                                            textTransform: '',
                                             color: '#888',
                                             borderBottom: '1px solid #ddd',
                                             zIndex: 2,
@@ -238,7 +238,7 @@ export const ExerciseDatabaseModal = ({
                                                         borderRadius: '4px',
                                                         fontSize: '13px',
                                                         fontFamily: 'inherit',
-                                                        color: '#1D1D1F',
+                                                        color: '#121317',
                                                     }}
                                                 />
                                             </td>
@@ -254,7 +254,7 @@ export const ExerciseDatabaseModal = ({
                                                         borderRadius: '4px',
                                                         fontSize: '13px',
                                                         fontFamily: 'inherit',
-                                                        color: '#1D1D1F',
+                                                        color: '#121317',
                                                     }}
                                                 />
                                             </td>
@@ -270,14 +270,14 @@ export const ExerciseDatabaseModal = ({
                                                         borderRadius: '4px',
                                                         fontSize: '13px',
                                                         fontFamily: 'inherit',
-                                                        color: '#1D1D1F',
+                                                        color: '#121317',
                                                     }}
                                                 />
                                             </td>
                                             <td style={{ padding: '8px 10px', textAlign: 'center' }}>
                                                 <i
                                                     className="ph ph-trash"
-                                                    style={{ color: '#FF3B30', cursor: 'pointer' }}
+                                                    style={{ color: '#C2413A', cursor: 'pointer' }}
                                                     onClick={() => deleteExDB(index)}
                                                 ></i>
                                             </td>
@@ -292,7 +292,7 @@ export const ExerciseDatabaseModal = ({
                         style={{
                             marginTop: '20px',
                             paddingTop: '15px',
-                            borderTop: '1px solid #E5E5EA',
+                            borderTop: '1px solid #E6E4DE',
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
@@ -357,7 +357,7 @@ export const ExerciseDatabaseModal = ({
                         <div style={{ color: '#999', fontSize: '12px' }}>
                             Modifica diretta • <span>{exerciseDB.length}</span> esercizi
                         </div>
-                        <span style={{ color: '#FF3B30', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }} onClick={resetDatabase}>
+                        <span style={{ color: '#C2413A', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }} onClick={resetDatabase}>
                             Reset
                         </span>
                     </div>

@@ -1,18 +1,18 @@
 import React from 'react';
 import { DayEditorModal } from './dayEditor/DayEditorModal';
-import { GOALS, LEVELS, goalById } from '../logic/science/guidelines';
+import { TrainingHeaderCard } from './TrainingHeaderCard';
 
 const tool = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 7,
-    border: '1px solid #E5E5EA',
+    border: '1px solid #E6E4DE',
     background: '#fff',
     borderRadius: 12,
     padding: '10px 14px',
     fontSize: 13,
     fontWeight: 700,
-    color: '#1D1D1F',
+    color: '#121317',
     cursor: 'pointer',
 };
 
@@ -32,71 +32,11 @@ export const TrainingMainContent = ({
     onOpenProgression,
     onPrint,
 }) => {
-    const goal = goalById(header.tipo);
-    const set = (k) => (e) => setHeader({ ...header, [k]: e.target.value });
-
     return (
-        <main style={{ flex: 1, position: 'relative', overflowY: 'auto', padding: '40px', background: '#F5F5F7' }}>
+        <main className="t-main">
             <div className="t-container-wrapper" style={{ height: '100%' }}>
                 {/* INTESTAZIONE CLIENTE E OBIETTIVO */}
-                <div className="t-client-header-card">
-                    <div className="t-input-floating">
-                        <label>Titolo scheda</label>
-                        <input type="text" value={header.titolo} onChange={set('titolo')} placeholder="Es. Mesociclo 1" />
-                    </div>
-                    <div className="t-input-floating">
-                        <label>Cliente</label>
-                        <input type="text" value={header.cliente} onChange={set('cliente')} placeholder="Nome Cognome" />
-                    </div>
-                    <div className="t-input-floating">
-                        <label>Obiettivo (descrizione)</label>
-                        <input type="text" value={header.obiettivo} onChange={set('obiettivo')} placeholder="Es. Ipertrofia e ricomposizione" />
-                    </div>
-                    <div className="t-input-floating">
-                        <label>Data</label>
-                        <input type="date" value={header.data} onChange={set('data')} />
-                    </div>
-                    <div className="t-input-floating">
-                        <label>Tipo di obiettivo</label>
-                        <select value={header.tipo || ''} onChange={set('tipo')}>
-                            <option value="">— scegli —</option>
-                            {GOALS.map((g) => (
-                                <option key={g.id} value={g.id}>
-                                    {g.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="t-input-floating">
-                        <label>Livello del cliente</label>
-                        <select value={header.livello || ''} onChange={set('livello')}>
-                            <option value="">— scegli —</option>
-                            {LEVELS.map((l) => (
-                                <option key={l.id} value={l.id}>
-                                    {l.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="t-input-floating">
-                        <label title="Riscaldamento generale + defaticamento, per stimare la durata delle sedute">Extra seduta (min)</label>
-                        <input type="number" min="0" value={header.extraMin ?? 10} onChange={set('extraMin')} />
-                    </div>
-                    <div style={{ gridColumn: '1 / -1', fontSize: 12, color: '#555', lineHeight: 1.5 }}>
-                        {goal ? (
-                            <>
-                                <b>{goal.label}:</b> {goal.reps[0]}-{goal.reps[1]} ripetizioni · {goal.pct[0]}-{goal.pct[1]}% del massimale · recupero{' '}
-                                {goal.rest[0]}-{goal.rest[1]} s · RPE {goal.rpe[0]}-{goal.rpe[1]}. {goal.hint}
-                                {header.livello ? ` Livello: ${LEVELS.find((l) => l.id === header.livello).sessions}.` : ''}
-                            </>
-                        ) : (
-                            <span style={{ color: '#86868B' }}>
-                                Scegli il tipo di obiettivo e il livello: la scheda mostrerà le indicazioni di riferimento e controllerà volume, recuperi e
-                                carico.
-                            </span>
-                        )}
-                    </div>
-                </div>
+                <TrainingHeaderCard header={header} setHeader={setHeader} />
 
                 {/* STRUMENTI */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 28 }}>
@@ -123,14 +63,14 @@ export const TrainingMainContent = ({
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#86868B',
+                            color: '#6E6D69',
                             background: 'rgba(255,255,255,0.5)',
                             borderRadius: 24,
-                            border: '2px dashed #E5E5EA',
+                            border: '2px dashed #E6E4DE',
                         }}
                     >
                         <i className="ph ph-hand-pointing" style={{ fontSize: 48, marginBottom: 16, opacity: 0.5 }}></i>
-                        <h3 style={{ fontSize: 20, fontWeight: 600, color: '#1D1D1F' }}>Seleziona un Giorno</h3>
+                        <h3 style={{ fontSize: 20, fontWeight: 600, color: '#121317' }}>Seleziona un Giorno</h3>
                         <p style={{ fontSize: 14 }}>Clicca su un giorno dall'indice a sinistra per compilare la scheda.</p>
                     </div>
                 )}

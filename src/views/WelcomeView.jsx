@@ -15,7 +15,7 @@ export const WelcomeView = ({ data, onComplete }) => {
     }, [onComplete]);
 
     return (
-        <div className={`fixed inset-0 z-50 flex items-center justify-center bg-white overflow-hidden ${isExiting ? 'fade-exit-active' : ''}`}>
+        <div className={`fixed inset-0 z-50 flex items-center justify-center bg-[var(--paper)] overflow-hidden ${isExiting ? 'fade-exit-active' : ''}`}>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30 blur-2xl scale-[1.2] welcome-reveal">
                 <ShaderCanvas size={600} className="rounded-full" />
             </div>
@@ -24,7 +24,7 @@ export const WelcomeView = ({ data, onComplete }) => {
                     <span className="text-xs font-bold tracking-[0.4em] uppercase text-gray-400">U R B I O S</span>
                 </div>
                 <div className="space-y-2">
-                    <p className="text-sm text-gray- font-medium tracking-wide">Bentornato</p>
+                    <p className="text-sm text-gray-500 font-medium tracking-wide">Bentornato</p>
                     <h1 className="text-6xl md:text-5xl  font-bold text-gray-900 leading-none">
                         {nome} {cognome}
                     </h1>

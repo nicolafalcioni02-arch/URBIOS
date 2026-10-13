@@ -2,7 +2,7 @@ import React from 'react';
 
 export const Button = ({ children, onClick, variant = 'primary', icon, className = '' }) => {
     const base =
-        'px-10 py-3 rounded-full font-medium transition-all duration-300 flex-row flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md active:scale-95 whitespace-nowrap';
+        'px-5 sm:px-10 py-3 rounded-full font-medium transition-all duration-300 flex-row flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md active:scale-95 whitespace-nowrap';
     const styles = {
         primary: 'bg-black text-white hover:bg-gray-800',
         secondary: 'bg-white text-black border border-gray-200 hover:border-black',

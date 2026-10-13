@@ -32,7 +32,7 @@ export const SmartLabCard = ({ label, name, unit, defaultMin, defaultMax, value,
     };
 
     // --- LOGICA COLORI ---
-    let statusClass = 'border-gray-200 bg-white';
+    let statusClass = 'border-[color:var(--line)] bg-white';
     let icon = 'ph-circle';
     let iconClass = 'text-gray-300';
     let textClass = 'text-gray-700';
@@ -43,17 +43,17 @@ export const SmartLabCard = ({ label, name, unit, defaultMin, defaultMax, value,
     if (hasValue) {
         const tolerance = (range.max - range.min) * 0.1;
         if (val >= range.min && val <= range.max) {
-            statusClass = 'border-emerald-300 bg-emerald-50/50 shadow-emerald-100';
+            statusClass = 'border-[#BFDCCB] bg-[#F1F8F4]';
             icon = 'ph-check-circle';
             iconClass = 'text-emerald-500';
             textClass = 'text-emerald-700 font-bold';
         } else if ((val >= range.min - tolerance && val < range.min) || (val > range.max && val <= range.max + tolerance)) {
-            statusClass = 'border-amber-300 bg-amber-50/50 shadow-amber-100';
+            statusClass = 'border-[#E9D3A6] bg-[#FBF5E8]';
             icon = 'ph-warning';
             iconClass = 'text-amber-500';
             textClass = 'text-amber-700 font-bold';
         } else {
-            statusClass = 'border-rose-300 bg-rose-50/50 shadow-rose-100';
+            statusClass = 'border-[#E7BDB9] bg-[#FBEFEE]';
             icon = 'ph-warning-octagon';
             iconClass = 'text-rose-500';
             textClass = 'text-rose-700 font-bold';
@@ -65,10 +65,10 @@ export const SmartLabCard = ({ label, name, unit, defaultMin, defaultMax, value,
         return (
             <div
                 onClick={() => setIsOpen(true)}
-                className={`relative p-3 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md flex items-center justify-between h-[60px] ${hasValue ? statusClass : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                className={`relative px-3.5 rounded-xl border transition-all duration-200 cursor-pointer active:scale-[.98] flex items-center justify-between h-[52px] ${hasValue ? statusClass : 'border-[color:var(--line)] bg-white hover:border-[#CFCBC2]'}`}
             >
                 <div className="flex items-center gap-2 overflow-hidden">
-                    <span className={`text-[11px] font-bold uppercase tracking-wider truncate ${hasValue ? 'text-gray-600' : 'text-gray-400'}`} title={label}>
+                    <span className={`text-[13px] font-medium truncate ${hasValue ? 'text-gray-700' : 'text-gray-500'}`} title={label}>
                         {label}
                     </span>
                 </div>
@@ -78,7 +78,7 @@ export const SmartLabCard = ({ label, name, unit, defaultMin, defaultMax, value,
                             {value} <span className="text-[9px] text-gray-500 font-normal">{currentUnit}</span>
                         </span>
                     ) : (
-                        <span className="text-xs text-gray-300 italic">Inserisci</span>
+                        <span className="text-xs text-gray-400">Inserisci</span>
                     )}
                     {hasValue ? <i className={`ph-fill ${icon} ${iconClass} text-lg`}></i> : <i className="ph ph-plus-circle text-gray-300 text-lg"></i>}
                 </div>
@@ -88,7 +88,7 @@ export const SmartLabCard = ({ label, name, unit, defaultMin, defaultMax, value,
 
     // --- RENDER APERTO ---
     return (
-        <div className={`relative p-3 rounded-xl border transition-all duration-100 ${statusClass} shadow-md ring-2 ring-blue-500/20 z-10 scale-[1.00]`}>
+        <div className={`relative p-3 rounded-xl border transition-all duration-100 ${statusClass} shadow-md ring-2 ring-black/10 z-10 scale-[1.00]`}>
             <div
                 className="flex justify-between items-start mb-2 cursor-pointer"
                 onClick={(e) => {
@@ -96,7 +96,7 @@ export const SmartLabCard = ({ label, name, unit, defaultMin, defaultMax, value,
                     setIsOpen(false);
                 }}
             >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 truncate w-3/4" title={label}>
+                <span className="text-[13px] font-medium text-gray-600 truncate w-3/4" title={label}>
                     {label}
                 </span>
                 <i className="ph ph-caret-up text-gray-400 hover:text-gray-600"></i>

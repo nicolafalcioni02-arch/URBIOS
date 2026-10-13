@@ -1,6 +1,6 @@
 // Frequenza cardiaca, zone, carico interno (TRIMP) e stime del VO2max.
 export const HRMAX_FORMULAS = [
-    { id: 'tanaka', label: 'Tanaka (208 − 0,7 × età) — consigliata', f: (age) => 208 - 0.7 * age },
+    { id: 'tanaka', label: 'Tanaka (208 − 0,7 × età) · consigliata', f: (age) => 208 - 0.7 * age },
     { id: 'gellish', label: 'Gellish (207 − 0,7 × età)', f: (age) => 207 - 0.7 * age },
     { id: 'nes', label: 'Nes (211 − 0,64 × età)', f: (age) => 211 - 0.64 * age },
     { id: 'fox', label: 'Fox (220 − età)', f: (age) => 220 - age },

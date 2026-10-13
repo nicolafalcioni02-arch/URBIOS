@@ -127,15 +127,15 @@ export const TrainingPrintView = ({ header, weeks, exerciseDB, massimali, profil
                     <div className="tp-client">
                         <div>
                             <small>Cliente</small>
-                            <b>{header.cliente || '—'}</b>
+                            <b>{header.cliente || '-'}</b>
                         </div>
                         <div>
                             <small>Obiettivo</small>
-                            <b>{header.obiettivo || (goal ? goal.label : '—')}</b>
+                            <b>{header.obiettivo || (goal ? goal.label : '-')}</b>
                         </div>
                         <div>
                             <small>Data</small>
-                            <b>{fmtDate(header.data) || '—'}</b>
+                            <b>{fmtDate(header.data) || '-'}</b>
                         </div>
                     </div>
 
@@ -155,7 +155,7 @@ export const TrainingPrintView = ({ header, weeks, exerciseDB, massimali, profil
                                     <div key={day.id} className={`tp-day tp-flow ${opts.pagePerDay && di > 0 ? 'tp-newpage' : ''}`}>
                                         <h3 className="tp-day-title">
                                             Giorno {day.number}
-                                            {day.title ? ` — ${day.title}` : ''}
+                                            {day.title ? ` · ${day.title}` : ''}
                                             <span>{day.rows.length} esercizi</span>
                                         </h3>
                                         {day.summary && (

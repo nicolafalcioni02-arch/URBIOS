@@ -14,7 +14,7 @@ export const AnthropometryTab = ({ adjustedW, bmi, bmiStatus, calcData, grant, i
                         background: '#FFFFFF',
                         padding: '20px',
                         borderRadius: '24px',
-                        border: '1px solid #E5E5EA',
+                        border: '1px solid #E6E4DE',
                     }}
                 >
                     <div className="t-input-floating">
@@ -71,11 +71,11 @@ export const AnthropometryTab = ({ adjustedW, bmi, bmiStatus, calcData, grant, i
                     <div className="smart-card">
                         <span className="smart-title">Peso Ideale / ABW</span>
                         <div style={{ display: 'flex', gap: '15px', alignItems: 'baseline', marginTop: '5px' }}>
-                            <span style={{ fontSize: '22px', fontWeight: 900, color: '#00C853' }}>
-                                {idealW.toFixed(1)} <span style={{ fontSize: '12px', color: '#86868B' }}>kg (PI)</span>
+                            <span style={{ fontSize: '22px', fontWeight: 900, color: '#1F8A5B' }}>
+                                {idealW.toFixed(1)} <span style={{ fontSize: '12px', color: '#6E6D69' }}>kg (PI)</span>
                             </span>
-                            <span style={{ fontSize: '18px', fontWeight: 800, color: '#1D1D1F' }}>
-                                {adjustedW.toFixed(1)} <span style={{ fontSize: '12px', color: '#86868B' }}>kg (ABW)</span>
+                            <span style={{ fontSize: '18px', fontWeight: 800, color: '#121317' }}>
+                                {adjustedW.toFixed(1)} <span style={{ fontSize: '12px', color: '#6E6D69' }}>kg (ABW)</span>
                             </span>
                         </div>
                         <span className="smart-sub">Lorentz (PI) &bull; Aggiustato per Obesità (ABW)</span>
@@ -83,7 +83,7 @@ export const AnthropometryTab = ({ adjustedW, bmi, bmiStatus, calcData, grant, i
                     <div className="smart-card">
                         <span className="smart-title">Morfotipo (Grant)</span>
                         <span className="smart-value">{grant.toFixed(1)}</span>
-                        <span className="smart-sub" style={{ color: '#007AFF', fontWeight: 800 }}>
+                        <span className="smart-sub" style={{ color: '#121317', fontWeight: 800 }}>
                             {getMorfotipo(grant, calcData.sex).toUpperCase()}
                         </span>
                     </div>

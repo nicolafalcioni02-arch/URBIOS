@@ -70,7 +70,7 @@ export const MealEditorModal = ({
                             }}
                         >
                             <div>
-                                <span style={{ fontSize: '10px', fontWeight: 800, color: '#00C853', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                                <span style={{ fontSize: '12px', fontWeight: 600, color: '#1F8A5B', textTransform: '', }}>
                                     {currentDay.title}
                                 </span>
                                 {/* Input per rinominare il pasto direttamente dal modale */}
@@ -83,7 +83,7 @@ export const MealEditorModal = ({
                                         fontSize: '28px',
                                         fontWeight: 800,
                                         margin: 0,
-                                        color: '#1D1D1F',
+                                        color: '#121317',
                                         border: 'none',
                                         outline: 'none',
                                         background: 'transparent',
@@ -94,26 +94,26 @@ export const MealEditorModal = ({
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                                 <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: '10px', color: '#86868B', textTransform: 'uppercase', fontWeight: 700 }}>Kcal</div>
+                                    <div style={{ fontSize: '10px', color: '#6E6D69', textTransform: '', fontWeight: 700 }}>Kcal</div>
                                     <div style={{ fontSize: '16px', fontWeight: 800 }}>{currentMealTotals.kcal.toFixed(0)}</div>
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: '10px', color: '#86868B', textTransform: 'uppercase', fontWeight: 700 }}>Carbo</div>
+                                    <div style={{ fontSize: '10px', color: '#6E6D69', textTransform: '', fontWeight: 700 }}>Carbo</div>
                                     <div style={{ fontSize: '16px', fontWeight: 800 }}>{currentMealTotals.c.toFixed(1)}g</div>
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: '10px', color: '#86868B', textTransform: 'uppercase', fontWeight: 700 }}>Pro</div>
-                                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#00C853' }}>{currentMealTotals.p.toFixed(1)}g</div>
+                                    <div style={{ fontSize: '10px', color: '#6E6D69', textTransform: '', fontWeight: 700 }}>Pro</div>
+                                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#1F8A5B' }}>{currentMealTotals.p.toFixed(1)}g</div>
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: '10px', color: '#86868B', textTransform: 'uppercase', fontWeight: 700 }}>Grassi</div>
+                                    <div style={{ fontSize: '10px', color: '#6E6D69', textTransform: '', fontWeight: 700 }}>Grassi</div>
                                     <div style={{ fontSize: '16px', fontWeight: 800 }}>{currentMealTotals.f.toFixed(1)}g</div>
                                 </div>
 
                                 <button
                                     onClick={() => setActiveMealInfo(null)}
                                     className="t-icon-btn"
-                                    style={{ width: '44px', height: '44px', background: '#F5F5F7', border: 'none', marginLeft: '10px' }}
+                                    style={{ width: '44px', height: '44px', background: '#F6F5F2', border: 'none', marginLeft: '10px' }}
                                 >
                                     X
                                 </button>
@@ -125,7 +125,7 @@ export const MealEditorModal = ({
                             style={{
                                 padding: '15px 40px',
                                 background: '#FFFFFF',
-                                borderBottom: '1px solid #E5E5EA',
+                                borderBottom: '1px solid #E6E4DE',
                                 display: 'flex',
                                 gap: '30px',
                                 alignItems: 'center',
@@ -134,10 +134,10 @@ export const MealEditorModal = ({
                                 top: 0,
                             }}
                         >
-                            <MacroProgressBar label="Kcal" current={currentMealTotals.kcal} target={targetKcal} hexColor="#007AFF" />
-                            <MacroProgressBar label="Pro" current={currentMealTotals.p} target={targetP} hexColor="#00C853" />
-                            <MacroProgressBar label="Car" current={currentMealTotals.c} target={targetC} hexColor="#1D1D1F" />
-                            <MacroProgressBar label="Fat" current={currentMealTotals.f} target={targetF} hexColor="#86868B" />
+                            <MacroProgressBar label="Kcal" current={currentMealTotals.kcal} target={targetKcal} hexColor="#2F54EB" />
+                            <MacroProgressBar label="Pro" current={currentMealTotals.p} target={targetP} hexColor="#1F8A5B" />
+                            <MacroProgressBar label="Car" current={currentMealTotals.c} target={targetC} hexColor="#121317" />
+                            <MacroProgressBar label="Fat" current={currentMealTotals.f} target={targetF} hexColor="#6E6D69" />
                         </div>
 
                         {/* CORPO DEL MODALE (Tabella di editing degli alimenti) */}
@@ -171,9 +171,9 @@ export const MealEditorModal = ({
                                         width: '100%',
                                         padding: '20px',
                                         borderRadius: '16px',
-                                        border: '2px dashed #E5E5EA',
+                                        border: '2px dashed #E6E4DE',
                                         background: '#FFFFFF',
-                                        color: '#86868B',
+                                        color: '#6E6D69',
                                         fontWeight: 700,
                                         cursor: 'pointer',
                                         transition: '0.3s',
@@ -209,7 +209,7 @@ export const MealEditorModal = ({
                                     title="Apri storico pasti"
                                     onClick={() => setIsLibraryOpen(true)}
                                     className="t-icon-btn"
-                                    style={{ width: '48px', height: '48px', background: '#F5F5F7', color: '#1D1D1F' }}
+                                    style={{ width: '48px', height: '48px', background: '#F6F5F2', color: '#121317' }}
                                 >
                                     <HistoryIcon />
                                 </button>
@@ -219,7 +219,7 @@ export const MealEditorModal = ({
                             <button
                                 onClick={() => setActiveMealInfo(null)}
                                 style={{
-                                    background: '#1D1D1F',
+                                    background: '#121317',
                                     color: 'white',
                                     padding: '14px 40px',
                                     borderRadius: '12px',

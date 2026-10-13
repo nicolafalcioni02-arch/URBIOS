@@ -11,6 +11,7 @@ export const DietSidebar = ({
     handleDragStart,
     handleDrop,
     removeDay,
+    open,
     setActiveMealInfo,
     setDragOverId,
     setIsDbOpen,
@@ -18,7 +19,7 @@ export const DietSidebar = ({
     targets,
 }) => {
     return (
-        <nav className="t-sidebar" style={{ paddingBottom: 0 }}>
+        <nav className={`t-sidebar${open ? ' open' : ''}`} style={{ paddingBottom: 0 }}>
             {/* 2. INDICE DRAG & DROP DEI GIORNI E PASTI */}
             {/* 2. INDICE DRAG & DROP DEI GIORNI E LISTA PASTI SINCRONIZZATA */}
             <ul className="t-nav-list" style={{ paddingBottom: '20px' }}>
@@ -38,7 +39,7 @@ export const DietSidebar = ({
                         style={{ marginBottom: '10px', borderRadius: '12px', transition: '0.2s' }}
                     >
                         {/* LIVELLO 1: IL GIORNO (Spostabile e Duplicabile) */}
-                        <li className="premium-item" style={{ cursor: 'grab', color: '#1D1D1F' }}>
+                        <li className="premium-item" style={{ cursor: 'grab', color: '#121317' }}>
                             <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                                 <span style={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     {day.title || `Giorno ${dIndex + 1}`}
@@ -89,8 +90,8 @@ export const DietSidebar = ({
                                                         <span
                                                             style={{
                                                                 fontSize: '10px',
-                                                                background: isSelected ? '#00C853' : '#E5E5EA',
-                                                                color: isSelected ? 'white' : '#86868B',
+                                                                background: isSelected ? '#1F8A5B' : '#E6E4DE',
+                                                                color: isSelected ? 'white' : '#6E6D69',
                                                                 padding: '2px 6px',
                                                                 borderRadius: '10px',
                                                                 fontWeight: 800,
@@ -140,13 +141,13 @@ export const DietSidebar = ({
                                   cursor: 'not-allowed',
                                   filter: 'grayscale(1)',
                                   pointerEvents: 'none',
-                                  background: '#F5F5F7',
-                                  color: '#1D1D1F',
+                                  background: '#F6F5F2',
+                                  color: '#121317',
                                   border: 'none',
                               }
                             : {
-                                  background: '#F5F5F7',
-                                  color: '#1D1D1F',
+                                  background: '#F6F5F2',
+                                  color: '#121317',
                                   border: 'none',
                               }
                     }

@@ -19,7 +19,7 @@ const AppShell = () => {
     }, [a.status]);
 
     let content = null;
-    if (!a.ready) content = <div className="h-screen bg-white" />;
+    if (!a.ready) content = <div className="h-screen" style={{ background: "var(--paper)" }} />;
     else if (a.status !== 'open') content = <StartScreen />;
     else if (!welcomeDone) content = <WelcomeView data={a.db} onComplete={finishWelcome} />;
     else

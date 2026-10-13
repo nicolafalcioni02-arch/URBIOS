@@ -190,8 +190,8 @@ export const ExportSection = ({ db }) => {
             </Section>
 
             <Section title="Formato dei numeri nei CSV">
-                <Radio name="dec" value="," current={decimal} onChange={setDecimal} label="Virgola decimale (80,5) — Excel italiano" />
-                <Radio name="dec" value="." current={decimal} onChange={setDecimal} label="Punto decimale (80.5) — Excel inglese, R, Python, SPSS" />
+                <Radio name="dec" value="," current={decimal} onChange={setDecimal} label="Virgola decimale (80,5) · Excel italiano" />
+                <Radio name="dec" value="." current={decimal} onChange={setDecimal} label="Punto decimale (80.5) · Excel inglese, R, Python, SPSS" />
             </Section>
 
             <Section title="Anonimizzazione" hint="Per condividere i dati per ricerca o per caricarli in uno strumento di intelligenza artificiale.">

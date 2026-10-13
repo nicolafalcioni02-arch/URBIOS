@@ -7,7 +7,7 @@ export const MacroProgressBar = ({ label, current, target, hexColor }) => {
     const pct = Math.min(rawPct, 100);
     const isOver = current > target && target > 0;
 
-    const activeColor = isOver ? '#FF3B30' : hexColor;
+    const activeColor = isOver ? '#C2413A' : hexColor;
 
     // Calcolo opacità dinamica per lo sfondo (esattamente come hai chiesto:
     // parte chiara e arriva a circa il 70% quando la barra è al 90%)
@@ -30,9 +30,9 @@ export const MacroProgressBar = ({ label, current, target, hexColor }) => {
 
     return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 800, color: '#86868B', textTransform: 'uppercase' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 800, color: '#6E6D69', textTransform: '' }}>
                 <span>{label}</span>
-                <span style={{ color: isOver ? '#FF3B30' : '#1D1D1F' }}>
+                <span style={{ color: isOver ? '#C2413A' : '#121317' }}>
                     {current.toFixed(0)} / {target.toFixed(0)} {label === 'Kcal' ? '' : 'g'}
                 </span>
             </div>

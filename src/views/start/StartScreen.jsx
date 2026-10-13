@@ -14,24 +14,18 @@ const errText = (e) =>
         NOT_ENCRYPTED: "L'archivio non è cifrato: non serve il codice di recupero.",
     }[e && e.message] || 'Errore imprevisto: ' + ((e && e.message) || e));
 
-const Card = ({ children }) => <div className="bg-white/90 backdrop-blur-xl border border-gray-200 rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-sm text-left">{children}</div>;
+const Card = ({ children }) => <div className="start-card rise">{children}</div>;
 
 const Btn = ({ children, onClick, variant = 'dark', disabled, className = '' }) => (
-    <button
-        onClick={onClick}
-        disabled={disabled}
-        className={`w-full px-6 py-3.5 rounded-full text-sm font-medium tracking-wide transition-all disabled:opacity-50 ${
-            variant === 'dark' ? 'bg-black text-white shadow-xl hover:bg-gray-900' : 'bg-white/70 backdrop-blur-sm border border-gray-200 text-gray-700 hover:bg-white'
-        } ${className}`}
-    >
+    <button onClick={onClick} disabled={disabled} className={`${variant === 'dark' ? 'vw-next' : 'vw-back'} w-full disabled:opacity-50 disabled:pointer-events-none ${className}`} style={{ minWidth: 0 }}>
         {children}
     </button>
 );
 
 const Field = ({ label, ...props }) => (
     <label className="block mb-3">
-        <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">{label}</span>
-        <input {...props} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-black bg-white" />
+        <span className="fld-label">{label}</span>
+        <input {...props} className="fld" />
     </label>
 );
 
@@ -42,7 +36,8 @@ export const StartScreen = () => {
     const [source, setSource] = useState(null); // { kind:'file', text, name } | { kind:'working' }
     const [error, setError] = useState('');
     const [busy, setBusy] = useState(false);
-    const [canvasSize, setCanvasSize] = useState(500);
+    const [canvasSize, setCanvasSize] = useState(300);
+    const heroRef = useRef(null);
 
     // form
     const [encrypt, setEncrypt] = useState(true);
@@ -52,10 +47,23 @@ export const StartScreen = () => {
     const [code, setCode] = useState('');
 
     useEffect(() => {
-        const resize = () => setCanvasSize(Math.min(window.innerWidth, window.innerHeight) * 0.7);
+        // la sfera sta sempre nello schermo, con spazio sotto per le azioni
+        const resize = () => setCanvasSize(Math.round(Math.max(190, Math.min(window.innerWidth * 0.74, window.innerHeight * 0.36, 340))));
         resize();
         window.addEventListener('resize', resize);
         return () => window.removeEventListener('resize', resize);
+    }, []);
+
+    // la sfera segue appena il puntatore (solo con mouse: sul touch resta ferma)
+    useEffect(() => {
+        const el = heroRef.current;
+        if (!el || !window.matchMedia('(pointer: fine)').matches) return undefined;
+        const move = (e) => {
+            el.style.setProperty('--px', ((e.clientX / window.innerWidth) * 2 - 1).toFixed(3));
+            el.style.setProperty('--py', ((e.clientY / window.innerHeight) * 2 - 1).toFixed(3));
+        };
+        window.addEventListener('pointermove', move);
+        return () => window.removeEventListener('pointermove', move);
     }, []);
 
     // se la sessione è "bloccata" si va direttamente alla richiesta password
@@ -135,42 +143,50 @@ export const StartScreen = () => {
     };
 
     // ---- viste ----
-    const Err = () => (error ? <p className="text-sm text-red-600 mb-3">{error}</p> : null);
+    const Err = () => (error ? <p className="text-[13px] mb-3" style={{ color: 'var(--bad)' }}>{error}</p> : null);
 
     let body;
     if (mode === 'home') {
         const r = a.resumeInfo;
         body = (
-            <div className="space-y-3 flex flex-col items-center w-full max-w-xs">
-                {r && (
-                    <div className="w-full bg-white/90 backdrop-blur border border-gray-200 rounded-2xl p-4 shadow-lg">
-                        <p className="text-xs font-bold text-gray-900 flex items-center gap-1">
-                            {r.encrypted && <i className="ph-fill ph-lock-key"></i>} Lavoro in corso su questo browser
-                        </p>
-                        <p className="text-[11px] text-gray-500 mt-0.5 mb-3">
-                            Ultima modifica: {new Date(r.savedAt).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}
-                            {r.dirty ? ' · non ancora salvato nel file' : ''}
-                        </p>
-                        <Btn onClick={onResume} disabled={busy}>
-                            Riprendi
-                        </Btn>
-                    </div>
-                )}
+            <div className="start-actions">
                 <input type="file" ref={fileInput} onChange={onFile} accept=".json,application/json" className="hidden" />
-                <Btn onClick={() => fileInput.current.click()} disabled={busy} variant={r ? 'light' : 'dark'}>
-                    Apri archivio (.json)
-                </Btn>
-                <Btn variant="light" onClick={() => go('new')}>
-                    Nuovo archivio
-                </Btn>
+                {r && (
+                    <button className="start-primary rise" onClick={onResume} disabled={busy}>
+                        <span className="min-w-0 text-left">
+                            <span className="start-title">Riprendi il lavoro</span>
+                            <span className="start-sub">
+                                {r.encrypted ? 'Protetto da password · ' : ''}ultima modifica {new Date(r.savedAt).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}
+                                {r.dirty ? ' · non ancora salvato nel file' : ''}
+                            </span>
+                        </span>
+                        <i className="ph-bold ph-arrow-right"></i>
+                    </button>
+                )}
+                <button className={r ? 'start-row rise' : 'start-primary rise'} style={{ animationDelay: '.06s' }} onClick={() => fileInput.current.click()} disabled={busy}>
+                    <i className="ph ph-folder-open start-ico"></i>
+                    <span className="min-w-0 text-left flex-1">
+                        <span className="start-title">Apri il mio archivio</span>
+                        <span className="start-sub">Scegli il file .json che hai salvato</span>
+                    </span>
+                    <i className="ph ph-arrow-right start-go"></i>
+                </button>
+                <button className="start-row rise" style={{ animationDelay: '.12s' }} onClick={() => go('new')}>
+                    <i className="ph ph-plus-circle start-ico"></i>
+                    <span className="min-w-0 text-left flex-1">
+                        <span className="start-title">Inizia da zero</span>
+                        <span className="start-sub">Crea un nuovo archivio, con password se vuoi</span>
+                    </span>
+                    <i className="ph ph-arrow-right start-go"></i>
+                </button>
                 {a.legacyFound && (
-                    <Btn variant="light" onClick={() => run(a.importLegacy)} disabled={busy}>
+                    <button className="start-link" onClick={() => run(a.importLegacy)} disabled={busy}>
                         Recupera i dati della versione precedente
-                    </Btn>
+                    </button>
                 )}
                 {ALLOW_DEMO_ENTRY && (
-                    <button onClick={a.enterDemo} className="text-xs text-gray-500 underline pt-1">
-                        Entra (Demo, solo sviluppo)
+                    <button onClick={a.enterDemo} className="start-link">
+                        Entra in modalità demo
                     </button>
                 )}
                 <Err />
@@ -245,17 +261,23 @@ export const StartScreen = () => {
         );
     }
 
+    const small = mode !== 'home';
     return (
-        <div className="min-h-screen w-full flex flex-col items-center justify-center relative bg-white overflow-hidden py-8 px-4">
-            <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
-                <ShaderCanvas size={canvasSize} className="rounded-full" />
+        <div className="start-wrap">
+            {/* La sfera e' il centro della schermata: il saluto sta DENTRO, le azioni sotto. Nelle schermate con campi si rimpicciolisce. */}
+            <div className="start-hero-box" style={{ height: small ? Math.round(canvasSize * 0.34) : canvasSize }}>
+                <div ref={heroRef} className="start-hero" style={{ width: canvasSize, height: canvasSize, transform: `translate(calc(var(--px, 0) * 10px), calc(var(--py, 0) * 8px)) scale(${small ? 0.34 : 1})` }}>
+                    <div className="start-float">
+                        <ShaderCanvas size={canvasSize} className="rounded-full" />
+                    </div>
+                    <h1 className="start-hello" style={{ fontSize: canvasSize * 0.27, opacity: small ? 0 : 1 }}>
+                        Hello
+                    </h1>
+                </div>
             </div>
-            <div className="relative z-10 text-center flex flex-col items-center w-full">
-                <h1 className="font-['Times'] font-extrabold text-7xl md:text-[10rem] leading-none tracking-tighter text-black mix-blend-overlay select-none">Hello</h1>
-                <h2 className="text-black/60 text-xs font-bold tracking-[0.4em] uppercase mb-8 mt-4">U R B I O S</h2>
-                {body}
-            </div>
-            <div className="absolute bottom-4 text-black/30 text-[10px] uppercase tracking-widest text-center px-4">&copy; 2026 URBIOS · dati solo su questo dispositivo</div>
+            <p className="start-brand">U R B I O S</p>
+            <div className="start-body">{body}</div>
+            <p className="start-foot">I dati restano solo su questo dispositivo</p>
         </div>
     );
 };

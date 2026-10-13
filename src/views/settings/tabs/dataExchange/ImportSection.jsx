@@ -135,7 +135,7 @@ export const ImportSection = ({ db, onUpdateDb }) => {
 
                         {inc.pazienti && (
                             <>
-                                <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-1">Se un paziente esiste già</p>
+                                <p className="text-[11px] font-bold text-gray-500 mb-1">Se un paziente esiste già</p>
                                 <Radio
                                     name="conf"
                                     value="merge"
@@ -172,7 +172,7 @@ export const ImportSection = ({ db, onUpdateDb }) => {
                         )}
                         {hasLib && (
                             <div className="mt-3">
-                                <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-1">
+                                <p className="text-[11px] font-bold text-gray-500 mb-1">
                                     Archivi (si aggiungono solo le voci mancanti)
                                 </p>
                                 {inc.diet_food_db && <Check label="Alimenti" checked={opts.libraries.foods} onChange={lib('foods')} />}

@@ -6,7 +6,7 @@ const TIPI = [
     ['riscaldamento', 'Serie di riscaldamento (non conta nel volume)'],
     ['drop', 'Drop set (riduzione del carico senza recupero)'],
 ];
-const BADGE = { '': { bg: '#E5E5EA', fg: '#86868B' }, riscaldamento: { bg: '#FFF1D6', fg: '#B26A00' }, drop: { bg: '#EEE2FF', fg: '#6B3FC2' } };
+const BADGE = { '': { bg: '#E6E4DE', fg: '#6E6D69' }, riscaldamento: { bg: '#FFF1D6', fg: '#B26A00' }, drop: { bg: '#EEE2FF', fg: '#6B3FC2' } };
 
 // Una riga di serie. Il pallino col numero cambia il tipo (lavoro → riscaldamento → drop).
 export const SetRow = ({ set, index, cardio, oneRm, onChange, onRemove }) => {
@@ -23,7 +23,7 @@ export const SetRow = ({ set, index, cardio, oneRm, onChange, onRemove }) => {
             <td>
                 <div
                     className="t-set-badge"
-                    title={TIPI.find(([t]) => t === tipo)[1] + ' — clicca per cambiare'}
+                    title={TIPI.find(([t]) => t === tipo)[1] + ' · clicca per cambiare'}
                     style={{ background: b.bg, color: b.fg, cursor: 'pointer', userSelect: 'none' }}
                     onClick={() => onChange('tipo', nextTipo())}
                 >
@@ -38,7 +38,7 @@ export const SetRow = ({ set, index, cardio, oneRm, onChange, onRemove }) => {
             <td>{inp('rec', "90''")}</td>
             <td>{inp('note', cardio ? 'Intensità, zona FC...' : 'Esecuzione controllata...')}</td>
             <td style={{ textAlign: 'center' }}>
-                <i className="ph ph-x" style={{ cursor: 'pointer', color: '#FF3B30' }} onClick={onRemove}></i>
+                <i className="ph ph-x" style={{ cursor: 'pointer', color: '#C2413A' }} onClick={onRemove}></i>
             </td>
         </tr>
     );

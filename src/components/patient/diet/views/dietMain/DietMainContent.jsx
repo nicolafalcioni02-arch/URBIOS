@@ -36,19 +36,22 @@ export const DietMainContent = ({
                     background: '#FFFFFF',
                     padding: '16px 24px',
                     borderRadius: '20px',
-                    border: '1px solid #E5E5EA',
+                    border: '1px solid #E6E4DE',
                     marginBottom: '25px',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '12px',
+                    boxSizing: 'border-box',
                     width: '100%',
                     maxWidth: '950px',
                     margin: '0 auto 25px auto',
                 }}
             >
                 {/* INFO DIETA ATTIVA (A SINISTRA) + TASTO INDIETRO CONTESTUALE */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 800, color: '#86868B', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#6E6D69', textTransform: '', }}>
                         Modalità Piano:
                     </span>
 
@@ -76,8 +79,8 @@ export const DietMainContent = ({
                             setTimeout(() => setDietViewMode('menu'), 50);
                         }}
                         style={{
-                            background: '#F5F5F7',
-                            color: '#1D1D1F',
+                            background: '#F6F5F2',
+                            color: '#121317',
                             border: 'none',
                             padding: '6px 14px',
                             borderRadius: '10px',
@@ -99,7 +102,7 @@ export const DietMainContent = ({
                     <button
                         onClick={() => setIsSaveStatusOpen(true)}
                         style={{
-                            background: '#1D1D1F',
+                            background: '#121317',
                             color: '#FFFFFF',
                             border: 'none',
                             padding: '10px 24px',
@@ -143,20 +146,20 @@ export const DietMainContent = ({
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#86868B',
+                            color: '#6E6D69',
                             background: '#FFFFFF',
                             borderRadius: '32px',
-                            border: '2px dashed #E5E5EA',
+                            border: '2px dashed #E6E4DE',
                             padding: '40px',
                         }}
                     >
-                        <div style={{ background: '#F2FFF7', padding: '24px', borderRadius: '24px', marginBottom: '25px', border: '1px solid #C8E6C9' }}>
+                        <div style={{ background: '#F1F8F4', padding: '24px', borderRadius: '24px', marginBottom: '25px', border: '1px solid #C8E6C9' }}>
                             <svg
                                 width="48"
                                 height="48"
                                 viewBox="0 0 24 24"
                                 fill="none"
-                                stroke="#00C853"
+                                stroke="#1F8A5B"
                                 strokeWidth="2.5"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -166,7 +169,7 @@ export const DietMainContent = ({
                                 <path d="M12 8h.01"></path>
                             </svg>
                         </div>
-                        <h3 style={{ fontSize: '24px', fontWeight: 900, color: '#1D1D1F', marginBottom: '12px', letterSpacing: '-0.5px' }}>
+                        <h3 style={{ fontSize: '24px', fontWeight: 600, color: '#121317', marginBottom: '12px', }}>
                             Setup Obiettivi Richiesto
                         </h3>
                         <p
@@ -177,7 +180,7 @@ export const DietMainContent = ({
                                 textAlign: 'center',
                                 lineHeight: '1.6',
                                 marginBottom: '35px',
-                                color: '#86868B',
+                                color: '#6E6D69',
                             }}
                         >
                             Per iniziare la compilazione del piano nutrizionale, configura prima i parametri.
@@ -185,7 +188,7 @@ export const DietMainContent = ({
                         <button
                             onClick={() => setIsSetupOpen(true)}
                             style={{
-                                background: '#00C853',
+                                background: '#1F8A5B',
                                 color: 'white',
                                 border: 'none',
                                 padding: '16px 40px',
@@ -215,7 +218,7 @@ export const DietMainContent = ({
                             </div>
                             <div className="t-input-floating">
                                 <label>Target Kcal</label>
-                                <div style={{ padding: '12px 16px', fontSize: '18px', fontWeight: 800, color: '#00C853' }}>{targets.kcal} kcal</div>
+                                <div style={{ padding: '12px 16px', fontSize: '18px', fontWeight: 800, color: '#1F8A5B' }}>{targets.kcal} kcal</div>
                             </div>
                         </div>
 
@@ -240,8 +243,8 @@ export const DietMainContent = ({
                         </section>
 
                         {/* 3. PANORAMICA DEL PIANO ALIMENTARE (Tutti i giorni) */}
-                        <div style={{ marginTop: '40px', marginBottom: '20px', borderBottom: '2px solid #E5E5EA', paddingBottom: '10px' }}>
-                            <span style={{ fontSize: '22px', fontWeight: 800, color: '#1D1D1F' }}>Panoramica del Piano Alimentare</span>
+                        <div style={{ marginTop: '40px', marginBottom: '20px', borderBottom: '2px solid #E6E4DE', paddingBottom: '10px' }}>
+                            <span style={{ fontSize: '22px', fontWeight: 800, color: '#121317' }}>Panoramica del Piano Alimentare</span>
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

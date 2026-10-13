@@ -28,19 +28,19 @@ export const SaveStatusModal = ({
                                 margin: '0 auto 15px auto',
                             }}
                         >
-                            <i className="ph-fill ph-carrot" style={{ fontSize: '30px', color: '#007AFF' }}></i>
+                            <i className="ph-fill ph-carrot" style={{ fontSize: '30px', color: '#121317' }}></i>
                         </div>
                         <h3 style={{ fontSize: '20px', fontWeight: 900, margin: 0 }}>Salva e Aggiorna Stato</h3>
-                        <p style={{ fontSize: '13px', color: '#86868B', marginTop: '5px', fontWeight: 600 }}>In quale fase si trova questo piano alimentare?</p>
+                        <p style={{ fontSize: '13px', color: '#6E6D69', marginTop: '5px', fontWeight: 600 }}>In quale fase si trova questo piano alimentare?</p>
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {[
                             { id: 'todo', label: 'Da Creare', color: '#8E8E93', icon: 'ph-clock' },
                             { id: 'draft', label: 'Da Finire', color: '#FF9500', icon: 'ph-pencil-line' },
-                            { id: 'pending', label: 'Finito ma da Inviare', color: '#007AFF', icon: 'ph-paper-plane-tilt' },
-                            { id: 'delivery', label: 'Consegnato', color: '#00C853', icon: 'ph-check-circle' },
-                            { id: 'edit', label: 'Da Modificare', color: '#FF3B30', icon: 'ph-warning-octagon' },
+                            { id: 'pending', label: 'Finito ma da Inviare', color: '#121317', icon: 'ph-paper-plane-tilt' },
+                            { id: 'delivery', label: 'Consegnato', color: '#1F8A5B', icon: 'ph-check-circle' },
+                            { id: 'edit', label: 'Da Modificare', color: '#C2413A', icon: 'ph-warning-octagon' },
                         ].map((status) => (
                             <div
                                 key={status.id}
@@ -74,7 +74,7 @@ export const SaveStatusModal = ({
                                 style={{
                                     padding: '16px',
                                     borderRadius: '16px',
-                                    border: '1px solid #E5E5EA',
+                                    border: '1px solid #E6E4DE',
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -84,7 +84,7 @@ export const SaveStatusModal = ({
                                 }}
                                 className="laf-row"
                                 onMouseOver={(e) => (e.currentTarget.style.borderColor = status.color)}
-                                onMouseOut={(e) => (e.currentTarget.style.borderColor = '#E5E5EA')}
+                                onMouseOut={(e) => (e.currentTarget.style.borderColor = '#E6E4DE')}
                             >
                                 <div
                                     style={{
@@ -100,7 +100,7 @@ export const SaveStatusModal = ({
                                 >
                                     <i className={`ph-bold ${status.icon}`} style={{ fontSize: '18px' }}></i>
                                 </div>
-                                <span style={{ fontWeight: 800, fontSize: '14px', color: '#1D1D1F' }}>{status.label}</span>
+                                <span style={{ fontWeight: 800, fontSize: '14px', color: '#121317' }}>{status.label}</span>
                             </div>
                         ))}
                     </div>
@@ -111,7 +111,7 @@ export const SaveStatusModal = ({
                             width: '100%',
                             padding: '14px',
                             background: '#F2F2F7',
-                            color: '#1D1D1F',
+                            color: '#121317',
                             borderRadius: '14px',
                             border: 'none',
                             fontWeight: 700,

@@ -92,7 +92,7 @@ export const CardioTool = ({ profile }) => {
                 <Field label="Distanza percorsa" value={dist} onChange={setDist} unit="m" width={90} />
                 {cooper !== null && (
                     <Result>
-                        <b>VO₂max ≈ {n1(cooper)} ml/kg/min</b> — {vo2Class(cooper)} (valutazione indicativa: dipende da età e sesso)
+                        <b>VO₂max ≈ {n1(cooper)} ml/kg/min</b> · {vo2Class(cooper)} (valutazione indicativa: dipende da età e sesso)
                     </Result>
                 )}
                 <div style={{ fontSize: 12, fontWeight: 700, margin: '12px 0 6px' }}>Rockport (1 miglio = 1609 m camminando)</div>
@@ -101,7 +101,7 @@ export const CardioTool = ({ profile }) => {
                 <Field label="FC a fine test" value={rkHr} onChange={setRkHr} unit="bpm" width={70} />
                 {rock !== null && Number.isFinite(rock) && (
                     <Result>
-                        <b>VO₂max ≈ {n1(rock)} ml/kg/min</b> — {vo2Class(rock)}
+                        <b>VO₂max ≈ {n1(rock)} ml/kg/min</b> · {vo2Class(rock)}
                     </Result>
                 )}
             </Card>

@@ -21,7 +21,7 @@ export const MealLibraryModal = ({ isLibraryOpen, libFilter, loadFromLibrary, me
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-black text-gray-900 leading-tight">Libreria Pasti</h3>
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{mealLibrary.length} modelli salvati</span>
+                                    <span className="text-xs font-bold text-gray-400 ">{mealLibrary.length} modelli salvati</span>
                                 </div>
                             </div>
                             <button
@@ -81,7 +81,7 @@ export const MealLibraryModal = ({ isLibraryOpen, libFilter, loadFromLibrary, me
 
                                             {/* LISTA ALIMENTI */}
                                             <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 mb-4 flex-1">
-                                                <span className="block text-[9px] font-bold uppercase text-gray-400 mb-2">
+                                                <span className="block text-[11px] font-bold text-gray-400 mb-2">
                                                     Composizione ({libMeal.items?.length || 0})
                                                 </span>
                                                 <div className="max-h-28 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
@@ -100,19 +100,19 @@ export const MealLibraryModal = ({ isLibraryOpen, libFilter, loadFromLibrary, me
                                             {/* RIASSUNTO MACRO IN LINEA */}
                                             <div className="flex justify-between items-center py-3 border-y border-gray-100 mb-4">
                                                 <div className="text-center">
-                                                    <span className="block text-[9px] font-bold uppercase text-gray-400">KCAL</span>
+                                                    <span className="block text-[11px] font-bold text-gray-400">KCAL</span>
                                                     <span className="text-sm font-black text-gray-800">{Math.round(libMeal.totals?.kcal || 0)}</span>
                                                 </div>
                                                 <div className="text-center">
-                                                    <span className="block text-[9px] font-bold uppercase text-gray-400">PRO</span>
+                                                    <span className="block text-[11px] font-bold text-gray-400">PRO</span>
                                                     <span className="text-sm font-black text-green-600">{libMeal.totals?.p?.toFixed(0) || 0}g</span>
                                                 </div>
                                                 <div className="text-center">
-                                                    <span className="block text-[9px] font-bold uppercase text-gray-400">CAR</span>
+                                                    <span className="block text-[11px] font-bold text-gray-400">CAR</span>
                                                     <span className="text-sm font-black text-gray-800">{libMeal.totals?.c?.toFixed(0) || 0}g</span>
                                                 </div>
                                                 <div className="text-center">
-                                                    <span className="block text-[9px] font-bold uppercase text-gray-400">FAT</span>
+                                                    <span className="block text-[11px] font-bold text-gray-400">FAT</span>
                                                     <span className="text-sm font-black text-gray-800">{libMeal.totals?.f?.toFixed(0) || 0}g</span>
                                                 </div>
                                             </div>

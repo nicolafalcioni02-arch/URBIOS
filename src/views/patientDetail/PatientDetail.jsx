@@ -3,8 +3,9 @@ import { PatientHeader } from './parts/PatientHeader';
 import { PatientTabContent } from './parts/PatientTabContent';
 import { usePatientVisitActions } from './hooks/usePatientVisitActions';
 
-export const PatientDetail = ({ patient, onBack, onUpdateDb, db }) => {
-    const [view, setView] = useState('history');
+export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = false }) => {
+    // un paziente senza visite parte dall'anagrafica, gli altri dallo storico
+    const [view, setView] = useState(patient?.visite?.length ? 'history' : 'info');
     const [status, setStatus] = useState(patient?.status || 'Attivo');
     const [dietViewMode, setDietViewMode] = useState('menu');
 
@@ -156,9 +157,9 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db }) => {
     });
 
     return (
-        <div className="h-full flex flex-col bg-[#f8f9fa] relative z-20">
+        <div className="h-full flex flex-col bg-[var(--paper)] relative z-20">
             {/* HEADER */}
-            <PatientHeader onBack={onBack} patient={patient} setView={setView} status={status} view={view} />
+            <PatientHeader onBack={onBack} patient={patient} setView={setView} status={status} view={view} readOnly={readOnly} />
 
             <PatientTabContent
                 configA={configA}

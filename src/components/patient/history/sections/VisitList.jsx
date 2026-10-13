@@ -5,11 +5,11 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
         <div className="space-y-3">
             {/* Column header */}
             <div className="hidden md:grid grid-cols-[140px_1fr_120px_110px_auto] gap-4 px-4 mb-1">
-                <span className="text-[9px] uppercase font-black tracking-widest text-gray-400">Data</span>
-                <span className="text-[9px] uppercase font-black tracking-widest text-gray-400">Peso · Variazione</span>
-                <span className="text-[9px] uppercase font-black tracking-widest text-gray-400">Stato Dieta</span>
-                <span className="text-[9px] uppercase font-black tracking-widest text-gray-400">Tipo Visita</span>
-                <span className="text-[9px] uppercase font-black tracking-widest text-gray-400">Azioni</span>
+                <span className="text-[11px] font-semibold text-gray-400">Data</span>
+                <span className="text-[11px] font-semibold text-gray-400">Peso · Variazione</span>
+                <span className="text-[11px] font-semibold text-gray-400">Stato Dieta</span>
+                <span className="text-[11px] font-semibold text-gray-400">Tipo Visita</span>
+                <span className="text-[11px] font-semibold text-gray-400">Azioni</span>
             </div>
 
             {filteredVisits.map((visit, index) => {
@@ -22,8 +22,8 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
                     <div
                         key={visit.id}
                         className={`
-                                grid grid-cols-[140px_1fr_120px_110px_auto] gap-4 items-center
-                                px-4 py-3.5 rounded-2xl border transition-all duration-150
+                                flex flex-wrap items-center gap-x-3 gap-y-2 md:grid md:grid-cols-[140px_1fr_120px_110px_auto] md:gap-4
+                                px-3 sm:px-4 py-3.5 rounded-2xl border transition-all duration-150
                                 hover:shadow-md hover:border-gray-300 cursor-default
                                 ${isIndipendente ? 'bg-blue-50/60 border-blue-100' : 'bg-white border-gray-100 shadow-sm'}
                             `}
@@ -31,7 +31,7 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
                         {/* Date */}
                         <div className="flex items-center gap-3">
                             <div className="text-center bg-black text-white px-2.5 py-2 rounded-xl min-w-[40px] shrink-0">
-                                <p className="text-[7px] font-black uppercase leading-none opacity-70">
+                                <p className="text-[7px] font-semibold leading-none opacity-70">
                                     {new Date(visit.data).toLocaleDateString('it-IT', { month: 'short' })}
                                 </p>
                                 <p className="text-sm font-black leading-tight">{new Date(visit.data).getDate()}</p>
@@ -43,7 +43,7 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
                         </div>
 
                         {/* Weight + delta */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-none">
                             <span className="text-xl font-black text-gray-800">
                                 {visit.peso}
                                 <span className="text-xs font-normal text-gray-400 ml-0.5">kg</span>
@@ -67,29 +67,33 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
                             )}
                         </div>
 
+                        {/* su telefono stato dieta e tipo visita vanno su una riga sotto; da md in su tornano colonne */}
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 basis-full order-last md:contents">
                         {/* Diet status badge */}
                         <div>
                             <span className={`inline-flex items-center gap-1.5 text-[9px] font-black px-2.5 py-1 rounded-full border ${dietBadge.color}`}>
                                 <span className={`w-1.5 h-1.5 rounded-full ${dietBadge.dot}`}></span>
-                                {dietBadge.label.toUpperCase()}
+                                {dietBadge.label}
                             </span>
                         </div>
 
                         {/* Visit type */}
                         <div>
                             {isIndipendente ? (
-                                <span className="inline-flex items-center gap-1 text-[9px] font-black text-blue-600 uppercase">
+                                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 ">
                                     <i className="ph-bold ph-carrot text-xs"></i> Solo Piano
                                 </span>
                             ) : (
-                                <span className="inline-flex items-center gap-1 text-[9px] font-black text-emerald-600 uppercase">
+                                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 ">
                                     <i className="ph-bold ph-calendar-check text-xs"></i> Associata
                                 </span>
                             )}
                         </div>
 
+                        </div>
+
                         {/* Actions */}
-                        <div className="flex gap-1 shrink-0">
+                        <div className="flex gap-1 shrink-0 ml-auto md:ml-0">
                             <button
                                 title="Piano dieta"
                                 className="w-8 h-8 rounded-lg border border-gray-100 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 text-gray-400 flex items-center justify-center transition-all"

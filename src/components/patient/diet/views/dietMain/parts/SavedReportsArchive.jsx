@@ -5,8 +5,8 @@ export const SavedReportsArchive = ({ deleteReport, dietDays, savedReports }) =>
     return (
         savedReports.length > 0 && (
             <div className="saved-reports-section" style={{ marginTop: '50px', paddingBottom: '60px' }}>
-                <div style={{ marginBottom: '25px', borderBottom: '2px solid #E5E5EA', paddingBottom: '10px' }}>
-                    <span style={{ fontSize: '22px', fontWeight: 800, color: '#1D1D1F' }}>Archivio Report Clinici</span>
+                <div style={{ marginBottom: '25px', borderBottom: '2px solid #E6E4DE', paddingBottom: '10px' }}>
+                    <span style={{ fontSize: '22px', fontWeight: 800, color: '#121317' }}>Archivio Report Clinici</span>
                 </div>
                 <div className="reports-grid">
                     {savedReports.map((report) => {
@@ -33,11 +33,10 @@ export const SavedReportsArchive = ({ deleteReport, dietDays, savedReports }) =>
                                             style={{
                                                 display: 'block',
                                                 fontSize: '10px',
-                                                color: '#00C853',
+                                                color: '#1F8A5B',
                                                 fontWeight: 800,
-                                                textTransform: 'uppercase',
+                                                textTransform: '',
                                                 marginBottom: '8px',
-                                                letterSpacing: '0.5px',
                                             }}
                                         >
                                             Note Cliniche

@@ -10,14 +10,14 @@ const errText = (e) =>
 
 const Section = ({ title, children }) => (
     <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-4">
-        <h4 className="text-xs font-bold uppercase tracking-widest text-gray-700 mb-3">{title}</h4>
+        <h4 className="text-xs font-bold text-gray-700 mb-3">{title}</h4>
         {children}
     </div>
 );
 
 const Input = ({ label, ...props }) => (
     <label className="block mb-3">
-        <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">{label}</span>
+        <span className="block text-xs font-bold text-gray-500 mb-1">{label}</span>
         <input {...props} className="w-full max-w-sm border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-black bg-white" />
     </label>
 );

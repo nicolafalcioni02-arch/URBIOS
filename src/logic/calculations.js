@@ -45,10 +45,11 @@ export const calculateEquation = (code, data) => {
 
         // 3. Crea la funzione dinamica
         // Passiamo "util" come Math per retrocompatibilità se usavi util.log10, altrimenti Math standard
-        const func = new Function(...keys, 'util', 'Math', `return ${code};`);
+        // "data" e' l'intero contesto: le formule predefinite lo usano (es. data.logSomma), quelle scritte a mano possono usare i nomi diretti
+        const func = new Function('data', ...keys, 'util', 'Math', `return ${code};`);
 
         // 4. Esegue
-        const result = func(...values, Math, Math);
+        const result = func(data, ...values, Math, Math);
 
         if (isNaN(result) || !isFinite(result)) return null;
 

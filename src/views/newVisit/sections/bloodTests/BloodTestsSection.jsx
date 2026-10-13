@@ -16,7 +16,7 @@ export const BloodTestsSection = ({ activeSection, renderBloodInput, sectionRefs
                 onToggle={() => setActiveSection(activeSection === 'ematochimico' ? null : 'ematochimico')}
             >
                 {/* Mantieni la TUA griglia originale */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mb-8 items-start">
                     {/* Pannello Glucidico */}
                     <MetabolicPanels renderBloodInput={renderBloodInput} />
 

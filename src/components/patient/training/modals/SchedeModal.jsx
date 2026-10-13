@@ -27,7 +27,7 @@ export const SchedeModal = ({ patient, schedaId, header, weeks, onOpen, onNew, o
                     <h2 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Schede salvate</h2>
                     <div style={{ display: 'flex', gap: 8 }}>
                         <button
-                            style={{ ...btn, background: '#1D1D1F', color: '#fff', border: 'none' }}
+                            style={{ ...btn, background: '#121317', color: '#fff', border: 'none' }}
                             onClick={() => {
                                 onNew();
                                 onClose();
@@ -40,7 +40,7 @@ export const SchedeModal = ({ patient, schedaId, header, weeks, onOpen, onNew, o
                         </button>
                     </div>
                 </div>
-                <p style={{ fontSize: 12, color: '#86868B', margin: '0 0 12px' }}>
+                <p style={{ fontSize: 12, color: '#6E6D69', margin: '0 0 12px' }}>
                     Ogni paziente può avere più schede (per esempio un mesociclo dopo l'altro). Le modifiche vengono salvate in automatico nell'archivio.
                 </p>
                 <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -51,7 +51,7 @@ export const SchedeModal = ({ patient, schedaId, header, weeks, onOpen, onNew, o
                             <div
                                 key={s.id}
                                 style={{
-                                    border: active ? '2px solid #007AFF' : '1px solid #E5E5EA',
+                                    border: active ? '2px solid #121317' : '1px solid #E6E4DE',
                                     borderRadius: 14,
                                     padding: '12px 14px',
                                     background: active ? '#F2F8FF' : '#fff',
@@ -62,18 +62,18 @@ export const SchedeModal = ({ patient, schedaId, header, weeks, onOpen, onNew, o
                                         <div style={{ fontWeight: 800, fontSize: 15 }}>
                                             {s.titolo || 'Scheda senza titolo'}
                                             {active && (
-                                                <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 700, color: '#007AFF', textTransform: 'uppercase' }}>
+                                                <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 700, color: '#121317', textTransform: '' }}>
                                                     in uso
                                                 </span>
                                             )}
                                             {s._unsaved && (
-                                                <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 600, color: '#86868B' }}>
+                                                <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 600, color: '#6E6D69' }}>
                                                     (vuota, non ancora salvata)
                                                 </span>
                                             )}
                                         </div>
-                                        <div style={{ fontSize: 12, color: '#86868B', marginTop: 2 }}>
-                                            {[s.obiettivo, fmt(s.data)].filter(Boolean).join(' · ') || '—'} · {sum.weeks} sett. · {sum.days} giorni ·{' '}
+                                        <div style={{ fontSize: 12, color: '#6E6D69', marginTop: 2 }}>
+                                            {[s.obiettivo, fmt(s.data)].filter(Boolean).join(' · ') || '-'} · {sum.weeks} sett. · {sum.days} giorni ·{' '}
                                             {sum.exercises} esercizi
                                         </div>
                                     </div>
@@ -102,7 +102,7 @@ export const SchedeModal = ({ patient, schedaId, header, weeks, onOpen, onNew, o
                                         )}
                                         {!s._unsaved && (
                                             <button
-                                                style={{ ...btn, color: '#FF3B30' }}
+                                                style={{ ...btn, color: '#C2413A' }}
                                                 onClick={() => window.confirm('Eliminare questa scheda?') && onDelete(s.id)}
                                             >
                                                 Elimina

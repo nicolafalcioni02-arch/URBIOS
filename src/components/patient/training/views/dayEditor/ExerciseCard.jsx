@@ -8,17 +8,17 @@ import { numOrNull } from '../../logic/science/parse';
 
 const SS = ['', 'A', 'B', 'C', 'D', 'E', 'F'];
 const chip = {
-    fontSize: 11,
-    fontWeight: 700,
-    borderRadius: 8,
-    padding: '5px 9px',
-    border: '1px solid #E5E5EA',
+    fontSize: 13,
+    fontWeight: 600,
+    borderRadius: 10,
+    padding: '8px 12px',
+    border: '1px solid #E6E4DE',
     background: '#fff',
-    color: '#555',
+    color: '#121317',
     cursor: 'pointer',
     display: 'inline-flex',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
 };
 
 // Una scheda-esercizio: nome (con suggerimenti), figure, superserie, serie con carico/%/RPE/tempo, riscaldamento, 1RM.
@@ -35,26 +35,26 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
     return (
         <div
             className="t-exercise-item"
-            style={{ marginBottom: 24, padding: 25, borderRadius: 24, background: '#F9F9FB', border: '1px solid #F0F0F2', position: 'relative' }}
+            style={{ marginBottom: 16, padding: 18, borderRadius: 20, background: '#FBFAF8', border: '1px solid #EDEBE5', position: 'relative' }}
         >
-            <div style={{ display: 'flex', gap: 15, marginBottom: 14, position: 'relative', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 14, position: 'relative', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'center' }}>
                     {imgs.slice(0, 2).map((src, i) => (
-                        <img key={i} src={src} alt="" style={{ width: 70, height: 'auto', borderRadius: 8, border: '1px solid #E5E5EA' }} />
+                        <img key={i} src={src} alt="" style={{ width: 56, height: 'auto', borderRadius: 10, border: '1px solid #E6E4DE' }} />
                     ))}
                     <button
                         title={imgs.length ? 'Gestisci le foto di questo esercizio' : 'Aggiungi le tue foto di questo esercizio'}
-                        style={{ ...chip, padding: '8px 10px' }}
+                        style={{ ...chip, padding: '9px 11px' }}
                         onClick={() => ops.openPhotos(ex)}
                     >
-                        <i className="ph ph-camera" style={{ fontSize: 15 }}></i>
+                        <i className="ph ph-camera" style={{ fontSize: 17 }}></i>
                         {imgs.length > 2 ? `+${imgs.length - 2}` : imgs.length ? '' : 'Foto'}
                     </button>
                 </div>
-                <div style={{ flex: 2, position: 'relative', minWidth: 220 }}>
+                <div style={{ flex: '2 1 200px', position: 'relative', minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         {label && (
-                            <span style={{ background: '#1D1D1F', color: '#fff', borderRadius: 6, padding: '3px 7px', fontSize: 11, fontWeight: 800 }}>
+                            <span style={{ background: '#121317', color: '#fff', borderRadius: 6, padding: '3px 7px', fontSize: 12, fontWeight: 700 }}>
                                 {label}
                             </span>
                         )}
@@ -63,7 +63,7 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                             className="t-ex-input"
                             value={ex.name}
                             onChange={(e) => ops.updateExValue(weekId, dayId, ex.id, 'name', e.target.value)}
-                            style={{ fontSize: 18, fontWeight: 700, width: '100%' }}
+                            style={{ fontSize: 17, fontWeight: 700, width: '100%' }}
                             placeholder="Nome esercizio..."
                         />
                     </div>
@@ -77,33 +77,35 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                         </div>
                     )}
                 </div>
-                <input
-                    type="text"
-                    className="t-ex-input"
-                    value={ex.group}
-                    onChange={(e) => ops.updateExValue(weekId, dayId, ex.id, 'group', e.target.value)}
-                    style={{ width: 130, textAlign: 'right', color: '#86868B' }}
-                    placeholder="Gruppo"
-                />
-                <select
-                    title="Superserie: gli esercizi consecutivi con la stessa lettera si eseguono uno dopo l'altro, senza recupero in mezzo"
-                    value={ex.ss || ''}
-                    onChange={(e) => ops.updateExValue(weekId, dayId, ex.id, 'ss', e.target.value)}
-                    style={{ ...chip, padding: '8px 6px' }}
-                >
-                    {SS.map((l) => (
-                        <option key={l} value={l}>
-                            {l ? `Superserie ${l}` : 'Singolo'}
-                        </option>
-                    ))}
-                </select>
-                <button className="t-icon-btn danger" onClick={() => ops.removeExercise(weekId, dayId, ex.id)}>
-                    <i className="ph ph-trash"></i>
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 1 240px', minWidth: 0 }}>
+                    <input
+                        type="text"
+                        className="t-ex-input"
+                        value={ex.group}
+                        onChange={(e) => ops.updateExValue(weekId, dayId, ex.id, 'group', e.target.value)}
+                        style={{ flex: 1, minWidth: 0, color: '#6E6D69', fontSize: 14, fontWeight: 500 }}
+                        placeholder="Gruppo muscolare"
+                    />
+                    <select
+                        title="Superserie: gli esercizi consecutivi con la stessa lettera si eseguono uno dopo l'altro, senza recupero in mezzo"
+                        value={ex.ss || ''}
+                        onChange={(e) => ops.updateExValue(weekId, dayId, ex.id, 'ss', e.target.value)}
+                        style={{ ...chip, padding: '9px 10px', flex: 'none' }}
+                    >
+                        {SS.map((l) => (
+                            <option key={l} value={l}>
+                                {l ? `Superserie ${l}` : 'Singolo'}
+                            </option>
+                        ))}
+                    </select>
+                    <button className="t-icon-btn danger" style={{ marginLeft: 0, flex: 'none' }} onClick={() => ops.removeExercise(weekId, dayId, ex.id)} aria-label="Elimina l'esercizio">
+                        <i className="ph ph-trash"></i>
+                    </button>
+                </div>
             </div>
 
             {cardio && (
-                <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#555' }}>
+                <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#555' }}>
                     <i className="ph ph-heartbeat"></i> Intensità (per il dispendio):
                     <select
                         value={ex.met || ''}
@@ -120,6 +122,7 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                 </div>
             )}
 
+            <div className="t-table-scroll">
             <table className="t-sets-table">
                 <thead>
                     <tr>
@@ -160,9 +163,10 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                     ))}
                 </tbody>
             </table>
+            </div>
 
             <div style={{ marginTop: 14, display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-                <button style={{ ...chip, color: '#007AFF', borderColor: '#BFD9FF' }} onClick={() => ops.addSet(weekId, dayId, ex.id)}>
+                <button style={{ ...chip, color: '#121317', borderColor: '#CFCBC2' }} onClick={() => ops.addSet(weekId, dayId, ex.id)}>
                     <i className="ph ph-plus-circle"></i> Aggiungi serie
                 </button>
                 {!cardio && (
@@ -178,18 +182,19 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                     type="text"
                     value={ex.note || ''}
                     onChange={(e) => ops.updateExValue(weekId, dayId, ex.id, 'note', e.target.value)}
-                    placeholder="Nota sull'esecuzione (si stampa sotto l'esercizio)"
-                    style={{ flex: 1, minWidth: 200, border: '1px solid #E5E5EA', borderRadius: 8, padding: '7px 10px', fontSize: 12, background: '#fff' }}
+                    placeholder="Nota sull'esecuzione"
+                    title="Si stampa sotto l'esercizio"
+                    style={{ flex: '1 1 200px', border: '1px solid #E6E4DE', borderRadius: 10, padding: '9px 12px', fontSize: 13, background: '#fff', outline: 'none' }}
                 />
                 {!cardio && oneRm && (
-                    <span style={{ fontSize: 12, color: '#555' }}>
+                    <span style={{ fontSize: 13, color: '#555' }}>
                         1RM salvato: <b>{oneRm} kg</b>
                     </span>
                 )}
                 {!cardio && est && (
                     <button
                         style={chip}
-                        title={`Stima da ${best.load} kg × ${best.reps} (media di ${Object.keys(est.byFormula).length} formule)${est.reliable ? '' : ' — poco affidabile oltre 10 ripetizioni'}`}
+                        title={`Stima da ${best.load} kg × ${best.reps} (media di ${Object.keys(est.byFormula).length} formule)${est.reliable ? '' : ' · poco affidabile oltre 10 ripetizioni'}`}
                         onClick={() => ops.saveMassimale(ex.name, Math.round(est.average * 2) / 2, 'stimato')}
                     >
                         <i className="ph ph-trophy"></i> 1RM stimato ≈ {Math.round(est.average)} kg · salva

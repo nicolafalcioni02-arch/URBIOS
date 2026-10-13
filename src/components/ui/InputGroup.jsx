@@ -15,7 +15,7 @@ export const InputGroup = ({ label, value: valueProp, placeholder, type = 'text'
 
     return (
         <div className={`space-y-1.5 ${full ? 'col-span-full' : ''}`}>
-            <label className="font-[Helvetica] text-[10px] uppercase font-bold text-gray-500 tracking-widest ml-1">{label}</label>
+            <label className="fld-label">{label}</label>
             <div className="relative flex items-center">
                 {options ? (
                     <div className="w-full relative">
@@ -25,13 +25,13 @@ export const InputGroup = ({ label, value: valueProp, placeholder, type = 'text'
                                 setLocal(e.target.value);
                                 commit(e.target.value);
                             }}
-                            className="w-full bg-gray-50 border border-gray-100 rounded-lg px-3 py-2.5 text-sm font-medium appearance-none focus:ring-1 focus:ring-black transition-all text-gray-700 cursor-pointer"
+                            className="fld"
                         >
                             {options.map((o) => (
                                 <option key={o}>{o}</option>
                             ))}
                         </select>
-                        <i className="ph ph-caret-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                        <i className="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                     </div>
                 ) : (
                     <input
@@ -46,8 +46,10 @@ export const InputGroup = ({ label, value: valueProp, placeholder, type = 'text'
                             }
                         }}
                         onBlur={() => commit(local)}
-                        placeholder={placeholder}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-lg px-3 py-2.5 text-sm font-medium focus:ring-1 focus:ring-black transition-all placeholder:text-gray-300 text-gray-700"
+                        placeholder={placeholder || ' '}
+                        className="fld"
+                        style={unit ? { paddingRight: 40 } : undefined}
+                        inputMode={type === 'number' ? 'decimal' : undefined}
                     />
                 )}
                 {unit && <span className="absolute right-3 text-xs text-gray-400 font-medium pointer-events-none">{unit}</span>}
@@ -68,7 +70,7 @@ export const TextAreaGroup = ({ label, value: valueProp, placeholder, rows = 3, 
 
     return (
         <div className="space-y-1.5 col-span-full">
-            <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider ml-1">{label}</label>
+            {label ? <label className="fld-label">{label}</label> : null}
             <textarea
                 value={local}
                 name={name}
@@ -76,7 +78,8 @@ export const TextAreaGroup = ({ label, value: valueProp, placeholder, rows = 3, 
                 onBlur={() => commit()}
                 rows={rows}
                 placeholder={placeholder}
-                className="w-full bg-gray-50 border border-gray-100 rounded-lg px-3 py-2.5 text-sm font-medium focus:ring-1 focus:ring-black transition-all placeholder:text-gray-300 text-gray-700 resize-none"
+                className="fld resize-none"
+                style={{ lineHeight: 1.5 }}
             ></textarea>
         </div>
     );
@@ -84,26 +87,30 @@ export const TextAreaGroup = ({ label, value: valueProp, placeholder, rows = 3, 
 
 // Aggiungiamo anche il BilateralInput
 export const BilateralInput = ({ label, name, onChange }) => (
-    <div className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 px-2 rounded transition-colors">
-        <span className="text-sm font-medium text-gray-600 w-1/3">{label}</span>
-        <div className="flex gap-2 w-2/3">
+    <div className="flex items-center justify-between gap-2 py-1.5">
+        <span className="text-sm font-medium text-gray-600 w-[34%] min-w-0 truncate">{label}</span>
+        <div className="flex gap-2 flex-1">
             <div className="relative w-full">
                 <input
                     type="number"
-                    placeholder="SX"
+                    placeholder=" "
                     onBlur={(e) => onChange && onChange(`${name}_sx`, e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded px-2 py-1 text-sm text-center focus:border-black outline-none"
+                    className="fld text-center"
+                    style={{ padding: '8px 22px 8px 8px' }}
+                    inputMode="decimal"
                 />
-                <span className="absolute right-1 top-1.5 text-[8px] text-gray-300">L</span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-300 pointer-events-none">sx</span>
             </div>
             <div className="relative w-full">
                 <input
                     type="number"
-                    placeholder="DX"
+                    placeholder=" "
                     onBlur={(e) => onChange && onChange(`${name}_dx`, e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded px-2 py-1 text-sm text-center focus:border-black outline-none"
+                    className="fld text-center"
+                    style={{ padding: '8px 22px 8px 8px' }}
+                    inputMode="decimal"
                 />
-                <span className="absolute right-1 top-1.5 text-[8px] text-gray-300">R</span>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-300 pointer-events-none">dx</span>
             </div>
         </div>
     </div>

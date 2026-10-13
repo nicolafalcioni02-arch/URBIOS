@@ -123,27 +123,27 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft }) => {
     };
 
     return ReactDOM.createPortal(
-        <div className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 fade-enter">
-            <div className="bg-gray-50 w-full max-w-[1600px] h-[95vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden relative border border-gray-200">
+        <div className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4 fade-enter">
+            <div className="bg-gray-50 w-full max-w-[1600px] h-full sm:h-[95vh] rounded-none sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden relative border border-gray-200">
                 {/* --- HEADER --- */}
                 <AnalisiHeader onClose={onClose} patient={patient} />
 
                 {/* --- CORPO PRINCIPALE --- */}
-                <div className="flex-1 p-8 overflow-y-auto">
+                <div className="flex-1 p-3 sm:p-8 overflow-y-auto">
                     <div className="flex flex-col gap-8 pb-20">
                         {/* ============================================================ */}
                         {/* SUPER BOX 1: SOMATOTIPO (GRAFICO SX + INPUT/TESTO DX)        */}
                         {/* ============================================================ */}
-                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200">
+                        <div className="bg-white rounded-3xl p-4 sm:p-8 shadow-sm border border-gray-200">
                             {/* Titolo Sezione */}
-                            <div className="w-full flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
+                            <div className="w-full flex flex-wrap justify-between items-center gap-3 mb-6 sm:mb-8 border-b border-gray-100 pb-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100">
                                         <i className="ph-fill ph-triangle text-2xl"></i>
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-gray-900 text-xl">Somatotipo</h3>
-                                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Heath-Carter Method</p>
+                                        <p className="text-xs text-gray-400 font-bold ">Heath-Carter Method</p>
                                     </div>
                                 </div>
                                 {/* Pulsante Salva (Apre il Modale) */}
@@ -167,7 +167,7 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft }) => {
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-12">
                                 {/* --- COLONNA SINISTRA: GRAFICO --- */}
                                 <div className="flex items-center justify-center bg-gray-50/50 rounded-2xl border border-gray-100 p-4">
                                     <Somatocarta endo={somatoValues.endo} meso={somatoValues.meso} ecto={somatoValues.ecto} />
@@ -176,9 +176,9 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft }) => {
                                 {/* --- COLONNA DESTRA: INPUT & REPORT --- */}
                                 <div className="flex flex-col h-full">
                                     {/* 1. Input Modificabili */}
-                                    <div className="grid grid-cols-3 gap-4 mb-6">
+                                    <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
                                         <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4 flex flex-col items-center hover:border-rose-300 transition-colors group">
-                                            <label className="text-[10px] font-black uppercase text-rose-400 mb-1 tracking-widest">Endo</label>
+                                            <label className="text-xs font-semibold text-rose-400 mb-1 ">Endo</label>
                                             <input
                                                 type="number"
                                                 step="0.1"
@@ -188,7 +188,7 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft }) => {
                                             />
                                         </div>
                                         <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex flex-col items-center hover:border-emerald-300 transition-colors group">
-                                            <label className="text-[10px] font-black uppercase text-emerald-400 mb-1 tracking-widest">Meso</label>
+                                            <label className="text-xs font-semibold text-emerald-400 mb-1 ">Meso</label>
                                             <input
                                                 type="number"
                                                 step="0.1"
@@ -198,7 +198,7 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft }) => {
                                             />
                                         </div>
                                         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col items-center hover:border-blue-300 transition-colors group">
-                                            <label className="text-[10px] font-black uppercase text-blue-400 mb-1 tracking-widest">Ecto</label>
+                                            <label className="text-xs font-semibold text-blue-400 mb-1 ">Ecto</label>
                                             <input
                                                 type="number"
                                                 step="0.1"
@@ -211,7 +211,7 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft }) => {
 
                                     {/* 2. Generatore Report */}
                                     <div className="flex-1 flex flex-col">
-                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                        <label className="text-xs font-bold text-gray-400 mb-2 flex items-center gap-2">
                                             <i className="ph-fill ph-article"></i> Referto Clinico Automatico
                                         </label>
                                         <div className="flex-1 bg-white rounded-2xl p-1 border border-gray-200 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all shadow-inner h-full min-h-[300px]">

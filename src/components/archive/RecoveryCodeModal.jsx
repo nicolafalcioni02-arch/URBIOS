@@ -38,7 +38,7 @@ export const RecoveryCodeModal = ({ code, onConfirm }) => {
                 <p className="text-sm text-gray-600 mb-5">
                     Se dimentichi la password, questo codice è l'<strong>unico modo</strong> per riaprire l'archivio. Non esiste nessun server che possa reimpostarla.
                 </p>
-                <div className="bg-gray-900 text-white rounded-2xl p-5 text-center font-mono text-xl md:text-2xl tracking-widest select-all break-all">{code}</div>
+                <div className="bg-gray-900 text-white rounded-2xl p-5 text-center font-mono text-xl md:text-2xl select-all break-all">{code}</div>
                 <div className="flex gap-2 mt-3">
                     <button onClick={copy} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-bold hover:bg-gray-50">
                         {copied ? 'Copiato ✓' : 'Copia'}

@@ -18,7 +18,7 @@ export const LafCalculatorModal = ({
                     <div
                         style={{
                             padding: '20px',
-                            borderBottom: '1px solid #E5E5EA',
+                            borderBottom: '1px solid #E6E4DE',
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
@@ -37,25 +37,25 @@ export const LafCalculatorModal = ({
                     <div style={{ padding: '20px' }}>
                         {/* Pre-caricamento Giornata Tipo */}
                         <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-                            <span style={{ fontSize: '11px', fontWeight: 800, color: '#86868B' }}>CARICA GIORNATA TIPO:</span>
+                            <span style={{ fontSize: '11px', fontWeight: 800, color: '#6E6D69' }}>CARICA GIORNATA TIPO:</span>
                             <button
                                 onClick={() => applyLafTemplate('sedentario')}
                                 className="setup-tab-btn"
-                                style={{ background: 'white', border: '1px solid #E5E5EA' }}
+                                style={{ background: 'white', border: '1px solid #E6E4DE' }}
                             >
                                 Sedentario
                             </button>
                             <button
                                 onClick={() => applyLafTemplate('leggero')}
                                 className="setup-tab-btn"
-                                style={{ background: 'white', border: '1px solid #E5E5EA' }}
+                                style={{ background: 'white', border: '1px solid #E6E4DE' }}
                             >
                                 Leggero
                             </button>
                             <button
                                 onClick={() => applyLafTemplate('attivo')}
                                 className="setup-tab-btn"
-                                style={{ background: 'white', border: '1px solid #E5E5EA' }}
+                                style={{ background: 'white', border: '1px solid #E6E4DE' }}
                             >
                                 Attivo
                             </button>
@@ -66,7 +66,7 @@ export const LafCalculatorModal = ({
                             className="matrix-table"
                             style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}
                         >
-                            <thead style={{ background: '#F5F5F7' }}>
+                            <thead style={{ background: '#F6F5F2' }}>
                                 <tr>
                                     <th>Attività</th>
                                     <th style={{ textAlign: 'center' }}>Coeff. (PAL)</th>
@@ -127,25 +127,25 @@ export const LafCalculatorModal = ({
                                 alignItems: 'center',
                                 marginTop: '20px',
                                 padding: '15px',
-                                background: totalLafHours === 24 ? '#F2FFF7' : '#FFF0F0',
+                                background: totalLafHours === 24 ? '#F1F8F4' : '#FFF0F0',
                                 borderRadius: '12px',
-                                border: `1px solid ${totalLafHours === 24 ? '#00C853' : '#FF3B30'}`,
+                                border: `1px solid ${totalLafHours === 24 ? '#1F8A5B' : '#C2413A'}`,
                             }}
                         >
                             <div>
-                                <span style={{ fontSize: '11px', fontWeight: 800, color: totalLafHours === 24 ? '#00C853' : '#FF3B30', display: 'block' }}>
+                                <span style={{ fontSize: '11px', fontWeight: 800, color: totalLafHours === 24 ? '#1F8A5B' : '#C2413A', display: 'block' }}>
                                     SOMMA ORE
                                 </span>
                                 <span style={{ fontSize: '20px', fontWeight: 900 }}>{totalLafHours} / 24</span>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                                <span style={{ fontSize: '11px', fontWeight: 800, color: '#86868B', display: 'block' }}>LAF FINALE</span>
-                                <span style={{ fontSize: '24px', fontWeight: 900, color: '#1D1D1F' }}>{totalLafHours === 24 ? calculatedLAF : '---'}</span>
+                                <span style={{ fontSize: '11px', fontWeight: 800, color: '#6E6D69', display: 'block' }}>LAF FINALE</span>
+                                <span style={{ fontSize: '24px', fontWeight: 900, color: '#121317' }}>{totalLafHours === 24 ? calculatedLAF : '---'}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div style={{ padding: '20px', background: 'white', borderTop: '1px solid #E5E5EA', display: 'flex', justifyContent: 'flex-end' }}>
+                    <div style={{ padding: '20px', background: 'white', borderTop: '1px solid #E6E4DE', display: 'flex', justifyContent: 'flex-end' }}>
                         <button
                             disabled={totalLafHours !== 24}
                             onClick={() => {
@@ -153,8 +153,8 @@ export const LafCalculatorModal = ({
                                 setIsLafModalOpen(false);
                             }}
                             style={{
-                                background: totalLafHours === 24 ? '#00C853' : '#E5E5EA',
-                                color: totalLafHours === 24 ? 'white' : '#86868B',
+                                background: totalLafHours === 24 ? '#1F8A5B' : '#E6E4DE',
+                                color: totalLafHours === 24 ? 'white' : '#6E6D69',
                                 padding: '12px 30px',
                                 borderRadius: '10px',
                                 border: 'none',

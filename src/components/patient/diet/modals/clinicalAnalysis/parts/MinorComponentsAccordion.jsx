@@ -13,7 +13,7 @@ export const MinorComponentsAccordion = ({ groupedMicros, multiplier, otherMicro
                 <div className="mt-10 text-left animate-fade-in-up space-y-8">
                     {Object.entries(groupedMicros).map(([catName, catData]) => (
                         <div key={catName} className="bg-white/50 p-6 rounded-[32px] border border-gray-200/50 shadow-sm">
-                            <h5 className={`text-xs font-black uppercase tracking-widest mb-4 flex items-center gap-2 ${catData.color}`}>
+                            <h5 className={`text-xs font-semibold mb-4 flex items-center gap-2 ${catData.color}`}>
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-white shadow-sm border border-gray-100`}>
                                     <i className={`ph-fill ${catData.icon} text-lg`}></i>
                                 </div>
@@ -26,10 +26,10 @@ export const MinorComponentsAccordion = ({ groupedMicros, multiplier, otherMicro
                                         className="bg-white p-3 rounded-2xl border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-500 relative overflow-hidden group/mini"
                                     >
                                         {/* EFFETTO FLUIDO MINI-CARD */}
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-100/40 via-blue-50/10 to-transparent opacity-0 group-hover/mini:opacity-100 scale-150 group-hover/mini:scale-100 transition-all duration-700 ease-out z-0"></div>
+                                        <div className="absolute inset-0 bg-[color:var(--soft)]"></div>
 
                                         <span
-                                            className="text-[9px] font-black text-gray-400 uppercase tracking-wider truncate transition-colors duration-300 group-hover/mini:text-gray-800 relative z-10"
+                                            className="text-[11px] font-semibold text-gray-400 truncate transition-colors duration-300 group-hover/mini:text-gray-800 relative z-10"
                                             title={item.key.replace(/_/g, ' ')}
                                         >
                                             {item.key.replace(/_/g, ' ')}

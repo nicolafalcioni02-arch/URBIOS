@@ -22,7 +22,7 @@ export const AnonymizePanel = ({ db, value, onChange }) => {
     return (
         <div className="mt-4 bg-white border border-gray-200 rounded-2xl p-5">
             <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="text-xs font-bold uppercase tracking-widest text-gray-600">Impostazioni di partenza:</span>
+                <span className="text-xs font-bold text-gray-600">Impostazioni di partenza:</span>
                 <Btn variant="light" onClick={() => onChange(defaultAnonOptions())}>
                     Rigorosa (consigliata)
                 </Btn>
@@ -33,7 +33,7 @@ export const AnonymizePanel = ({ db, value, onChange }) => {
 
             {Object.entries(groups).map(([g, fields]) => (
                 <div key={g} className="mb-3">
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-1">{g} — spunta ciò che va RIMOSSO</p>
+                    <p className="text-[11px] font-bold text-gray-500 mb-1">{g} · spunta ciò che va RIMOSSO</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
                         {fields.map((f) => (
                             <Check key={f.key} label={f.label} checked={value.removeFields[f.key]} onChange={(v) => setField(f.key, v)} />
@@ -44,15 +44,15 @@ export const AnonymizePanel = ({ db, value, onChange }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
                 <div>
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-1">Data di nascita</p>
+                    <p className="text-[11px] font-bold text-gray-500 mb-1">Data di nascita</p>
                     <Select value={value.birth} onChange={(v) => set({ birth: v })} options={BIRTH_MODES} />
                 </div>
                 <div>
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-1">Date delle visite</p>
+                    <p className="text-[11px] font-bold text-gray-500 mb-1">Date delle visite</p>
                     <Select value={value.dates} onChange={(v) => set({ dates: v })} options={DATE_MODES} />
                 </div>
                 <div>
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500 mb-1">ID paziente</p>
+                    <p className="text-[11px] font-bold text-gray-500 mb-1">ID paziente</p>
                     <Select value={value.idMode} onChange={(v) => set({ idMode: v })} options={ID_MODES} />
                 </div>
             </div>

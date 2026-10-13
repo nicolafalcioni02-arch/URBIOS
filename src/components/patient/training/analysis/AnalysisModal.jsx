@@ -7,7 +7,7 @@ import { Card, Table, n1 } from '../tools/ui';
 import { fmtDuration } from '../logic/science/parse';
 
 const COLORS = { info: ['#EAF3FF', '#0A57B5', 'ℹ'], warn: ['#FFF4DD', '#8A5A00', '⚠'], alert: ['#FFE5E3', '#B3261E', '⛔'] };
-const kg = (x) => (x >= 1000 ? `${n1(x / 1000, 2)} t` : x ? `${Math.round(x)} kg` : '—');
+const kg = (x) => (x >= 1000 ? `${n1(x / 1000, 2)} t` : x ? `${Math.round(x)} kg` : '-');
 
 // Cruscotto di analisi della scheda: serve al professionista per controllare volume, intensità, carico e coerenza con l'obiettivo.
 export const AnalysisModal = ({ weeks, header, massimali, profile, onClose }) => {
@@ -26,13 +26,13 @@ export const AnalysisModal = ({ weeks, header, massimali, profile, onClose }) =>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 28px 8px' }}>
                     <div>
                         <h2 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Analisi della scheda</h2>
-                        <div style={{ fontSize: 12, color: '#86868B', marginTop: 2 }}>
+                        <div style={{ fontSize: 12, color: '#6E6D69', marginTop: 2 }}>
                             {A.goal ? A.goal.label : 'Obiettivo non scelto'}
                             {A.level ? ` · livello ${A.level}` : ''} ·{' '}
                             {profile && profile.weightKg ? `${profile.weightKg} kg` : 'peso del cliente non disponibile (le kcal non si calcolano)'}
                         </div>
                     </div>
-                    <button onClick={onClose} className="t-icon-btn" style={{ width: 40, height: 40, background: '#F5F5F7', border: 'none' }}>
+                    <button onClick={onClose} className="t-icon-btn" style={{ width: 40, height: 40, background: '#F6F5F2', border: 'none' }}>
                         <i className="ph-bold ph-x"></i>
                     </button>
                 </div>
@@ -62,7 +62,7 @@ export const AnalysisModal = ({ weeks, header, massimali, profile, onClose }) =>
                                 </div>
                             );
                         })}
-                        {warns.length > 40 && <div style={{ fontSize: 12, color: '#86868B' }}>… e altri {warns.length - 40} avvisi.</div>}
+                        {warns.length > 40 && <div style={{ fontSize: 12, color: '#6E6D69' }}>… e altri {warns.length - 40} avvisi.</div>}
                     </Card>
 
                     {A.weeks.length > 0 && (
@@ -88,20 +88,20 @@ export const AnalysisModal = ({ weeks, header, massimali, profile, onClose }) =>
                                     'ACWR',
                                 ]}
                                 rows={A.weeks.map((w) => [
-                                    <span key={w.id} style={{ cursor: 'pointer', color: '#007AFF', fontWeight: 700 }} onClick={() => setSel(w.id)}>
+                                    <span key={w.id} style={{ cursor: 'pointer', color: '#121317', fontWeight: 700 }} onClick={() => setSel(w.id)}>
                                         {w.title}
                                     </span>,
                                     w.trainingDays,
                                     w.workSets,
                                     kg(w.volumeLoad),
-                                    w.avgPct !== null ? `${Math.round(w.avgPct)}%` : '—',
-                                    w.avgRpe !== null ? n1(w.avgRpe) : '—',
+                                    w.avgPct !== null ? `${Math.round(w.avgPct)}%` : '-',
+                                    w.avgRpe !== null ? n1(w.avgRpe) : '-',
                                     fmtDuration(w.minutes * 60),
-                                    w.kcal !== null ? Math.round(w.kcal) : '—',
+                                    w.kcal !== null ? Math.round(w.kcal) : '-',
                                     Math.round(w.weekLoad),
-                                    w.monotony !== null ? n1(w.monotony, 2) : '—',
-                                    w.strain !== null ? Math.round(w.strain) : '—',
-                                    w.acwr !== null ? n1(w.acwr, 2) : '—',
+                                    w.monotony !== null ? n1(w.monotony, 2) : '-',
+                                    w.strain !== null ? Math.round(w.strain) : '-',
+                                    w.acwr !== null ? n1(w.acwr, 2) : '-',
                                 ])}
                             />
                         </Card>
@@ -110,12 +110,12 @@ export const AnalysisModal = ({ weeks, header, massimali, profile, onClose }) =>
                     {W && (
                         <>
                             <Card
-                                title={`Volume per gruppo muscolare — ${W.title}`}
+                                title={`Volume per gruppo muscolare · ${W.title}`}
                                 hint="Serie di lavoro (il riscaldamento non conta). Gli esercizi cardio sono esclusi."
                             >
                                 <MuscleBars muscles={W.muscles} goal={A.goal} level={A.level} deload={W.kind === 'deload'} />
                             </Card>
-                            <Card title={`Giorni — ${W.title}`}>
+                            <Card title={`Giorni · ${W.title}`}>
                                 <Table
                                     small
                                     head={['Giorno', 'Serie', 'Volume', 'Intens.', 'RPE seduta', 'Durata', 'Densità', 'Carico', 'kcal', 'Cardio']}
@@ -123,19 +123,19 @@ export const AnalysisModal = ({ weeks, header, massimali, profile, onClose }) =>
                                         d.title || `Giorno ${i + 1}`,
                                         d.workSets,
                                         kg(d.volumeLoad),
-                                        d.avgPct !== null ? `${Math.round(d.avgPct)}%` : '—',
-                                        d.sessionRpe !== null ? n1(d.sessionRpe) : '—',
-                                        d.trains ? `${Math.round(d.minutes)} min${d.overridden ? '' : ' ~'}` : '—',
-                                        d.density ? `${n1(d.density, 0)} kg/min` : '—',
+                                        d.avgPct !== null ? `${Math.round(d.avgPct)}%` : '-',
+                                        d.sessionRpe !== null ? n1(d.sessionRpe) : '-',
+                                        d.trains ? `${Math.round(d.minutes)} min${d.overridden ? '' : ' ~'}` : '-',
+                                        d.density ? `${n1(d.density, 0)} kg/min` : '-',
                                         Math.round(d.loadAU),
-                                        d.kcal !== null ? Math.round(d.kcal) : '—',
-                                        d.cardioMin ? `${Math.round(d.cardioMin)} min` : '—',
+                                        d.kcal !== null ? Math.round(d.kcal) : '-',
+                                        d.cardioMin ? `${Math.round(d.cardioMin)} min` : '-',
                                     ])}
                                 />
                             </Card>
                         </>
                     )}
-                    <div style={{ fontSize: 11, color: '#86868B', lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 11, color: '#6E6D69', lineHeight: 1.5 }}>
                         Metodo: serie dirette = serie di lavoro sul muscolo principale dell'esercizio; serie ponderate = dirette + 50% delle serie sui muscoli
                         secondari (muscoli da free-exercise-db). Durata stimata = tempo sotto tensione (tempo di esecuzione o 4 s/ripetizione) + recuperi + 45 s
                         di cambio attrezzo + minuti extra. Energia = MET × peso × ore (Compendium of Physical Activities). Sono stime di supporto, non misure.

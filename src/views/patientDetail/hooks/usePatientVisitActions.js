@@ -42,7 +42,11 @@ export const usePatientVisitActions = ({ configA, configB, db, onUpdateDb, patie
                 calculationContext[k] = valStr === '' ? 0 : parseFloat(valStr) || 0;
             });
 
-            console.log('Contesto calcoli pronto:', calculationContext); // DEBUG
+            // Somma delle pliche e suo logaritmo: servono alle formule di densita' (stesso calcolo della schermata Nuova Visita)
+            const plicheKeys = ['pl_pettorale', 'pl_tricipite', 'pl_bicipite', 'pl_sottoscap', 'pl_ascellare', 'pl_addome', 'pl_sovrailiaca', 'pl_coscia', 'pl_polpaccio'];
+            const sommaPliche = plicheKeys.reduce((acc, k) => acc + (calculationContext[k] || 0), 0);
+            calculationContext.sommaPliche = sommaPliche;
+            calculationContext.logSomma = sommaPliche > 0 ? Math.log10(sommaPliche) : 0;
 
             // B. Helper Calcolo
             const calcola = (cfg) => {
@@ -57,7 +61,7 @@ export const usePatientVisitActions = ({ configA, configB, db, onUpdateDb, patie
 
                 // Eseguiamo i calcoli solo se abbiamo le formule e la funzione calculateEquation esiste
                 try {
-                    if (fDens && typeof calculateEquation === 'function') {
+                    if (fDens && sommaPliche > 0 && typeof calculateEquation === 'function') {
                         dcVal = calculateEquation(fDens.equazione, calculationContext);
                     }
 

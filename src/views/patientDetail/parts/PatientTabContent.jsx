@@ -22,7 +22,7 @@ export const PatientTabContent = ({
     visitDraft,
 }) => {
     return (
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 relative">
+        <div className={`flex-1 overflow-y-auto relative ${view === 'visit' ? '' : 'p-4 md:p-8'}`}>
             {view === 'info' && <ClinicalFolder patient={patient} updatePatientInfo={updatePatientInfo} professionalData={db.utente} />}
 
             {view === 'history' && <HistoryView patient={patient} onUpdateDb={onUpdateDb} />}

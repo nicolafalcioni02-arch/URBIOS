@@ -49,7 +49,7 @@ export const MetabolismTab = ({ adjustedW, calcData, idealW, rmr, setCalcData, s
                             <button
                                 onClick={() => setIsLafModalOpen(true)}
                                 style={{
-                                    background: '#00C853',
+                                    background: '#1F8A5B',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '6px',
@@ -75,15 +75,15 @@ export const MetabolismTab = ({ adjustedW, calcData, idealW, rmr, setCalcData, s
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '10px' }}>
-                    <div className="smart-card" style={{ background: '#1D1D1F', color: 'white', borderColor: '#1D1D1F' }}>
-                        <span className="smart-title" style={{ color: '#86868B' }}>
+                    <div className="smart-card" style={{ background: '#121317', color: 'white', borderColor: '#121317' }}>
+                        <span className="smart-title" style={{ color: '#6E6D69' }}>
                             Fabbisogno Energetico Totale (TDEE)
                         </span>
-                        <div style={{ fontSize: '42px', fontWeight: 900, color: '#00C853', marginTop: '10px' }}>
+                        <div style={{ fontSize: '42px', fontWeight: 900, color: '#1F8A5B', marginTop: '10px' }}>
                             {/* Il TDEE ora si aggiorna istantaneamente in base al peso scelto sopra */}
                             {tdee} <span style={{ fontSize: '16px', color: 'white' }}>KCAL / Die</span>
                         </div>
-                        <span className="smart-sub" style={{ color: '#86868B' }}>
+                        <span className="smart-sub" style={{ color: '#6E6D69' }}>
                             Metabolismo Basale: {Math.round(rmr)} kcal (Peso:{' '}
                             {calcData.weightTarget === 'ideal'
                                 ? idealW.toFixed(1)

@@ -84,7 +84,7 @@ export const NutritionSetupModal = ({
                 });
             }
 
-            const bgDynamicColor = isViewValid && setupTab === 'partizione matriciale' ? '#F2FFF7' : `rgba(255, 59, 48, ${errorOpacity})`;
+            const bgDynamicColor = isViewValid && setupTab === 'partizione matriciale' ? '#F1F8F4' : `rgba(255, 59, 48, ${errorOpacity})`;
 
             return (
                 <div className="modal-backdrop">
@@ -103,7 +103,7 @@ export const NutritionSetupModal = ({
                         >
                             <div>
                                 <h3 style={{ fontSize: '22px', fontWeight: 900, margin: 0 }}>Clinical Setup Suite</h3>
-                                <span style={{ fontSize: '12px', color: '#86868B', fontWeight: 700 }}>Pannello Analitico Avanzato</span>
+                                <span style={{ fontSize: '12px', color: '#6E6D69', fontWeight: 700 }}>Pannello Analitico Avanzato</span>
                             </div>
                             <button
                                 onClick={() => setIsSetupOpen(false)}
@@ -115,7 +115,7 @@ export const NutritionSetupModal = ({
                                     borderRadius: '18px',
                                     cursor: 'pointer',
                                     fontWeight: 900,
-                                    color: '#1D1D1F',
+                                    color: '#121317',
                                 }}
                             >
                                 ✕
@@ -127,7 +127,7 @@ export const NutritionSetupModal = ({
                             <div className="setup-tab-nav">
                                 {['antropometria', 'metabolismo & energia', 'partizione matriciale'].map((t) => (
                                     <button key={t} className={`setup-tab-btn ${setupTab === t ? 'active' : ''}`} onClick={() => setSetupTab(t)}>
-                                        {t.toUpperCase()}
+                                        {t.charAt(0).toUpperCase() + t.slice(1)}
                                     </button>
                                 ))}
                             </div>
@@ -258,8 +258,8 @@ export const NutritionSetupModal = ({
                                     setIsSetupOpen(false);
                                 }}
                                 style={{
-                                    background: totalDist === 100 ? '#00C853' : '#E5E5EA',
-                                    color: totalDist === 100 ? 'white' : '#86868B',
+                                    background: totalDist === 100 ? '#1F8A5B' : '#E6E4DE',
+                                    color: totalDist === 100 ? 'white' : '#6E6D69',
                                     padding: '15px 45px',
                                     borderRadius: '14px',
                                     border: 'none',
@@ -269,7 +269,7 @@ export const NutritionSetupModal = ({
                                     transition: 'all 0.3s ease',
                                 }}
                             >
-                                APPLICA
+                                Applica
                             </button>
                         </div>
                     </div>

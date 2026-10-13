@@ -50,14 +50,14 @@ export const ExercisePhotosModal = ({ exercise, exerciseDB, onSave, onClose }) =
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                     <div>
                         <h2 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Foto dell'esercizio</h2>
-                        <div style={{ fontSize: 14, color: '#86868B', marginTop: 2 }}>{name || '(senza nome)'}</div>
+                        <div style={{ fontSize: 14, color: '#6E6D69', marginTop: 2 }}>{name || '(senza nome)'}</div>
                     </div>
                     <button style={btn} onClick={onClose}>
                         Annulla
                     </button>
                 </div>
-                {!name && <p style={{ color: '#FF3B30', fontSize: 13 }}>Scrivi prima il nome dell'esercizio: le foto vengono collegate al nome.</p>}
-                <p style={{ fontSize: 12, color: '#86868B', margin: '0 0 12px' }}>
+                {!name && <p style={{ color: '#C2413A', fontSize: 13 }}>Scrivi prima il nome dell'esercizio: le foto vengono collegate al nome.</p>}
+                <p style={{ fontSize: 12, color: '#6E6D69', margin: '0 0 12px' }}>
                     Fotografa l'esecuzione (posizione iniziale e finale): le foto restano nell'archivio, si riusano in ogni scheda con questo esercizio e
                     vengono stampate. Massimo {MAX_PHOTOS}. Da telefono puoi scattarle direttamente.
                 </p>
@@ -69,7 +69,7 @@ export const ExercisePhotosModal = ({ exercise, exerciseDB, onSave, onClose }) =
                                 <img
                                     src={src}
                                     alt=""
-                                    style={{ width: 150, height: 112, objectFit: 'cover', borderRadius: 12, border: '1px solid #E5E5EA', display: 'block' }}
+                                    style={{ width: 150, height: 112, objectFit: 'cover', borderRadius: 12, border: '1px solid #E6E4DE', display: 'block' }}
                                 />
                                 <div style={{ position: 'absolute', top: 4, right: 4, display: 'flex', gap: 4 }}>
                                     {i > 0 && (
@@ -84,7 +84,7 @@ export const ExercisePhotosModal = ({ exercise, exerciseDB, onSave, onClose }) =
                                     )}
                                     <button
                                         title="Elimina"
-                                        style={{ ...btn, padding: '2px 7px', color: '#FF3B30' }}
+                                        style={{ ...btn, padding: '2px 7px', color: '#C2413A' }}
                                         onClick={() => setPhotos((p) => p.filter((_, k) => k !== i))}
                                     >
                                         ×
@@ -103,7 +103,7 @@ export const ExercisePhotosModal = ({ exercise, exerciseDB, onSave, onClose }) =
                                     flexDirection: 'column',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    color: '#86868B',
+                                    color: '#6E6D69',
                                     cursor: busy ? 'wait' : 'pointer',
                                     fontSize: 13,
                                     fontWeight: 700,
@@ -124,11 +124,11 @@ export const ExercisePhotosModal = ({ exercise, exerciseDB, onSave, onClose }) =
                             </label>
                         )}
                     </div>
-                    {error && <p style={{ color: '#FF3B30', fontSize: 13 }}>{error}</p>}
+                    {error && <p style={{ color: '#C2413A', fontSize: 13 }}>{error}</p>}
 
                     {catalog.length > 0 && (
                         <div style={{ borderTop: '1px solid #EEE', paddingTop: 12 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: '#86868B', textTransform: 'uppercase', marginBottom: 8 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: '#6E6D69', textTransform: '', marginBottom: 8 }}>
                                 Figure del catalogo
                             </div>
                             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
@@ -137,7 +137,7 @@ export const ExercisePhotosModal = ({ exercise, exerciseDB, onSave, onClose }) =
                                         key={i}
                                         src={src}
                                         alt=""
-                                        style={{ width: 110, borderRadius: 8, border: '1px solid #E5E5EA', opacity: photos.length && !useCatalog ? 0.4 : 1 }}
+                                        style={{ width: 110, borderRadius: 8, border: '1px solid #E6E4DE', opacity: photos.length && !useCatalog ? 0.4 : 1 }}
                                     />
                                 ))}
                                 {photos.length > 0 && (
@@ -147,7 +147,7 @@ export const ExercisePhotosModal = ({ exercise, exerciseDB, onSave, onClose }) =
                                 )}
                             </div>
                             {photos.length === 0 && (
-                                <p style={{ fontSize: 12, color: '#86868B', marginTop: 6 }}>Verranno usate queste figure finché non aggiungi le tue.</p>
+                                <p style={{ fontSize: 12, color: '#6E6D69', marginTop: 6 }}>Verranno usate queste figure finché non aggiungi le tue.</p>
                             )}
                         </div>
                     )}
@@ -155,7 +155,7 @@ export const ExercisePhotosModal = ({ exercise, exerciseDB, onSave, onClose }) =
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
                     <button
-                        style={{ ...btn, background: '#1D1D1F', color: '#fff', border: 'none' }}
+                        style={{ ...btn, background: '#121317', color: '#fff', border: 'none' }}
                         disabled={!name || busy}
                         onClick={() => {
                             onSave(exercise, photos, useCatalog);

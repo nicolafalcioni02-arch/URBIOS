@@ -58,18 +58,18 @@ export const getAdjustedWeight = (actual, ideal) => ideal + 0.25 * (actual - ide
 
 export const getBMICategory = (bmi) => {
     if (bmi < 18.5) return { label: 'Sottopeso', color: '#FF9500' };
-    if (bmi < 25) return { label: 'Normopeso', color: '#00C853' };
+    if (bmi < 25) return { label: 'Normopeso', color: '#1F8A5B' };
     if (bmi < 30) return { label: 'Sovrappeso', color: '#FF9500' };
-    if (bmi < 35) return { label: 'Obesità I', color: '#FF3B30' };
-    return { label: 'Obesità II-III', color: '#FF3B30' };
+    if (bmi < 35) return { label: 'Obesità I', color: '#C2413A' };
+    return { label: 'Obesità II-III', color: '#C2413A' };
 };
 
 export const getWHRCategory = (whr, sex) => {
     const highRisk = sex === 'M' ? 0.9 : 0.85;
     const modRisk = sex === 'M' ? 0.85 : 0.8;
-    if (whr >= highRisk) return { label: 'Rischio Alto', color: '#FF3B30' };
+    if (whr >= highRisk) return { label: 'Rischio Alto', color: '#C2413A' };
     if (whr >= modRisk) return { label: 'Rischio Medio', color: '#FF9500' };
-    return { label: 'Rischio Basso', color: '#00C853' };
+    return { label: 'Rischio Basso', color: '#1F8A5B' };
 };
 
 export const getMorfotipo = (grant, sex) => {

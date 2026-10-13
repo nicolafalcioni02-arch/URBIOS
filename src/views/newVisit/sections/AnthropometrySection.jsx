@@ -10,7 +10,7 @@ export const AnthropometrySection = ({ activeSection, sectionRefs, setActiveSect
                 isOpen={activeSection === 'antropometria'}
                 onToggle={() => setActiveSection(activeSection === 'antropometria' ? null : 'antropometria')}
             >
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
                     <Card title="Ponderale & Tronco" icon="ph-scales">
                         <div className="grid grid-cols-2 gap-4 mb-4">
                             <InputGroup label="Peso" placeholder="0.0" unit="kg" name="peso" value={visitDraft.peso} onChange={updateDraft} />

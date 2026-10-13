@@ -41,14 +41,14 @@ export const useSmartChartPlot = ({ activeDay, dietDays, drvDB, getPatientTarget
             primary: '#0A84FF',
             green: '#30D158',
             gray: '#636366',
-            orange: '#FF9F0A',
+            orange: '#B7791F',
             red: '#FF453A',
             purple: '#BF5AF2',
             teal: '#5AC8FA',
             pink: '#FF375F',
             bg: 'rgba(0,0,0,0)',
             grid: 'rgba(0,0,0,0.04)',
-            text: '#1D1D1F',
+            text: '#121317',
             subtext: '#8E8E93',
         };
 

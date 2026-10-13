@@ -1,8 +1,10 @@
 import React from 'react';
 
 export const TrainingSidebar = ({
+    open,
     activeDayInfo,
     addNewWeek,
+    addDay,
     dragOverId,
     duplicateDay,
     duplicateWeek,
@@ -19,7 +21,7 @@ export const TrainingSidebar = ({
     weeks,
 }) => {
     return (
-        <nav className="t-sidebar" style={{ paddingBottom: 0 }}>
+        <nav className={`t-sidebar${open ? ' open' : ''}`} style={{ paddingBottom: 0 }}>
             <ul className="t-nav-list" style={{ paddingBottom: '20px' }}>
                 {weeks.map((w, wIndex) => (
                     <div
@@ -39,7 +41,7 @@ export const TrainingSidebar = ({
                         {/* LIVELLO SETTIMANA */}
                         <li className="t-nav-item premium-item" onClick={() => document.getElementById(w.id)?.scrollIntoView({ behavior: 'smooth' })}>
                             <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                                <span style={{ fontWeight: 700, color: '#1D1D1F', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontWeight: 700, color: '#121317', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <i className="ph ph-calendar-blank"></i> {w.title || `Settimana ${wIndex + 1}`}
                                 </span>
                                 {/* MINI SHORTCUTS A DESTRA */}
@@ -90,8 +92,8 @@ export const TrainingSidebar = ({
                                                 style={{
                                                     padding: '6px 8px',
                                                     fontSize: '12px',
-                                                    background: isSelected ? '#E0F0FF' : 'transparent',
-                                                    color: isSelected ? '#007AFF' : '#555',
+                                                    background: isSelected ? '#ECEDF1' : 'transparent',
+                                                    color: isSelected ? '#121317' : '#555',
                                                 }}
                                                 onClick={() => setActiveDayInfo({ weekId: w.id, dayId: d.id })}
                                             >
@@ -144,6 +146,15 @@ export const TrainingSidebar = ({
                                         </div>
                                     );
                                 })}
+                            <div
+                                className="t-nav-item premium-item"
+                                style={{ padding: '6px 8px', fontSize: '12px', color: '#6E6D69' }}
+                                onClick={() => addDay(w.id)}
+                            >
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <i className="ph ph-plus"></i> Aggiungi giorno
+                                </span>
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -159,7 +170,7 @@ export const TrainingSidebar = ({
                 </button>
                 <button
                     className="t-btn-sidebar-action"
-                    style={{ background: '#E0F0FF', color: '#007AFF', border: 'none' }}
+                    style={{ background: '#ECEDF1', color: '#121317', border: 'none' }}
                     onClick={() => setIsSchedeOpen(true)}
                 >
                     <i className="ph ph-folder-notch" style={{ fontSize: '16px' }}></i> Schede Salvate

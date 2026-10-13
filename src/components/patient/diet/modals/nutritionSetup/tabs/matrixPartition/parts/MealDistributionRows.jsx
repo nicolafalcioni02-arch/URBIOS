@@ -54,9 +54,9 @@ export const MealDistributionRows = ({
                         value={meal.value}
                         onChange={(e) => updateMatrixMeal(meal.id, 'value', Number(e.target.value))}
                     />{' '}
-                    <span style={{ fontSize: '10px', color: '#86868B' }}>%</span>
+                    <span style={{ fontSize: '10px', color: '#6E6D69' }}>%</span>
                 </td>
-                <td style={{ textAlign: 'center', color: '#00C853', fontWeight: 900 }}>{Math.round(tdee * pct)}</td>
+                <td style={{ textAlign: 'center', color: '#1F8A5B', fontWeight: 900 }}>{Math.round(tdee * pct)}</td>
                 <td style={{ textAlign: 'center' }}>{Math.round(totalC_g * pct)}</td>
                 <td style={{ textAlign: 'center' }}>{Math.round(totalP_g * pct)}</td>
                 <td style={{ textAlign: 'center' }}>{Math.round(totalF_g * pct)}</td>
@@ -68,7 +68,7 @@ export const MealDistributionRows = ({
                             style={{
                                 background: 'transparent',
                                 border: 'none',
-                                color: '#007AFF',
+                                color: '#121317',
                                 fontWeight: 900,
                                 cursor: 'pointer',
                                 padding: '5px',
@@ -83,7 +83,7 @@ export const MealDistributionRows = ({
                             style={{
                                 background: 'transparent',
                                 border: 'none',
-                                color: '#FF3B30',
+                                color: '#C2413A',
                                 fontWeight: 900,
                                 cursor: 'pointer',
                                 padding: '5px',

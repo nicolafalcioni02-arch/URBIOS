@@ -8,7 +8,7 @@ export const EngagementLetterSection = ({ localUser, updateUser }) => {
             <div className="space-y-6">
                 {/* SEZIONE A: VARIABILI DINAMICHE */}
                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                    <h4 className="text-xs font-bold uppercase tracking-widest mb-4 text-black">A. Dati Variabili del Documento</h4>
+                    <h4 className="text-xs font-bold mb-4 text-black">A. Dati Variabili del Documento</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <InputGroup
                             label="Compenso (Testo per punto 7)"
@@ -44,7 +44,7 @@ export const EngagementLetterSection = ({ localUser, updateUser }) => {
                 {/* SEZIONE B: CORPO DEL CONTRATTO */}
                 <div className="space-y-2">
                     <div className="flex justify-between items-end">
-                        <label className="text-[10px] uppercase font-bold text-gray-400 ml-1">B. Testo "Lettera di Incarico" (Punti 1-8)</label>
+                        <label className="text-xs font-bold text-gray-400 ml-1">B. Testo "Lettera di Incarico" (Punti 1-8)</label>
                         <button
                             onClick={() =>
                                 updateUser(
@@ -96,7 +96,7 @@ Prende atto che il Professionista è regolarmente assicurato per la responsabili
                 {/* SEZIONE C: PRIVACY */}
                 <div className="space-y-2 pt-4">
                     <div className="flex justify-between items-end">
-                        <label className="text-[10px] uppercase font-bold text-gray-400 ml-1">C. Testo "Informativa Privacy" (GDPR)</label>
+                        <label className="text-xs font-bold text-gray-400 ml-1">C. Testo "Informativa Privacy" (GDPR)</label>
                         <button
                             onClick={() =>
                                 updateUser(

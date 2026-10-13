@@ -46,7 +46,7 @@ export const NutrientTargetsGrid = ({ currentProfile, multiplier, patientTargets
                         {/* Intestazione Card */}
                         <div className="flex justify-between items-start mb-2 z-10 relative">
                             <span
-                                className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate pr-2 group-hover:text-gray-800 transition-colors duration-300"
+                                className="text-xs font-semibold text-gray-400 truncate pr-2 group-hover:text-gray-800 transition-colors duration-300"
                                 title={ref.name}
                             >
                                 {ref.name}
@@ -70,7 +70,7 @@ export const NutrientTargetsGrid = ({ currentProfile, multiplier, patientTargets
 
                         {/* Sezione Target e Grafico a Barra */}
                         <div className="mt-auto z-10 relative">
-                            <div className="flex justify-between text-[9px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider">
+                            <div className="flex justify-between text-[11px] font-bold text-gray-400 mb-1.5 ">
                                 <span>
                                     Trgt: {target.toFixed(2)} {ref.unit}
                                 </span>

@@ -47,7 +47,7 @@ export const ProgressionModal = ({ weeks, header, massimali, profile, onApply, o
             >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 28px 8px' }}>
                     <h2 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Genera progressione</h2>
-                    <button onClick={onClose} className="t-icon-btn" style={{ width: 40, height: 40, background: '#F5F5F7', border: 'none' }}>
+                    <button onClick={onClose} className="t-icon-btn" style={{ width: 40, height: 40, background: '#F6F5F2', border: 'none' }}>
                         <i className="ph-bold ph-x"></i>
                     </button>
                 </div>
@@ -65,7 +65,7 @@ export const ProgressionModal = ({ weeks, header, massimali, profile, onApply, o
                             {MODELS.map((x) => (
                                 <label key={x.id} style={{ display: 'block', padding: '6px 0', cursor: 'pointer', fontSize: 14 }}>
                                     <input type="radio" name="model" checked={model === x.id} onChange={() => setModel(x.id)} /> <b>{x.label}</b>
-                                    <div style={{ fontSize: 12, color: '#86868B', marginLeft: 22 }}>{x.desc}</div>
+                                    <div style={{ fontSize: 12, color: '#6E6D69', marginLeft: 22 }}>{x.desc}</div>
                                 </label>
                             ))}
                         </div>
@@ -101,11 +101,11 @@ export const ProgressionModal = ({ weeks, header, massimali, profile, onApply, o
                             rows={A.weeks.map((w) => [
                                 w.title,
                                 w.workSets,
-                                w.volumeLoad ? `${Math.round(w.volumeLoad)} kg` : '—',
-                                w.avgPct !== null ? `${Math.round(w.avgPct)}%` : '—',
-                                w.avgRpe !== null ? n1(w.avgRpe) : '—',
+                                w.volumeLoad ? `${Math.round(w.volumeLoad)} kg` : '-',
+                                w.avgPct !== null ? `${Math.round(w.avgPct)}%` : '-',
+                                w.avgRpe !== null ? n1(w.avgRpe) : '-',
                                 Math.round(w.weekLoad),
-                                w.acwr !== null ? n1(w.acwr, 2) : '—',
+                                w.acwr !== null ? n1(w.acwr, 2) : '-',
                             ])}
                         />
                         {generated[1] && (

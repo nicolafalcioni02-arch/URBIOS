@@ -53,8 +53,8 @@ export const SettingsModal = ({ db, onUpdateDb, onClose }) => {
     };
 
     return ReactDOM.createPortal(
-        <div className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 fade-enter">
-            <div className="bg-white w-full max-w-5xl h-[85vh] rounded-2xl shadow-2xl flex overflow-hidden">
+        <div className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4 fade-enter">
+            <div className="bg-white w-full max-w-5xl h-full md:h-[85vh] rounded-none md:rounded-2xl shadow-2xl flex overflow-hidden">
                 {/* SIDEBAR */}
                 <div className="w-64 bg-gray-50 border-r border-gray-100 p-6 flex flex-col justify-between hidden md:flex">
                     <div>
@@ -96,11 +96,30 @@ export const SettingsModal = ({ db, onUpdateDb, onClose }) => {
                 </div>
 
                 {/* CONTENUTO */}
-                <div className="flex-1 overflow-y-auto p-8 relative bg-white">
+                <div className="flex-1 min-w-0 overflow-y-auto p-4 md:p-8 relative bg-white">
+                    {/* SCHEDE PER TELEFONO/TABLET (la barra laterale compare solo da md in su) */}
+                    <div className="md:hidden sticky -top-4 z-40 -mx-4 -mt-4 mb-4 h-16 flex items-center gap-2 pl-4 pr-16 bg-white/95 backdrop-blur border-b border-gray-100 overflow-x-auto no-scrollbar">
+                        {[
+                            ['profilo', 'ph-user-circle', 'Profilo'],
+                            ['formule', 'ph-function', 'Formule'],
+                            ['dati', 'ph-arrows-left-right', 'Dati'],
+                            ['sicurezza', 'ph-shield-check', 'Sicurezza'],
+                            ['info', 'ph-info', 'Info'],
+                        ].map(([id, icon, label]) => (
+                            <button
+                                key={id}
+                                onClick={() => setTab(id)}
+                                className={`flex-none flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${tab === id ? 'bg-black text-white shadow' : 'bg-gray-100 text-gray-500'}`}
+                            >
+                                <i className={`ph ${icon} text-base`}></i> {label}
+                            </button>
+                        ))}
+                    </div>
+
                     {/* TASTO CHIUDI (X) - Con z-index alto e posizionamento sicuro */}
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors z-50"
+                        className="fixed md:absolute top-3 right-3 md:top-4 md:right-4 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors z-50"
                     >
                         <i className="ph ph-x text-xl"></i>
                     </button>
