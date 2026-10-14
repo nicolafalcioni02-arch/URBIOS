@@ -233,6 +233,8 @@ export const ReportStudio = ({ patient, db, visitDraft, initial = [], layout: la
 
                 <div className="rs-scroll" onClick={() => setSideOpen(false)}>
                     <div className={`rs-page rs-layout-${layout.id}`} style={{ '--accent': accent }}>
+                        {layout.id === 'decorato' && <div className="rs-frame" />}
+                        {layout.id === 'decorato' && <style>{'@media print { @page { size: A4 portrait; margin: 20mm 22mm; } }'}</style>}
                         {sections.map((s, i) => (
                             <React.Fragment key={s.id}>
                                 {i > 0 && s.newPage && <div className="rs-sep"><span>nuova pagina</span></div>}
