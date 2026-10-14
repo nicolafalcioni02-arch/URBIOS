@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { PrintCenter } from './PrintCenter';
 
-const Ctx = createContext(null);
+// un solo contesto anche quando il modulo viene ricaricato a caldo durante lo sviluppo:
+// altrimenti chi lo usa e chi lo fornisce finirebbero su due contesti diversi e il tasto stampa non farebbe nulla
+const Ctx = globalThis.__urbiosPrintCenterCtx || (globalThis.__urbiosPrintCenterCtx = createContext(null));
 
 // Il Centro stampa è uno solo per la scheda paziente: chiunque al suo interno lo apre con usePrintCenter().open(...).
 // open() senza argomenti = ultimo pacchetto usato; open(['dieta']) o open([{ type: 'grafici', visitId }]) = solo quei documenti.

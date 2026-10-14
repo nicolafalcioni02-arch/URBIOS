@@ -265,6 +265,7 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
 // tasto stampante nella barra in alto: apre il Centro stampa
 const PrintButton = () => {
     const pc = usePrintCenter();
+    if (!pc) return null;
     return (
         <button className="vw-chip !px-0 w-10 !h-10 justify-center flex-none" onClick={() => pc.open()} title="Centro stampa: tutti i documenti del paziente, pronti da stampare o inviare" aria-label="Centro stampa">
             <i className="ph ph-printer"></i>
