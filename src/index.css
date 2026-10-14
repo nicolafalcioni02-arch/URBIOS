@@ -1,5 +1,5 @@
 /* 1. Importazione Font */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500;1,600;1,800&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500;1,600;1,800&family=Inter:wght@300;400;500;600&family=Caveat:wght@500;600&display=swap');
 
 /* 2. Direttive Tailwind (Obbligatorie) */
 @tailwind base;
@@ -101,7 +101,7 @@ img, svg, video, canvas { max-width: 100%; }
 }
 @media (max-width: 900px) {
     /* la pastiglia di stato non deve coprire i pulsanti in fondo a finestre e cassetti */
-    body:has(.modal-backdrop, .tp-overlay, .t-nav-backdrop.open, .d-nav-backdrop.open, .report-overlay, .report-modal) .archive-chip { display: none; }
+    body:has(.modal-backdrop, .tp-overlay, .t-nav-backdrop.open, .d-nav-backdrop.open, .report-overlay, .report-modal, .rs-overlay) .archive-chip { display: none; }
 }
 @media (pointer: coarse) {
     button, select, [role="button"] { min-height: 40px; }
@@ -405,3 +405,30 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ink); }
 @keyframes pets-wag { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(-7deg); } 30% { transform: rotate(6deg); } 45% { transform: rotate(-4deg); } 60% { transform: rotate(0); } }
 @media (max-width: 479px) { .pets-soon:not(.pets-soon-lg) { display: none; } }
 @media (prefers-reduced-motion: reduce) { .pets-mark { animation: none; } }
+
+
+/* Widget laterali nelle schermate del paziente (solo desktop): il contenuto lascia lo spazio alle due colonne */
+@media (min-width: 1360px) and (hover: hover) {
+    .wd-padded { padding-left: calc(clamp(190px, 14.5vw, 270px) + 18px) !important; padding-right: calc(clamp(190px, 14.5vw, 270px) + 18px) !important; }
+}
+@media (min-width: 1360px) and (max-width: 1699px) and (hover: hover) {
+    .wd-padded .anag-grid { grid-template-columns: minmax(0, 1fr) !important; max-width: 860px; margin-inline: auto; }
+}
+
+/* Nuova Visita: scelta iniziale */
+.vs-hero { display: flex; align-items: center; gap: 16px; padding: 22px; border-radius: 24px; background: var(--ink); color: #fff; cursor: pointer;
+  box-shadow: 0 14px 30px rgba(18, 19, 23, .22); transition: transform .3s var(--ease), box-shadow .3s var(--ease); }
+.vs-hero:hover { transform: translateY(-2px); box-shadow: 0 18px 38px rgba(18, 19, 23, .28); }
+.vs-hero:active { transform: scale(.985); }
+.vs-hero-icon { width: 56px; height: 56px; border-radius: 18px; background: rgba(255,255,255,.14); display: grid; place-items: center; font-size: 28px; flex: none; }
+.vs-card { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); cursor: pointer;
+  transition: transform .3s var(--ease), border-color .2s; }
+.vs-card:hover:not(:disabled) { transform: translateY(-1px); border-color: var(--ink); }
+.vs-card:active:not(:disabled) { transform: scale(.985); }
+.vs-card:disabled, .vs-row:disabled { opacity: .45; cursor: default; }
+.vs-card-icon { width: 42px; height: 42px; border-radius: 14px; background: var(--soft); display: grid; place-items: center; font-size: 22px; color: var(--ink); flex: none; }
+.vs-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 14px; background: transparent; border: 1px solid var(--line); cursor: pointer; transition: border-color .2s, background-color .2s; }
+.vs-row:hover:not(:disabled) { border-color: var(--ink); background: var(--surface); }
+.vw-seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--soft); }
+.vw-seg button { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); transition: background-color .25s, color .25s; }
+.vw-seg button.is-on { background: var(--ink); color: #fff; }

@@ -1,15 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { WidgetDock } from '../../components/widgets/WidgetDock';
 import { PatientHeader } from './parts/PatientHeader';
 import { PatientTabContent } from './parts/PatientTabContent';
 import { UrbiosAiModal } from '../../ai/UrbiosAiModal';
 import { usePatientVisitActions } from './hooks/usePatientVisitActions';
 
-export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = false }) => {
+export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = false, onOpenAgenda }) => {
     // un paziente senza visite parte dall'anagrafica, gli altri dallo storico
     const [view, setView] = useState(patient?.visite?.length ? 'history' : 'info');
     const [status, setStatus] = useState(patient?.status || 'Attivo');
     const [dietViewMode, setDietViewMode] = useState('menu');
+    // Dieta e Training si modificano dentro Nuova visita: le tab aprono il percorso gia' sul piano giusto
+    const [visitStart, setVisitStart] = useState(null);
+    // cambia solo quando un percorso comincia o finisce: nel frattempo Nuova visita resta com'e' anche se si guarda altro
+    const [visitKey, setVisitKey] = useState(0);
     const [aiOpen, setAiOpen] = useState(false);
+    const [widgetsEditing, setWidgetsEditing] = useState(false);
+    const [headTop, setHeadTop] = useState(72);
+    const headRef = useRef(null);
+    const widgetsHidden = !!(db && db.widgets && db.widgets.hidePatient);
+    const canWidgets = !readOnly; // i casi dimostrativi non toccano il db
+
+    // le colonne dei widget partono sotto l'intestazione, qualunque altezza abbia
+    useEffect(() => {
+        const el = headRef.current;
+        if (!el || typeof ResizeObserver === 'undefined') return undefined;
+        const ro = new ResizeObserver(() => setHeadTop(el.offsetHeight + 8));
+        ro.observe(el);
+        setHeadTop(el.offsetHeight + 8);
+        return () => ro.disconnect();
+    }, []);
+    const toggleHidden = () => {
+        setWidgetsEditing(false);
+        onUpdateDb((prev) => ({ ...prev, widgets: { ...(prev.widgets || {}), hidePatient: !(prev.widgets && prev.widgets.hidePatient) } }));
+    };
 
     useEffect(() => {
         setDietViewMode('menu');
@@ -147,6 +171,17 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
         valutazione_report: '',
     });
 
+    const goTab = (id) => {
+        const plan = id === 'diet' ? 'dieta' : id === 'Allenamento' ? 'training' : null;
+        if (plan && patient?.visite?.length) {
+            setVisitStart(plan);
+            setVisitKey((k) => k + 1);
+            setView('visit');
+        } else {
+            setView(id);
+        }
+    };
+
     const { updateDraft, updateDraftMany, updatePatientInfo, updatePatientMany, handleFinalizeVisit } = usePatientVisitActions({
         configA,
         configB,
@@ -161,7 +196,19 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
     return (
         <div className="h-full flex flex-col bg-[var(--paper)] relative z-20">
             {/* HEADER */}
-            <PatientHeader onBack={onBack} patient={patient} setView={setView} status={status} view={view} readOnly={readOnly} onAi={() => setAiOpen(true)} />
+            <div ref={headRef}>
+                <PatientHeader
+                    onBack={onBack}
+                    patient={patient}
+                    setView={goTab}
+                    status={status}
+                    view={view}
+                    readOnly={readOnly}
+                    onAi={() => setAiOpen(true)}
+                    widgets={canWidgets ? { editing: widgetsEditing, hidden: widgetsHidden, toggleEdit: () => setWidgetsEditing((v) => !v), toggleHidden } : null}
+                />
+            </div>
+            {canWidgets && <WidgetDock db={db} onUpdateDb={onUpdateDb} mode="patient" top={headTop} hidden={widgetsHidden} editing={widgetsEditing} onEditingChange={setWidgetsEditing} onOpenAgenda={onOpenAgenda} />}
 
             <PatientTabContent
                 configA={configA}
@@ -169,6 +216,14 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
                 db={db}
                 dietViewMode={dietViewMode}
                 handleFinalizeVisit={handleFinalizeVisit}
+                updateDraftMany={updateDraftMany}
+                visitStart={visitStart}
+                onDone={() => {
+                    setVisitStart(null);
+                    setVisitKey((k) => k + 1);
+                    setView('history');
+                }}
+                visitKey={visitKey}
                 onUpdateDb={onUpdateDb}
                 patient={patient}
                 setConfigA={setConfigA}
@@ -178,6 +233,7 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
                 updatePatientInfo={updatePatientInfo}
                 view={view}
                 visitDraft={visitDraft}
+                widgetsPad={canWidgets && !widgetsHidden}
             />
 
             {aiOpen && (
@@ -189,8 +245,8 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
                     onApplyPatient={updatePatientMany}
                     onApplyDraft={updateDraftMany}
                     onGoVisit={() => setView('visit')}
-                    onGoTraining={() => setView('Allenamento')}
-                    onGoDiet={() => setView('diet')}
+                    onGoTraining={() => goTab('Allenamento')}
+                    onGoDiet={() => goTab('diet')}
                 />
             )}
         </div>

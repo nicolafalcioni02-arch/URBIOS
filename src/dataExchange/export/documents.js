@@ -39,6 +39,9 @@ export const patientSheetBlocks = (p) => {
         ['Patologie e interventi', val(p.patologie)],
         ['Terapie farmacologiche', val(p.farmaci)],
         ['Allergie e intolleranze', val(p.allergie)],
+        ['Anamnesi verificata il', val(p.anamnesi_verificata)],
+        ['Lettera di incarico', p.documenti?.incarico ? `${p.documenti.incarico.stato} ${p.documenti.incarico.dataFirma || p.documenti.incarico.dataConsegna || ''}`.trim() : ''],
+        ['Informativa privacy', p.documenti?.privacy ? `${p.documenti.privacy.stato} ${p.documenti.privacy.dataFirma || p.documenti.privacy.dataConsegna || ''}`.trim() : ''],
         ['Obiettivo', val(p.obiettivo)],
         ['Note', val(p.note)],
     ]);

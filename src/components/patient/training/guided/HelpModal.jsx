@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { buildPrompt, newRequestId } from '../../../../ai/promptBuilder';
+import { buildPrompt, newRequestId, redactText } from '../../../../ai/promptBuilder';
 import { parseAiResponse } from '../../../../ai/responseParser';
 import { TrainingReview } from '../../../../ai/TrainingReview';
 import { trainingContext } from '../../../../ai/trainingSection';
@@ -80,14 +80,14 @@ export const HelpModal = ({ patient, db, header, weeks, massimali, profile, exer
         return `Sei un assistente per preparatori atletici e chinesiologi che usano il software URBIOS. La schermata "Training" ha 3 passi: 1) Obiettivo (tipo di obiettivo, livello, struttura), 2) Scheda (settimane, sedute, esercizi con serie, ripetizioni, carico, %1RM, RPE, tempo, recupero), 3) Consegna (controllo, stato, stampa).
 Rispondi in italiano semplice, con passi numerati brevi e concreti, con numeri (serie, ripetizioni, RPE). Se non sei sicuro di una funzione del software, dillo invece di inventarla.
 
-CLIENTE: ${patient.nome} ${patient.cognome}, ${sex}${profile?.age ? `, ${profile.age} anni` : ''}${profile?.weightKg ? `, ${profile.weightKg} kg` : ''}.
-${patient.patologie ? `Patologie: ${Array.isArray(patient.patologie) ? patient.patologie.join(', ') : patient.patologie}.\n` : ''}${patient.obiettivo ? `Obiettivo del cliente: ${patient.obiettivo}.\n` : ''}
+CLIENTE (anonimo): ${sex}${profile?.age ? `, ${profile.age} anni` : ''}${profile?.weightKg ? `, ${profile.weightKg} kg` : ''}.
+${patient.patologie ? `Patologie: ${redactText(Array.isArray(patient.patologie) ? patient.patologie.join(', ') : patient.patologie, patient)}.\n` : ''}${patient.obiettivo ? `Obiettivo del cliente: ${redactText(patient.obiettivo, patient)}.\n` : ''}
 SCHEDA: ${header.titolo || '(senza nome)'} · obiettivo ${goal ? goal.label : 'non impostato'}${header.livello ? ` · livello ${levelShort(header.livello).toLowerCase()}` : ''}.
 
 CONTENUTO ATTUALE:
 ${schedaText(weeks)}
 ${warn ? `\nAVVISI DEL SOFTWARE:\n${warn}\n` : ''}
-PROBLEMA: ${problem.label}${problem.ask ? `\n${problem.ask}` : ''}${detail.trim() ? `\nDettagli del professionista: ${detail.trim()}` : ''}
+PROBLEMA: ${problem.label}${problem.ask ? `\n${problem.ask}` : ''}${detail.trim() ? `\nDettagli del professionista: ${redactText(detail.trim(), patient)}` : ''}
 `;
     }, [problem, detail, nWeeks, patient, weeks, header, massimali, profile, db, exerciseDB, requestId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -159,6 +159,7 @@ PROBLEMA: ${problem.label}${problem.ask ? `\n${problem.ask}` : ''}${detail.trim(
                                         value={detail}
                                         onChange={(e) => setDetail(e.target.value)}
                                     />
+                                    <p className="dg-hint" style={{ color: '#7A5B0B' }}><i className="ph ph-shield-warning"></i> Non scrivere nome, residenza, contatti o altri dati che identificano il paziente (GDPR e AI Act): solo dati clinici.</p>
                                     {problem.fillsPlan && (
                                         <div className="mt-4">
                                             <p className="fld-label">Quante settimane?</p>
@@ -181,6 +182,7 @@ PROBLEMA: ${problem.label}${problem.ask ? `\n${problem.ask}` : ''}${detail.trim(
                         <div className="dg-in">
                             <h3 className="text-[22px] font-semibold">Copia il prompt</h3>
                             <p className="dg-sub">Incollalo nel tuo agente AI preferito e aspetta la risposta.{problem?.fillsPlan ? ' Poi copiala esattamente com’è e torna qui.' : ''}</p>
+                            <p className="dg-hint" style={{ color: '#7A5B0B' }}><i className="ph ph-shield-warning"></i> Non scrivere nome, residenza, contatti o altri dati che identificano il paziente (GDPR e AI Act): solo dati clinici.</p>
                             <details className="mt-4">
                                 <summary className="cursor-pointer text-[13px] text-[color:var(--muted)]">Mostra il testo ({prompt.length.toLocaleString('it-IT')} caratteri)</summary>
                                 <pre className="mt-2 p-4 rounded-2xl bg-[color:var(--soft)] max-h-64 overflow-auto text-[12px] whitespace-pre-wrap">{prompt}</pre>

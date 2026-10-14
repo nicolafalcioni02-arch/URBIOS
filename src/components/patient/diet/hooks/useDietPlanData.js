@@ -84,6 +84,34 @@ export const useDietPlanData = ({ db, onUpdateDb, patient }) => {
         return visitaAttiva?.dettagli?.diet_saved_reports || [];
     });
 
+    // I dati del paziente restano collegati: l'eta' segue sempre la data di nascita; sesso, peso, altezza, vita, fianchi e polso
+    // si riempiono dall'archivio solo se il piano non li ha ancora (cio' che il professionista ha scritto a mano non si tocca).
+    const nascita = currentPatient?.dataNascita;
+    const sessoP = currentPatient?.sesso;
+    const ultimaMisura = listaVisite.find((v) => v.dettagli && (v.dettagli.altezza || v.dettagli.cm_vita_min || v.peso));
+    useEffect(() => {
+        setCalcData((c) => {
+            const next = { ...c };
+            const b = nascita ? new Date(nascita) : null;
+            if (b && !Number.isNaN(b.getTime())) {
+                const o = new Date();
+                let eta = o.getFullYear() - b.getFullYear();
+                if (o.getMonth() < b.getMonth() || (o.getMonth() === b.getMonth() && o.getDate() < b.getDate())) eta--;
+                next.age = eta;
+            }
+            const fill = (key, val) => {
+                if ((next[key] === '' || next[key] == null) && val) next[key] = val;
+            };
+            if (!next.sex && sessoP) next.sex = sessoP;
+            fill('weight', parseFloat(ultimaMisura?.peso) || '');
+            fill('height', parseFloat(ultimaMisura?.dettagli?.altezza) || '');
+            fill('waist', parseFloat(ultimaMisura?.dettagli?.cm_vita_min) || '');
+            fill('hip', parseFloat(ultimaMisura?.dettagli?.cm_fianchi_max) || '');
+            fill('wrist', parseFloat(ultimaMisura?.dettagli?.dm_polso) || '');
+            return Object.keys(next).every((k) => next[k] === c[k]) ? c : next;
+        });
+    }, [nascita, sessoP, ultimaMisura?.id, selectedVisitaId]);
+
     // Quando si cambia piano il salvataggio automatico NON deve scrivere i dati del piano precedente dentro quello nuovo:
     // il primo passaggio dopo il cambio viene saltato, il successivo salva già i dati ricaricati.
     const skipAutosave = useRef(false);

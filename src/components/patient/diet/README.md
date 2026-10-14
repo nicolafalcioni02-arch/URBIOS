@@ -20,7 +20,7 @@ diet/
 ├── modals/                   MealEditor, MealLibrary, SaveMealToLibrary, SaveStatus, ChangeVisit,
 │                             nutritionSetup/ (3 tab), LafCalculator, FoodDatabase, SmartChart,
 │                             clinicalAnalysis/, DrvEditor
-├── printReport/              DietPrintReport + sheets/ (copertina, impostazioni, giorni, spesa, finale) + logic/printLayout
+├── printReport/              dietDocument (DietDocBody) + sheets/ (copertina, impostazioni, giorni, spesa, finale) + logic/printLayout
 ├── ui/                       icons, MacroProgressBar, MiniReportChart
 ├── logic/                    clinicalFormulas (RMR, BMI, WHR...), dietTotals
 └── data/                     defaultFoodDB, nutrientMapping, metricCatalog

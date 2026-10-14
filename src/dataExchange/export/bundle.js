@@ -106,6 +106,11 @@ export const buildExport = (db, options) => {
     if (o.include.json) {
         const data = o.include.studio || !anonymized ? work : { ...work, utente: {} };
         const out = { ...data };
+        if (anonymized) {
+            // foglietti, liste e agenda (note, luoghi, orari) non devono uscire in un export anonimo
+            delete out.widgets;
+            delete out.agenda;
+        }
         if (!o.include.archivi)
             ['formule', 'rangeEmato', 'diet_food_db', 'diet_meal_library', 'diet_drv_db', 'training_exercise_db'].forEach((k) => delete out[k]);
         files.push({

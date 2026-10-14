@@ -335,6 +335,7 @@ export const RecipeModal = ({ patient, db, foodDB, mealLibrary, setMealLibrary, 
                             </div>
                             <label className="fld-label mt-3">Richieste particolari (facoltative)</label>
                             <textarea className="fld" rows={3} style={{ height: 'auto', padding: 14 }} placeholder="Es. senza lattosio, poco zucchero, ricca di proteine, adatta a una colazione…" value={ai.notes} onChange={(e) => setAi({ ...ai, notes: e.target.value })} />
+                            <p className="dg-hint" style={{ color: '#7A5B0B' }}><i className="ph ph-shield-warning"></i> Non scrivere nome, residenza, contatti o altri dati che identificano il paziente (GDPR e AI Act): solo dati clinici.</p>
                             <label className="flex items-start gap-2.5 mt-4 p-4 rounded-2xl border border-[color:var(--line)] bg-white cursor-pointer">
                                 <input type="checkbox" className="mt-1 w-4 h-4" checked={ai.includeFoodList} onChange={(e) => setAi({ ...ai, includeFoodList: e.target.checked })} />
                                 <span className="text-[14px]">

@@ -4,8 +4,9 @@ import { Somatocarta } from '../../components/charts/somatocarta/Somatocarta';
 import { generateAdvancedInterpretation } from './logic/somatotypeInterpretation';
 import { ConfirmSaveModal } from './modals/ConfirmSaveModal';
 import { AnalisiHeader } from './sections/AnalisiHeader';
+import { BodyCompositionCharts } from './sections/BodyCompositionCharts';
 
-export const Analisi = ({ onClose, patient, visitData, updateDraft }) => {
+export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sesso, eta }) => {
     // --- STATI ---
     const [somatoValues, setSomatoValues] = useState({ endo: 0, meso: 0, ecto: 0 });
     const [interpretationText, setInterpretationText] = useState('');
@@ -230,6 +231,8 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft }) => {
                                 </div>
                             </div>
                         </div>
+
+                        <BodyCompositionCharts visitData={visitData} report={report} sesso={sesso} eta={eta} />
 
                         {/* ============================================================ */}
                         {/* SUPER BOX 2: BIVA (Segnaposto)                               */}

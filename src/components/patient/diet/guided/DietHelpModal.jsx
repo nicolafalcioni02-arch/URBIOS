@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { buildPrompt, newRequestId } from '../../../../ai/promptBuilder';
+import { buildPrompt, newRequestId, redactText } from '../../../../ai/promptBuilder';
 import { parseAiResponse } from '../../../../ai/responseParser';
 import { DietReview } from '../../../../ai/DietReview';
 import { alignToPlan, computeRmr, computeTdee, planSummary } from './guidedLogic';
@@ -79,14 +79,14 @@ export const DietHelpModal = ({ patient, calcData, targets, dietDays, foodDB, db
         return `Sei un assistente per dietisti e nutrizionisti che usano il software URBIOS. La schermata "Dieta" ha 3 passi: 1) Obiettivi (fabbisogno, macro, pasti), 2) Menù (giorni, pasti, alimenti e grammi), 3) Consegna (controllo, stampa, analisi).
 Rispondi in italiano semplice, con passi numerati brevi e concreti. Se non sei sicuro di una funzione del software, dillo invece di inventarla.
 
-PAZIENTE: ${patient.nome} ${patient.cognome}, ${profile}.
-${patient.patologie ? `Patologie: ${Array.isArray(patient.patologie) ? patient.patologie.join(', ') : patient.patologie}.\n` : ''}${patient.allergie ? `Allergie/intolleranze: ${Array.isArray(patient.allergie) ? patient.allergie.join(', ') : patient.allergie}.\n` : ''}${patient.farmaci ? `Farmaci: ${patient.farmaci}.\n` : ''}${patient.obiettivo ? `Obiettivo: ${patient.obiettivo}.\n` : ''}
+PAZIENTE (anonimo): ${profile}.
+${patient.patologie ? `Patologie: ${redactText(Array.isArray(patient.patologie) ? patient.patologie.join(', ') : patient.patologie, patient)}.\n` : ''}${patient.allergie ? `Allergie/intolleranze: ${redactText(Array.isArray(patient.allergie) ? patient.allergie.join(', ') : patient.allergie, patient)}.\n` : ''}${patient.farmaci ? `Farmaci: ${redactText(patient.farmaci, patient)}.\n` : ''}${patient.obiettivo ? `Obiettivo: ${redactText(patient.obiettivo, patient)}.\n` : ''}
 OBIETTIVO IMPOSTATO: ${configured ? `${tdee} kcal/die, carboidrati ${calcData.macroTargets.c}% / proteine ${calcData.macroTargets.p}% / grassi ${calcData.macroTargets.f}%.` : 'non ancora impostato.'}
 
 MENÙ ATTUALE:
 ${plan}
 
-PROBLEMA: ${problem.label}${problem.ask ? `\n${problem.ask}` : ''}${detail.trim() ? `\nDettagli del professionista: ${detail.trim()}` : ''}
+PROBLEMA: ${problem.label}${problem.ask ? `\n${problem.ask}` : ''}${detail.trim() ? `\nDettagli del professionista: ${redactText(detail.trim(), patient)}` : ''}
 `;
     }, [problem, detail, days, patient, calcData, configured, tdee, dietDays, foodDB, db, ctx, requestId, sex]);
 
@@ -165,6 +165,7 @@ PROBLEMA: ${problem.label}${problem.ask ? `\n${problem.ask}` : ''}${detail.trim(
                                         value={detail}
                                         onChange={(e) => setDetail(e.target.value)}
                                     />
+                                    <p className="dg-hint" style={{ color: '#7A5B0B' }}><i className="ph ph-shield-warning"></i> Non scrivere nome, residenza, contatti o altri dati che identificano il paziente (GDPR e AI Act): solo dati clinici.</p>
                                     {problem.fillsPlan && (
                                         <div className="mt-4">
                                             <p className="fld-label">Quanti giorni di menù?</p>
@@ -187,6 +188,7 @@ PROBLEMA: ${problem.label}${problem.ask ? `\n${problem.ask}` : ''}${detail.trim(
                         <div className="dg-in">
                             <h3 className="text-[22px] font-semibold">Copia il prompt</h3>
                             <p className="dg-sub">Incollalo nel tuo agente AI preferito (ChatGPT, Claude, Gemini…) e aspetta la risposta.{problem?.fillsPlan ? ' Poi copiala esattamente com’è e torna qui.' : ''}</p>
+                            <p className="dg-hint" style={{ color: '#7A5B0B' }}><i className="ph ph-shield-warning"></i> Non scrivere nome, residenza, contatti o altri dati che identificano il paziente (GDPR e AI Act): solo dati clinici.</p>
                             <details className="mt-4">
                                 <summary className="cursor-pointer text-[13px] text-[color:var(--muted)]">Mostra il testo ({prompt.length.toLocaleString('it-IT')} caratteri)</summary>
                                 <pre className="mt-2 p-4 rounded-2xl bg-[color:var(--soft)] max-h-64 overflow-auto text-[12px] whitespace-pre-wrap">{prompt}</pre>

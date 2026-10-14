@@ -6,15 +6,7 @@
 // min/max: soglie di plausibilità (fuori soglia = avviso, il valore non viene applicato di default)
 
 export const PATIENT_FIELDS = [
-    { key: 'dataNascita', label: 'Data di nascita', type: 'date', group: 'Dati personali' },
-    { key: 'luogoNascita', label: 'Luogo di nascita', type: 'text', group: 'Dati personali' },
     { key: 'professione', label: 'Professione', type: 'text', group: 'Dati personali' },
-    { key: 'statoCivile', label: 'Stato civile', type: 'text', group: 'Dati personali' },
-    { key: 'cellulare', label: 'Cellulare', type: 'text', group: 'Contatti' },
-    { key: 'email', label: 'Email', type: 'text', group: 'Contatti' },
-    { key: 'indirizzo', label: 'Indirizzo', type: 'text', group: 'Contatti' },
-    { key: 'cap', label: 'CAP', type: 'text', group: 'Contatti' },
-    { key: 'citta', label: 'Città', type: 'text', group: 'Contatti' },
     { key: 'anamnesi_familiare', label: 'Anamnesi familiare', type: 'text', group: 'Salute', hint: 'patologie nei familiari' },
     { key: 'patologie', label: 'Patologie', type: 'text', group: 'Salute', hint: 'patologie e disturbi del paziente' },
     { key: 'farmaci', label: 'Farmaci e integratori', type: 'text', group: 'Salute' },
@@ -22,6 +14,8 @@ export const PATIENT_FIELDS = [
     { key: 'obiettivo', label: 'Obiettivo del paziente', type: 'text', group: 'Obiettivo' },
 ];
 
+// Privacy: anagrafica e contatti (nome, residenza, telefono, email, data/luogo di nascita, stato civile)
+// NON fanno parte dei campi AI: non escono mai nel prompt (minimizzazione GDPR).
 // Nome, cognome, sesso e numero paziente NON si toccano mai: identificano la persona.
 export const PROTECTED_PATIENT_KEYS = ['id', 'nome', 'cognome', 'sesso', 'cf'];
 

@@ -1,14 +1,13 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
+import { docsSummary } from '../../../components/patient/info/documentsLogic';
 
 const TABS = [
     { id: 'info', label: 'Anagrafica', icon: 'ph-user' },
     { id: 'history', label: 'Storico', icon: 'ph-clock-counter-clockwise' },
     { id: 'visit', label: 'Nuova visita', icon: 'ph-plus-circle' },
-    { id: 'Allenamento', label: 'Training', icon: 'ph-barbell' },
-    { id: 'diet', label: 'Diet', icon: 'ph-carrot' },
 ];
 
-export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly = false, onAi }) => {
+export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly = false, onAi, widgets }) => {
     const wrap = useRef(null);
     const [pill, setPill] = useState({ left: 0, width: 0, ready: false });
 
@@ -40,9 +39,11 @@ export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly
     }, [view]);
 
     const active = status === 'Attivo';
+    // puntino sulla scheda Anagrafica finche' manca qualche firma
+    const docsPending = !readOnly && !docsSummary(patient).completo;
 
     return (
-        <div className="bg-[var(--paper)]/90 backdrop-blur-xl border-b border-[color:var(--line)] px-4 sm:px-8 py-3 sm:py-4 sticky top-0 z-30 flex flex-col lg:flex-row justify-between items-stretch lg:items-center flex-none gap-3 sm:gap-4">
+        <div className="bg-[var(--paper)]/90 backdrop-blur-xl border-b border-[color:var(--line)] px-4 sm:px-8 py-3 sm:py-4 sticky top-0 z-30 flex flex-col lg:grid lg:grid-cols-[1fr_auto_1fr] items-stretch lg:items-center flex-none gap-3 sm:gap-4">
             <div className="flex items-center gap-3 w-full lg:w-auto min-w-0">
                 <button onClick={onBack} className="vw-chip !px-0 w-10 !h-10 justify-center flex-none" aria-label="Torna ai pazienti">
                     <i className="ph ph-arrow-left"></i>
@@ -67,7 +68,7 @@ export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly
                 </div>
             </div>
 
-            <div ref={wrap} className="relative flex p-1 rounded-full bg-[color:var(--soft)] overflow-x-auto max-w-full no-scrollbar">
+            <div ref={wrap} className="relative flex p-1 rounded-full bg-[color:var(--soft)] overflow-x-auto max-w-full no-scrollbar lg:justify-self-center">
                 <span
                     className="absolute top-1 bottom-1 rounded-full bg-[color:var(--ink)]"
                     style={{
@@ -86,15 +87,31 @@ export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly
                     >
                         <i className={`ph ${tab.icon} text-[17px]`}></i>
                         {tab.label}
+                        {tab.id === 'info' && docsPending && <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--warn)' }} title="Documenti da firmare"></span>}
                     </button>
                 ))}
             </div>
+
+            <div className="flex items-center justify-end gap-2 min-w-0">
+            {widgets && (
+                <div className="flex items-center gap-1.5 flex-none max-[1359px]:hidden">
+                    {!widgets.hidden && (
+                        <button className="vw-chip !px-0 w-10 !h-10 justify-center" onClick={widgets.toggleEdit} title="Modifica i widget laterali (tieni premuto su un widget per fare lo stesso)" aria-label="Modifica i widget">
+                            <i className={`ph ${widgets.editing ? 'ph-check' : 'ph-squares-four'}`}></i>
+                        </button>
+                    )}
+                    <button className="vw-chip !px-0 w-10 !h-10 justify-center" onClick={widgets.toggleHidden} title={widgets.hidden ? 'Mostra i widget' : 'Nascondi i widget (più spazio al contenuto)'} aria-label={widgets.hidden ? 'Mostra i widget' : 'Nascondi i widget'}>
+                        <i className={`ph ${widgets.hidden ? 'ph-eye' : 'ph-eye-slash'}`}></i>
+                    </button>
+                </div>
+            )}
 
             {onAi && !readOnly && (
                 <button onClick={onAi} className="vw-chip justify-center flex-none" style={{ background: 'var(--ink)', color: '#fff', borderColor: 'var(--ink)' }}>
                     <i className="ph ph-sparkle"></i> URBIOS AI
                 </button>
             )}
+            </div>
         </div>
     );
 };

@@ -20,13 +20,14 @@ export const usePatientVisitActions = ({ configA, configB, db, onUpdateDb, patie
     };
 
     // --- 3. SALVATAGGIO CON CALCOLI PROTETTI ---
-    const handleFinalizeVisit = () => {
+    // `stay`: la visita resta aperta (si prosegue con Dieta/Training): niente avviso e niente cambio di pagina. Ritorna true se salvata.
+    const handleFinalizeVisit = ({ stay = false } = {}) => {
         console.log('Tentativo di salvataggio visita...'); // DEBUG
 
         // 1. Validazione base
         if (!visitDraft.peso) {
             alert('Devi inserire almeno il PESO per salvare la visita!');
-            return;
+            return false;
         }
 
         try {
@@ -121,14 +122,18 @@ export const usePatientVisitActions = ({ configA, configB, db, onUpdateDb, patie
                 return { ...prev, pazienti: updatedPatients };
             });
 
-            alert('Visita salvata con successo!');
-            setView('history');
+            if (!stay) {
+                alert('Visita salvata con successo!');
+                setView('history');
+            }
 
             // Reset pulito
             setVisitDraft((prev) => Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: '' }), {}));
+            return true;
         } catch (error) {
             console.error('ERRORE FATALE DURANTE IL SALVATAGGIO:', error);
             alert('Si è verificato un errore durante il salvataggio. Controlla la console (F12) per i dettagli.');
+            return false;
         }
     };
 

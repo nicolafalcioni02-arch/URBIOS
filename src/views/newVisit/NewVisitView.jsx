@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { SmartLabCard } from '../../components/ui/SmartLabCard';
-import { ReportPreviewModal } from '../../components/reports/reportPreview/ReportPreviewModal';
+import { ReportStudio } from '../../components/reports/studio/ReportStudio';
 import { calculateEquation } from '../../logic/calculations';
 import { Analisi } from '../analisi/Analisi';
 import { DEFAULT_RANGE_EMATO } from '../../logic/db_defaults';
@@ -12,9 +12,15 @@ import { BioimpedanceSection } from './sections/BioimpedanceSection';
 import { BloodTestsSection } from './sections/bloodTests/BloodTestsSection';
 import { ConclusionsSection } from './sections/ConclusionsSection';
 import { GeneralSection } from './sections/GeneralSection';
+import { ClinicalAnamnesis } from '../../components/patient/info/ClinicalAnamnesis';
+import { buildSections, VISIT_MODES, carryOver } from './data/visitSections';
+import { VisitStart } from './layout/VisitStart';
+import { PlansWorkspace } from './layout/PlansWorkspace';
+import { DietPlan } from '../../components/patient/diet/DietPlan';
+import { TrainingPlan } from '../../components/patient/training/TrainingPlan';
 import { SkinfoldsSection } from './sections/SkinfoldsSection';
 
-export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeVisit, configA, setConfigA, configB, setConfigB, db, onUpdateDb }) => {
+export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeVisit, updatePatientInfo, configA, setConfigA, configB, setConfigB, db, onUpdateDb, onDone, initialMode, updateDraftMany }) => {
     const [showReport, setShowReport] = useState(false);
     const [showAnalisi, setShowAnalisi] = useState(false);
 
@@ -26,6 +32,15 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
 
     // Passo corrente della visita (indice in SECTIONS)
     const [step, setStep] = useState(0);
+    // percorso scelto nella schermata iniziale: { mode, rilievi, plans }; null = ancora da scegliere
+    const [path, setPath] = useState(() => {
+        const m = VISIT_MODES.find((x) => x.id === initialMode);
+        return m ? { mode: m, rilievi: m.rilievi, plans: m.plans } : null;
+    });
+    const sections = useMemo(() => (path ? buildSections(path.rilievi) : []), [path]);
+    // fase "piani": Dieta e Training come due lavori distinti; si apre subito se il percorso non ha rilievi
+    const [inPlans, setInPlans] = useState(() => !!path && path.rilievi.length === 0);
+    const [plan, setPlan] = useState(() => path?.plans?.[0] || 'dieta');
     const sectionRefs = useRef({});
     const noop = () => {};
 
@@ -176,6 +191,7 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
         const common = { activeSection: id, sectionRefs, setActiveSection: noop, updateDraft, visitDraft };
         return (
             <StepContext.Provider value={true}>
+                {id === 'anamnesi' && <ClinicalAnamnesis patient={patient} updatePatientInfo={updatePatientInfo} />}
                 {id === 'antropometria' && <AnthropometrySection {...common} />}
                 {id === 'plicometria' && (
                     <SkinfoldsSection
@@ -198,27 +214,58 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
         );
     };
 
+    if (!path) {
+        return (
+            <VisitStart
+                patient={patient}
+                onPick={(m) => {
+                    setStep(0);
+                    setPath({ mode: m, rilievi: m.rilievi, plans: m.plans });
+                    setPlan(m.plans[0]);
+                    setInPlans(m.rilievi.length === 0);
+                    // il controllo parte dai dati stabili dell'ultima visita (altezza, diametri, lunghezze)
+                    if (m.id === 'controllo' && updateDraftMany) updateDraftMany(carryOver(patient.visite?.[0]?.dettagli));
+                }}
+            />
+        );
+    }
+
+    if (inPlans) {
+        return (
+            <PlansWorkspace patient={patient} active={plan} setActive={setPlan} onDone={onDone}>
+                {plan === 'dieta' ? <DietPlan patient={patient} onUpdateDb={onUpdateDb} db={db} /> : <TrainingPlan patient={patient} onUpdateDb={onUpdateDb} db={db} />}
+            </PlansWorkspace>
+        );
+    }
+
     return (
         <>
             <VisitWizard
                 patient={patient}
                 visitDraft={visitDraft}
+                sections={sections}
+                title={path.mode.title}
+                onChangeMode={() => setPath(null)}
                 step={step}
                 setStep={setStep}
                 onPreview={() => setShowReport(true)}
                 onAnalysis={() => setShowAnalisi(true)}
                 onSave={() => {
-                    // senza il peso non si puo' salvare: si torna al primo passo, dove va inserito
-                    if (!visitDraft.peso) setStep(0);
-                    handleFinalizeVisit();
+                    // senza il peso non si puo' salvare: si torna al passo delle misure, dove va inserito
+                    if (!visitDraft.peso) {
+                        setStep(Math.max(0, sections.findIndex((s) => s.id === 'antropometria')));
+                        handleFinalizeVisit();
+                        return;
+                    }
+                    if (handleFinalizeVisit({ stay: true })) setInPlans(true);
                 }}
                 renderStep={renderStep}
             />
 
             {showReport && (
-                <ReportPreviewModal visitDraft={getLiveReportData()} patient={patient} professionalData={db.utente} onClose={() => setShowReport(false)} />
+                <ReportStudio initial={['visita']} visitDraft={getLiveReportData()} patient={patient} db={db} onClose={() => setShowReport(false)} />
             )}
-            {showAnalisi && <Analisi patient={patient} visitData={visitDraft} updateDraft={updateDraft} onClose={() => setShowAnalisi(false)} />}
+            {showAnalisi && <Analisi patient={patient} visitData={visitDraft} report={getLiveReportData()} sesso={sessoPaziente} eta={etaPaziente} updateDraft={updateDraft} onClose={() => setShowAnalisi(false)} />}
 
             <PendingChangeModal
                 confirmSettingsChange={confirmSettingsChange}

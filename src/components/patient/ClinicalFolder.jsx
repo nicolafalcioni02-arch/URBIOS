@@ -1,118 +1,62 @@
 import React, { useState } from 'react';
-import { Card } from '../ui/Card';
-import { InputGroup, TextAreaGroup } from '../ui/InputGroup';
-import { Button } from '../ui/Button';
-import { LetteraIncaricoModal } from '../reports/LetteraIncaricoModal';
+import { InputGroup } from '../ui/InputGroup';
+import { DocumentsPanel } from './info/DocumentsPanel';
 
+// Scheda paziente: prima i documenti da firmare, poi i dati fissi (l'anamnesi e' il primo passo di Nuova visita) (anagrafica, recapiti)
 export const ClinicalFolder = ({ patient, updatePatientInfo, professionalData }) => {
-    const [showLettera, setShowLettera] = useState(false);
+    const [anagraficaOpen, setAnagraficaOpen] = useState(!patient.cf && !patient.dataNascita);
+    const riga = [patient.cf, patient.dataNascita, patient.cellulare, patient.email].filter(Boolean).join('  ·  ');
 
     return (
-        <div className="fade-enter grid grid-cols-1 xl:grid-cols-2 gap-8 pb-32">
+        <div className="anag-grid fade-enter grid grid-cols-1 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] gap-6 pb-32 items-start">
             <div className="space-y-6">
-                <Card title="Dati Amministrativi" icon="ph-identification-card">
-                    <div className="grid grid-cols-2 gap-4">
-                        <InputGroup label="Nome" value={patient.nome} name="nome" onChange={updatePatientInfo} />
-                        <InputGroup label="Cognome" value={patient.cognome} name="cognome" onChange={updatePatientInfo} />
-                        <InputGroup label="Sesso Biologico" options={['M', 'F']} value={patient.sesso || 'M'} name="sesso" onChange={updatePatientInfo} />
-                        <InputGroup label="Data di Nascita" type="date" value={patient.dataNascita} name="dataNascita" onChange={updatePatientInfo} />
-                        <InputGroup
-                            label="Luogo di Nascita"
-                            placeholder="Comune (PR)"
-                            value={patient.luogoNascita}
-                            name="luogoNascita"
-                            onChange={updatePatientInfo}
-                        />
-                        <InputGroup label="Codice Fiscale" placeholder="16 caratteri" full value={patient.cf} name="cf" onChange={updatePatientInfo} />
-                        <InputGroup
-                            label="Professione"
-                            placeholder="Es. Impiegato"
-                            value={patient.professione}
-                            name="professione"
-                            onChange={updatePatientInfo}
-                        />
-                        <InputGroup
-                            label="Stato Civile"
-                            options={['Celibe/Nubile', 'Coniugato/a', 'Divorziato/a', 'Vedovo/a']}
-                            value={patient.statoCivile}
-                            name="statoCivile"
-                            onChange={updatePatientInfo}
-                        />
-                    </div>
-                </Card>
-                <Card title="Recapiti" icon="ph-address-book">
-                    <div className="grid grid-cols-2 gap-4">
-                        <InputGroup label="Cellulare" type="tel" placeholder="+39..." value={patient.cellulare} name="cellulare" onChange={updatePatientInfo} />
-                        <InputGroup label="Email" type="email" full value={patient.email} name="email" onChange={updatePatientInfo} />
-                        <InputGroup label="Indirizzo" placeholder="Via..." full value={patient.indirizzo} name="indirizzo" onChange={updatePatientInfo} />
-                        <InputGroup label="CAP" placeholder="00000" value={patient.cap} name="cap" onChange={updatePatientInfo} />
-                        <InputGroup label="Città" placeholder="Milano" value={patient.citta} name="citta" onChange={updatePatientInfo} />
-                    </div>
-                </Card>
-            </div>
-            <div className="space-y-6">
-                <Card title="Anamnesi Medica Remota" icon="ph-folder-lock">
-                    <div className="space-y-4">
-                        <TextAreaGroup
-                            label="Anamnesi Familiare"
-                            placeholder="Diabete, Ipertensione, Obesità in famiglia..."
-                            name="anamnesi_familiare"
-                            value={patient.anamnesi_familiare}
-                            onChange={updatePatientInfo}
-                        />
-                        <TextAreaGroup
-                            label="Patologie Pregresse & Interventi"
-                            placeholder="Elenco patologie diagnosticate..."
-                            name="patologie"
-                            value={patient.patologie}
-                            onChange={updatePatientInfo}
-                        />
-                        <TextAreaGroup
-                            label="Terapie Farmacologiche Croniche"
-                            placeholder="Farmaci assunti regolarmente..."
-                            name="farmaci"
-                            value={patient.farmaci}
-                            onChange={updatePatientInfo}
-                        />
-                        <TextAreaGroup
-                            label="Allergie & Intolleranze"
-                            placeholder="Nichel, Glutine, Lattosio..."
-                            name="allergie"
-                            value={patient.allergie}
-                            onChange={updatePatientInfo}
-                        />
-                    </div>
-                </Card>
-                <Card title="Note Generali" icon="ph-note-pencil">
-                    <TextAreaGroup
-                        label="Obiettivo del Paziente"
-                        placeholder="Perdita peso, Performance, Ricomposizione..."
-                        rows={4}
-                        name="obiettivo"
-                        value={patient.obiettivo}
-                        onChange={updatePatientInfo}
-                    />
-                </Card>
-
-                {/* BOTTONE GENERA LETTERA */}
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 flex flex-col items-center justify-center text-center space-y-3">
-                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-gray-200 shadow-sm">
-                        <i className="ph-duotone ph-file-signature text-2xl text-black"></i>
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-sm">Contrattualistica</h4>
-                        <p className="text-xs text-gray-500 max-w-xs mx-auto">
-                            Genera la Lettera di Incarico e Privacy precompilata con i dati del paziente e le tue impostazioni.
-                        </p>
-                    </div>
-                    <Button onClick={() => setShowLettera(true)} variant="primary" className="w-full justify-center">
-                        Genera Lettera di Incarico
-                    </Button>
-                </div>
+                <DocumentsPanel patient={patient} professionalData={professionalData} updatePatientInfo={updatePatientInfo} />
             </div>
 
-            {/* MODALE LETTERA */}
-            {showLettera && <LetteraIncaricoModal patient={patient} professional={professionalData || {}} onClose={() => setShowLettera(false)} />}
+            <div className="panel !p-0 overflow-hidden">
+                <button
+                    type="button"
+                    onClick={() => setAnagraficaOpen((o) => !o)}
+                    className="w-full flex items-center justify-between gap-3 text-left px-[18px] py-4 hover:bg-[color:var(--soft)] transition-colors"
+                    aria-expanded={anagraficaOpen}
+                >
+                    <span className="flex items-center gap-2.5 min-w-0">
+                        <i className="ph ph-identification-card text-[17px] text-[color:var(--muted)]"></i>
+                        <span className="min-w-0">
+                            <span className="block font-semibold text-[15px] text-[color:var(--ink)]">Anagrafica e recapiti</span>
+                            {!anagraficaOpen && <span className="block text-[12px] text-[color:var(--muted)] truncate">{riga || 'Dati da compilare'}</span>}
+                        </span>
+                    </span>
+                    <i className={`ph ph-caret-down text-[color:var(--muted)] transition-transform duration-300 ${anagraficaOpen ? 'rotate-180' : ''}`}></i>
+                </button>
+                {anagraficaOpen && (
+                    <div className="px-[18px] pb-5 space-y-5">
+                        <div className="grid grid-cols-2 gap-4">
+                            <InputGroup label="Nome" value={patient.nome} name="nome" onChange={updatePatientInfo} />
+                            <InputGroup label="Cognome" value={patient.cognome} name="cognome" onChange={updatePatientInfo} />
+                            <InputGroup label="Sesso biologico" options={['M', 'F']} value={patient.sesso || 'M'} name="sesso" onChange={updatePatientInfo} />
+                            <InputGroup label="Data di nascita" type="date" value={patient.dataNascita} name="dataNascita" onChange={updatePatientInfo} />
+                            <InputGroup label="Luogo di nascita" placeholder="Comune (PR)" value={patient.luogoNascita} name="luogoNascita" onChange={updatePatientInfo} />
+                            <InputGroup label="Professione" placeholder="Es. Impiegato" value={patient.professione} name="professione" onChange={updatePatientInfo} />
+                            <InputGroup label="Codice fiscale" placeholder="16 caratteri" full value={patient.cf} name="cf" onChange={updatePatientInfo} />
+                            <InputGroup
+                                label="Stato civile"
+                                options={['Celibe/Nubile', 'Coniugato/a', 'Divorziato/a', 'Vedovo/a']}
+                                value={patient.statoCivile}
+                                name="statoCivile"
+                                onChange={updatePatientInfo}
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 pt-5 border-t" style={{ borderColor: 'var(--line)' }}>
+                            <InputGroup label="Cellulare" type="tel" placeholder="+39..." value={patient.cellulare} name="cellulare" onChange={updatePatientInfo} />
+                            <InputGroup label="Email" type="email" value={patient.email} name="email" onChange={updatePatientInfo} />
+                            <InputGroup label="Indirizzo" placeholder="Via..." full value={patient.indirizzo} name="indirizzo" onChange={updatePatientInfo} />
+                            <InputGroup label="CAP" placeholder="00000" value={patient.cap} name="cap" onChange={updatePatientInfo} />
+                            <InputGroup label="Città" placeholder="Milano" value={patient.citta} name="citta" onChange={updatePatientInfo} />
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

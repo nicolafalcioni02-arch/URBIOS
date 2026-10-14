@@ -19,6 +19,19 @@ const ageOf = (iso) => {
     return a;
 };
 
+// Privacy: toglie dal testo libero ciò che identifica il paziente (nome, email, telefono, codice fiscale).
+export const redactText = (text, patient) => {
+    let t = String(text ?? '').replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, '[email omessa]');
+    const names = [patient?.nome, patient?.cognome]
+        .flatMap((n) => String(n || '').split(/\s+/))
+        .filter((n) => n.length >= 2)
+        .map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    if (names.length) t = t.replace(new RegExp(`(?<![\\p{L}])(${names.join('|')})(?![\\p{L}])`, 'giu'), '[nome omesso]');
+    return t
+        .replace(/\b[A-Za-z]{6}\d{2}[A-Za-z]\d{2}[A-Za-z]\d{3}[A-Za-z]\b/g, '[codice fiscale omesso]')
+        .replace(/(?<!\d)(\+?\d[\d\s./-]{7,}\d)(?!\d)/g, '[numero omesso]');
+};
+
 const describe = (f) => {
     let t = f.type === 'number' ? 'numero' : f.type === 'date' ? 'data AAAA-MM-GG' : f.type === 'enum' ? `uno tra: ${f.options.join(' | ')}` : 'testo';
     if (f.unit) t += ` (${f.unit})`;
@@ -34,7 +47,7 @@ const knownLines = (patient, visitDraft, fields) => {
     const out = [];
     for (const f of fields) {
         const v = f.scope === 'anagrafica' ? patient[f.key] : visitDraft[f.key];
-        if (v !== undefined && v !== null && String(v).trim() !== '') out.push(`- ${f.label}: ${v}${f.unit ? ' ' + f.unit : ''}`);
+        if (v !== undefined && v !== null && String(v).trim() !== '') out.push(`- ${f.label}: ${redactText(v, patient)}${f.unit ? ' ' + f.unit : ''}`);
     }
     return out.length ? out.join('\n') : '(nessun dato già presente)';
 };
@@ -51,7 +64,7 @@ export const buildPrompt = ({ patient, visitDraft, db, answers, questions, secti
 
     const interview = questions
         .filter((q) => (answers[q.id] || '').trim())
-        .map((q) => `D: ${q.q}\nR: ${answers[q.id].trim()}`)
+        .map((q) => `D: ${q.q}\nR: ${redactText(answers[q.id].trim(), patient)}`)
         .join('\n\n');
 
     const known = [
@@ -94,7 +107,7 @@ REGOLE (importanti):
 8. In "avvisi" segnala incongruenze, dati critici mancanti o elementi che il professionista dovrebbe verificare.
 9. Copia esattamente i campi "richiesta" e "paziente_id" nel JSON.
 
-PAZIENTE: ${patient.nome} ${patient.cognome}, ${sex}${age !== null ? `, ${age} anni` : ''}.
+PAZIENTE (anonimo): ${sex}${age !== null ? `, ${age} anni` : ''}.
 
 ${known}
 

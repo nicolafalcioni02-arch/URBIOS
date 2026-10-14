@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { DietPrintReport } from './printReport/DietPrintReport';
+import { ReportStudio } from '../../reports/studio/ReportStudio';
 import { dietCss } from './dietStyles';
 import { AnalysisModal } from './analysis/AnalysisModal';
 import { DrvEditorModal } from './modals/DrvEditorModal';
@@ -196,17 +196,7 @@ export const DietPlan = ({ patient, onUpdateDb, db }) => {
                 totalLafHours={totalLafHours}
             />
 
-            {isPrintReportOpen && (
-                <DietPrintReport
-                    patient={patientProfile}
-                    professionalData={db?.utente}
-                    dietDays={dietDays}
-                    targets={targets}
-                    savedReports={savedReports}
-                    issueDate={issueDate}
-                    onClose={() => setIsPrintReportOpen(false)}
-                />
-            )}
+            {isPrintReportOpen && <ReportStudio initial={['dieta']} patient={currentPatient} db={db} onClose={() => setIsPrintReportOpen(false)} />}
         </div>
     );
 };

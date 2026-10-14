@@ -2,6 +2,7 @@
 // Come per i menù, l'AI scrive nomi e grammi degli ingredienti: kcal e macro arrivano dal database alimenti.
 import { matchFood } from './foodMatcher';
 import { foodListText } from './dietSection';
+import { redactText } from './promptBuilder';
 
 const num = (v) => {
     const x = parseFloat(String(v ?? '').replace(',', '.'));
@@ -10,8 +11,8 @@ const num = (v) => {
 const list = (v) => (Array.isArray(v) ? v.join(', ') : v ? String(v) : '');
 
 export const buildRecipePrompt = ({ patient, foodDB, requestId, title, servings, notes, includeFoodList }) => {
-    const allergy = list(patient?.allergie);
-    const diseases = list(patient?.patologie);
+    const allergy = redactText(list(patient?.allergie), patient);
+    const diseases = redactText(list(patient?.patologie), patient);
     const template = {
         format: 'URBIOS-AI',
         version: 1,
@@ -39,8 +40,8 @@ REGOLE:
 7. Rispetta ALLERGIE e INTOLLERANZE e le richieste qui sotto. Se una richiesta è incompatibile con la ricetta, scegli la variante più sicura e segnalalo in "avvisi".
 8. Copia esattamente "richiesta" e "paziente_id".
 
-RICETTA RICHIESTA: ${title || '(a scelta, adatta al paziente)'}
-${servings ? `Porzioni desiderate: ${servings}\n` : ''}${notes ? `Richieste del professionista: ${notes}\n` : ''}${patient ? `PAZIENTE: ${patient.nome || ''} ${patient.cognome || ''}\n` : ''}${allergy ? `Allergie/intolleranze: ${allergy}\n` : ''}${diseases ? `Patologie: ${diseases}\n` : ''}
+RICETTA RICHIESTA: ${redactText(title, patient) || '(a scelta, adatta al paziente)'}
+${servings ? `Porzioni desiderate: ${servings}\n` : ''}${notes ? `Richieste del professionista: ${redactText(notes, patient)}\n` : ''}${allergy ? `Allergie/intolleranze: ${allergy}\n` : ''}${diseases ? `Patologie: ${diseases}\n` : ''}
 ${includeFoodList ? `DATABASE ALIMENTI DI URBIOS (usa PREFERIBILMENTE questi nomi, identici, per gli ingredienti):\n${foodListText(foodDB)}\n` : ''}
 FORMATO DELLA RISPOSTA:
 \`\`\`json

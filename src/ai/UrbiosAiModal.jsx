@@ -451,6 +451,9 @@ export const UrbiosAiModal = ({ patient, visitDraft, db, onClose, onApplyPatient
                                 if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') qi < askQs.length - 1 ? setQi(qi + 1) : goMeasures();
                             }}
                         />
+                        <p className="inline-flex items-center gap-1.5 text-[12px] mt-2 px-2.5 py-1 rounded-full" style={{ background: '#FBF1D9', color: '#7A5B0B' }}>
+                            <i className="ph ph-shield-warning"></i> Non scrivere nome, cognome, residenza, telefono, email o altri dati che identificano il paziente: servono solo i dati clinici.
+                        </p>
                         <p className="text-[12px] text-[color:var(--muted)] mt-2">Chiedi al paziente, poi tocca le risposte rapide e/o trascrivi quello che dice. “Avanti” senza rispondere salta la domanda. ⌘/Ctrl + Invio per proseguire.</p>
                     </div>
                 )}
@@ -482,6 +485,12 @@ export const UrbiosAiModal = ({ patient, visitDraft, db, onClose, onApplyPatient
                         <p className="text-[14.5px] text-[color:var(--muted)] mt-1">
                             {answered} risposte raccolte. Vai sul tuo agente AI preferito, incolla il testo e aspetta il risultato.
                         </p>
+                        <div className="flex items-start gap-2.5 mt-5 p-4 rounded-2xl" style={{ background: '#FBF1D9', color: '#7A5B0B' }}>
+                            <i className="ph ph-shield-warning text-lg mt-0.5"></i>
+                            <p className="text-[13.5px]">
+                                <b>Privacy (GDPR e AI Act):</b> il prompt non contiene nome, cognome, residenza né contatti del paziente: solo sesso, età e dati clinici. Non aggiungere dati identificativi quando lo incolli e usa un servizio AI con accordo sul trattamento dei dati (DPA) e senza addestramento sui tuoi dati. Il piano generato è un supporto: va sempre verificato da te prima dell’uso.
+                            </p>
+                        </div>
                         {sections.includes('dieta') && (
                             <label className="flex items-start gap-2.5 mt-5 p-4 rounded-2xl border border-[color:var(--line)] bg-white cursor-pointer">
                                 <input type="checkbox" className="mt-1 w-4 h-4" checked={dietOpts.includeFoodList} onChange={(e) => setDietOpts({ ...dietOpts, includeFoodList: e.target.checked })} />

@@ -1,13 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-
-export const LetteraIncaricoModal = ({ patient, professional, onClose }) => {
-    // Helper per evitare "undefined"
+// HTML della lettera di incarico + informativa privacy (usato da Report Studio)
+export const buildLetterHtml = ({ patient, professional }) => {
     const val = (v) => v || '____________________';
     const today = new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
-
-    const getLetterContent = () => {
-        return `
+    professional = professional || {};
+    patient = patient || {};
+    return `
                     <div style="font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.4;">
                         
                         <div style="text-align: center; margin-bottom: 30px; border-bottom: 1px solid #000; padding-bottom: 15px;">
@@ -101,33 +98,4 @@ export const LetteraIncaricoModal = ({ patient, professional, onClose }) => {
 
                     </div>
                 `;
-    };
-
-    return ReactDOM.createPortal(
-        <div className="report-overlay">
-            <div className="report-toolbar">
-                <div className="text-white text-xs font-bold mr-4 uppercase tracking-widest flex items-center gap-2">
-                    <i className="ph-fill ph-file-text"></i> Anteprima Lettera
-                </div>
-                <button className="btn-print" onClick={() => window.print()}>
-                    <i className="ph-fill ph-printer"></i> Stampa / Salva PDF
-                </button>
-                <button className="btn-close" onClick={onClose}>
-                    Chiudi
-                </button>
-            </div>
-
-            <div className="report-container">
-                <div id="report-content-wrapper">
-                    <div
-                        className="paper-sheet"
-                        contentEditable={true} // Permette piccole correzioni al volo
-                        suppressContentEditableWarning={true}
-                        dangerouslySetInnerHTML={{ __html: getLetterContent() }}
-                    ></div>
-                </div>
-            </div>
-        </div>,
-        document.body
-    );
 };

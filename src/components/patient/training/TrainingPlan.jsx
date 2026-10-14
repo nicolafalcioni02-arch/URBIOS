@@ -6,7 +6,7 @@ import { trainingCss } from './trainingStyles';
 import { useTrainingEditing } from './hooks/useTrainingEditing';
 import { useExerciseDatabase } from './hooks/useExerciseDatabase';
 import { useTrainingPersistence } from './hooks/useTrainingPersistence';
-import { TrainingPrintView } from './print/TrainingPrintView';
+import { ReportStudio } from '../../reports/studio/ReportStudio';
 import { ToolsModal } from './tools/ToolsModal';
 import { AnalysisModal } from './analysis/AnalysisModal';
 import { ProgressionModal } from './analysis/ProgressionModal';
@@ -125,7 +125,7 @@ export const TrainingPlan = ({ patient, db, onUpdateDb }) => {
             />
 
             {isPrintOpen && (
-                <TrainingPrintView header={header} weeks={weeks} exerciseDB={exerciseDB} massimali={massimali} profile={profile} professional={db && db.utente} onClose={() => setIsPrintOpen(false)} />
+                <ReportStudio initial={['training']} patient={patient} db={db} onClose={() => setIsPrintOpen(false)} />
             )}
             {isToolsOpen && <ToolsModal profile={profile} massimali={massimali} exerciseDB={exerciseDB} saveMassimale={saveMassimale} deleteMassimale={deleteMassimale} onClose={() => setIsToolsOpen(false)} />}
             {isAnalysisOpen && <AnalysisModal weeks={weeks} header={header} massimali={massimali} profile={profile} onClose={() => setIsAnalysisOpen(false)} />}

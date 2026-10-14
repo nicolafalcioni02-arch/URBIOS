@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ClinicalFolder } from '../../../components/patient/ClinicalFolder';
 import { HistoryView } from '../../../components/patient/history/HistoryView';
 import { NewVisitView } from '../../newVisit/NewVisitView';
@@ -11,6 +11,10 @@ export const PatientTabContent = ({
     db,
     dietViewMode,
     handleFinalizeVisit,
+    onDone,
+    updateDraftMany,
+    visitStart,
+    visitKey = 0,
     onUpdateDb,
     patient,
     setConfigA,
@@ -20,18 +24,30 @@ export const PatientTabContent = ({
     updatePatientInfo,
     view,
     visitDraft,
+    widgetsPad = false,
 }) => {
+    // Nuova visita, una volta aperta, resta montata (solo nascosta): cambiare scheda per guardare lo storico non fa perdere il lavoro
+    const [visitOpened, setVisitOpened] = useState(view === 'visit');
+    useEffect(() => {
+        if (view === 'visit') setVisitOpened(true);
+    }, [view]);
+
     return (
-        <div className={`flex-1 overflow-y-auto relative ${['visit', 'diet', 'Allenamento'].includes(view) ? '' : 'p-4 md:p-8'}`}>
+        <div className={`flex-1 overflow-y-auto relative ${['visit', 'diet', 'Allenamento'].includes(view) ? '' : 'p-4 md:p-8'} ${widgetsPad ? 'wd-padded' : ''}`}>
             {view === 'info' && <ClinicalFolder patient={patient} updatePatientInfo={updatePatientInfo} professionalData={db.utente} />}
 
             {view === 'history' && <HistoryView patient={patient} onUpdateDb={onUpdateDb} />}
 
-            {view === 'visit' && (
+            {(visitOpened || view === 'visit') && (
+                <div hidden={view !== 'visit'} className="h-full">
                 <NewVisitView
+                    key={visitKey}
+                    initialMode={visitStart}
+                    updateDraftMany={updateDraftMany}
                     patient={patient}
                     visitDraft={visitDraft}
                     updateDraft={updateDraft}
+                    updatePatientInfo={updatePatientInfo}
                     handleFinalizeVisit={handleFinalizeVisit}
                     configA={configA}
                     setConfigA={setConfigA}
@@ -39,7 +55,9 @@ export const PatientTabContent = ({
                     setConfigB={setConfigB}
                     db={db}
                     onUpdateDb={onUpdateDb}
+                    onDone={onDone}
                 />
+                </div>
             )}
 
             {/* --- ECCO IL BLOCCO ALLENAMENTO REINSERITO --- */}

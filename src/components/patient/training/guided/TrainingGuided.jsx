@@ -8,6 +8,7 @@ import { ProgramStep } from './ProgramStep';
 import { DeliverStep } from './DeliverStep';
 import { PlanPanel } from './PlanPanel';
 import { BookModal } from './BookModal';
+import { MeasuresModal } from '../../MeasuresModal';
 import { HelpModal } from './HelpModal';
 import { goalShort, levelShort, schedaLabel } from './trainingGuidedLogic';
 
@@ -60,6 +61,7 @@ export const TrainingGuided = ({
     const [step, setStep] = useState(blank ? 'setup' : 'program');
     const [planOpen, setPlanOpen] = useState(false);
     const [bookOpen, setBookOpen] = useState(false);
+    const [measuresOpen, setMeasuresOpen] = useState(false);
     const [helpOpen, setHelpOpen] = useState(false);
 
     // cambiando scheda si riparte dal passo giusto
@@ -102,6 +104,7 @@ export const TrainingGuided = ({
                 kicker="Scheda di allenamento"
                 plan={{ label: schedaLabel(header), status: st, onClick: () => setPlanOpen(true), title: 'Nome, data e stato della scheda; altre schede del paziente', icon: 'ph-barbell' }}
                 tools={[
+                    { label: 'Misure', icon: 'ph-ruler', onClick: () => setMeasuresOpen(true), title: 'Le misure del paziente registrate in archivio' },
                     { label: 'Libro schede', icon: 'ph-books', onClick: () => setBookOpen(true), title: 'Le schede già fatte, da riusare' },
                     { label: 'Aiuto AI', icon: 'ph-sparkle', onClick: () => setHelpOpen(true), primary: true, title: "Fatti aiutare dall'intelligenza artificiale" },
                 ]}
@@ -138,6 +141,7 @@ export const TrainingGuided = ({
             {planOpen && (
                 <PlanPanel patient={patient} schedaId={schedaId} header={header} setHeader={setHeader} weeks={weeks} onOpen={openScheda} onNew={newScheda} onDuplicate={duplicateScheda} onDelete={deleteScheda} onClose={() => setPlanOpen(false)} />
             )}
+            {measuresOpen && <MeasuresModal patient={patient} onClose={() => setMeasuresOpen(false)} />}
             {bookOpen && <BookModal patient={patient} header={header} weeks={weeks} book={book} setBook={setBook} setWeeks={setWeeks} loadScheda={loadScheda} onClose={() => setBookOpen(false)} />}
             {helpOpen && <HelpModal patient={patient} db={db} header={header} weeks={weeks} massimali={massimali} profile={profile} exerciseDB={exerciseDB} onApply={applyAi} onClose={() => setHelpOpen(false)} />}
         </div>

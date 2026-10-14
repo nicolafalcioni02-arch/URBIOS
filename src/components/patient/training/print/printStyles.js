@@ -1,17 +1,8 @@
 // CSS della stampa della scheda di allenamento (A4). Il browser fa l'impaginazione: le righe non si spezzano,
 // l'intestazione della tabella si ripete su ogni pagina, ogni giorno può iniziare su una pagina nuova.
-export const trainingPrintCss = `
-.tp-overlay { position: fixed; inset: 0; z-index: 30000; background: #323639; display: flex; flex-direction: column;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-.tp-toolbar { background: #1D1D1F; color: #fff; padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; font-size: 13px; }
-.tp-toolbar label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
-.tp-toolbar select { background: #2c2c2e; color: #fff; border: 1px solid #555; border-radius: 8px; padding: 6px 8px; font-size: 13px; }
-.tp-toolbar .tp-btn { border: none; border-radius: 10px; padding: 9px 16px; font-weight: 700; font-size: 13px; cursor: pointer; }
-.tp-btn.main { background: #0A84FF; color: #fff; } .tp-btn.alt { background: #fff; color: #111; }
-.tp-scroll { flex: 1; overflow: auto; padding: 24px 12px 60px; }
-.tp-doc { width: 210mm; max-width: 100%; margin: 0 auto; background: #fff; color: #111; padding: 12mm; box-sizing: border-box;
-  box-shadow: 0 10px 30px rgba(0,0,0,.45); font-size: 10pt; line-height: 1.35; }
-.tp-doc * { box-sizing: border-box; }
+
+// stile del solo documento (tabelle, intestazioni): riusato anche da Report Studio
+export const trainingDocCss = `
 .tp-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12mm; padding-bottom: 5mm; border-bottom: 2px solid #111; margin-bottom: 6mm; }
 .tp-studio-name { font-size: 17pt; font-weight: 800; text-transform: uppercase; letter-spacing: -.3px; line-height: 1.05; }
 .tp-studio-sub { font-size: 8pt; text-transform: uppercase; letter-spacing: 1.6px; color: #666; margin-top: 1.5mm; }
@@ -50,6 +41,21 @@ export const trainingPrintCss = `
 .tp-empty { color: #aaa; }
 .tp-newpage { border-top: 2px dashed #b9b9b9; padding-top: 6mm; margin-top: 10mm; }
 .tp-newpage::before { content: 'nuova pagina'; display: block; font-size: 7pt; text-transform: uppercase; letter-spacing: 1.5px; color: #aaa; margin: -9mm 0 4mm; text-align: right; }
+`;
+
+export const trainingPrintCss = `
+.tp-overlay { position: fixed; inset: 0; z-index: 30000; background: #323639; display: flex; flex-direction: column;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+.tp-toolbar { background: #1D1D1F; color: #fff; padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; font-size: 13px; }
+.tp-toolbar label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.tp-toolbar select { background: #2c2c2e; color: #fff; border: 1px solid #555; border-radius: 8px; padding: 6px 8px; font-size: 13px; }
+.tp-toolbar .tp-btn { border: none; border-radius: 10px; padding: 9px 16px; font-weight: 700; font-size: 13px; cursor: pointer; }
+.tp-btn.main { background: #0A84FF; color: #fff; } .tp-btn.alt { background: #fff; color: #111; }
+.tp-scroll { flex: 1; overflow: auto; padding: 24px 12px 60px; }
+.tp-doc { width: 210mm; max-width: 100%; margin: 0 auto; background: #fff; color: #111; padding: 12mm; box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45); font-size: 10pt; line-height: 1.35; }
+.tp-doc * { box-sizing: border-box; }
+${trainingDocCss}
 body.tp-open { overflow: hidden; }
 
 @media print {

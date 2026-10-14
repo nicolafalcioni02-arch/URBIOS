@@ -6,6 +6,7 @@ import { DietHelpModal } from './DietHelpModal';
 import { RecipeModal } from './RecipeModal';
 import { PlanLinkModal } from './PlanLinkModal';
 import { DietBookModal } from './DietBookModal';
+import { MeasuresModal } from '../../MeasuresModal';
 import { addItems, makeIndependentVisit, planLabel, statusOf, todayIso } from './guidedLogic';
 import { guidedCss } from './guidedStyles';
 import { GuidedHead, GuidedSteps, StepTitle, stepDir } from '../../shared/GuidedParts';
@@ -62,6 +63,7 @@ export const DietGuided = ({
     const [recipeFor, setRecipeFor] = useState(null); // { dayId, mealId }
     const [planOpen, setPlanOpen] = useState(false);
     const [bookOpen, setBookOpen] = useState(false);
+    const [measuresOpen, setMeasuresOpen] = useState(false);
     const [newDate, setNewDate] = useState(todayIso());
     const [newNoDate, setNewNoDate] = useState(false);
 
@@ -151,6 +153,7 @@ export const DietGuided = ({
                 kicker="Piano alimentare"
                 plan={visitaAttiva ? { label: planLabel(visitaAttiva), status: st, onClick: () => setPlanOpen(true), title: 'Nome, data, stato e collegamento del piano' } : null}
                 tools={[
+                    { label: 'Misure', icon: 'ph-ruler', onClick: () => setMeasuresOpen(true), title: 'Le misure del paziente registrate in archivio' },
                     { label: 'Libro diete', icon: 'ph-books', onClick: () => setBookOpen(true), title: 'Le diete già fatte, da riusare' },
                     { label: 'Aiuto AI', icon: 'ph-sparkle', onClick: () => setHelpOpen(true), primary: true, title: "Fatti aiutare dall'intelligenza artificiale" },
                 ]}
@@ -271,6 +274,7 @@ export const DietGuided = ({
                     onClose={() => setPlanOpen(false)}
                 />
             )}
+            {measuresOpen && <MeasuresModal patient={patient} onClose={() => setMeasuresOpen(false)} />}
             {bookOpen && (
                 <DietBookModal
                     patient={patient}

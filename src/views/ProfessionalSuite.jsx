@@ -3,6 +3,9 @@ import { SettingsModal } from './settings/SettingsModal';
 import { PatientDetail } from './patientDetail/PatientDetail';
 import { StudentMode } from './StudentMode';
 import { useArchive } from '../storage/ArchiveProvider';
+import { WidgetDock } from '../components/widgets/WidgetDock';
+import { AgendaView } from './agenda/AgendaView';
+import { dateKey, isActive, sameDay, startOf } from '../components/agenda/agendaLogic';
 
 export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const [selectedPatientId, setSelectedPatientId] = useState(null);
@@ -10,6 +13,8 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const [studentMode, setStudentMode] = useState(false);
     const [adding, setAdding] = useState(false);
     const [petsOpen, setPetsOpen] = useState(false);
+    const [widgetsEditing, setWidgetsEditing] = useState(false);
+    const [agenda, setAgenda] = useState(null); // null = chiusa, altrimenti { date, open?, newAppt? }
     const [query, setQuery] = useState('');
     const [form, setForm] = useState({ nome: '', cognome: '', sesso: 'M' });
     const { dirty, ephemeral, saveFile, openExitDialog } = useArchive();
@@ -49,18 +54,49 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
         return <StudentMode onExit={() => setStudentMode(false)} db={data} />;
     }
 
+    const agendaView = agenda && (
+        <>
+            {showSettings && <SettingsModal db={data} onUpdateDb={onUpdateDb} onClose={() => setShowSettings(false)} />}
+            <div className={selectedPatient ? 'fixed inset-0 z-[60] bg-[var(--paper)]' : 'h-full'}>
+                <AgendaView
+                    key={`${agenda.date}-${agenda.open || ''}-${agenda.newAppt ? 'n' : ''}`}
+                    db={data}
+                    onUpdateDb={onUpdateDb}
+                    initial={agenda}
+                    onBack={() => setAgenda(null)}
+                    onOpenPatient={(id) => {
+                        setAgenda(null);
+                        setSelectedPatientId(id);
+                    }}
+                    onOpenSettings={() => setShowSettings(true)}
+                />
+            </div>
+        </>
+    );
+
     if (selectedPatientId && selectedPatient) {
-        return <PatientDetail patient={selectedPatient} onBack={() => setSelectedPatientId(null)} onUpdateDb={onUpdateDb} db={data} />;
+        // la scheda resta montata sotto l'agenda: la visita in corso non si perde
+        return (
+            <>
+                <PatientDetail key={selectedPatient.id} patient={selectedPatient} onBack={() => setSelectedPatientId(null)} onUpdateDb={onUpdateDb} db={data} onOpenAgenda={(o) => setAgenda({ date: dateKey(new Date()), ...o })} />
+                {agendaView}
+            </>
+        );
     }
+    if (agenda) return agendaView;
 
     // --- SCHERMATA PRINCIPALE ---
     const q = query.trim().toLowerCase();
     const list = q ? data.pazienti.filter((p) => `${p.nome} ${p.cognome} ${p.id}`.toLowerCase().includes(q)) : data.pazienti;
+    const todayAppts = (data.agenda || []).filter((a) => isActive(a) && sameDay(startOf(a), new Date())).length;
     const lastVisit = (p) => (p.visite.length ? new Date(p.visite[0].data).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Nessuna visita');
 
     return (
         <div className="h-full w-full bg-[var(--paper)] overflow-y-auto font-sans">
             {showSettings && <SettingsModal db={data} onUpdateDb={onUpdateDb} onClose={() => setShowSettings(false)} />}
+
+            {/* Scrivania laterale: solo desktop largo (il componente si nasconde da solo su schermi più piccoli) */}
+            <WidgetDock db={data} onUpdateDb={onUpdateDb} editing={widgetsEditing} onEditingChange={setWidgetsEditing} onOpenAgenda={(o) => setAgenda({ date: dateKey(new Date()), ...o })} />
 
             <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-6 sm:pt-12 pb-24">
                 {/* Barra alta: marchio a sinistra, azioni secondarie a destra */}
@@ -70,6 +106,15 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                         <button onClick={() => setStudentMode(true)} className="home-quiet" title="Casi dimostrativi per esercitarsi">
                             <i className="ph ph-student"></i>
                             <span className="hidden sm:inline">Modalità Student</span>
+                        </button>
+                        <button onClick={() => setAgenda({ date: dateKey(new Date()) })} className="home-quiet" title="Agenda e appuntamenti">
+                            <i className="ph ph-calendar-dots"></i>
+                            <span className="hidden sm:inline">Agenda</span>
+                            {todayAppts > 0 && <span className="pets-soon">{todayAppts}</span>}
+                        </button>
+                        <button onClick={() => setWidgetsEditing((v) => !v)} className="home-quiet max-[1359px]:!hidden" title="Modifica i widget laterali (tieni premuto su un widget per fare lo stesso)">
+                            <i className={`ph ${widgetsEditing ? 'ph-check' : 'ph-squares-four'}`}></i>
+                            <span>{widgetsEditing ? 'Fine' : 'Widget'}</span>
                         </button>
                         <button onClick={() => setPetsOpen(true)} className="home-quiet" title="Pets: in arrivo">
                             <i className="ph ph-dog"></i>
