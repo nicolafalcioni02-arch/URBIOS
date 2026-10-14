@@ -103,7 +103,7 @@ export const DietPlan = ({ patient, onUpdateDb, db }) => {
     })();
 
     return (
-        <div className="d-root">
+        <div className="d-root dg-page">
             <style>{dietCss}</style>
 
             <DietGuided

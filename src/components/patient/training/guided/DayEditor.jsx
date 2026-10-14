@@ -28,7 +28,7 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
     return (
         <div>
             {/* riepilogo del giorno */}
-            <div className="dg-sticky" style={{ top: 0 }}>
+            <div className="dg-sticky">
                 {A.trains ? (
                     <div className="flex gap-2 flex-wrap">
                         <Stat k="Serie di lavoro" v={A.workSets} hint="Riscaldamento escluso" />

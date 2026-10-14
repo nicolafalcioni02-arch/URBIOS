@@ -1,4 +1,5 @@
 import React from 'react';
+import { confetti } from '../../shared/fx';
 import { STATUSES, dayStatus, dayTotals, setPlanStatus, statusOf } from './guidedLogic';
 
 // Passo 3 — Consegna: controllo finale, poi stampa, analisi e stato del piano.
@@ -24,7 +25,6 @@ export const DeliverStep = ({ patient, targets, dietDays, visitaAttiva, onUpdate
 
     return (
         <div className="max-w-3xl mx-auto dg-in">
-            <h2 className="dg-h">Ultimo controllo</h2>
             <p className="dg-sub">{problems === 0 ? 'Tutto in ordine: puoi consegnare il piano.' : `${problems} ${problems === 1 ? 'giorno merita' : 'giorni meritano'} un’occhiata prima della consegna.`}</p>
 
             <section className="dg-card">
@@ -86,7 +86,7 @@ export const DeliverStep = ({ patient, targets, dietDays, visitaAttiva, onUpdate
                     {STATUSES.filter((x) => x.id !== 'active' || statusOf(visitaAttiva).id === 'active').map((x) => {
                         const on = statusOf(visitaAttiva).id === x.id;
                         return (
-                            <button key={x.id} className="dg-mini !h-9 !text-[13px]" style={on ? { background: x.color, color: '#fff', borderColor: x.color } : undefined} onClick={() => setPlanStatus(onUpdateDb, patient.id, visitaAttiva.id, x.id)}>
+                            <button key={x.id} className="dg-mini !h-9 !text-[13px]" style={on ? { background: x.color, color: '#fff', borderColor: x.color } : undefined} onClick={(e) => { setPlanStatus(onUpdateDb, patient.id, visitaAttiva.id, x.id); if (x.id === 'delivery') confetti(e.currentTarget); }}>
                                 <i className={`ph ${x.icon}`}></i> {x.label}
                             </button>
                         );

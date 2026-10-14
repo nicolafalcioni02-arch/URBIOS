@@ -35,9 +35,6 @@ export const SetupStep = ({ header, setHeader, weeks, setWeeks, onDone }) => {
 
     return (
         <div className="max-w-3xl mx-auto dg-in">
-            <h2 className="dg-h">Partiamo dall’obiettivo</h2>
-            <p className="dg-sub">Poche scelte: poi ti preparo la struttura della scheda. {!blank && 'Puoi sempre cambiare le risposte.'}</p>
-
             <section className="dg-card">
                 <p className="dg-q">1 · Come si chiama la scheda?</p>
                 <input className="fld" placeholder="Es. Mesociclo 1, Ipertrofia estate…" value={header.titolo} onChange={(e) => set({ titolo: e.target.value })} />
@@ -112,7 +109,7 @@ export const SetupStep = ({ header, setHeader, weeks, setWeeks, onDone }) => {
                 <p className="dg-hint">Serve a stimare la durata delle sedute.</p>
             </details>
 
-            <div className="flex justify-end mt-6">
+            <div className="dg-foot">
                 <button className="vw-next" disabled={!ready} onClick={confirm} style={!ready ? { opacity: 0.4, pointerEvents: 'none' } : undefined}>
                     {blank ? 'Crea la scheda' : 'Conferma e torna alla scheda'} <i className="ph ph-arrow-right"></i>
                 </button>

@@ -22,7 +22,7 @@ export const PatientTabContent = ({
     visitDraft,
 }) => {
     return (
-        <div className={`flex-1 overflow-y-auto relative ${view === 'visit' ? '' : 'p-4 md:p-8'}`}>
+        <div className={`flex-1 overflow-y-auto relative ${['visit', 'diet', 'Allenamento'].includes(view) ? '' : 'p-4 md:p-8'}`}>
             {view === 'info' && <ClinicalFolder patient={patient} updatePatientInfo={updatePatientInfo} professionalData={db.utente} />}
 
             {view === 'history' && <HistoryView patient={patient} onUpdateDb={onUpdateDb} />}
@@ -44,23 +44,10 @@ export const PatientTabContent = ({
 
             {/* --- ECCO IL BLOCCO ALLENAMENTO REINSERITO --- */}
             {view === 'Allenamento' && (
-                <div className="bg-white min-h-[80vh] rounded-xl overflow-hidden shadow-sm border border-gray-200">
-                    <TrainingPlan patient={patient} onUpdateDb={onUpdateDb} db={db} />
-                </div>
+                <TrainingPlan patient={patient} onUpdateDb={onUpdateDb} db={db} />
             )}
 
-            {view === 'diet' && (
-                <div className="bg-white min-h-[80vh] rounded-xl overflow-hidden shadow-sm border border-gray-200">
-                    <DietPlan
-                        patient={patient}
-                        onUpdateDb={onUpdateDb}
-                        db={db}
-                        // Queste sono le due props che il figlio si aspetta:
-                        dietViewMode={dietViewMode}
-                        setDietViewMode={setDietViewMode}
-                    />
-                </div>
-            )}
+            {view === 'diet' && <DietPlan patient={patient} onUpdateDb={onUpdateDb} db={db} />}
         </div>
     );
 };

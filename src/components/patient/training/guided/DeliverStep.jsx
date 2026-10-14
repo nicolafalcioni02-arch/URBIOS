@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { analyzeScheda } from '../logic/analysis';
 import { STATUSES, statusById } from '../../shared/planCommon';
+import { confetti } from '../../shared/fx';
 
 // Passo 3 — Consegna: controllo finale (avvisi di programmazione), stato della scheda, stampa.
 
@@ -25,7 +26,6 @@ export const DeliverStep = ({ weeks, header, setHeader, massimali, profile, onPr
 
     return (
         <div className="max-w-3xl mx-auto dg-in">
-            <h2 className="dg-h">Ultimo controllo</h2>
             <p className="dg-sub">{problems === 0 ? 'Tutto in ordine: puoi consegnare la scheda.' : `${problems} ${problems === 1 ? 'cosa merita' : 'cose meritano'} un’occhiata prima della consegna.`}</p>
 
             <section className="dg-card">
@@ -80,7 +80,7 @@ export const DeliverStep = ({ weeks, header, setHeader, massimali, profile, onPr
                 <p className="dg-q">Stato della scheda</p>
                 <div className="flex gap-1.5 flex-wrap">
                     {STATUSES.filter((x) => x.id !== 'active' || st.id === 'active').map((x) => (
-                        <button key={x.id} className="dg-mini !h-9 !text-[13px]" style={st.id === x.id ? { background: x.color, color: '#fff', borderColor: x.color } : undefined} onClick={() => setHeader({ ...header, stato: x.id })}>
+                        <button key={x.id} className="dg-mini !h-9 !text-[13px]" style={st.id === x.id ? { background: x.color, color: '#fff', borderColor: x.color } : undefined} onClick={(e) => { setHeader({ ...header, stato: x.id }); if (x.id === 'delivery') confetti(e.currentTarget); }}>
                             <i className={`ph ${x.icon}`}></i> {x.label}
                         </button>
                     ))}

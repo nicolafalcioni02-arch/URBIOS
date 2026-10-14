@@ -1,10 +1,17 @@
 // Stili della Dieta guidata (iniettati, con prefisso dg- per non toccare il resto).
 // Le classi uai-* servono al pannello di verifica dell'AI (DietReview) quando compare qui dentro.
 export const guidedCss = `
-.dg-root { box-sizing: border-box; padding: 16px 16px 0; flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); text-align: left; overflow: hidden; }
+.dg-root { box-sizing: border-box; width: 100%; max-width: 64rem; margin: 0 auto; padding: 14px 16px 90px; color: var(--ink); text-align: left; overflow-x: clip; }
+@media (min-width: 768px) { .dg-root { padding: 22px 32px 100px; } }
+/* i contenitori storici (.d-root / .t-root) non devono più fare da scatola */
+.d-root.dg-page, .t-root.dg-page { display: block; height: auto; min-height: 0; overflow: visible; margin: 0; width: 100%; background: transparent; }
 
 /* testata */
-.dg-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 14px 20px 10px; }
+.dg-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; animation: rise .5s var(--ease) backwards; }
+.dg-orb { position: relative; flex: none; width: 52px; height: 52px; }
+.dg-orb > div { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; background: #fff; box-shadow: 0 6px 18px rgba(18,19,23,.10); transition: transform .8s var(--ease); }
+.dg-headmain { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.dg-kicker { font-size: 13px; color: var(--muted); line-height: 1.2; }
 .dg-planbtn { display: inline-flex; align-items: center; gap: 9px; max-width: 100%; min-height: 42px; padding: 0 16px; border-radius: 16px; border: 1px solid var(--line); background: #fff; font-size: 14.5px; font-weight: 600; cursor: pointer; transition: all .2s; text-align: left; }
 .dg-planbtn:hover { border-color: var(--ink); }
 .dg-planbtn > i:first-child { font-size: 19px; flex: none; }
@@ -16,22 +23,26 @@ export const guidedCss = `
 .dg-tool i { font-size: 18px; }
 .dg-tool.ai { background: var(--ink); color: #fff; border-color: var(--ink); }
 /* i tre passi */
-.dg-stepbar { flex: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; box-sizing: border-box; padding: 4px 20px 14px; border-bottom: 1px solid var(--line); }
+.dg-stepbar { position: sticky; top: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 -16px; padding: 8px 16px 14px; background: color-mix(in srgb, var(--paper) 86%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); animation: rise .55s var(--ease) .05s backwards; }
+@media (min-width: 768px) { .dg-stepbar { margin: 0 -32px; padding: 8px 32px 14px; } }
+.dg-prog { grid-column: 1 / -1; height: 3px; border-radius: 99px; background: var(--soft); overflow: hidden; }
+.dg-prog > i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--ink), #5b5f6b, var(--ok)); background-size: 200% 100%; animation: dgShim 3s linear infinite; transition: width .8s var(--ease); }
+@keyframes dgShim { to { background-position: -200% 0; } }
 .dg-step { display: flex; align-items: center; gap: 11px; min-width: 0; padding: 9px 14px; border-radius: 18px; border: 1px solid var(--line); background: #fff; text-align: left; cursor: pointer; transition: all .25s var(--ease, ease); }
-.dg-step:hover { border-color: var(--ink); }
+.dg-step:hover { border-color: var(--ink); transform: translateY(-1px); }
 .dg-step b { display: block; font-size: 14.5px; line-height: 1.2; }
 .dg-step small { display: block; font-size: 12px; font-weight: 500; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dg-step.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.dg-step.on { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: 0 10px 26px rgba(18,19,23,.22); }
 .dg-step.on small { color: rgba(255,255,255,.7); }
 .dg-step.locked { opacity: .55; }
 .dg-dot { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: var(--soft); flex: none; }
 .dg-step.on .dg-dot { background: #fff; color: var(--ink); }
-.dg-step .dg-dot i { color: var(--ok); }
+.dg-step .dg-dot i { color: var(--ok); animation: pop .45s var(--ease) backwards; }
 /* strumenti del passo */
 .dg-toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
 .dg-sm { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 13px; border-radius: 999px; border: 1px solid transparent; background: var(--soft); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; }
 .dg-sm:hover { border-color: var(--ink); }
-.dg-body { flex: 1; overflow-y: auto; padding: 24px 20px 48px; }
+.dg-body { padding: 8px 0 24px; }
 .dg-stat { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; flex: none; }
 .dg-in, .uai-in { animation: dgIn .4s var(--ease, ease) both; }
 @keyframes dgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -50,7 +61,7 @@ export const guidedCss = `
 .dg-result { margin-top: 20px; padding: 22px; border-radius: 24px; background: var(--ink); color: #fff; }
 .dg-bar, .uai-bar { height: 6px; border-radius: 99px; background: var(--soft); overflow: hidden; }
 .dg-bar > i, .uai-bar > i { display: block; height: 100%; border-radius: 99px; background: var(--ink); transition: width .4s var(--ease, ease); }
-.dg-sticky { position: sticky; top: -24px; z-index: 5; margin-top: 12px; padding: 16px 18px; border-radius: 22px; background: color-mix(in srgb, #fff 94%, transparent); backdrop-filter: blur(10px); border: 1px solid var(--line); box-shadow: 0 8px 24px rgba(18,19,23,.06); }
+.dg-sticky { position: sticky; top: var(--dg-sticky-top, 82px); z-index: 5; margin-top: 12px; padding: 16px 18px; border-radius: 22px; background: color-mix(in srgb, #fff 94%, transparent); backdrop-filter: blur(10px); border: 1px solid var(--line); box-shadow: 0 8px 24px rgba(18,19,23,.06); }
 .dg-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .dg-row:last-child { border-bottom: 0; }
 .dg-stepper { display: inline-flex; align-items: center; gap: 4px; background: var(--soft); border-radius: 999px; padding: 3px; flex: none; }
@@ -67,8 +78,8 @@ export const guidedCss = `
 .dg-ghost.has { color: var(--ink); }
 .dg-ghost em { position: absolute; top: 2px; right: 0; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px; background: var(--ink); color: #fff; font-size: 10px; font-style: normal; font-weight: 700; display: grid; place-items: center; }
 .dg-subs { margin: 2px 0 8px; padding: 14px; border-radius: 18px; background: #FBFAF8; border: 1px solid var(--line); }
-.dg-sub { padding: 10px 0; border-bottom: 1px solid var(--line); }
-.dg-sub:last-of-type { border-bottom: 0; }
+.dg-subrow { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.dg-subrow:last-of-type { border-bottom: 0; }
 .dg-mini { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 11px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all .2s; }
 .dg-mini:hover { border-color: var(--ink); }
 .dg-mini.on { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -92,6 +103,39 @@ export const guidedCss = `
 .dg-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-end; justify-content: center; background: rgba(18,19,23,.45); backdrop-filter: blur(6px); }
 .dg-modal { width: 100%; max-width: 48rem; height: 100dvh; display: flex; flex-direction: column; background: var(--paper); overflow: hidden; }
 @media (min-width: 640px) { .dg-overlay { align-items: center; padding: 24px; } .dg-modal { height: 88vh; border-radius: 28px; box-shadow: 0 30px 80px rgba(0,0,0,.3); } }
-@media (max-width: 899px) { .dg-root { padding: 0; height: auto; min-height: 70vh; overflow: visible; } .dg-body { overflow: visible; padding: 18px 14px 40px; } .dg-head { padding: 12px 14px 8px; } .dg-stepbar { padding: 4px 14px 12px; } }
-@media (max-width: 560px) { .dg-tool { padding: 0 13px; height: 40px; font-size: 13px; } .dg-planbtn { width: 100%; } .dg-tools { width: 100%; } .dg-tools .dg-tool { flex: 1; justify-content: center; } .dg-step { padding: 8px 9px; gap: 7px; } .dg-step b { font-size: 13px; } .dg-step small { font-size: 11px; } .dg-dot { width: 24px; height: 24px; font-size: 12px; } .dg-h { font-size: 24px; } .dg-sticky { top: 0; } }
+@media (max-width: 899px) { .dg-body { padding-top: 4px; } }
+@media (max-width: 560px) { .dg-tool { padding: 0 13px; height: 40px; font-size: 13px; } .dg-planbtn { width: 100%; } .dg-tools { width: 100%; } .dg-tools .dg-tool { flex: 1; justify-content: center; } .dg-step { padding: 8px 9px; gap: 7px; } .dg-step b { font-size: 13px; } .dg-step small { font-size: 11px; } .dg-dot { width: 24px; height: 24px; font-size: 12px; } .dg-h { font-size: 24px; }  }
+
+@media (max-width: 560px) { .dg-root { --dg-sticky-top: 72px; } }
+/* titolo del passo (stesso stile di "Nuova visita") */
+.dg-title { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 32px; line-height: 1.05; color: var(--ink); margin: 4px 0 0; }
+@media (min-width: 640px) { .dg-title { font-size: 38px; } }
+.dg-hint2 { font-size: 14px; color: var(--muted); margin: 6px 0 18px; max-width: 36rem; }
+.dg-fwd { animation: dgFwd .5s var(--ease) backwards; }
+.dg-back { animation: dgBack .5s var(--ease) backwards; }
+@keyframes dgFwd { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+@keyframes dgBack { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
+/* le carte salgono una dopo l'altra */
+.dg-body .dg-card, .dg-body .dg-result, .dg-body .dg-sticky { animation: rise .6s var(--ease) backwards; }
+.dg-body .dg-card:nth-of-type(2) { animation-delay: .05s; }
+.dg-body .dg-card:nth-of-type(3) { animation-delay: .1s; }
+.dg-body .dg-card:nth-of-type(4) { animation-delay: .15s; }
+.dg-body .dg-card:nth-of-type(5) { animation-delay: .2s; }
+.dg-body .dg-card:nth-of-type(n+6) { animation-delay: .25s; }
+.dg-chip.on, .dg-mini.on { animation: pop .38s var(--ease); }
+.dg-card { transition: box-shadow .35s var(--ease), transform .35s var(--ease); }
+.dg-card:hover { box-shadow: 0 14px 34px rgba(18,19,23,.07); }
+.dg-action:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(18,19,23,.10); }
+.dg-action { transition: all .3s var(--ease); }
+.dg-result { position: relative; overflow: hidden; }
+.dg-result::after { content: ''; position: absolute; inset: -40% -20% auto auto; width: 70%; height: 140%; background: radial-gradient(closest-side, rgba(255,255,255,.16), transparent); pointer-events: none; animation: dgGlow 7s ease-in-out infinite; }
+@keyframes dgGlow { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-12%, 8%); } }
+/* barra Indietro / Avanti sempre sotto il pollice, come in "Nuova visita" */
+.dg-foot { position: sticky; bottom: 0; z-index: 25; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 28px -16px 0; padding: 12px 16px max(12px, env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+@media (min-width: 768px) { .dg-foot { margin: 28px -32px 0; padding: 12px 32px; } }
+.dg-foot .vw-next { margin-left: auto; }
+/* coriandoli della consegna */
+.dg-confetti { position: fixed; z-index: 99999; width: 8px; height: 8px; border-radius: 2px; pointer-events: none; animation: dgConf .95s cubic-bezier(.2,.8,.3,1) forwards; }
+@keyframes dgConf { 0% { transform: translate(0,0) rotate(0); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .dg-root *, .dg-confetti { animation: none !important; transition: none !important; } }
 `;

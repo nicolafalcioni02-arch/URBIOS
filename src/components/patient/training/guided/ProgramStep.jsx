@@ -195,7 +195,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                 </section>
             )}
 
-            <div className="flex justify-between items-center mt-8">
+            <div className="dg-foot">
                 <button className="vw-back" onClick={onSetup}>
                     <i className="ph ph-arrow-left"></i> Obiettivo
                 </button>

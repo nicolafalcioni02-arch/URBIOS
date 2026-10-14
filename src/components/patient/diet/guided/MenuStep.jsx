@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { buildIndex, foodValues, searchFoods } from '../../../../ai/foodMatcher';
+import { CountUp } from '../../shared/fx';
 import { addFood, addSub, removeSub, setSubMode, suggestSubs, swapSub, SUB_MODES, dayStatus, dayTotals, duplicateDay, macroGrams, mealKcal, newDay, removeItem, scaleDayTo, setGrams } from './guidedLogic';
 
 // Passo 2 — Menù: giorni, pasti e alimenti si modificano sul posto. In alto, sempre visibile, l'andamento rispetto all'obiettivo.
@@ -60,7 +61,7 @@ const SubsPanel = ({ item, day, meal, foodDB, index, update }) => {
             <p className="text-[12px] font-semibold tracking-wider uppercase text-[color:var(--muted)] mb-2">Alternative a {item.name}</p>
             {subs.length === 0 && <p className="text-[13px] text-[color:var(--muted)] mb-2">Nessuna alternativa. Scegline una qui sotto o cercala.</p>}
             {subs.map((s) => (
-                <div key={s.id} className="dg-sub">
+                <div key={s.id} className="dg-subrow">
                     <div className="flex items-center gap-2">
                         <div className="flex-1 min-w-0">
                             <p className="text-[14px] font-medium break-words">{s.name}</p>
@@ -245,7 +246,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
             <div className="dg-sticky">
                 <div className="flex items-baseline justify-between gap-3 flex-wrap">
                     <p className="text-[26px] font-semibold leading-none">
-                        {Math.round(tot.kcal)} <span className="text-[14px] font-medium text-[color:var(--muted)]">{tdee ? `/ ${tdee} kcal` : 'kcal'}</span>
+                        <CountUp value={tot.kcal} duration={450} /> <span className="text-[14px] font-medium text-[color:var(--muted)]">{tdee ? `/ ${tdee} kcal` : 'kcal'}</span>
                     </p>
                     {st.label && (
                         <span className="text-[12.5px] font-semibold px-2.5 py-1 rounded-full" style={{ background: st.id === 'ok' ? '#DCE9E1' : st.id === 'off' ? '#FDECEA' : 'var(--soft)', color: st.color }}>
@@ -370,7 +371,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
                 )}
             </div>
 
-            <div className="flex justify-between items-center mt-8">
+            <div className="dg-foot">
                 <button className="vw-back" onClick={onGoals}>
                     <i className="ph ph-arrow-left"></i> Obiettivi
                 </button>

@@ -93,10 +93,8 @@ export const TrainingPlan = ({ patient, db, onUpdateDb }) => {
     const ops = { ...editing, updateSetFieldValue, saveMassimale, openPhotos: (ex) => setPhotosFor(ex) };
 
     return (
-        <div className="t-root">
+        <div className="t-root dg-page">
             <style>{trainingCss}</style>
-            {/* la schermata guidata scorre al suo interno, con testata e passi sempre in vista (su schermi grandi) */}
-            <style>{`@media (min-width: 901px) { .t-root { height: 88vh; overflow: hidden; } }`}</style>
 
             <TrainingGuided
                 patient={patient}

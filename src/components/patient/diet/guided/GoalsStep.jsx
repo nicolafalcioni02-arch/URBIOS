@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ACTIVITY, GOALS, MACRO_PRESETS, MEAL_PRESETS, applyGoals, computeRmr, computeTdee, macroGrams, prefillCalc, sumDist, sumPct } from './guidedLogic';
 import { dietContext } from '../../../../ai/dietSection';
+import { CountUp } from '../../shared/fx';
 
 // Passo 1 — Obiettivi: poche domande in parole semplici; il resto (kcal, macro, pasti) si calcola da solo.
 
@@ -84,9 +85,6 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
 
     return (
         <div className="max-w-3xl mx-auto dg-in">
-            <h2 className="dg-h">Partiamo dall’obiettivo</h2>
-            <p className="dg-sub">Poche domande: kcal, macro e pasti li calcolo io. {targets?.isConfigured && 'Puoi sempre cambiare le risposte.'}</p>
-
             <section className="dg-card">
                 <p className="dg-q">1 · Chi è il paziente?</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -242,7 +240,7 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
                     <>
                         <p className="text-[12px] uppercase tracking-wider opacity-70 font-semibold">Fabbisogno stimato</p>
                         <p className="text-[34px] font-semibold leading-tight">
-                            {tdee.toLocaleString('it-IT')} <span className="text-[16px] font-medium opacity-80">kcal al giorno</span>
+                            <CountUp value={tdee} /> <span className="text-[16px] font-medium opacity-80">kcal al giorno</span>
                         </p>
                         {grams && (
                             <p className="text-[14px] opacity-85 mt-1">
@@ -256,7 +254,7 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
                 )}
             </section>
 
-            <div className="flex justify-end mt-6">
+            <div className="dg-foot">
                 <button className="vw-next" disabled={!ready} onClick={confirm} style={!ready ? { opacity: 0.4, pointerEvents: 'none' } : undefined}>
                     {targets?.isConfigured ? 'Aggiorna e torna al menù' : 'Conferma e costruisci il menù'} <i className="ph ph-arrow-right"></i>
                 </button>

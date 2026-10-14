@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GoalsStep } from './GoalsStep';
 import { MenuStep } from './MenuStep';
 import { DeliverStep } from './DeliverStep';
@@ -8,7 +8,7 @@ import { PlanLinkModal } from './PlanLinkModal';
 import { DietBookModal } from './DietBookModal';
 import { addItems, makeIndependentVisit, planLabel, statusOf, todayIso } from './guidedLogic';
 import { guidedCss } from './guidedStyles';
-import { GuidedHead, GuidedSteps } from '../../shared/GuidedParts';
+import { GuidedHead, GuidedSteps, StepTitle, stepDir } from '../../shared/GuidedParts';
 
 // Dieta — un'unica schermata guidata. Gerarchia (dall'alto):
 //  1. testata: il piano (nome, data, stato) + gli strumenti globali (Libro diete, Aiuto AI)
@@ -20,6 +20,13 @@ const STEPS = [
     { id: 'menu', n: 2, label: 'Menù' },
     { id: 'deliver', n: 3, label: 'Consegna' },
 ];
+
+const TITLES = {
+    goals: ['Partiamo dall’obiettivo', 'Poche domande: kcal, macro e pasti li calcolo io.'],
+    menu: ['Costruiamo il menù', 'Giorni, pasti e alimenti: tutto in questa pagina.'],
+    deliver: ['Ultimo controllo', 'Verifica il piano, imposta lo stato e consegna.'],
+};
+const ORDER = ['goals', 'menu', 'deliver'];
 
 export const DietGuided = ({
     patient,
@@ -119,6 +126,15 @@ export const DietGuided = ({
     };
 
     const st = visitaAttiva ? statusOf(visitaAttiva) : null;
+    // transizione laterale tra i passi e avanzamento del lavoro
+    const idx = ORDER.indexOf(step);
+    const prevIdx = useRef(idx);
+    const dir = stepDir(prevIdx.current, idx);
+    useEffect(() => {
+        prevIdx.current = idx;
+    }, [idx]);
+    const hasFood = dietDays.some((d) => d.meals.some((m) => m.items.length));
+    const progress = ((configured ? 1 : 0) + (hasFood ? 1 : 0) + (st && ['pending', 'delivery', 'active'].includes(st.id) ? 1 : 0)) / 3;
     const sub = {
         goals: configured ? `${Math.round(targets.kcal).toLocaleString('it-IT')} kcal` : 'da impostare',
         menu: !configured ? 'dopo gli obiettivi' : dietDays.length ? `${dietDays.length} ${dietDays.length === 1 ? 'giorno' : 'giorni'}` : 'vuoto',
@@ -131,6 +147,8 @@ export const DietGuided = ({
 
             {/* 1 · Testata: il piano e gli strumenti globali · 2 · I passi del lavoro */}
             <GuidedHead
+                progress={progress}
+                kicker="Piano alimentare"
                 plan={visitaAttiva ? { label: planLabel(visitaAttiva), status: st, onClick: () => setPlanOpen(true), title: 'Nome, data, stato e collegamento del piano' } : null}
                 tools={[
                     { label: 'Libro diete', icon: 'ph-books', onClick: () => setBookOpen(true), title: 'Le diete già fatte, da riusare' },
@@ -139,6 +157,7 @@ export const DietGuided = ({
             />
             {visitaAttiva && (
                 <GuidedSteps
+                    progress={progress}
                     current={step}
                     onGo={go}
                     steps={STEPS.map((s) => ({
@@ -176,7 +195,8 @@ export const DietGuided = ({
                         </p>
                     </div>
                 ) : (
-                    <>
+                    <div key={step} className={dir}>
+                        <StepTitle id={step} dir="" title={TITLES[step][0]} hint={TITLES[step][1]} />
                         {step === 'goals' && (
                             <GoalsStep
                                 patient={patient}
@@ -221,7 +241,7 @@ export const DietGuided = ({
                                 onMenu={() => setStep('menu')}
                             />
                         )}
-                    </>
+                    </div>
                 )}
             </div>
 
