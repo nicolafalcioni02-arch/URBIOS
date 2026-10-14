@@ -12,6 +12,8 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
     const [dietViewMode, setDietViewMode] = useState('menu');
     // Dieta e Training si modificano dentro Nuova visita: le tab aprono il percorso gia' sul piano giusto
     const [visitStart, setVisitStart] = useState(null);
+    // visita su cui aprire la dieta (dallo Storico); null = la piu' recente
+    const [visitStartId, setVisitStartId] = useState(null);
     // cambia solo quando un percorso comincia o finisce: nel frattempo Nuova visita resta com'e' anche se si guarda altro
     const [visitKey, setVisitKey] = useState(0);
     const [aiOpen, setAiOpen] = useState(false);
@@ -171,10 +173,11 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
         valutazione_report: '',
     });
 
-    const goTab = (id) => {
+    const goTab = (id, visitId = null) => {
         const plan = id === 'diet' ? 'dieta' : id === 'Allenamento' ? 'training' : null;
         if (plan && patient?.visite?.length) {
             setVisitStart(plan);
+            setVisitStartId(visitId);
             setVisitKey((k) => k + 1);
             setView('visit');
         } else {
@@ -218,6 +221,7 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
                 handleFinalizeVisit={handleFinalizeVisit}
                 updateDraftMany={updateDraftMany}
                 visitStart={visitStart}
+                visitStartId={visitStartId}
                 onDone={() => {
                     setVisitStart(null);
                     setVisitKey((k) => k + 1);
@@ -225,6 +229,7 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
                 }}
                 visitKey={visitKey}
                 onUpdateDb={onUpdateDb}
+                onOpenDiet={(visitId) => goTab('diet', visitId)}
                 patient={patient}
                 setConfigA={setConfigA}
                 setConfigB={setConfigB}

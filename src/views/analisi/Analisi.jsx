@@ -4,11 +4,19 @@ import { Somatocarta } from '../../components/charts/somatocarta/Somatocarta';
 import { generateAdvancedInterpretation } from './logic/somatotypeInterpretation';
 import { ConfirmSaveModal } from './modals/ConfirmSaveModal';
 import { AnalisiHeader } from './sections/AnalisiHeader';
+import { ChartsReport } from './ChartsReport';
+import { computeSomatotype } from './logic/somatotype';
+import { buildBodyModel } from './logic/bodyModel';
+import { Body3D } from './sections/Body3D';
 import { BodyCompositionCharts } from './sections/BodyCompositionCharts';
 
 export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sesso, eta }) => {
     // --- STATI ---
     const [somatoValues, setSomatoValues] = useState({ endo: 0, meso: 0, ecto: 0 });
+    const [tab, setTab] = useState('comp');
+    const [showRings, setShowRings] = useState(true);
+    const [showPliche, setShowPliche] = useState(false);
+    const [showReport, setShowReport] = useState(false);
     const [interpretationText, setInterpretationText] = useState('');
 
     // Stati per UI di Salvataggio
@@ -23,46 +31,7 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
     useEffect(() => {
         if (!visitData) return;
         const savedInterpretation = visitData.somatotipo_interpretazione || '';
-        const getVal = (k) => parseFloat(String(visitData[k] || '0').replace(',', '.')) || 0;
-
-        // Recupero dati
-        const peso = getVal('peso');
-        const altezza = getVal('altezza');
-        const tricipite = getVal('pl_tricipite');
-        const sottoscap = getVal('pl_sottoscap');
-        const sovrailiaca = getVal('pl_sovrailiaca');
-        const polpaccioPl = getVal('pl_polpaccio');
-        const omero = getVal('dm_omero') / 10;
-        const femore = getVal('dm_femore') / 10;
-        const braccio = getVal('circ_braccio_flesso') || getVal('circ_braccio');
-        const polpaccio = getVal('circ_polpaccio');
-
-        const sommaPliche = tricipite + sottoscap + sovrailiaca;
-        let endo = 0,
-            meso = 0,
-            ecto = 0;
-
-        if (altezza > 0 && sommaPliche > 0) {
-            const X = sommaPliche * (170.18 / altezza);
-            endo = -0.7182 + 0.1451 * X - 0.00068 * Math.pow(X, 2) + 0.0000014 * Math.pow(X, 3);
-        }
-        if (altezza > 0) {
-            const braccioCorr = braccio - tricipite / 10;
-            const polpaccioCorr = polpaccio - polpaccioPl / 10;
-            meso = 0.858 * omero + 0.601 * femore + 0.188 * braccioCorr + 0.161 * polpaccioCorr - 0.131 * altezza + 4.5;
-        }
-        if (peso > 0 && altezza > 0) {
-            const hwr = altezza / Math.pow(peso, 0.3333);
-            if (hwr >= 40.75) ecto = 0.732 * hwr - 28.58;
-            else if (hwr > 38.25) ecto = 0.463 * hwr - 17.63;
-            else ecto = 0.1;
-        }
-
-        const calculatedValues = {
-            endo: Math.max(0.1, endo),
-            meso: Math.max(0.1, meso),
-            ecto: Math.max(0.1, ecto),
-        };
+        const calculatedValues = computeSomatotype(visitData);
 
         setSomatoValues(calculatedValues);
 
@@ -123,6 +92,8 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
         }));
     };
 
+    const model = buildBodyModel(visitData, report, sesso);
+
     return ReactDOM.createPortal(
         <div className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4 fade-enter">
             <div className="bg-gray-50 w-full max-w-[1600px] h-full sm:h-[95vh] rounded-none sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden relative border border-gray-200">
@@ -130,8 +101,42 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
                 <AnalisiHeader onClose={onClose} patient={patient} />
 
                 {/* --- CORPO PRINCIPALE --- */}
-                <div className="flex-1 p-3 sm:p-8 overflow-y-auto">
-                    <div className="flex flex-col gap-8 pb-20">
+                <div className="flex-1 p-3 sm:p-5 overflow-y-auto lg:overflow-hidden">
+                    <div className="flex flex-col lg:flex-row gap-4 lg:h-full">
+                        {/* Colonna sinistra: modello 3D che segue le misure */}
+                        <aside className="lg:w-[300px] xl:w-[340px] flex-none bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col overflow-hidden h-[380px] lg:h-full">
+                            <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
+                                <span className="text-xs font-bold text-gray-700">Modello corporeo</span>
+                                <div className="flex gap-1">
+                                    {[['Anelli', showRings, setShowRings], ['Pliche', showPliche, setShowPliche]].map(([n, on, set]) => (
+                                        <button key={n} onClick={() => set((v) => !v)} className={`text-[10px] font-bold px-2 py-1 rounded-full border ${on ? 'bg-black text-white border-black' : 'text-gray-500 border-gray-200'}`}>{n}</button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="flex-1 min-h-0"><Body3D model={model} showRings={showRings} showPliche={showPliche} /></div>
+                            <div className="px-4 py-2 border-t border-gray-100 text-[10px] text-gray-500 leading-snug">
+                                {model.altezza ? `${model.altezza} cm` : '-- cm'} · {model.peso ? `${model.peso} kg` : '-- kg'}
+                                {model.fm ? ` · ${model.fm.toFixed(1)}% grasso` : ''}. Anelli e pliche sono dove si prendono le misure (la vita è verde, gialla o rossa in base al rapporto vita/altezza; le sfere delle pliche crescono con lo spessore). Trascina per ruotare.
+                            </div>
+                        </aside>
+
+                        {/* Colonna destra: schede */}
+                        <div className="flex-1 min-w-0 flex flex-col gap-3 lg:h-full">
+                            <div className="flex flex-wrap items-center gap-2 flex-none">
+                            <div className="flex gap-1 bg-white border border-gray-200 rounded-xl p-1 self-start flex-none">
+                                {[['comp', 'Composizione corporea', 'ph-chart-pie-slice'], ['somato', 'Somatotipo', 'ph-triangle']].map(([id, label, ic]) => (
+                                    <button key={id} onClick={() => setTab(id)} className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors ${tab === id ? 'bg-black text-white' : 'text-gray-500 hover:bg-gray-100'}`}>
+                                        <i className={`ph-bold ${ic}`}></i>{label}
+                                    </button>
+                                ))}
+                            </div>
+                            <button onClick={() => setShowReport(true)} className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
+                                <i className="ph-bold ph-file-pdf"></i> Report grafici A4
+                            </button>
+                            </div>
+                            <div className="flex-1 min-h-0 lg:overflow-y-auto pr-1 pb-6">
+                        {tab === 'comp' && <BodyCompositionCharts visitData={visitData} report={report} sesso={sesso} eta={eta} />}
+                        {tab === 'somato' && (<>
                         {/* ============================================================ */}
                         {/* SUPER BOX 1: SOMATOTIPO (GRAFICO SX + INPUT/TESTO DX)        */}
                         {/* ============================================================ */}
@@ -147,14 +152,14 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
                                         <p className="text-xs text-gray-400 font-bold ">Heath-Carter Method</p>
                                     </div>
                                 </div>
-                                {/* Pulsante Salva (Apre il Modale) */}
-                                <button
+                                {/* Pulsante Salva (Apre il Modale): non c'è quando l'analisi è aperta dallo storico, in sola lettura */}
+                                {updateDraft && <button
                                     onClick={() => setShowConfirmModal(true)}
                                     className="group flex items-center gap-2 px-6 py-3 bg-black text-white rounded-xl font-bold text-sm hover:bg-gray-800 transition-all shadow-lg shadow-gray-200 active:scale-95"
                                 >
                                     <i className="ph-bold ph-floppy-disk text-lg"></i>
                                     <span>Salva Referto Somatotipo</span>
-                                </button>
+                                </button>}
                             </div>
 
                             {/* Banner Successo (Post-Salvataggio) */}
@@ -232,12 +237,13 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
                             </div>
                         </div>
 
-                        <BodyCompositionCharts visitData={visitData} report={report} sesso={sesso} eta={eta} />
+                        </>)}
+                            </div>
+                        </div>
 
-                        {/* ============================================================ */}
-                        {/* SUPER BOX 2: BIVA (Segnaposto)                               */}
-                        {/* ============================================================ */}
-
+                        {showReport && (
+                            <ChartsReport patient={patient} visitData={visitData} report={report} sesso={sesso} eta={eta} model={model} somatoValues={somatoValues} date={visitData?.data} onClose={() => setShowReport(false)} />
+                        )}
                         {/* --- MODALE CONFERMA SALVATAGGIO --- */}
                         {<ConfirmSaveModal executeSave={executeSave} setShowConfirmModal={setShowConfirmModal} showConfirmModal={showConfirmModal} />}
                     </div>

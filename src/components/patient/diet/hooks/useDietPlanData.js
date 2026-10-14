@@ -3,7 +3,7 @@ import { defaultFoodDB } from '../data/defaultFoodDB';
 import { defaultDrv } from '../data/defaultDrv';
 
 // Dati del piano: paziente/visita attiva, calcData, targets, giorni, report, database; autosave sul DB centrale
-export const useDietPlanData = ({ db, onUpdateDb, patient }) => {
+export const useDietPlanData = ({ db, onUpdateDb, patient, initialVisitId = null }) => {
     // Recupera l'istanza aggiornata del paziente dal DB centrale
     const currentPatient = db?.pazienti?.find((p) => p.id === patient?.id) || patient;
     const listaVisite = currentPatient?.visite || [];
@@ -11,7 +11,7 @@ export const useDietPlanData = ({ db, onUpdateDb, patient }) => {
     // NUOVO: Stato per decidere su quale visita stiamo modificando/visualizzando la dieta
     // Di default prende la più recente (indice 0), ma l'utente potrà cambiarla
     const [selectedVisitaId, setSelectedVisitaId] = useState(() => {
-        return listaVisite[0]?.id || null;
+        return (initialVisitId && listaVisite.some((v) => v.id === initialVisitId) ? initialVisitId : listaVisite[0]?.id) || null;
     });
 
     // Trova l'oggetto visita attivo su cui lavorare

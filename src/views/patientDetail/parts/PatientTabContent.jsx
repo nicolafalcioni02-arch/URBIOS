@@ -14,8 +14,10 @@ export const PatientTabContent = ({
     onDone,
     updateDraftMany,
     visitStart,
+    visitStartId = null,
     visitKey = 0,
     onUpdateDb,
+    onOpenDiet,
     patient,
     setConfigA,
     setConfigB,
@@ -36,13 +38,14 @@ export const PatientTabContent = ({
         <div className={`flex-1 overflow-y-auto relative ${['visit', 'diet', 'Allenamento'].includes(view) ? '' : 'p-4 md:p-8'} ${widgetsPad ? 'wd-padded' : ''}`}>
             {view === 'info' && <ClinicalFolder patient={patient} updatePatientInfo={updatePatientInfo} professionalData={db.utente} />}
 
-            {view === 'history' && <HistoryView patient={patient} onUpdateDb={onUpdateDb} />}
+            {view === 'history' && <HistoryView patient={patient} onUpdateDb={onUpdateDb} onOpenDiet={onOpenDiet} />}
 
             {(visitOpened || view === 'visit') && (
                 <div hidden={view !== 'visit'} className="h-full">
                 <NewVisitView
                     key={visitKey}
                     initialMode={visitStart}
+                    initialVisitId={visitStartId}
                     updateDraftMany={updateDraftMany}
                     patient={patient}
                     visitDraft={visitDraft}

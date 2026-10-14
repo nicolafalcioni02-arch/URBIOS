@@ -17,7 +17,7 @@ import { useDietPlanData } from './hooks/useDietPlanData';
 // Modulo Dieta. La schermata è una sola (guidata, in 3 passi: Obiettivi → Menù → Consegna), vedi guided/.
 // Qui vivono lo stato del piano e le finestre di servizio (database alimenti, analisi, grafici, stampa, riferimenti, calcolatore LAF).
 // (la vecchia "vista avanzata" è stata tolta: una copia è in .claude/backup/DietPlan.avanzata.jsx)
-export const DietPlan = ({ patient, onUpdateDb, db }) => {
+export const DietPlan = ({ patient, onUpdateDb, db, initialVisitId = null }) => {
     const {
         currentPatient,
         listaVisite,
@@ -41,7 +41,7 @@ export const DietPlan = ({ patient, onUpdateDb, db }) => {
         dietBook,
         setDietBook,
         patientProfile,
-    } = useDietPlanData({ db, onUpdateDb, patient });
+    } = useDietPlanData({ db, onUpdateDb, patient, initialVisitId });
 
     // finestre di servizio
     const [isPrintReportOpen, setIsPrintReportOpen] = useState(false);

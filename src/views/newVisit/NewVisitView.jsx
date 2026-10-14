@@ -3,6 +3,7 @@ import { SmartLabCard } from '../../components/ui/SmartLabCard';
 import { ReportStudio } from '../../components/reports/studio/ReportStudio';
 import { calculateEquation } from '../../logic/calculations';
 import { Analisi } from '../analisi/Analisi';
+import { Measure3DModal } from './modals/Measure3DModal';
 import { DEFAULT_RANGE_EMATO } from '../../logic/db_defaults';
 import { VisitWizard } from './layout/VisitWizard';
 import { StepContext } from '../../components/ui/Card';
@@ -20,9 +21,10 @@ import { DietPlan } from '../../components/patient/diet/DietPlan';
 import { TrainingPlan } from '../../components/patient/training/TrainingPlan';
 import { SkinfoldsSection } from './sections/SkinfoldsSection';
 
-export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeVisit, updatePatientInfo, configA, setConfigA, configB, setConfigB, db, onUpdateDb, onDone, initialMode, updateDraftMany }) => {
+export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeVisit, updatePatientInfo, configA, setConfigA, configB, setConfigB, db, onUpdateDb, onDone, initialMode, initialVisitId, updateDraftMany }) => {
     const [showReport, setShowReport] = useState(false);
     const [showAnalisi, setShowAnalisi] = useState(false);
+    const [show3D, setShow3D] = useState(null); // 'circ' | 'pliche': misure guidate sul corpo 3D
 
     const [pendingChange, setPendingChange] = useState(null);
 
@@ -187,13 +189,29 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
         );
     };
 
+    const btn3D = (layer) => (
+        <button
+            onClick={() => setShow3D(layer)}
+            className="mb-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-black text-white text-xs font-bold hover:bg-gray-800 active:scale-95 transition-all"
+        >
+            <i className="ph-bold ph-person-simple text-base"></i> 3D · misura sul corpo
+        </button>
+    );
+
     const renderStep = (id) => {
         const common = { activeSection: id, sectionRefs, setActiveSection: noop, updateDraft, visitDraft };
         return (
             <StepContext.Provider value={true}>
                 {id === 'anamnesi' && <ClinicalAnamnesis patient={patient} updatePatientInfo={updatePatientInfo} />}
-                {id === 'antropometria' && <AnthropometrySection {...common} />}
+                {id === 'antropometria' && (
+                    <>
+                        {btn3D('circ')}
+                        <AnthropometrySection {...common} />
+                    </>
+                )}
                 {id === 'plicometria' && (
+                    <>
+                    {btn3D('pliche')}
                     <SkinfoldsSection
                         {...common}
                         calculationContext={calculationContext}
@@ -205,6 +223,7 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
                         setConfigB={setConfigB}
                         sommaPliche={sommaPliche}
                     />
+                    </>
                 )}
                 {id === 'bioimpedenza' && <BioimpedanceSection {...common} monoPhA={monoPhA} rawRz={rawRz} rawXc={rawXc} rzH={rzH} xcH={xcH} />}
                 {id === 'ematochimico' && <BloodTestsSection activeSection={id} renderBloodInput={renderBloodInput} sectionRefs={sectionRefs} setActiveSection={noop} />}
@@ -233,7 +252,7 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
     if (inPlans) {
         return (
             <PlansWorkspace patient={patient} active={plan} setActive={setPlan} onDone={onDone}>
-                {plan === 'dieta' ? <DietPlan patient={patient} onUpdateDb={onUpdateDb} db={db} /> : <TrainingPlan patient={patient} onUpdateDb={onUpdateDb} db={db} />}
+                {plan === 'dieta' ? <DietPlan patient={patient} onUpdateDb={onUpdateDb} db={db} initialVisitId={initialVisitId} /> : <TrainingPlan patient={patient} onUpdateDb={onUpdateDb} db={db} />}
             </PlansWorkspace>
         );
     }
@@ -265,6 +284,7 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
             {showReport && (
                 <ReportStudio initial={['visita']} visitDraft={getLiveReportData()} patient={patient} db={db} onClose={() => setShowReport(false)} />
             )}
+            {show3D && <Measure3DModal layer={show3D} sesso={sessoPaziente} visitDraft={visitDraft} updateDraft={updateDraft} onClose={() => setShow3D(null)} />}
             {showAnalisi && <Analisi patient={patient} visitData={visitDraft} report={getLiveReportData()} sesso={sessoPaziente} eta={etaPaziente} updateDraft={updateDraft} onClose={() => setShowAnalisi(false)} />}
 
             <PendingChangeModal

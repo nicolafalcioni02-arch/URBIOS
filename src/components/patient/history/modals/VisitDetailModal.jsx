@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { DEFAULT_RANGE_EMATO } from '../../../../logic/db_defaults';
 import { VisitDetailContent } from './VisitDetailContent';
 
-export const VisitDetailModal = ({ selectedVisit, setSelectedVisit }) => {
+export const VisitDetailModal = ({ selectedVisit, setSelectedVisit, onOpenAnalisi, onPrintCharts }) => {
     return (
         selectedVisit &&
         ReactDOM.createPortal(
@@ -22,6 +22,24 @@ export const VisitDetailModal = ({ selectedVisit, setSelectedVisit }) => {
                             <i className="ph ph-x text-lg"></i>
                         </button>
                     </div>
+                    {onOpenAnalisi && (
+                        <div className="px-6 pt-4 flex gap-2">
+                            <button
+                                onClick={() => onOpenAnalisi(selectedVisit)}
+                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl font-bold text-sm hover:bg-gray-800 transition-all active:scale-[0.99]"
+                            >
+                                <i className="ph-bold ph-chart-pie-slice text-lg"></i> Analisi clinica avanzata
+                            </button>
+                            {onPrintCharts && (
+                                <button
+                                    onClick={() => onPrintCharts(selectedVisit)}
+                                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-800 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all active:scale-[0.99]"
+                                >
+                                    <i className="ph-bold ph-printer text-lg"></i> Stampa
+                                </button>
+                            )}
+                        </div>
+                    )}
                     {<VisitDetailContent selectedVisit={selectedVisit} />}
                 </div>
             </div>,

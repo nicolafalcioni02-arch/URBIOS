@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 
-export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handleDelete, setSearchTerm, setSelectedVisit, sortedVisits }) => {
+export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handleDelete, onOpenDiet, setSearchTerm, setSelectedVisit, sortedVisits }) => {
+    const [noteVisit, setNoteVisit] = useState(null); // visita di cui si legge la nota
     return (
         <div className="space-y-3">
             {/* Column header */}
@@ -14,7 +16,10 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
 
             {filteredVisits.map((visit, index) => {
                 const isIndipendente = visit.note?.includes('Solo Dieta');
-                const dietBadge = getDietBadge(visit.dietStatus);
+                // lo stato "attivo" conta solo se la visita ha davvero una dieta con alimenti
+                const days = visit.dettagli?.diet_plan_data;
+                const hasDiet = Array.isArray(days) && days.some((d) => (d.meals || []).some((m) => (m.items || []).length > 0));
+                const dietBadge = hasDiet || visit.dietStatus === 'todo' ? getDietBadge(visit.dietStatus) : { label: 'Nessuna dieta', color: 'bg-gray-100 text-gray-500 border-gray-200', dot: 'bg-gray-300' };
                 const delta = getWeightDelta(visit, index, sortedVisits);
                 const hasNote = visit.note && !visit.note.includes('Solo Dieta');
 
@@ -61,9 +66,17 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
                                 </span>
                             )}
                             {hasNote && (
-                                <span title={visit.note} className="text-amber-400 shrink-0">
+                                <button
+                                    type="button"
+                                    title="Leggi la nota"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setNoteVisit(visit);
+                                    }}
+                                    className="text-amber-400 hover:text-amber-500 shrink-0"
+                                >
                                     <i className="ph-fill ph-note text-sm"></i>
-                                </span>
+                                </button>
                             )}
                         </div>
 
@@ -83,10 +96,12 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
                                 <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 ">
                                     <i className="ph-bold ph-carrot text-xs"></i> Solo Piano
                                 </span>
-                            ) : (
+                            ) : hasDiet ? (
                                 <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 ">
                                     <i className="ph-bold ph-calendar-check text-xs"></i> Associata
                                 </span>
+                            ) : (
+                                <span className="text-[11px] font-semibold text-gray-300">Controllo</span>
                             )}
                         </div>
 
@@ -96,6 +111,7 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
                         <div className="flex gap-1 shrink-0 ml-auto md:ml-0">
                             <button
                                 title="Piano dieta"
+                                onClick={() => onOpenDiet && onOpenDiet(visit)}
                                 className="w-8 h-8 rounded-lg border border-gray-100 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 text-gray-400 flex items-center justify-center transition-all"
                             >
                                 <i className="ph-bold ph-leaf text-sm"></i>
@@ -109,7 +125,7 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
                             </button>
                             <button
                                 title="Elimina visita"
-                                onClick={(e) => handleDelete(e, visit.id)}
+                                onClick={(e) => handleDelete(e, visit)}
                                 className="w-8 h-8 rounded-lg border border-gray-100 hover:bg-red-50 hover:border-red-200 hover:text-red-500 text-gray-400 flex items-center justify-center transition-all"
                             >
                                 <i className="ph-bold ph-trash text-sm"></i>
@@ -128,6 +144,25 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
                     </button>
                 </div>
             )}
+            {noteVisit &&
+                ReactDOM.createPortal(
+                    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setNoteVisit(null)}></div>
+                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10 fade-enter overflow-hidden">
+                            <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+                                <div>
+                                    <h3 className="font-bold">Nota della visita</h3>
+                                    <p className="text-xs text-gray-500">{new Date(noteVisit.data).toLocaleDateString('it-IT', { dateStyle: 'long' })}</p>
+                                </div>
+                                <button onClick={() => setNoteVisit(null)} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center" title="Chiudi">
+                                    <i className="ph ph-x text-lg"></i>
+                                </button>
+                            </div>
+                            <p className="p-5 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed max-h-[60vh] overflow-y-auto">{noteVisit.note}</p>
+                        </div>
+                    </div>,
+                    document.body
+                )}
         </div>
     );
 };

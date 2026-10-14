@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
+const CompactCtx = createContext(false); // report: riquadri piccoli, tre per riga
 const num = (v) => parseFloat(String(v ?? '').replace(',', '.')) || 0;
 const r1 = (v) => Math.round(v * 10) / 10;
 
@@ -48,25 +49,32 @@ const CIRC = [
     ['circ_polpaccio', 'Polpaccio'],
 ];
 
-const Card = ({ icon, title, sub, children, empty }) => (
-    <div className="bg-white rounded-3xl p-4 sm:p-6 shadow-sm border border-gray-200 flex flex-col">
-        <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-100">
-            <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100">
-                <i className={`ph-fill ${icon} text-xl`}></i>
+const Card = ({ icon, title, sub, children, empty }) => {
+    const compact = useContext(CompactCtx);
+    return (
+        <div className={`bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col ${compact ? 'p-2' : 'p-3'}`}>
+            <div className={`flex items-center gap-2 border-b border-gray-100 ${compact ? 'mb-1 pb-1' : 'mb-2 pb-2 gap-3'}`}>
+                <div className={`rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 flex-none ${compact ? 'w-5 h-5' : 'w-7 h-7'}`}>
+                    <i className={`ph-fill ${icon} ${compact ? 'text-[10px]' : 'text-sm'}`}></i>
+                </div>
+                <div className="min-w-0">
+                    <h4 className={`font-bold text-gray-900 leading-tight ${compact ? 'text-[11px]' : 'text-sm'}`}>{title}</h4>
+                    {sub && <p className={`text-gray-400 font-semibold ${compact ? 'text-[8px] leading-tight' : 'text-[10px]'}`}>{sub}</p>}
+                </div>
             </div>
-            <div>
-                <h4 className="font-bold text-gray-900">{title}</h4>
-                {sub && <p className="text-[11px] text-gray-400 font-semibold">{sub}</p>}
-            </div>
+            {empty ? (
+                <p className={`text-gray-400 italic text-center text-xs ${compact ? 'py-3 text-[10px]' : 'py-6'}`}>{empty}</p>
+            ) : (
+                <div className={`relative ${compact ? 'h-[92px]' : 'h-[170px]'}`}>{children}</div>
+            )}
         </div>
-        {empty ? <p className="text-sm text-gray-400 italic py-10 text-center">{empty}</p> : <div className="flex-1 min-h-[220px] relative">{children}</div>}
-    </div>
-);
+    );
+};
 
 const Stat = ({ label, value, unit, note }) => (
-    <div className="bg-gray-50 border border-gray-100 rounded-2xl p-3 text-center">
-        <div className="text-[10px] font-bold text-gray-400 uppercase">{label}</div>
-        <div className="text-2xl font-black text-gray-800">
+    <div className="bg-gray-50 border border-gray-100 rounded-xl px-2 py-1.5 text-center">
+        <div className="text-[9px] font-bold text-gray-400 uppercase">{label}</div>
+        <div className="text-lg font-black text-gray-800 leading-tight">
             {value}
             <span className="text-xs font-semibold text-gray-400 ml-1">{unit}</span>
         </div>
@@ -76,7 +84,13 @@ const Stat = ({ label, value, unit, note }) => (
 
 const baseOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
 
-export const BodyCompositionCharts = ({ visitData = {}, report = {}, sesso = 'M', eta = 30 }) => {
+// `only`: elenco di grafici da mostrare (per il report); `fixed`: misure fisse e niente animazioni, per la stampa.
+export const BodyCompositionCharts = ({ visitData = {}, report = {}, sesso = 'M', eta = 30, only = null, fixed: fixed0 = false, compact = false }) => {
+    const fixed = fixed0 || compact;
+    const show = (id) => !only || only.includes(id);
+    const R = fixed ? { responsive: false, animation: false, ...(compact ? { font: { size: 8 } } : {}) } : {};
+    const legendBottom = compact ? { display: true, position: 'bottom', labels: { boxWidth: 7, padding: 4, font: { size: 8 } } } : { display: true, position: 'bottom' };
+    const cp = compact ? { width: 218, height: 92 } : fixed ? { width: 330, height: 170 } : {};
     const d = useMemo(() => {
         const peso = num(visitData.peso);
         const altezza = num(visitData.altezza);
@@ -108,7 +122,7 @@ export const BodyCompositionCharts = ({ visitData = {}, report = {}, sesso = 'M'
             rzH: rz > 0 && h > 0 ? rz / h : 0,
             xcH: xc > 0 && h > 0 ? xc / h : 0,
             pliche: PLICHE.map(([k, l]) => [l, num(visitData[k])]).filter(([, v]) => v > 0),
-            circ: CIRC.map(([k, l]) => [l, num(visitData[k]) || (k === 'circ_braccio' ? num(visitData.circ_braccio_flesso) : 0)]).filter(([, v]) => v > 0),
+            circ: CIRC.map(([k, l]) => [l, num(visitData[k]) || num(visitData[`${k}_dx`]) || num(visitData[`${k}_sx`]) || (k === 'circ_braccio' ? num(visitData.circ_braccio_flesso) : 0)]).filter(([, v]) => v > 0),
         };
     }, [visitData, report]);
 
@@ -153,8 +167,9 @@ export const BodyCompositionCharts = ({ visitData = {}, report = {}, sesso = 'M'
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: { top: 28 } },
-        plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+        ...R,
+        layout: { padding: { top: compact ? 16 : 24 } },
+        plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: compact ? 7 : 10, padding: compact ? 4 : 10, font: { size: compact ? 8 : 10 } } } },
         scales: { x: { stacked: true, max, grid: { display: false } }, y: { stacked: true, display: false } },
     });
 
@@ -172,8 +187,9 @@ export const BodyCompositionCharts = ({ visitData = {}, report = {}, sesso = 'M'
     ];
 
     return (
-        <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-3 px-1">
+        <CompactCtx.Provider value={compact}>
+        <div className="flex flex-col gap-3">
+            <div className="hidden">
                 <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
                     <i className="ph-fill ph-chart-pie-slice text-2xl"></i>
                 </div>
@@ -183,51 +199,61 @@ export const BodyCompositionCharts = ({ visitData = {}, report = {}, sesso = 'M'
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3">
+            {show('stats') && <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                 <Stat label="Peso" value={d.peso ? r1(d.peso) : '--'} unit="kg" />
                 <Stat label="BMI" value={d.bmi ? r1(d.bmi) : '--'} note={d.bmi ? bmiCat : ''} />
                 <Stat label="Massa grassa" value={hasFm ? r1(d.main.fm) : '--'} unit="%" note={hasFm ? bandOf(d.main.fm).label : 'serve la plicometria'} />
                 <Stat label="Massa magra" value={d.main.ffmKg ? r1(d.main.ffmKg) : '--'} unit="kg" />
                 <Stat label="FMI" value={d.fmi ? r1(d.fmi) : '--'} unit="kg/m²" />
                 <Stat label="FFMI" value={d.ffmi ? r1(d.ffmi) : '--'} unit="kg/m²" />
-            </div>
+            </div>}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className={fixed ? `grid ${only && only.length === 1 ? 'grid-cols-1' : compact ? 'grid-cols-3 gap-2' : 'grid-cols-2'} gap-3` : 'grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3'}>
+                {show('donut') && (
                 <Card icon="ph-chart-donut" title="Massa grassa / magra" sub="In kg sul peso totale" empty={!hasFm && 'Compila la plicometria per vedere la ripartizione.'}>
                     {hasFm && (
                         <Doughnut
+                            {...cp}
                             data={{
                                 labels: ['Massa grassa', 'Massa magra'],
                                 datasets: [{ data: [r1(d.main.fmKg), r1(d.main.ffmKg)], backgroundColor: ['#fb7185', '#34d399'], borderWidth: 0 }],
                             }}
                             options={{
-                                ...baseOpts,
+                                ...baseOpts, ...R,
                                 cutout: '62%',
                                 plugins: {
-                                    legend: { display: true, position: 'bottom' },
+                                    legend: legendBottom,
                                     tooltip: { callbacks: { label: (c) => ` ${c.label}: ${c.parsed} kg` } },
                                 },
                             }}
                         />
                     )}
                 </Card>
+                )}
 
+                {show('fasce') && (
                 <Card icon="ph-gauge" title="% massa grassa nelle fasce" sub={`Riferimento ${sesso === 'F' ? 'donna' : 'uomo'}`} empty={!hasFm && 'Dato non disponibile.'}>
-                    {hasFm && <Bar data={bandChart(d.main.fm, bands, 40)} options={bandOpts(40)} plugins={[markerPlugin(d.main.fm, 40)]} />}
+                    {hasFm && <Bar {...cp} data={bandChart(d.main.fm, bands, 40)} options={bandOpts(40)} plugins={[markerPlugin(d.main.fm, 40)]} />}
                 </Card>
+                )}
 
+                {show('confronto') && (
                 <Card icon="ph-scales" title="Confronto metodi plicometrici" sub="% massa grassa: Metodo A vs B" empty={!(d.A.fm > 0 || d.B.fm > 0) && 'Nessun metodo calcolabile.'}>
                     <Bar
+                        {...cp}
                         data={{
                             labels: ['Metodo A', 'Metodo B'],
                             datasets: [{ data: [r1(d.A.fm), r1(d.B.fm)], backgroundColor: ['#6366f1', '#a78bfa'], borderRadius: 8 }],
                         }}
-                        options={{ ...baseOpts, scales: { y: { beginAtZero: true, title: { display: true, text: '% FM' } } } }}
+                        options={{ ...baseOpts, ...R, scales: { y: { beginAtZero: true, title: { display: true, text: '% FM' } } } }}
                     />
                 </Card>
+                )}
 
+                {show('composizione') && (
                 <Card icon="ph-stack" title="Composizione per metodo" sub="Massa grassa e magra (kg)" empty={!(d.A.fm > 0 || d.B.fm > 0) && 'Nessun metodo calcolabile.'}>
                     <Bar
+                        {...cp}
                         data={{
                             labels: ['Metodo A', 'Metodo B'],
                             datasets: [
@@ -236,56 +262,66 @@ export const BodyCompositionCharts = ({ visitData = {}, report = {}, sesso = 'M'
                             ],
                         }}
                         options={{
-                            ...baseOpts,
-                            plugins: { legend: { display: true, position: 'bottom' } },
+                            ...baseOpts, ...R,
+                            plugins: { legend: legendBottom },
                             scales: { x: { stacked: true }, y: { stacked: true, title: { display: true, text: 'kg' } } },
                         }}
                     />
                 </Card>
+                )}
 
+                {show('pliche') && (
                 <Card icon="ph-ruler" title="Spessori delle pliche" sub="Millimetri per sito" empty={!d.pliche.length && 'Nessuna plica inserita.'}>
                     <Bar
+                        {...cp}
                         data={{
                             labels: d.pliche.map(([l]) => l),
                             datasets: [{ data: d.pliche.map(([, v]) => v), backgroundColor: '#f59e0b', borderRadius: 6 }],
                         }}
-                        options={{ ...baseOpts, indexAxis: 'y', scales: { x: { title: { display: true, text: 'mm' } } } }}
+                        options={{ ...baseOpts, ...R, indexAxis: compact ? 'x' : 'y', scales: compact ? { x: { ticks: { autoSkip: false, font: { size: 7 } } }, y: { title: { display: true, text: 'mm', font: { size: 8 } } } } : { x: { title: { display: true, text: 'mm' } }, y: { ticks: { autoSkip: false } } } }}
                     />
                 </Card>
+                )}
 
+                {show('circ') && (
                 <Card icon="ph-tape" title="Circonferenze" sub="Centimetri per distretto" empty={!d.circ.length && 'Nessuna circonferenza inserita.'}>
                     <Bar
+                        {...cp}
                         data={{
                             labels: d.circ.map(([l]) => l),
                             datasets: [{ data: d.circ.map(([, v]) => v), backgroundColor: '#0ea5e9', borderRadius: 6 }],
                         }}
-                        options={{ ...baseOpts, scales: { y: { title: { display: true, text: 'cm' } } } }}
+                        options={{ ...baseOpts, ...R, scales: { y: { title: { display: true, text: 'cm' } } } }}
                     />
                 </Card>
+                )}
 
+                {show('bmi') && (
                 <Card icon="ph-person-simple" title="BMI" sub="Indice di massa corporea" empty={!d.bmi && 'Servono peso e altezza.'}>
-                    {d.bmi > 0 && <Bar data={bandChart(d.bmi, imcBands, 40)} options={bandOpts(40)} plugins={[markerPlugin(d.bmi, 40)]} />}
+                    {d.bmi > 0 && <Bar {...cp} data={bandChart(d.bmi, imcBands, 40)} options={bandOpts(40)} plugins={[markerPlugin(d.bmi, 40)]} />}
                 </Card>
+                )}
 
-                <Card icon="ph-heartbeat" title="Rapporto vita / altezza" sub="Rischio cardiometabolico" empty={!d.whtr && 'Servono vita e altezza.'}>
-                    {d.whtr > 0 && <Bar data={bandChart(d.whtr, whtrBands, 0.8)} options={bandOpts(0.8)} plugins={[markerPlugin(Number(d.whtr.toFixed(2)), 0.8)]} />}
-                    {d.whr > 0 && (
-                        <p className="text-xs text-gray-500 mt-2 text-center font-semibold">
-                            Vita/fianchi: {d.whr.toFixed(2)} {d.whr > whrLimit ? '(sopra il limite)' : '(nella norma)'}
-                        </p>
-                    )}
+                {show('whtr') && (
+                <Card icon="ph-heartbeat" title="Rapporto vita / altezza" sub={d.whr > 0 ? `Vita/fianchi ${d.whr.toFixed(2)} ${d.whr > whrLimit ? '(sopra il limite)' : '(nella norma)'}` : 'Rischio cardiometabolico'} empty={!d.whtr && 'Servono vita e altezza.'}>
+                    {d.whtr > 0 && <Bar {...cp} data={bandChart(d.whtr, whtrBands, 0.8)} options={bandOpts(0.8)} plugins={[markerPlugin(Number(d.whtr.toFixed(2)), 0.8)]} />}
                 </Card>
+                )}
 
+                {show('bia') && (
                 <Card icon="ph-lightning" title="Bioimpedenza vettoriale" sub="Angolo di fase, Rz/H e Xc/H" empty={!d.pha && 'Inserisci Rz e Xc nella bioimpedenza.'}>
                     <Bar
+                        {...cp}
                         data={{
                             labels: ['Angolo di fase (°)', 'Rz/H (Ω/m)', 'Xc/H (Ω/m)'],
                             datasets: [{ data: [r1(d.pha), r1(d.rzH), r1(d.xcH)], backgroundColor: ['#8b5cf6', '#14b8a6', '#f43f5e'], borderRadius: 6 }],
                         }}
-                        options={{ ...baseOpts, scales: { y: { beginAtZero: true } } }}
+                        options={{ ...baseOpts, ...R, scales: { y: { beginAtZero: true } } }}
                     />
                 </Card>
+                )}
             </div>
         </div>
+        </CompactCtx.Provider>
     );
 };

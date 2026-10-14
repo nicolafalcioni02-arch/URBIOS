@@ -27,7 +27,7 @@ export const VisitDetailContent = ({ selectedVisit }) => {
                 <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
                     <p className="text-xs font-bold text-gray-400">BMI</p>
                     <p className="text-3xl font-bold text-gray-800">
-                        {dettagli.peso && dettagli.altezza ? (dettagli.peso / (dettagli.altezza / 100) ** 2).toFixed(1) : '-'}
+                        {selectedVisit.peso && dettagli.altezza ? (selectedVisit.peso / (dettagli.altezza / 100) ** 2).toFixed(1) : '-'}
                     </p>
                 </div>
             </div>
