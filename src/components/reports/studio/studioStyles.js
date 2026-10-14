@@ -103,10 +103,8 @@ export const studioCss = `
 .rs-layout-compatto { padding: 10mm 10mm 12mm; }
 
 /* Decorato: cornice doppia, angoli e ornamenti colorati */
-.rs-layout-decorato { padding: 12mm; --rs-orn: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 22'><g fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round'><path d='M10 11h82M148 11h82'/><path d='M92 11c8-9 16-9 20 0 4-9 12-9 20 0-8 9-16 9-20 0-4 9-12 9-20 0z'/></g><circle cx='120' cy='11' r='3' fill='%23000'/></svg>"); }
-.rs-layout-decorato .rs-body { border: 3px double var(--accent); border-radius: 14px; padding: 9mm 9mm 10mm; position: relative; margin-bottom: 4mm;
-  -webkit-box-decoration-break: clone; box-decoration-break: clone;
-  background: radial-gradient(circle at 0 0, color-mix(in srgb, var(--accent) 16%, #fff) 0 14mm, transparent 14.5mm), radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--accent) 16%, #fff) 0 14mm, transparent 14.5mm), #fff; }
+.rs-layout-decorato { padding: 16mm; --rs-orn: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 22'><g fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round'><path d='M10 11h82M148 11h82'/><path d='M92 11c8-9 16-9 20 0 4-9 12-9 20 0-8 9-16 9-20 0-4 9-12 9-20 0z'/></g><circle cx='120' cy='11' r='3' fill='%23000'/></svg>"); }
+.rs-layout-decorato .rs-body { position: relative; margin-bottom: 4mm; }
 .rs-layout-decorato .rs-body::before { content: ''; display: block; height: 22px; margin: -3mm 0 5mm;
   background: var(--accent); -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 22'><g fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round'><path d='M10 11h82M148 11h82'/><path d='M92 11c8-9 16-9 20 0 4-9 12-9 20 0-8 9-16 9-20 0-4 9-12 9-20 0z'/></g><circle cx='120' cy='11' r='3' fill='%23000'/></svg>") center / 220px 22px no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 22'><g fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round'><path d='M10 11h82M148 11h82'/><path d='M92 11c8-9 16-9 20 0 4-9 12-9 20 0-8 9-16 9-20 0-4 9-12 9-20 0z'/></g><circle cx='120' cy='11' r='3' fill='%23000'/></svg>") center / 220px 22px no-repeat; }
 .rs-layout-decorato .rs-body * { font-family: Georgia, 'Times New Roman', serif !important; }
@@ -117,8 +115,6 @@ export const studioCss = `
 .rs-layout-decorato .tp-week-title::after, .rs-layout-decorato .tp-day-title::after { content: '❦'; color: var(--accent); margin-left: 8px; font-weight: 400; }
 .rs-layout-decorato .rs-sep { display: none; }
 .rs-layout-decorato .rs-newpage { margin-top: 0; }
-.rs-hd, .rs-ft { display: none; }
-.rs-flow { width: 100%; border-collapse: collapse; border: none; } .rs-flow > thead > tr > td, .rs-flow > tbody > tr > td, .rs-flow > tfoot > tr > td { padding: 0; border: none; vertical-align: top; }
 
 
 ${trainingDocCss}
@@ -150,16 +146,6 @@ ${trainingDocCss}
   .rs-layout-moderno::before, .rs-layout-clinico::before { margin: 0 0 8mm; }
   .rs-layout-compatto, .rs-layout-decorato { padding: 0 !important; }
   .rs-pb { border-top: none; margin: 0; }
-  .rs-layout-decorato .rs-body { border: none !important; background: none !important; padding: 0 !important; margin: 0 !important; border-radius: 0; }
-  .rs-layout-decorato .rs-body::before { display: none !important; }
-  .rs-layout-decorato .rs-hd, .rs-layout-decorato .rs-ft { display: block; position: relative; border: 3px double var(--accent); }
-  .rs-layout-decorato .rs-hd { margin: 8mm 8mm 0; height: 16mm; border-bottom: none; border-radius: 12px 12px 0 0;
-    background: radial-gradient(circle at 0 0, color-mix(in srgb, var(--accent) 16%, #fff) 0 14mm, transparent 14.5mm); }
-  .rs-layout-decorato .rs-ft { margin: 0 8mm 8mm; height: 16mm; border-top: none; border-radius: 0 0 12px 12px;
-    background: radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--accent) 16%, #fff) 0 14mm, transparent 14.5mm); }
-  .rs-layout-decorato .rs-bd { margin: 0 8mm; padding: 0 12mm; border-left: 3px double var(--accent); border-right: 3px double var(--accent); }
-  .rs-hd svg, .rs-ft svg { position: absolute; left: 50%; width: 170px; height: 16px; margin-left: -85px; color: var(--accent); }
-  .rs-hd svg { top: 3mm; } .rs-ft svg { bottom: 3mm; transform: scaleY(-1); }
   .rs-newpage { break-before: page; page-break-before: always; }
   .tp-newpage { break-before: page; page-break-before: always; border-top: none; padding-top: 0; margin-top: 0; }
   .tp-newpage::before { display: none; }

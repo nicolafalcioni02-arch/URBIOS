@@ -13,6 +13,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const [studentMode, setStudentMode] = useState(false);
     const [adding, setAdding] = useState(false);
     const [petsOpen, setPetsOpen] = useState(false);
+    const [studentSoonOpen, setStudentSoonOpen] = useState(false);
     const [widgetsEditing, setWidgetsEditing] = useState(false);
     const [agenda, setAgenda] = useState(null); // null = chiusa, altrimenti { date, open?, newAppt? }
     const [query, setQuery] = useState('');
@@ -103,23 +104,25 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                 <div className="flex items-center justify-between mb-8 sm:mb-12 rise">
                     <span className="text-[13px] font-semibold tracking-[0.32em] text-[color:var(--ink)]">URBIOS</span>
                     <div className="flex items-center gap-1">
-                        <button onClick={() => setStudentMode(true)} className="home-quiet" title="Casi dimostrativi per esercitarsi">
+                        {/* Student: bloccata per ora (codice intatto in StudentMode.jsx). Per riattivarla: setStudentMode(true) al posto di setStudentSoonOpen(true) */}
+                        <button onClick={() => setStudentSoonOpen(true)} className="home-quiet" title="Student: in arrivo">
                             <i className="ph ph-student"></i>
-                            <span className="hidden sm:inline">Modalità Student</span>
-                        </button>
-                        <button onClick={() => setAgenda({ date: dateKey(new Date()) })} className="home-quiet" title="Agenda e appuntamenti">
-                            <i className="ph ph-calendar-dots"></i>
-                            <span className="hidden sm:inline">Agenda</span>
-                            {todayAppts > 0 && <span className="pets-soon">{todayAppts}</span>}
-                        </button>
-                        <button onClick={() => setWidgetsEditing((v) => !v)} className="home-quiet max-[1359px]:!hidden" title="Modifica i widget laterali (tieni premuto su un widget per fare lo stesso)">
-                            <i className={`ph ${widgetsEditing ? 'ph-check' : 'ph-squares-four'}`}></i>
-                            <span>{widgetsEditing ? 'Fine' : 'Widget'}</span>
+                            <span className="hidden sm:inline">Student</span>
+                            <span className="pets-soon">presto</span>
                         </button>
                         <button onClick={() => setPetsOpen(true)} className="home-quiet" title="Pets: in arrivo">
                             <i className="ph ph-dog"></i>
                             <span>Pets</span>
                             <span className="pets-soon">presto</span>
+                        </button>
+                        <button onClick={() => setWidgetsEditing((v) => !v)} className="home-quiet max-[1359px]:!hidden" title="Modifica i widget laterali (tieni premuto su un widget per fare lo stesso)">
+                            <i className={`ph ${widgetsEditing ? 'ph-check' : 'ph-squares-four'}`}></i>
+                            <span>{widgetsEditing ? 'Fine' : 'Widget'}</span>
+                        </button>
+                        <button onClick={() => setAgenda({ date: dateKey(new Date()) })} className="home-quiet" title="Agenda e appuntamenti">
+                            <i className="ph ph-calendar-dots"></i>
+                            <span className="hidden sm:inline">Agenda</span>
+                            {todayAppts > 0 && <span className="pets-soon">{todayAppts}</span>}
                         </button>
                         <button onClick={() => setShowSettings(true)} className="home-quiet" title="Impostazioni e formule">
                             <i className="ph ph-gear"></i>
@@ -214,6 +217,26 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                         </p>
                         <span className="pets-soon pets-soon-lg">In arrivo</span>
                         <button onClick={() => setPetsOpen(false)} className="pets-close">
+                            Ho capito
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Student: in arrivo, diventerà un libro */}
+            {studentSoonOpen && (
+                <div className="sheet-back" onClick={() => setStudentSoonOpen(false)}>
+                    <div className="sheet text-center" onClick={(e) => e.stopPropagation()}>
+                        <div className="pets-mark" aria-hidden="true">
+                            <i className="ph-fill ph-book-open-text"></i>
+                        </div>
+                        <h2 className="text-[26px] leading-tight text-[color:var(--ink)]" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 600 }}>
+                            Student
+                        </h2>
+                        <p className="text-[16px] font-medium text-[color:var(--ink)] mt-2">Si sta trasformando in qualcosa di nuovo.</p>
+                        <p className="text-[14px] text-[color:var(--muted)] mt-2 leading-relaxed">La modalità Student è in pausa mentre la rivediamo da capo: tornerà presto, in una forma più completa.</p>
+                        <span className="pets-soon pets-soon-lg">In arrivo</span>
+                        <button onClick={() => setStudentSoonOpen(false)} className="pets-close">
                             Ho capito
                         </button>
                     </div>
