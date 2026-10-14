@@ -1,4 +1,4 @@
-// HTML della lettera di incarico + informativa privacy (usato da Report Studio)
+// HTML della lettera di incarico + informativa privacy (usato dal Centro stampa)
 export const buildLetterHtml = ({ patient, professional }) => {
     const val = (v) => v || '____________________';
     const today = new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });

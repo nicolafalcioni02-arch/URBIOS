@@ -19,6 +19,7 @@ Formato: `[ ]` aperto · `[x]` risolto. Ogni voce: dove, cosa succede, fix propo
 - [x] **Unità "PROVA" nei range ematici** (risolto: ora mg/dL) — `src/logic/db_defaults.js` (`DEFAULT_RANGE_EMATO.bg_glicemia.unit: 'PROVA'`): resto di un test, compare come unità della glicemia (anche negli export `range_ematici.csv`). Dovrebbe essere `mg/dL`.
 - [ ] **Dati demo incoerenti** — `src/components/Pazienti_demo/casiDemo.js`: i valori nutrizionali degli alimenti sono per 100 g nell'app, ma alcuni sono per porzione (es. "Olio EVO" 10 g con kcal 90 invece di ~899): i totali del piano demo risultano sbagliati.
 - [ ] **Import archivio: il conteggio "formule" include quelle di default** — `import/analyze.js`: `normalizeDb` aggiunge le formule di default anche se il file non le contiene, e l'anteprima le conta come "4 formule" (non vengono comunque duplicate).
+- [ ] **Icona `ph-file-signature` inesistente** — `components/patient/info/DocumentsPanel.jsx` e `documentsLogic.js` usano `ph-file-signature`, che in @phosphor-icons/web 2.0.3 non c'è: l'icona resta vuota. Fix proposto: `ph-signature` (già usata nel Centro stampa).
 
 ## Training: idee e limiti noti
 - [ ] **Foto e dimensione dell'archivio** — le foto del professionista sono incorporate nel file (~35 KB l'una, max 4 per esercizio). Con centinaia di foto il file archivio diventa pesante (e la cifratura/salvataggio più lenti). Valutare un avviso sulla dimensione o un limite complessivo.

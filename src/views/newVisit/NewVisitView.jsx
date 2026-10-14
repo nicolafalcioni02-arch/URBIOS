@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { SmartLabCard } from '../../components/ui/SmartLabCard';
-import { ReportStudio } from '../../components/reports/studio/ReportStudio';
+import { usePrintCenter, usePrintDraft } from '../../components/reports/printCenter/PrintCenterProvider';
 import { calculateEquation } from '../../logic/calculations';
 import { Analisi } from '../analisi/Analisi';
 import { Measure3DModal } from './modals/Measure3DModal';
@@ -22,7 +22,7 @@ import { TrainingPlan } from '../../components/patient/training/TrainingPlan';
 import { SkinfoldsSection } from './sections/SkinfoldsSection';
 
 export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeVisit, updatePatientInfo, configA, setConfigA, configB, setConfigB, db, onUpdateDb, onDone, initialMode, initialVisitId, updateDraftMany }) => {
-    const [showReport, setShowReport] = useState(false);
+    const printCenter = usePrintCenter();
     const [showAnalisi, setShowAnalisi] = useState(false);
     const [show3D, setShow3D] = useState(null); // 'circ' | 'pliche': misure guidate sul corpo 3D
 
@@ -112,6 +112,8 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
             risultati_metodo_B: calcolaMetodo(configB),
         };
     };
+    // il Centro stampa (anche dal tasto in alto) può stampare la visita in corso prima di salvarla
+    usePrintDraft(getLiveReportData);
 
     // Calcoli per BIVA
     const rawRz = visitDraft.biva_rz;
@@ -267,7 +269,7 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
                 onChangeMode={() => setPath(null)}
                 step={step}
                 setStep={setStep}
-                onPreview={() => setShowReport(true)}
+                onPreview={() => printCenter && printCenter.open(['visita', 'grafici'])}
                 onAnalysis={() => setShowAnalisi(true)}
                 onSave={() => {
                     // senza il peso non si puo' salvare: si torna al passo delle misure, dove va inserito
@@ -280,10 +282,6 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
                 }}
                 renderStep={renderStep}
             />
-
-            {showReport && (
-                <ReportStudio initial={['visita']} visitDraft={getLiveReportData()} patient={patient} db={db} onClose={() => setShowReport(false)} />
-            )}
             {show3D && <Measure3DModal layer={show3D} sesso={sessoPaziente} visitDraft={visitDraft} updateDraft={updateDraft} onClose={() => setShow3D(null)} />}
             {showAnalisi && <Analisi patient={patient} visitData={visitDraft} report={getLiveReportData()} sesso={sessoPaziente} eta={etaPaziente} updateDraft={updateDraft} onClose={() => setShowAnalisi(false)} />}
 

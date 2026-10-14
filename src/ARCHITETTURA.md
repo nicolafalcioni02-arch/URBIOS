@@ -11,7 +11,7 @@ src/
 ├── components/                        pezzi riusabili o per area funzionale
 │   ├── ui/                            mattoncini generici (Button, Card, InputGroup...)
 │   ├── charts/                        grafici (BIVA, Somatocarta, SmartPlot)
-│   ├── reports/                       anteprime/stampe (Report visita, Lettera d'incarico)
+│   ├── reports/                       stampe: printCenter/ = Centro stampa (unico motore: compone, impagina in A4, modifica, stampa/PDF)
 │   ├── visuals/                       effetti grafici (shader)
 │   └── patient/                       moduli della scheda paziente (Storico, Training, Dieta...)
 ├── dataExchange/                      IMPORT/EXPORT: CSV, documenti, ZIP, anonimizzazione, unione dati (vedi dataExchange/README.md)

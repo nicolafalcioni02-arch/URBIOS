@@ -4,6 +4,7 @@ import { PatientHeader } from './parts/PatientHeader';
 import { PatientTabContent } from './parts/PatientTabContent';
 import { UrbiosAiModal } from '../../ai/UrbiosAiModal';
 import { usePatientVisitActions } from './hooks/usePatientVisitActions';
+import { PrintCenterProvider, usePrintCenter } from '../../components/reports/printCenter/PrintCenterProvider';
 
 export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = false, onOpenAgenda }) => {
     // un paziente senza visite parte dall'anagrafica, gli altri dallo storico
@@ -197,6 +198,7 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
     });
 
     return (
+        <PrintCenterProvider patient={patient} db={db} onUpdateDb={onUpdateDb} readOnly={readOnly}>
         <div className="h-full flex flex-col bg-[var(--paper)] relative z-20">
             {/* HEADER */}
             <div ref={headRef}>
@@ -209,6 +211,7 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
                     readOnly={readOnly}
                     onAi={() => setAiOpen(true)}
                     widgets={canWidgets ? { editing: widgetsEditing, hidden: widgetsHidden, toggleEdit: () => setWidgetsEditing((v) => !v), toggleHidden } : null}
+                    printButton={<PrintButton />}
                 />
             </div>
             {canWidgets && <WidgetDock db={db} onUpdateDb={onUpdateDb} mode="patient" top={headTop} hidden={widgetsHidden} editing={widgetsEditing} onEditingChange={setWidgetsEditing} onOpenAgenda={onOpenAgenda} />}
@@ -255,5 +258,16 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
                 />
             )}
         </div>
+        </PrintCenterProvider>
+    );
+};
+
+// tasto stampante nella barra in alto: apre il Centro stampa
+const PrintButton = () => {
+    const pc = usePrintCenter();
+    return (
+        <button className="vw-chip !px-0 w-10 !h-10 justify-center flex-none" onClick={() => pc.open()} title="Centro stampa: tutti i documenti del paziente, pronti da stampare o inviare" aria-label="Centro stampa">
+            <i className="ph ph-printer"></i>
+        </button>
     );
 };

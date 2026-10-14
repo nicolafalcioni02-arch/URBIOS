@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { ReportStudio } from '../../reports/studio/ReportStudio';
+import React from 'react';
+import { usePrintCenter } from '../../reports/printCenter/PrintCenterProvider';
 import { DOCS, STATI, docOf, docsSummary, fmtDate, missingForLetter, oggi } from './documentsLogic';
 
 const TONE = { da_consegnare: 'var(--warn)', consegnato: 'var(--accent)', firmato: 'var(--ok)' };
 
 // Contrattualistica: genera la lettera e tiene traccia di cosa e' stato consegnato e firmato
 export const DocumentsPanel = ({ patient, professionalData, updatePatientInfo }) => {
-    const [showLettera, setShowLettera] = useState(false);
+    const printCenter = usePrintCenter();
     const { firmati, totale, completo } = docsSummary(patient);
     const missing = missingForLetter(patient);
 
@@ -30,14 +30,7 @@ export const DocumentsPanel = ({ patient, professionalData, updatePatientInfo })
 
     const setDate = (id, field, v) => save(id, { ...docOf(patient, id), [field]: v });
 
-    // stampando la lettera i documenti ancora "da consegnare" passano a "consegnato"
-    const onPrinted = () => {
-        const all = { ...(patient.documenti || {}) };
-        DOCS.forEach((d) => {
-            if (docOf(patient, d.id).stato === 'da_consegnare') all[d.id] = { stato: 'consegnato', dataConsegna: oggi() };
-        });
-        updatePatientInfo('documenti', all);
-    };
+    // stampando la lettera (dal Centro stampa) i documenti ancora "da consegnare" passano a "consegnato"
 
     const markAllSigned = () => {
         const all = { ...(patient.documenti || {}) };
@@ -68,7 +61,7 @@ export const DocumentsPanel = ({ patient, professionalData, updatePatientInfo })
                         </button>
                     )}
                     <button
-                        onClick={() => setShowLettera(true)}
+                        onClick={() => printCenter && printCenter.open(['lettera'])}
                         className="vw-chip !h-9 text-[13px]"
                         style={{ background: 'var(--ink)', color: '#fff', borderColor: 'var(--ink)' }}
                     >
@@ -126,7 +119,6 @@ export const DocumentsPanel = ({ patient, professionalData, updatePatientInfo })
                 })}
             </div>
 
-            {showLettera && <ReportStudio initial={['lettera']} patient={patient} db={{ utente: professionalData || {} }} onPrint={onPrinted} onClose={() => setShowLettera(false)} />}
         </div>
     );
 };

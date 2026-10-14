@@ -4,19 +4,19 @@ import { Somatocarta } from '../../components/charts/somatocarta/Somatocarta';
 import { generateAdvancedInterpretation } from './logic/somatotypeInterpretation';
 import { ConfirmSaveModal } from './modals/ConfirmSaveModal';
 import { AnalisiHeader } from './sections/AnalisiHeader';
-import { ChartsReport } from './ChartsReport';
+import { usePrintCenter } from '../../components/reports/printCenter/PrintCenterProvider';
 import { computeSomatotype } from './logic/somatotype';
 import { buildBodyModel } from './logic/bodyModel';
 import { Body3D } from './sections/Body3D';
 import { BodyCompositionCharts } from './sections/BodyCompositionCharts';
 
-export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sesso, eta }) => {
+export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sesso, eta, visitId = null }) => {
     // --- STATI ---
     const [somatoValues, setSomatoValues] = useState({ endo: 0, meso: 0, ecto: 0 });
     const [tab, setTab] = useState('comp');
     const [showRings, setShowRings] = useState(true);
     const [showPliche, setShowPliche] = useState(false);
-    const [showReport, setShowReport] = useState(false);
+    const printCenter = usePrintCenter();
     const [interpretationText, setInterpretationText] = useState('');
 
     // Stati per UI di Salvataggio
@@ -130,9 +130,9 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
                                     </button>
                                 ))}
                             </div>
-                            <button onClick={() => setShowReport(true)} className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
-                                <i className="ph-bold ph-file-pdf"></i> Report grafici A4
-                            </button>
+                            {printCenter && <button onClick={() => printCenter.open([{ type: 'grafici', visitId: visitId || 'draft' }])} className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:bg-gray-100 flex items-center gap-1.5">
+                                <i className="ph-bold ph-printer"></i> Stampa grafici A4
+                            </button>}
                             </div>
                             <div className="flex-1 min-h-0 lg:overflow-y-auto pr-1 pb-6">
                         {tab === 'comp' && <BodyCompositionCharts visitData={visitData} report={report} sesso={sesso} eta={eta} />}
@@ -240,10 +240,6 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
                         </>)}
                             </div>
                         </div>
-
-                        {showReport && (
-                            <ChartsReport patient={patient} visitData={visitData} report={report} sesso={sesso} eta={eta} model={model} somatoValues={somatoValues} date={visitData?.data} onClose={() => setShowReport(false)} />
-                        )}
                         {/* --- MODALE CONFERMA SALVATAGGIO --- */}
                         {<ConfirmSaveModal executeSave={executeSave} setShowConfirmModal={setShowConfirmModal} showConfirmModal={showConfirmModal} />}
                     </div>

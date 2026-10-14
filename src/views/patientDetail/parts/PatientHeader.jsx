@@ -7,7 +7,7 @@ const TABS = [
     { id: 'visit', label: 'Nuova visita', icon: 'ph-plus-circle' },
 ];
 
-export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly = false, onAi, widgets }) => {
+export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly = false, onAi, widgets, printButton = null }) => {
     const wrap = useRef(null);
     const [pill, setPill] = useState({ left: 0, width: 0, ready: false });
 
@@ -93,6 +93,7 @@ export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly
             </div>
 
             <div className="flex items-center justify-end gap-2 min-w-0">
+            {printButton}
             {widgets && (
                 <div className="flex items-center gap-1.5 flex-none max-[1359px]:hidden">
                     {!widgets.hidden && (

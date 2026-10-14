@@ -6,7 +6,7 @@ import { trainingCss } from './trainingStyles';
 import { useTrainingEditing } from './hooks/useTrainingEditing';
 import { useExerciseDatabase } from './hooks/useExerciseDatabase';
 import { useTrainingPersistence } from './hooks/useTrainingPersistence';
-import { ReportStudio } from '../../reports/studio/ReportStudio';
+import { usePrintCenter } from '../../reports/printCenter/PrintCenterProvider';
 import { ToolsModal } from './tools/ToolsModal';
 import { AnalysisModal } from './analysis/AnalysisModal';
 import { ProgressionModal } from './analysis/ProgressionModal';
@@ -23,7 +23,7 @@ export const TrainingPlan = ({ patient, db, onUpdateDb }) => {
         useTrainingPersistence({ patient, onUpdateDb });
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [isPrintOpen, setIsPrintOpen] = useState(false);
+    const printCenter = usePrintCenter();
     const [isToolsOpen, setIsToolsOpen] = useState(false);
     const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
     const [isProgressionOpen, setIsProgressionOpen] = useState(false);
@@ -121,12 +121,8 @@ export const TrainingPlan = ({ patient, db, onUpdateDb }) => {
                 onTools={() => setIsToolsOpen(true)}
                 onProgression={() => setIsProgressionOpen(true)}
                 onAnalysis={() => setIsAnalysisOpen(true)}
-                onPrint={() => setIsPrintOpen(true)}
+                onPrint={printCenter ? () => printCenter.open(['training']) : undefined}
             />
-
-            {isPrintOpen && (
-                <ReportStudio initial={['training']} patient={patient} db={db} onClose={() => setIsPrintOpen(false)} />
-            )}
             {isToolsOpen && <ToolsModal profile={profile} massimali={massimali} exerciseDB={exerciseDB} saveMassimale={saveMassimale} deleteMassimale={deleteMassimale} onClose={() => setIsToolsOpen(false)} />}
             {isAnalysisOpen && <AnalysisModal weeks={weeks} header={header} massimali={massimali} profile={profile} onClose={() => setIsAnalysisOpen(false)} />}
             {isProgressionOpen && <ProgressionModal weeks={weeks} header={header} massimali={massimali} profile={profile} onApply={(w) => setWeeks(w)} onClose={() => setIsProgressionOpen(false)} />}

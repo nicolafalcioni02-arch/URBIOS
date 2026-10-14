@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { ReportStudio } from '../../reports/studio/ReportStudio';
+import { usePrintCenter } from '../../reports/printCenter/PrintCenterProvider';
 import { dietCss } from './dietStyles';
 import { AnalysisModal } from './analysis/AnalysisModal';
 import { DrvEditorModal } from './modals/DrvEditorModal';
@@ -44,7 +44,7 @@ export const DietPlan = ({ patient, onUpdateDb, db, initialVisitId = null }) => 
     } = useDietPlanData({ db, onUpdateDb, patient, initialVisitId });
 
     // finestre di servizio
-    const [isPrintReportOpen, setIsPrintReportOpen] = useState(false);
+    const printCenter = usePrintCenter();
     const [isDbOpen, setIsDbOpen] = useState(false);
     const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
     const [isSmartOpen, setIsSmartOpen] = useState(false);
@@ -129,7 +129,7 @@ export const DietPlan = ({ patient, onUpdateDb, db, initialVisitId = null }) => 
                 onFoods={() => setIsDbOpen(true)}
                 onAnalysis={() => setIsAnalysisOpen(true)}
                 onChart={() => setIsSmartOpen(true)}
-                onPrint={() => setIsPrintReportOpen(true)}
+                onPrint={printCenter ? () => printCenter.open([{ type: 'dieta', visitId: selectedVisitaId }]) : undefined}
                 onLaf={() => setIsLafModalOpen(true)}
                 onActiveDay={setActiveDayId}
             />
@@ -196,7 +196,6 @@ export const DietPlan = ({ patient, onUpdateDb, db, initialVisitId = null }) => 
                 totalLafHours={totalLafHours}
             />
 
-            {isPrintReportOpen && <ReportStudio initial={['dieta']} patient={currentPatient} db={db} onClose={() => setIsPrintReportOpen(false)} />}
         </div>
     );
 };

@@ -2,9 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { SmartPlotModal } from '../../charts/SmartPlotModal';
 import { SearchCalendarModal } from './modals/SearchCalendarModal';
 import { VisitDetailModal } from './modals/VisitDetailModal';
-import { ChartsReport } from '../../../views/analisi/ChartsReport';
-import { buildBodyModel } from '../../../views/analisi/logic/bodyModel';
-import { computeSomatotype } from '../../../views/analisi/logic/somatotype';
+import { usePrintCenter } from '../../reports/printCenter/PrintCenterProvider';
 import { Analisi } from '../../../views/analisi/Analisi';
 import { DietPreviewModal } from './modals/DietPreviewModal';
 import { HistoryStatsCards } from './sections/HistoryStatsCards';
@@ -18,7 +16,7 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
     const [selectedVisit, setSelectedVisit] = useState(null);
     const [isSearchCalendarOpen, setIsSearchCalendarOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [printVisit, setPrintVisit] = useState(null); // visita di cui si stampa il report grafici
+    const printCenter = usePrintCenter();
     const [analisiVisit, setAnalisiVisit] = useState(null); // visita di cui si apre l'analisi avanzata
     const [dietVisit, setDietVisit] = useState(null); // visita di cui si guarda l'anteprima della dieta
     const [toDelete, setToDelete] = useState(null); // visita da eliminare, in attesa di conferma
@@ -155,10 +153,14 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
             {<VisitDetailModal
                 selectedVisit={selectedVisit}
                 setSelectedVisit={setSelectedVisit}
-                onPrintCharts={(v) => {
-                    setSelectedVisit(null);
-                    setPrintVisit(v);
-                }}
+                onPrintCharts={
+                    printCenter
+                        ? (v) => {
+                              setSelectedVisit(null);
+                              printCenter.open([{ type: 'visita', visitId: v.id }, { type: 'grafici', visitId: v.id }]);
+                          }
+                        : null
+                }
                 onOpenAnalisi={(v) => {
                     setSelectedVisit(null);
                     setAnalisiVisit(v);
@@ -171,25 +173,10 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
                     report={analisiVisit.dettagli || {}}
                     sesso={visitCtx(analisiVisit).sesso}
                     eta={visitCtx(analisiVisit).eta}
+                    visitId={analisiVisit.id}
                     onClose={() => setAnalisiVisit(null)}
                 />
             )}
-            {printVisit && (() => {
-                const c = visitCtx(printVisit);
-                return (
-                    <ChartsReport
-                        patient={patient}
-                        visitData={c.visitData}
-                        report={printVisit.dettagli || {}}
-                        sesso={c.sesso}
-                        eta={c.eta}
-                        model={buildBodyModel(c.visitData, printVisit.dettagli || {}, c.sesso)}
-                        somatoValues={computeSomatotype(c.visitData)}
-                        date={printVisit.data}
-                        onClose={() => setPrintVisit(null)}
-                    />
-                );
-            })()}
 
             <DietPreviewModal
                 visit={dietVisit}

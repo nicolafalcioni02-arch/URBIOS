@@ -11,7 +11,7 @@ const kgFmt = (x) => (x >= 1000 ? `${(x / 1000).toFixed(1).replace('.', ',')} t`
 
 export const TRAINING_DEFAULT_OPTS = { weekId: 'all', images: true, pagePerDay: true, notes: true, studio: true, summary: false, legend: true };
 
-// Contenuto della scheda di allenamento (senza hook: si può anche rendere in HTML statico per Report Studio)
+// Contenuto della scheda di allenamento (senza hook: si può anche rendere in HTML statico per il Centro stampa)
 export const TrainingDocBody = ({ header, weeks, exerciseDB, massimali, profile, professional, opts: o }) => {
     const opts = { ...TRAINING_DEFAULT_OPTS, ...(o || {}) };
     const prof = professional || {};

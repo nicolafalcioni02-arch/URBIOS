@@ -1,7 +1,7 @@
 // CSS della stampa della scheda di allenamento (A4). Il browser fa l'impaginazione: le righe non si spezzano,
 // l'intestazione della tabella si ripete su ogni pagina, ogni giorno può iniziare su una pagina nuova.
 
-// stile del solo documento (tabelle, intestazioni): riusato anche da Report Studio
+// stile del solo documento (tabelle, intestazioni): riusato anche dal Centro stampa
 export const trainingDocCss = `
 .tp-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12mm; padding-bottom: 5mm; border-bottom: 2px solid #111; margin-bottom: 6mm; }
 .tp-studio-name { font-size: 17pt; font-weight: 800; text-transform: uppercase; letter-spacing: -.3px; line-height: 1.05; }
