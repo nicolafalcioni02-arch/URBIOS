@@ -233,8 +233,11 @@ export const ReportStudio = ({ patient, db, visitDraft, initial = [], layout: la
 
                 <div className="rs-scroll" onClick={() => setSideOpen(false)}>
                     <div className={`rs-page rs-layout-${layout.id}`} style={{ '--accent': accent }}>
-                        {layout.id === 'decorato' && <div className="rs-frame" />}
-                        {layout.id === 'decorato' && <style>{'@media print { @page { size: A4 portrait; margin: 20mm 22mm; } }'}</style>}
+                        {layout.id === 'decorato' && <style>{'@media print { @page { size: A4 portrait; margin: 0; } }'}</style>}
+                        <table className="rs-flow">
+                            <thead><tr><td><div className="rs-hd"><svg viewBox="0 0 240 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><path d="M10 11h82M148 11h82" /><path d="M92 11c8-9 16-9 20 0 4-9 12-9 20 0-8 9-16 9-20 0-4 9-12 9-20 0z" /><circle cx="120" cy="11" r="3" fill="currentColor" /></svg></div></td></tr></thead>
+                            <tfoot><tr><td><div className="rs-ft"><svg viewBox="0 0 240 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><path d="M10 11h82M148 11h82" /><path d="M92 11c8-9 16-9 20 0 4-9 12-9 20 0-8 9-16 9-20 0-4 9-12 9-20 0z" /><circle cx="120" cy="11" r="3" fill="currentColor" /></svg></div></td></tr></tfoot>
+                            <tbody><tr><td><div className="rs-bd">
                         {sections.map((s, i) => (
                             <React.Fragment key={s.id}>
                                 {i > 0 && s.newPage && <div className="rs-sep"><span>nuova pagina</span></div>}
@@ -248,6 +251,8 @@ export const ReportStudio = ({ patient, db, visitDraft, initial = [], layout: la
                                 />
                             </React.Fragment>
                         ))}
+                            </div></td></tr></tbody>
+                        </table>
                         {sections.length === 0 && <p style={{ color: '#999', textAlign: 'center', padding: '40mm 0' }}>Nessuna sezione nel report.</p>}
                     </div>
                 </div>
