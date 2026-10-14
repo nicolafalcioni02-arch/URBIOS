@@ -7,6 +7,7 @@ import { AnalisiHeader } from './sections/AnalisiHeader';
 import { usePrintCenter } from '../../components/reports/printCenter/PrintCenterProvider';
 import { computeSomatotype } from './logic/somatotype';
 import { buildBodyModel } from './logic/bodyModel';
+import { getComposition } from './logic/composition';
 import { Body3D } from './sections/Body3D';
 import { BodyCompositionCharts } from './sections/BodyCompositionCharts';
 
@@ -14,8 +15,7 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
     // --- STATI ---
     const [somatoValues, setSomatoValues] = useState({ endo: 0, meso: 0, ecto: 0 });
     const [tab, setTab] = useState('comp');
-    const [showRings, setShowRings] = useState(true);
-    const [showPliche, setShowPliche] = useState(false);
+    const [layer3d, setLayer3d] = useState('circ');
     const printCenter = usePrintCenter();
     const [interpretationText, setInterpretationText] = useState('');
 
@@ -93,10 +93,11 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
     };
 
     const model = buildBodyModel(visitData, report, sesso);
+    const comp = getComposition(visitData || {}, report || {}, sesso, eta);
 
     return ReactDOM.createPortal(
         <div className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4 fade-enter">
-            <div className="bg-gray-50 w-full max-w-[1600px] h-full sm:h-[95vh] rounded-none sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden relative border border-gray-200">
+            <div style={{ background: '#F6F5F2' }} className="w-full max-w-[1680px] h-full sm:h-[95vh] rounded-none sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden relative border border-gray-200">
                 {/* --- HEADER --- */}
                 <AnalisiHeader onClose={onClose} patient={patient} />
 
@@ -104,19 +105,34 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
                 <div className="flex-1 p-3 sm:p-5 overflow-y-auto lg:overflow-hidden">
                     <div className="flex flex-col lg:flex-row gap-4 lg:h-full">
                         {/* Colonna sinistra: modello 3D che segue le misure */}
-                        <aside className="lg:w-[300px] xl:w-[340px] flex-none bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col overflow-hidden h-[380px] lg:h-full">
-                            <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
-                                <span className="text-xs font-bold text-gray-700">Modello corporeo</span>
-                                <div className="flex gap-1">
-                                    {[['Anelli', showRings, setShowRings], ['Pliche', showPliche, setShowPliche]].map(([n, on, set]) => (
-                                        <button key={n} onClick={() => set((v) => !v)} className={`text-[10px] font-bold px-2 py-1 rounded-full border ${on ? 'bg-black text-white border-black' : 'text-gray-500 border-gray-200'}`}>{n}</button>
+                        <aside className="lg:w-[400px] xl:w-[460px] flex-none bg-white rounded-2xl border border-stone-200 flex flex-col overflow-hidden h-[520px] lg:h-full">
+                            <div className="px-4 py-3 border-b border-stone-100 flex items-center justify-between gap-3">
+                                <div className="min-w-0">
+                                    <div className="text-[13px] font-bold text-stone-900">Modello corporeo</div>
+                                    <div className="text-[11px] text-stone-500 truncate">
+                                        {model.altezza ? `${model.altezza} cm` : '-- cm'} · {model.peso ? `${model.peso} kg` : '-- kg'}
+                                        {comp.fm > 0 ? ` · ${comp.fm.toFixed(1).replace('.', ',')}% grasso` : ''}
+                                    </div>
+                                </div>
+                                <div className="flex p-0.5 rounded-full bg-stone-100 flex-none">
+                                    {[['circ', 'Circonferenze'], ['pliche', 'Pliche']].map(([id, l]) => (
+                                        <button key={id} onClick={() => setLayer3d(id)} className={`px-3 h-7 rounded-full text-[11px] font-bold transition-colors ${layer3d === id ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-900'}`}>
+                                            {l}
+                                        </button>
                                     ))}
                                 </div>
                             </div>
-                            <div className="flex-1 min-h-0"><Body3D model={model} showRings={showRings} showPliche={showPliche} /></div>
-                            <div className="px-4 py-2 border-t border-gray-100 text-[10px] text-gray-500 leading-snug">
-                                {model.altezza ? `${model.altezza} cm` : '-- cm'} · {model.peso ? `${model.peso} kg` : '-- kg'}
-                                {model.fm ? ` · ${model.fm.toFixed(1)}% grasso` : ''}. Anelli e pliche sono dove si prendono le misure (la vita è verde, gialla o rossa in base al rapporto vita/altezza; le sfere delle pliche crescono con lo spessore). Trascina per ruotare.
+                            <div className="flex-1 min-h-0">
+                                <Body3D model={model} showRings={layer3d === 'circ'} showPliche={layer3d === 'pliche'} />
+                            </div>
+                            <div className="px-4 py-2.5 border-t border-stone-100 text-[11px] text-stone-500 leading-snug flex gap-2">
+                                <i className="ph ph-hand-grabbing text-[14px] mt-px flex-none"></i>
+                                <span>
+                                    {layer3d === 'circ'
+                                        ? 'Il corpo prende la forma delle misure. La vita è verde, gialla o rossa in base al rapporto vita/altezza.'
+                                        : 'Ogni sfera è un punto di plica: più è grande, più la plica è spessa.'}{' '}
+                                    Trascina per ruotare.
+                                </span>
                             </div>
                         </aside>
 
@@ -135,7 +151,7 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
                             </button>}
                             </div>
                             <div className="flex-1 min-h-0 lg:overflow-y-auto pr-1 pb-6">
-                        {tab === 'comp' && <BodyCompositionCharts visitData={visitData} report={report} sesso={sesso} eta={eta} />}
+                        {tab === 'comp' && <BodyCompositionCharts visitData={visitData} report={report} sesso={sesso} eta={eta} patient={patient} date={visitData?.data} />}
                         {tab === 'somato' && (<>
                         {/* ============================================================ */}
                         {/* SUPER BOX 1: SOMATOTIPO (GRAFICO SX + INPUT/TESTO DX)        */}

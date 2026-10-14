@@ -2,21 +2,28 @@ import React, { useMemo } from 'react';
 import { Somatocarta } from '../../components/charts/somatocarta/Somatocarta';
 import { BodyCompositionCharts } from './sections/BodyCompositionCharts';
 import { snapshotBody } from './sections/Body3D';
-import { TrendChart, trendPoints } from './sections/TrendChart';
 import { PLI_SITES } from './sections/measureSites';
 
 // Report grafici: due pagine fisse (corpo 3D e indici; grafici, andamento e parametri) usate dal Centro stampa.
 export const chartsCss = `
-.cr-page { display: flex; flex-direction: column; gap: 3mm; font-family: Inter, system-ui, sans-serif; color: #111827; }
-.cr-hd { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--accent, #111827); padding-bottom: 3mm; }
-.cr-hd h1 { font-size: 18px; margin: 0; } .cr-hd p { margin: 2px 0 0; font-size: 11px; color: #6b7280; }
-.cr-imgs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3mm; }
-.cr-imgs figure { margin: 0; padding: 0 5mm; text-align: center; font-size: 9px; color: #6b7280; } .cr-imgs img { width: 100%; height: auto; display: block; }
-.cr-box { border: 1px solid #e5e7eb; border-radius: 12px; padding: 6px 8px; font-size: 11px; }
-.cr-box > strong { display: block; margin-bottom: 3px; }
-.cr-params { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px 12px; font-size: 9px; }
-.cr-params table { border-collapse: collapse; width: 100%; align-self: start; } .cr-params th { text-align: left; font-size: 9px; color: var(--accent, #4f46e5); border-bottom: 1px solid #e5e7eb; padding: 1px 0; }
-.cr-params td { padding: 1px 0; color: #374151; } .cr-params td:last-child { text-align: right; font-weight: 700; }
+.cr-page { display: flex; flex-direction: column; gap: 3mm; font-family: Inter, system-ui, sans-serif; color: #1c1917; }
+.cr-hd { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: .4mm solid var(--accent, #1c1917); padding-bottom: 2.5mm; }
+.cr-kicker { font-size: 7.5pt; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--accent, #4f46e5); }
+.cr-hd h1 { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 600; font-size: 20pt; line-height: 1.1; margin: .5mm 0 0; }
+.cr-hd p { margin: 1mm 0 0; font-size: 8.5pt; color: #78716c; } .cr-hd .cr-date { font-weight: 600; color: #1c1917; }
+.cr-p1 { display: flex; flex-direction: column; gap: 3mm; }
+.cr-imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm; border: 1px solid #e7e5e4; border-radius: 3mm; padding: 2mm; background: radial-gradient(ellipse at 50% 35%, #fff 0%, #f5f3f0 75%); }
+.cr-imgs figure { margin: 0; text-align: center; } .cr-imgs img { width: 100%; height: auto; display: block; }
+.cr-imgs figcaption { font-size: 7.5pt; color: #78716c; font-weight: 600; margin-top: 1mm; }
+.cr-empty { grid-column: 1 / -1; text-align: center; color: #a8a29e; font-size: 9pt; padding: 30mm 4mm; }
+.cr-p2 { display: grid; grid-template-columns: 1fr 2fr; gap: 2mm; align-items: start; }
+.cr-p2 > .cr-box:only-child { grid-column: 1 / -1; }
+.cr-box { border: 1px solid #e7e5e4; border-radius: 3mm; padding: 2.5mm 3mm; font-size: 9pt; background: #fff; }
+.cr-box > strong { display: block; margin-bottom: 1.5mm; font-size: 8.5pt; }
+.cr-somato { font-size: 8pt; color: #57534e; }
+.cr-params { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2mm 4mm; font-size: 7.5pt; }
+.cr-params table { border-collapse: collapse; width: 100%; align-self: start; } .cr-params th { text-align: left; font-size: 7pt; letter-spacing: .08em; text-transform: uppercase; color: var(--accent, #4f46e5); border-bottom: 1px solid #e7e5e4; padding: .5mm 0; }
+.cr-params td { padding: .4mm 0; color: #44403c; } .cr-params td:last-child { text-align: right; font-weight: 700; white-space: nowrap; }
 `;
 const pv = (v) => {
     const n = parseFloat(String(v ?? '').replace(',', '.'));
@@ -63,14 +70,13 @@ const snapCache = new Map();
 const bodyImages = (model) => {
     const key = JSON.stringify(model);
     if (snapCache.has(key)) return snapCache.get(key);
+    const hasCirc = ['collo', 'torace', 'vita', 'fianchi', 'braccio', 'coscia', 'polpaccio'].some((k) => model[k] > 0);
+    const hasPl = Object.values(model.pl || {}).some((v) => v > 0);
     let imgs = [];
     try {
-        imgs = [
-            ['Davanti · circonferenze', snapshotBody(model, { showRings: true }, 0, 700, 800)],
-            ['Dietro · circonferenze', snapshotBody(model, { showRings: true }, Math.PI, 700, 800)],
-            ['Davanti · pliche', snapshotBody(model, { showPliche: true }, 0, 700, 800)],
-            ['Dietro · pliche', snapshotBody(model, { showPliche: true }, Math.PI, 700, 800)],
-        ];
+        if (hasCirc) imgs.push(['Circonferenze · vista frontale', snapshotBody(model, { showRings: true }, 0, 440, 680)]);
+        if (hasPl) imgs.push(['Pliche · vista di tre quarti', snapshotBody(model, { showPliche: true }, -0.75, 440, 680)]);
+        if (imgs.length === 1) imgs.push([hasCirc ? 'Vista laterale' : 'Pliche · vista frontale', snapshotBody(model, hasCirc ? { showRings: true } : { showPliche: true }, hasCirc ? -Math.PI / 2 : 0, 440, 680)]);
     } catch (e) {
         imgs = [];
     }
@@ -79,25 +85,26 @@ const bodyImages = (model) => {
     return imgs;
 };
 
-// page: 1 = indici e corpo 3D, 2 = grafici, andamento, somatotipo e parametri
+// page: 1 = indici, corpo 3D e composizione; 2 = misure, andamento, somatotipo e parametri
 export const ChartsPage = ({ page, patient, visitData, report, sesso, eta, model, somatoValues, date }) => {
     const imgs = useMemo(() => (page === 1 ? bodyImages(model) : []), [page, model]);
-    const trend = useMemo(() => (page === 2 ? trendPoints(patient, visitData, report, date) : null), [page, patient, visitData, report, date]);
     const groups = useMemo(() => paramGroups(visitData || {}, report), [visitData, report]);
-    const hasSomato = somatoValues && (somatoValues.endo > 0 || somatoValues.meso > 0 || somatoValues.ecto > 0);
+    const hasSomato = somatoValues && (somatoValues.endo > 0.1 || somatoValues.meso > 0.1 || somatoValues.ecto > 0.1);
     const name = `${patient?.nome || ''} ${patient?.cognome || ''}`.trim();
+    const common = { visitData, report, sesso, eta, patient, date, compact: true };
     const header = (
         <div className="cr-hd">
             <div>
-                <h1>{page === 1 ? 'Composizione corporea' : 'Grafici e parametri'}</h1>
+                <div className="cr-kicker">{page === 1 ? 'Composizione corporea' : 'Misure e andamento'}</div>
+                <h1>{name}</h1>
                 <p>
-                    {name} · {sesso === 'F' ? 'Donna' : 'Uomo'}
+                    {sesso === 'F' ? 'Donna' : 'Uomo'}
                     {eta ? ` · ${eta} anni` : ''}
                     {model.altezza ? ` · ${model.altezza} cm` : ''}
                     {model.peso ? ` · ${model.peso} kg` : ''}
                 </p>
             </div>
-            <p>{fmtDate(date)}</p>
+            <p className="cr-date">{fmtDate(date)}</p>
         </div>
     );
 
@@ -105,69 +112,67 @@ export const ChartsPage = ({ page, patient, visitData, report, sesso, eta, model
         return (
             <div className="cr-page">
                 {header}
-                <BodyCompositionCharts visitData={visitData} report={report} sesso={sesso} eta={eta} fixed only={['stats']} />
-                {imgs.length > 0 && (
+                <BodyCompositionCharts {...common} only={['stats']} />
+                <div className="cr-p1">
                     <div className="cr-imgs">
                         {imgs.map(([t, src]) => (
                             <figure key={t}>
                                 <img src={src} alt={t} />
-                                {t}
+                                <figcaption>{t}</figcaption>
                             </figure>
                         ))}
+                        {!imgs.length && <p className="cr-empty">Inserisci circonferenze o pliche per vedere il modello corporeo.</p>}
                     </div>
-                )}
+                    <BodyCompositionCharts {...common} only={['composizione', 'grasso', 'rischio']} columns={3} />
+                </div>
             </div>
         );
 
     return (
         <div className="cr-page">
             {header}
-            <BodyCompositionCharts visitData={visitData} report={report} sesso={sesso} eta={eta} compact only={['donut', 'fasce', 'confronto', 'composizione', 'pliche', 'circ', 'bmi', 'whtr', 'bia']} />
-            <div style={{ display: 'grid', gridTemplateColumns: trend && hasSomato ? '2fr 1fr' : '1fr', gap: 8, alignItems: 'start' }}>
-                {trend && (
-                    <div className="cr-box">
-                        <strong>Andamento nel tempo</strong>
-                        <TrendChart points={trend} width={470} height={150} />
-                    </div>
-                )}
-                {hasSomato && (
-                    <div className="cr-box">
-                        <strong>Somatotipo</strong>
-                        <div style={{ width: 230, height: 172, overflow: 'hidden' }}>
-                            <div style={{ zoom: 0.3 }}>
-                                <Somatocarta endo={somatoValues.endo} meso={somatoValues.meso} ecto={somatoValues.ecto} />
+            <BodyCompositionCharts {...common} only={['pliche', 'circ', 'magra', 'bia', 'metodi', 'trend']} columns={2} />
+            {(hasSomato || groups.length > 0) && (
+                <div className="cr-p2">
+                    {hasSomato && (
+                        <div className="cr-box">
+                            <strong>Somatotipo</strong>
+                            <div style={{ width: '100%', aspectRatio: '1.33', overflow: 'hidden', position: 'relative' }}>
+                                <div style={{ zoom: 0.3, position: 'absolute', left: 0, top: 0 }}>
+                                    <Somatocarta endo={somatoValues.endo} meso={somatoValues.meso} ecto={somatoValues.ecto} />
+                                </div>
+                            </div>
+                            <span className="cr-somato">
+                                Endo <b>{somatoValues.endo.toFixed(1)}</b> · Meso <b>{somatoValues.meso.toFixed(1)}</b> · Ecto <b>{somatoValues.ecto.toFixed(1)}</b>
+                            </span>
+                        </div>
+                    )}
+                    {groups.length > 0 && (
+                        <div className="cr-box">
+                            <strong>Parametri della visita</strong>
+                            <div className="cr-params">
+                                {groups.map(([g, rows]) => (
+                                    <table key={g}>
+                                        <thead>
+                                            <tr>
+                                                <th colSpan={2}>{g}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {rows.map(([l, v, u]) => (
+                                                <tr key={l}>
+                                                    <td>{l}</td>
+                                                    <td>
+                                                        {v} {u}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                ))}
                             </div>
                         </div>
-                        <span style={{ fontSize: 9 }}>
-                            Endo {somatoValues.endo.toFixed(1)} · Meso {somatoValues.meso.toFixed(1)} · Ecto {somatoValues.ecto.toFixed(1)}
-                        </span>
-                    </div>
-                )}
-            </div>
-            {groups.length > 0 && (
-                <div className="cr-box">
-                    <strong>Parametri della visita</strong>
-                    <div className="cr-params">
-                        {groups.map(([g, rows]) => (
-                            <table key={g}>
-                                <thead>
-                                    <tr>
-                                        <th colSpan={2}>{g}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {rows.map(([l, v, u]) => (
-                                        <tr key={l}>
-                                            <td>{l}</td>
-                                            <td>
-                                                {v} {u}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        ))}
-                    </div>
+                    )}
                 </div>
             )}
         </div>

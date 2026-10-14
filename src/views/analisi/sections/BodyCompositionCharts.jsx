@@ -1,327 +1,335 @@
-import React, { createContext, useContext, useMemo } from 'react';
-import { Doughnut, Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
+import React, { useMemo } from 'react';
+import { bodyIndices, getComposition } from '../logic/composition';
+import { BandGauge, Donut, HBars, MiniTrend, fmt } from './svgCharts';
 
-ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+// Grafici della composizione corporea: stessi componenti nella finestra di Analisi e nelle pagine del report.
+// `only`: elenco dei riquadri da mostrare; `compact`: versione per la stampa (riquadri piccoli, quelli vuoti spariscono).
 
-const CompactCtx = createContext(false); // report: riquadri piccoli, tre per riga
 const num = (v) => parseFloat(String(v ?? '').replace(',', '.')) || 0;
-const r1 = (v) => Math.round(v * 10) / 10;
 
-// Fasce di % massa grassa (ACE, adattate): [min, max] per sesso
+const C = { fat: '#f43f5e', lean: '#10b981', blue: '#bfdbfe', green: '#86efac', mint: '#bbf7d0', yellow: '#fde68a', red: '#fecaca' };
+
 const FM_BANDS = {
-    M: [
-        { label: 'Essenziale', max: 6, color: '#93c5fd' },
-        { label: 'Atletico', max: 14, color: '#6ee7b7' },
-        { label: 'Fitness', max: 18, color: '#a7f3d0' },
-        { label: 'Nella media', max: 25, color: '#fde68a' },
-        { label: 'Eccesso', max: 40, color: '#fca5a5' },
-    ],
-    F: [
-        { label: 'Essenziale', max: 14, color: '#93c5fd' },
-        { label: 'Atletico', max: 21, color: '#6ee7b7' },
-        { label: 'Fitness', max: 25, color: '#a7f3d0' },
-        { label: 'Nella media', max: 32, color: '#fde68a' },
-        { label: 'Eccesso', max: 45, color: '#fca5a5' },
-    ],
+    M: { min: 2, bands: [{ label: 'Essenziale', max: 5, color: C.blue }, { label: 'Atletico', max: 13, color: C.green }, { label: 'Fitness', max: 17, color: C.mint }, { label: 'Media', max: 24, color: C.yellow }, { label: 'Eccesso', max: 40, color: C.red }] },
+    F: { min: 10, bands: [{ label: 'Essenziale', max: 13, color: C.blue }, { label: 'Atletico', max: 20, color: C.green }, { label: 'Fitness', max: 24, color: C.mint }, { label: 'Media', max: 31, color: C.yellow }, { label: 'Eccesso', max: 45, color: C.red }] },
 };
+const BMI_BANDS = { min: 15, bands: [{ label: 'Sottopeso', max: 18.5, color: C.blue }, { label: 'Normopeso', max: 25, color: C.green }, { label: 'Sovrappeso', max: 30, color: C.yellow }, { label: 'Obesità', max: 40, color: C.red }] };
+const WHTR_BANDS = { min: 0.3, bands: [{ label: 'Basso', max: 0.4, color: C.blue }, { label: 'Ottimale', max: 0.5, color: C.green }, { label: 'Rischio', max: 0.6, color: C.yellow }, { label: 'Alto rischio', max: 0.75, color: C.red }] };
+const WHR_BANDS = {
+    M: { min: 0.7, bands: [{ label: 'Basso', max: 0.9, color: C.green }, { label: 'Moderato', max: 0.99, color: C.yellow }, { label: 'Alto', max: 1.2, color: C.red }] },
+    F: { min: 0.6, bands: [{ label: 'Basso', max: 0.8, color: C.green }, { label: 'Moderato', max: 0.85, color: C.yellow }, { label: 'Alto', max: 1.1, color: C.red }] },
+};
+const FFMI_BANDS = {
+    M: { min: 12, bands: [{ label: 'Basso', max: 17, color: C.blue }, { label: 'Nella media', max: 20, color: C.green }, { label: 'Elevato', max: 23, color: C.mint }, { label: 'Molto elevato', max: 28, color: C.yellow }] },
+    F: { min: 10, bands: [{ label: 'Basso', max: 14, color: C.blue }, { label: 'Nella media', max: 17, color: C.green }, { label: 'Elevato', max: 20, color: C.mint }, { label: 'Molto elevato', max: 24, color: C.yellow }] },
+};
+const FMI_BANDS = {
+    M: { min: 0, bands: [{ label: 'Basso', max: 3, color: C.blue }, { label: 'Normale', max: 6, color: C.green }, { label: 'Eccesso', max: 9, color: C.yellow }, { label: 'Obesità', max: 15, color: C.red }] },
+    F: { min: 0, bands: [{ label: 'Basso', max: 5, color: C.blue }, { label: 'Normale', max: 9, color: C.green }, { label: 'Eccesso', max: 13, color: C.yellow }, { label: 'Obesità', max: 20, color: C.red }] },
+};
+const PHA_BANDS = {
+    M: { min: 3, bands: [{ label: 'Basso', max: 5, color: C.red }, { label: 'Ridotto', max: 6, color: C.yellow }, { label: 'Buono', max: 7.5, color: C.green }, { label: 'Ottimo', max: 10, color: C.mint }] },
+    F: { min: 3, bands: [{ label: 'Basso', max: 4.5, color: C.red }, { label: 'Ridotto', max: 5.5, color: C.yellow }, { label: 'Buono', max: 7, color: C.green }, { label: 'Ottimo', max: 9, color: C.mint }] },
+};
+export const bandOf = (v, def) => def.bands.find((b) => v <= b.max) || def.bands[def.bands.length - 1];
 
 const PLICHE = [
     ['pl_pettorale', 'Pettorale'],
+    ['pl_ascellare', 'Ascellare'],
     ['pl_tricipite', 'Tricipite'],
     ['pl_bicipite', 'Bicipite'],
     ['pl_sottoscap', 'Sottoscapolare'],
-    ['pl_ascellare', 'Ascellare'],
-    ['pl_addome', 'Addome'],
     ['pl_sovrailiaca', 'Sovrailiaca'],
+    ['pl_addome', 'Addome'],
     ['pl_coscia', 'Coscia'],
     ['pl_polpaccio', 'Polpaccio'],
 ];
-
 const CIRC = [
     ['cm_collo', 'Collo'],
     ['cm_torace', 'Torace'],
-    ['circ_braccio', 'Braccio'],
-    ['circ_avambr', 'Avambraccio'],
     ['cm_vita_min', 'Vita'],
     ['cm_fianchi_max', 'Fianchi'],
+    ['circ_braccio', 'Braccio'],
+    ['circ_avambr', 'Avambraccio'],
+    ['circ_polso', 'Polso'],
     ['circ_coscia', 'Coscia'],
     ['circ_polpaccio', 'Polpaccio'],
+    ['circ_caviglia', 'Caviglia'],
 ];
 
-const Card = ({ icon, title, sub, children, empty }) => {
-    const compact = useContext(CompactCtx);
-    return (
-        <div className={`bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col ${compact ? 'p-2' : 'p-3'}`}>
-            <div className={`flex items-center gap-2 border-b border-gray-100 ${compact ? 'mb-1 pb-1' : 'mb-2 pb-2 gap-3'}`}>
-                <div className={`rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 flex-none ${compact ? 'w-5 h-5' : 'w-7 h-7'}`}>
-                    <i className={`ph-fill ${icon} ${compact ? 'text-[10px]' : 'text-sm'}`}></i>
-                </div>
-                <div className="min-w-0">
-                    <h4 className={`font-bold text-gray-900 leading-tight ${compact ? 'text-[11px]' : 'text-sm'}`}>{title}</h4>
-                    {sub && <p className={`text-gray-400 font-semibold ${compact ? 'text-[8px] leading-tight' : 'text-[10px]'}`}>{sub}</p>}
-                </div>
+const Card = ({ icon, title, sub, children, compact, className = '' }) => (
+    <div className={`bg-white border border-stone-200 flex flex-col ${compact ? 'rounded-xl p-2.5 gap-1.5' : 'rounded-2xl p-4 gap-3 shadow-[0_1px_2px_rgba(0,0,0,.03)]'} ${className}`} style={compact ? { breakInside: 'avoid' } : null}>
+        <div className="flex items-start gap-2.5">
+            <span className={`rounded-full bg-stone-100 text-stone-700 grid place-items-center flex-none ${compact ? 'w-5 h-5' : 'w-8 h-8'}`}>
+                <i className={`ph-bold ${icon} ${compact ? 'text-[11px]' : 'text-[15px]'}`}></i>
+            </span>
+            <div className="min-w-0">
+                <h4 className={`font-bold text-stone-900 leading-tight ${compact ? 'text-[11px]' : 'text-[14px]'}`}>{title}</h4>
+                {sub && <p className={`text-stone-500 leading-snug ${compact ? 'text-[8.5px]' : 'text-[11.5px] mt-0.5'}`}>{sub}</p>}
             </div>
-            {empty ? (
-                <p className={`text-gray-400 italic text-center text-xs ${compact ? 'py-3 text-[10px]' : 'py-6'}`}>{empty}</p>
-            ) : (
-                <div className={`relative ${compact ? 'h-[92px]' : 'h-[170px]'}`}>{children}</div>
-            )}
         </div>
-    );
-};
-
-const Stat = ({ label, value, unit, note }) => (
-    <div className="bg-gray-50 border border-gray-100 rounded-xl px-2 py-1.5 text-center">
-        <div className="text-[9px] font-bold text-gray-400 uppercase">{label}</div>
-        <div className="text-lg font-black text-gray-800 leading-tight">
-            {value}
-            <span className="text-xs font-semibold text-gray-400 ml-1">{unit}</span>
-        </div>
-        {note && <div className="text-[10px] font-semibold text-gray-500">{note}</div>}
+        {children}
     </div>
 );
 
-const baseOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+const Empty = ({ children }) => <p className="text-stone-400 text-[12px] text-center py-5 px-3 leading-relaxed">{children}</p>;
 
-// `only`: elenco di grafici da mostrare (per il report); `fixed`: misure fisse e niente animazioni, per la stampa.
-export const BodyCompositionCharts = ({ visitData = {}, report = {}, sesso = 'M', eta = 30, only = null, fixed: fixed0 = false, compact = false }) => {
-    const fixed = fixed0 || compact;
+const Gauge = ({ title, note, compact, ...g }) => (
+    <div>
+        <div className={`flex justify-between items-baseline ${compact ? 'text-[9px] mb-0.5' : 'text-[12px] mb-1'}`}>
+            <span className="font-semibold text-stone-700">{title}</span>
+            {note && <span className="text-stone-500">{note}</span>}
+        </div>
+        <BandGauge {...g} height={compact ? 50 : 54} />
+    </div>
+);
+
+const Stat = ({ label, value, unit, note, compact, strong }) => (
+    <div className={`border rounded-xl text-center ${strong ? 'bg-stone-900 border-stone-900' : 'bg-white border-stone-200'} ${compact ? 'px-1.5 py-1.5' : 'px-2 py-2.5'}`}>
+        <div className={`font-bold uppercase tracking-[.08em] ${strong ? 'text-stone-400' : 'text-stone-400'} ${compact ? 'text-[7px]' : 'text-[9.5px]'}`}>{label}</div>
+        <div className={`font-extrabold leading-tight tabular-nums ${strong ? 'text-white' : 'text-stone-900'} ${compact ? 'text-[15px]' : 'text-[22px]'}`}>
+            {value}
+            {unit && <span className={`font-semibold ml-0.5 ${strong ? 'text-stone-400' : 'text-stone-400'} ${compact ? 'text-[8px]' : 'text-[11px]'}`}>{unit}</span>}
+        </div>
+        {note && <div className={`font-semibold truncate ${strong ? 'text-stone-300' : 'text-stone-500'} ${compact ? 'text-[7.5px]' : 'text-[10.5px]'}`}>{note}</div>}
+    </div>
+);
+
+// punti dell'andamento: visite salvate + quella mostrata (se non è già nello storico)
+const trendSeries = (patient, visitData, report, sesso, eta, date) => {
+    const rows = (patient?.visite || []).map((v) => {
+        const d = { ...(v.dettagli || {}), peso: v.peso ?? v.dettagli?.peso };
+        return { date: v.data, d, r: v.dettagli || {} };
+    });
+    const curDate = date || new Date().toISOString().slice(0, 10);
+    if (!rows.some((x) => String(x.date) === String(curDate))) rows.push({ date: curDate, d: visitData, r: report });
+    rows.sort((a, b) => new Date(a.date) - new Date(b.date));
+    const all = rows.map((x) => {
+        const c = getComposition(x.d, x.r, sesso, eta);
+        return { date: x.date, peso: num(x.d.peso), fm: c.fm, ffm: c.ffmKg, vita: num(x.d.cm_vita_min) };
+    });
+    return [
+        ['peso', 'Peso', 'kg', '#4f46e5'],
+        ['fm', 'Massa grassa', '%', C.fat],
+        ['ffm', 'Massa magra', 'kg', '#059669'],
+        ['vita', 'Vita', 'cm', '#0284c7'],
+    ]
+        .map(([k, label, unit, color]) => ({ key: k, label, unit, color, pts: all.filter((p) => p[k] > 0).map((p) => ({ date: p.date, v: p[k] })) }))
+        .filter((s) => s.pts.length >= 2);
+};
+
+export const BodyCompositionCharts = ({ visitData = {}, report = {}, sesso = 'M', eta = 30, only = null, compact = false, patient = null, date = null, columns }) => {
+    const sx = sesso === 'F' ? 'F' : 'M';
     const show = (id) => !only || only.includes(id);
-    const R = fixed ? { responsive: false, animation: false, ...(compact ? { font: { size: 8 } } : {}) } : {};
-    const legendBottom = compact ? { display: true, position: 'bottom', labels: { boxWidth: 7, padding: 4, font: { size: 8 } } } : { display: true, position: 'bottom' };
-    const cp = compact ? { width: 218, height: 92 } : fixed ? { width: 330, height: 170 } : {};
-    const d = useMemo(() => {
-        const peso = num(visitData.peso);
-        const altezza = num(visitData.altezza);
-        const m = (k) => num(report?.risultati_metodo_A?.[k] === '--' ? 0 : report?.risultati_metodo_A?.[k]);
-        const mb = (k) => num(report?.risultati_metodo_B?.[k] === '--' ? 0 : report?.risultati_metodo_B?.[k]);
-        const A = { fm: m('fm_percent'), fmKg: m('fm_kg'), ffmKg: m('ffm_kg') };
-        const B = { fm: mb('fm_percent'), fmKg: mb('fm_kg'), ffmKg: mb('ffm_kg') };
-        const main = A.fm > 0 ? A : B;
-        const h = altezza / 100;
-        const bmi = h > 0 && peso > 0 ? peso / (h * h) : 0;
-        const vita = num(visitData.cm_vita_min);
-        const fianchi = num(visitData.cm_fianchi_max);
-        const rz = num(visitData.biva_rz);
-        const xc = num(visitData.biva_xc);
-        return {
-            peso,
-            altezza,
-            A,
-            B,
-            main,
-            bmi,
-            vita,
-            fianchi,
-            whr: vita > 0 && fianchi > 0 ? vita / fianchi : 0,
-            whtr: vita > 0 && altezza > 0 ? vita / altezza : 0,
-            fmi: main.fmKg > 0 && h > 0 ? main.fmKg / (h * h) : 0,
-            ffmi: main.ffmKg > 0 && h > 0 ? main.ffmKg / (h * h) : 0,
-            pha: rz > 0 && xc > 0 ? (Math.atan2(xc, rz) * 180) / Math.PI : 0,
-            rzH: rz > 0 && h > 0 ? rz / h : 0,
-            xcH: xc > 0 && h > 0 ? xc / h : 0,
-            pliche: PLICHE.map(([k, l]) => [l, num(visitData[k])]).filter(([, v]) => v > 0),
-            circ: CIRC.map(([k, l]) => [l, num(visitData[k]) || num(visitData[`${k}_dx`]) || num(visitData[`${k}_sx`]) || (k === 'circ_braccio' ? num(visitData.circ_braccio_flesso) : 0)]).filter(([, v]) => v > 0),
-        };
-    }, [visitData, report]);
+    const k = useMemo(() => bodyIndices(visitData, report, sx, eta), [visitData, report, sx, eta]);
+    const comp = k.comp;
+    const hasFm = comp.fm > 0;
+    const pliche = PLICHE.map(([key, label]) => ({ label, value: num(visitData[key]) })).filter((r) => r.value > 0);
+    const circ = CIRC.map(([key, label]) => {
+        const dx = num(visitData[`${key}_dx`]);
+        const sxv = num(visitData[`${key}_sx`]);
+        const single = num(visitData[key]) || (key === 'circ_braccio' ? num(visitData.circ_braccio_flesso) : 0);
+        return dx || sxv ? { label, value: dx || sxv, value2: dx && sxv ? sxv : 0 } : { label, value: single };
+    }).filter((r) => r.value > 0);
+    const trend = useMemo(() => (show('trend') && patient ? trendSeries(patient, visitData, report, sx, eta, date) : []), [patient, visitData, report, sx, eta, date]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const bands = FM_BANDS[sesso] || FM_BANDS.M;
-    const hasFm = d.main.fm > 0;
-    const bandOf = (v) => bands.find((b) => v <= b.max) || bands[bands.length - 1];
-    const bmiCat = d.bmi < 18.5 ? 'Sottopeso' : d.bmi < 25 ? 'Normopeso' : d.bmi < 30 ? 'Sovrappeso' : 'Obesità';
-    const whrLimit = sesso === 'F' ? 0.85 : 0.9;
+    const fmDef = FM_BANDS[sx];
+    const srcNote = comp.source === 'stima' ? `stima ${comp.method}` : comp.source ? `Metodo ${comp.source}${comp.method ? ` · ${comp.method}` : ''}` : '';
+    const sumPl = pliche.reduce((a, r) => a + r.value, 0);
 
-    // Per i grafici a barre orizzontali a fasce: segmenti impilati con il marcatore del paziente
-    const bandChart = (value, bandsArr, max, unit = '%') => ({
-        labels: [''],
-        datasets: [
-            ...bandsArr.map((b, i) => {
-                const prev = i === 0 ? 0 : bandsArr[i - 1].max;
-                return { label: b.label, data: [Math.max(0, Math.min(b.max, max) - prev)], backgroundColor: b.color, borderWidth: 0, stack: 's' };
-            }),
-        ],
-        _v: value,
-        _u: unit,
-    });
-    const markerPlugin = (value, max) => ({
-        id: 'marker',
-        afterDatasetsDraw(chart) {
-            const { ctx, scales, chartArea } = chart;
-            const x = scales.x.getPixelForValue(Math.min(value, max));
-            ctx.save();
-            ctx.fillStyle = '#111827';
-            ctx.beginPath();
-            ctx.moveTo(x, chartArea.top - 2);
-            ctx.lineTo(x - 7, chartArea.top - 14);
-            ctx.lineTo(x + 7, chartArea.top - 14);
-            ctx.fill();
-            ctx.fillRect(x - 1.5, chartArea.top, 3, chartArea.bottom - chartArea.top);
-            ctx.font = 'bold 12px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(String(r1(value)), x, chartArea.top - 18);
-            ctx.restore();
-        },
-    });
-    const bandOpts = (max) => ({
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        ...R,
-        layout: { padding: { top: compact ? 16 : 24 } },
-        plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: compact ? 7 : 10, padding: compact ? 4 : 10, font: { size: compact ? 8 : 10 } } } },
-        scales: { x: { stacked: true, max, grid: { display: false } }, y: { stacked: true, display: false } },
-    });
+    const cards = [];
+    const push = (id, node, ok, wide) => {
+        if (!show(id)) return;
+        if (!ok && compact) return;
+        cards.push({ id, node, wide });
+    };
 
-    const imcBands = [
-        { label: 'Sottopeso', max: 18.5, color: '#93c5fd' },
-        { label: 'Normopeso', max: 25, color: '#6ee7b7' },
-        { label: 'Sovrappeso', max: 30, color: '#fde68a' },
-        { label: 'Obesità', max: 40, color: '#fca5a5' },
-    ];
-    const whtrBands = [
-        { label: 'Basso', max: 0.4, color: '#93c5fd' },
-        { label: 'Ottimale', max: 0.5, color: '#6ee7b7' },
-        { label: 'Rischio', max: 0.6, color: '#fde68a' },
-        { label: 'Alto rischio', max: 0.8, color: '#fca5a5' },
-    ];
+    push(
+        'composizione',
+        <Card key="composizione" compact={compact} icon="ph-chart-donut" title="Composizione corporea" sub={hasFm ? srcNote : 'Massa grassa e massa magra'}>
+            {hasFm ? (
+                <div className={`flex items-center ${compact ? 'gap-2' : 'gap-4'}`}>
+                    <div style={{ width: compact ? 70 : 132, flex: 'none' }}>
+                        <Donut size={150} thick={22} parts={[{ value: comp.fmKg || comp.fm, color: C.fat }, { value: comp.ffmKg || 100 - comp.fm, color: C.lean }]} center={`${fmt(comp.fm)}%`} sub="GRASSO" />
+                    </div>
+                    <div className={`flex-1 grid ${compact ? 'gap-1 text-[9px]' : 'gap-2 text-[12.5px]'}`}>
+                        {[
+                            ['Massa grassa', comp.fmKg, C.fat, `${fmt(comp.fm)}%`],
+                            ['Massa magra', comp.ffmKg, C.lean, `${fmt(100 - comp.fm)}%`],
+                        ].map(([l, kg, c, p]) => (
+                            <div key={l} className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-full flex-none" style={{ background: c }} />
+                                <span className="text-stone-600 flex-1 whitespace-nowrap">{l}</span>
+                                <b className="tabular-nums text-stone-900">{kg ? `${fmt(kg)} kg` : p}</b>
+                            </div>
+                        ))}
+                        {k.peso > 0 && (
+                            <div className="flex items-center gap-2 pt-1 border-t border-stone-100 text-stone-500">
+                                <span className="w-2.5 flex-none" />
+                                <span className="flex-1 whitespace-nowrap">Peso totale</span>
+                                <b className="tabular-nums text-stone-900">{fmt(k.peso)} kg</b>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            ) : (
+                <Empty>Inserisci le pliche nella visita: la massa grassa viene calcolata (o stimata) in automatico.</Empty>
+            )}
+        </Card>,
+        hasFm
+    );
+
+    push(
+        'grasso',
+        <Card key="grasso" compact={compact} icon="ph-drop" title="Massa grassa" sub={`Riferimenti ${sx === 'F' ? 'donna' : 'uomo'} (ACE)`}>
+            {hasFm ? (
+                <>
+                    <Gauge compact={compact} title="% massa grassa" note={bandOf(comp.fm, fmDef).label} value={comp.fm} unit="%" min={fmDef.min} bands={fmDef.bands} />
+                    {k.fmi > 0 && <Gauge compact={compact} title="Indice di massa grassa (FMI)" note="kg/m²" value={k.fmi} min={FMI_BANDS[sx].min} bands={FMI_BANDS[sx].bands} />}
+                </>
+            ) : (
+                <Empty>Dato non disponibile senza plicometria.</Empty>
+            )}
+        </Card>,
+        hasFm
+    );
+
+    const risk = k.bmi > 0 || k.whtr > 0 || k.whr > 0;
+    push(
+        'rischio',
+        <Card key="rischio" compact={compact} icon="ph-heartbeat" title="Indici di rischio" sub="Peso, girovita e salute cardiometabolica">
+            {risk ? (
+                <>
+                    {k.bmi > 0 && <Gauge compact={compact} title="BMI" note={bandOf(k.bmi, BMI_BANDS).label} value={k.bmi} min={BMI_BANDS.min} bands={BMI_BANDS.bands} />}
+                    {k.whtr > 0 && <Gauge compact={compact} title="Vita / altezza" note={bandOf(k.whtr, WHTR_BANDS).label} value={k.whtr} digits={2} min={WHTR_BANDS.min} bands={WHTR_BANDS.bands} />}
+                    {k.whr > 0 && <Gauge compact={compact} title="Vita / fianchi" note={bandOf(k.whr, WHR_BANDS[sx]).label} value={k.whr} digits={2} min={WHR_BANDS[sx].min} bands={WHR_BANDS[sx].bands} />}
+                </>
+            ) : (
+                <Empty>Servono peso, altezza e circonferenza vita.</Empty>
+            )}
+        </Card>,
+        risk
+    );
+
+    push(
+        'magra',
+        <Card key="magra" compact={compact} icon="ph-barbell" title="Massa magra" sub="Muscoli, ossa e acqua in rapporto all'altezza">
+            {k.ffmi > 0 ? (
+                <>
+                    <Gauge compact={compact} title="Indice di massa magra (FFMI)" note={`${fmt(comp.ffmKg)} kg`} value={k.ffmi} min={FFMI_BANDS[sx].min} bands={FFMI_BANDS[sx].bands} />
+                    {!compact && <p className="text-[11.5px] text-stone-500 leading-relaxed">FFMI = massa magra / altezza². Utile per seguire il mantenimento muscolare durante il dimagrimento.</p>}
+                </>
+            ) : (
+                <Empty>Serve la massa grassa per calcolare la massa magra.</Empty>
+            )}
+        </Card>,
+        k.ffmi > 0
+    );
+
+    push(
+        'pliche',
+        <Card key="pliche" compact={compact} icon="ph-ruler" title="Pliche" sub={pliche.length ? `Somma di ${pliche.length}: ${fmt(sumPl)} mm` : 'Spessore in millimetri'}>
+            {pliche.length ? <HBars rows={pliche} unit="mm" color="#f59e0b" rowH={compact ? 17 : 22} /> : <Empty>Nessuna plica inserita.</Empty>}
+        </Card>,
+        pliche.length > 0
+    );
+
+    push(
+        'circ',
+        <Card key="circ" compact={compact} icon="ph-arrows-out-line-horizontal" title="Circonferenze" sub={circ.some((r) => r.value2) ? 'Centimetri · destra e sinistra' : 'Centimetri per distretto'}>
+            {circ.length ? <HBars rows={circ} unit="cm" color="#0ea5e9" legend={['Destra', 'Sinistra']} rowH={compact ? 17 : 22} /> : <Empty>Nessuna circonferenza inserita.</Empty>}
+        </Card>,
+        circ.length > 0
+    );
+
+    push(
+        'bia',
+        <Card key="bia" compact={compact} icon="ph-lightning" title="Bioimpedenza" sub="Angolo di fase: qualità e integrità delle cellule">
+            {k.pha > 0 ? (
+                <>
+                    <Gauge compact={compact} title="Angolo di fase" note={bandOf(k.pha, PHA_BANDS[sx]).label} value={k.pha} unit="°" min={PHA_BANDS[sx].min} bands={PHA_BANDS[sx].bands} />
+                    <div className={`grid grid-cols-4 gap-1.5 text-center ${compact ? 'text-[8px]' : 'text-[11px]'}`}>
+                        {[
+                            ['Rz', k.rz, 'Ω'],
+                            ['Xc', k.xc, 'Ω'],
+                            ['Rz/H', k.rzH, 'Ω/m'],
+                            ['Xc/H', k.xcH, 'Ω/m'],
+                        ].map(([l, v, u]) => (
+                            <div key={l} className="bg-stone-50 rounded-lg py-1">
+                                <div className="text-stone-400 font-semibold">{l}</div>
+                                <b className="text-stone-900 tabular-nums">{fmt(v, 0)}</b> <span className="text-stone-400">{u}</span>
+                            </div>
+                        ))}
+                    </div>
+                </>
+            ) : (
+                <Empty>Inserisci resistenza (Rz) e reattanza (Xc) nella bioimpedenza.</Empty>
+            )}
+        </Card>,
+        k.pha > 0
+    );
+
+    if (comp.A && comp.B)
+        push(
+            'metodi',
+            <Card key="metodi" compact={compact} icon="ph-scales" title="Confronto dei metodi" sub="% massa grassa con le due formule scelte">
+                <HBars
+                    rows={[
+                        { label: 'Metodo A', value: comp.A.fm, color: '#6366f1' },
+                        { label: 'Metodo B', value: comp.B.fm, color: '#a78bfa' },
+                    ]}
+                    unit="%"
+                    rowH={compact ? 18 : 24}
+                />
+                <p className={`text-stone-500 ${compact ? 'text-[8px]' : 'text-[11px]'}`}>Differenza: {fmt(Math.abs(comp.A.fm - comp.B.fm))} punti percentuali.</p>
+            </Card>,
+            true
+        );
+
+    push(
+        'trend',
+        <Card key="trend" compact={compact} icon="ph-chart-line-up" title="Andamento nel tempo" sub={trend.length ? `${trend[0].pts.length} rilevazioni` : 'Servono almeno due visite'}>
+            {trend.length ? (
+                <div className={`grid ${compact ? 'grid-cols-4 gap-2' : 'grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2'}`}>
+                    {trend.map((s) => (
+                        <div key={s.key}>
+                            <div className={`font-semibold text-stone-700 ${compact ? 'text-[8.5px]' : 'text-[12px]'}`}>{s.label}</div>
+                            <MiniTrend pts={s.pts} unit={s.unit} color={s.color} height={compact ? 100 : 110} />
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <Empty>Con la prossima visita qui vedrai come cambiano peso, massa grassa e girovita.</Empty>
+            )}
+        </Card>,
+        trend.length > 0,
+        true
+    );
+
+    // nel report i riquadri seguono l'ordine richiesto
+    if (only) cards.sort((a, b) => only.indexOf(a.id) - only.indexOf(b.id));
 
     return (
-        <CompactCtx.Provider value={compact}>
-        <div className="flex flex-col gap-3">
-            <div className="hidden">
-                <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
-                    <i className="ph-fill ph-chart-pie-slice text-2xl"></i>
+        <div className={`flex flex-col ${compact ? 'gap-2' : 'gap-3'}`}>
+            {show('stats') && (
+                <div className={`grid ${compact ? 'grid-cols-6 gap-1.5' : 'grid-cols-3 sm:grid-cols-6 gap-2'}`}>
+                    <Stat compact={compact} strong label="Peso" value={k.peso ? fmt(k.peso) : '--'} unit="kg" />
+                    <Stat compact={compact} label="BMI" value={k.bmi ? fmt(k.bmi) : '--'} note={k.bmi ? bandOf(k.bmi, BMI_BANDS).label : ''} />
+                    <Stat compact={compact} label="Massa grassa" value={hasFm ? fmt(comp.fm) : '--'} unit="%" note={hasFm ? (comp.source === 'stima' ? 'stima dalle pliche' : bandOf(comp.fm, fmDef).label) : 'servono le pliche'} />
+                    <Stat compact={compact} label="Grasso" value={comp.fmKg ? fmt(comp.fmKg) : '--'} unit="kg" />
+                    <Stat compact={compact} label="Massa magra" value={comp.ffmKg ? fmt(comp.ffmKg) : '--'} unit="kg" />
+                    <Stat compact={compact} label="Angolo di fase" value={k.pha ? fmt(k.pha) : '--'} unit="°" note={k.pha ? bandOf(k.pha, PHA_BANDS[sx]).label : ''} />
                 </div>
-                <div>
-                    <h3 className="font-bold text-gray-900 text-xl">Composizione corporea</h3>
-                    <p className="text-xs text-gray-400 font-bold">Calcolata dalle misure della visita in corso</p>
+            )}
+            {cards.length > 0 && (
+                <div className={compact ? `grid gap-2 ${columns === 1 ? 'grid-cols-1' : columns === 2 ? 'grid-cols-2' : 'grid-cols-3'}` : 'grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3 items-start'}>
+                    {cards.map((c) => (
+                        <div key={c.id} className={c.wide ? (compact ? (columns === 1 ? '' : columns === 2 ? 'col-span-2' : 'col-span-3') : 'md:col-span-2') : ''}>
+                            {c.node}
+                        </div>
+                    ))}
                 </div>
-            </div>
-
-            {show('stats') && <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                <Stat label="Peso" value={d.peso ? r1(d.peso) : '--'} unit="kg" />
-                <Stat label="BMI" value={d.bmi ? r1(d.bmi) : '--'} note={d.bmi ? bmiCat : ''} />
-                <Stat label="Massa grassa" value={hasFm ? r1(d.main.fm) : '--'} unit="%" note={hasFm ? bandOf(d.main.fm).label : 'serve la plicometria'} />
-                <Stat label="Massa magra" value={d.main.ffmKg ? r1(d.main.ffmKg) : '--'} unit="kg" />
-                <Stat label="FMI" value={d.fmi ? r1(d.fmi) : '--'} unit="kg/m²" />
-                <Stat label="FFMI" value={d.ffmi ? r1(d.ffmi) : '--'} unit="kg/m²" />
-            </div>}
-
-            <div className={fixed ? `grid ${only && only.length === 1 ? 'grid-cols-1' : compact ? 'grid-cols-3 gap-2' : 'grid-cols-2'} gap-3` : 'grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3'}>
-                {show('donut') && (
-                <Card icon="ph-chart-donut" title="Massa grassa / magra" sub="In kg sul peso totale" empty={!hasFm && 'Compila la plicometria per vedere la ripartizione.'}>
-                    {hasFm && (
-                        <Doughnut
-                            {...cp}
-                            data={{
-                                labels: ['Massa grassa', 'Massa magra'],
-                                datasets: [{ data: [r1(d.main.fmKg), r1(d.main.ffmKg)], backgroundColor: ['#fb7185', '#34d399'], borderWidth: 0 }],
-                            }}
-                            options={{
-                                ...baseOpts, ...R,
-                                cutout: '62%',
-                                plugins: {
-                                    legend: legendBottom,
-                                    tooltip: { callbacks: { label: (c) => ` ${c.label}: ${c.parsed} kg` } },
-                                },
-                            }}
-                        />
-                    )}
-                </Card>
-                )}
-
-                {show('fasce') && (
-                <Card icon="ph-gauge" title="% massa grassa nelle fasce" sub={`Riferimento ${sesso === 'F' ? 'donna' : 'uomo'}`} empty={!hasFm && 'Dato non disponibile.'}>
-                    {hasFm && <Bar {...cp} data={bandChart(d.main.fm, bands, 40)} options={bandOpts(40)} plugins={[markerPlugin(d.main.fm, 40)]} />}
-                </Card>
-                )}
-
-                {show('confronto') && (
-                <Card icon="ph-scales" title="Confronto metodi plicometrici" sub="% massa grassa: Metodo A vs B" empty={!(d.A.fm > 0 || d.B.fm > 0) && 'Nessun metodo calcolabile.'}>
-                    <Bar
-                        {...cp}
-                        data={{
-                            labels: ['Metodo A', 'Metodo B'],
-                            datasets: [{ data: [r1(d.A.fm), r1(d.B.fm)], backgroundColor: ['#6366f1', '#a78bfa'], borderRadius: 8 }],
-                        }}
-                        options={{ ...baseOpts, ...R, scales: { y: { beginAtZero: true, title: { display: true, text: '% FM' } } } }}
-                    />
-                </Card>
-                )}
-
-                {show('composizione') && (
-                <Card icon="ph-stack" title="Composizione per metodo" sub="Massa grassa e magra (kg)" empty={!(d.A.fm > 0 || d.B.fm > 0) && 'Nessun metodo calcolabile.'}>
-                    <Bar
-                        {...cp}
-                        data={{
-                            labels: ['Metodo A', 'Metodo B'],
-                            datasets: [
-                                { label: 'Massa grassa', data: [r1(d.A.fmKg), r1(d.B.fmKg)], backgroundColor: '#fb7185', borderRadius: 6 },
-                                { label: 'Massa magra', data: [r1(d.A.ffmKg), r1(d.B.ffmKg)], backgroundColor: '#34d399', borderRadius: 6 },
-                            ],
-                        }}
-                        options={{
-                            ...baseOpts, ...R,
-                            plugins: { legend: legendBottom },
-                            scales: { x: { stacked: true }, y: { stacked: true, title: { display: true, text: 'kg' } } },
-                        }}
-                    />
-                </Card>
-                )}
-
-                {show('pliche') && (
-                <Card icon="ph-ruler" title="Spessori delle pliche" sub="Millimetri per sito" empty={!d.pliche.length && 'Nessuna plica inserita.'}>
-                    <Bar
-                        {...cp}
-                        data={{
-                            labels: d.pliche.map(([l]) => l),
-                            datasets: [{ data: d.pliche.map(([, v]) => v), backgroundColor: '#f59e0b', borderRadius: 6 }],
-                        }}
-                        options={{ ...baseOpts, ...R, indexAxis: compact ? 'x' : 'y', scales: compact ? { x: { ticks: { autoSkip: false, font: { size: 7 } } }, y: { title: { display: true, text: 'mm', font: { size: 8 } } } } : { x: { title: { display: true, text: 'mm' } }, y: { ticks: { autoSkip: false } } } }}
-                    />
-                </Card>
-                )}
-
-                {show('circ') && (
-                <Card icon="ph-tape" title="Circonferenze" sub="Centimetri per distretto" empty={!d.circ.length && 'Nessuna circonferenza inserita.'}>
-                    <Bar
-                        {...cp}
-                        data={{
-                            labels: d.circ.map(([l]) => l),
-                            datasets: [{ data: d.circ.map(([, v]) => v), backgroundColor: '#0ea5e9', borderRadius: 6 }],
-                        }}
-                        options={{ ...baseOpts, ...R, scales: { y: { title: { display: true, text: 'cm' } } } }}
-                    />
-                </Card>
-                )}
-
-                {show('bmi') && (
-                <Card icon="ph-person-simple" title="BMI" sub="Indice di massa corporea" empty={!d.bmi && 'Servono peso e altezza.'}>
-                    {d.bmi > 0 && <Bar {...cp} data={bandChart(d.bmi, imcBands, 40)} options={bandOpts(40)} plugins={[markerPlugin(d.bmi, 40)]} />}
-                </Card>
-                )}
-
-                {show('whtr') && (
-                <Card icon="ph-heartbeat" title="Rapporto vita / altezza" sub={d.whr > 0 ? `Vita/fianchi ${d.whr.toFixed(2)} ${d.whr > whrLimit ? '(sopra il limite)' : '(nella norma)'}` : 'Rischio cardiometabolico'} empty={!d.whtr && 'Servono vita e altezza.'}>
-                    {d.whtr > 0 && <Bar {...cp} data={bandChart(d.whtr, whtrBands, 0.8)} options={bandOpts(0.8)} plugins={[markerPlugin(Number(d.whtr.toFixed(2)), 0.8)]} />}
-                </Card>
-                )}
-
-                {show('bia') && (
-                <Card icon="ph-lightning" title="Bioimpedenza vettoriale" sub="Angolo di fase, Rz/H e Xc/H" empty={!d.pha && 'Inserisci Rz e Xc nella bioimpedenza.'}>
-                    <Bar
-                        {...cp}
-                        data={{
-                            labels: ['Angolo di fase (°)', 'Rz/H (Ω/m)', 'Xc/H (Ω/m)'],
-                            datasets: [{ data: [r1(d.pha), r1(d.rzH), r1(d.xcH)], backgroundColor: ['#8b5cf6', '#14b8a6', '#f43f5e'], borderRadius: 6 }],
-                        }}
-                        options={{ ...baseOpts, ...R, scales: { y: { beginAtZero: true } } }}
-                    />
-                </Card>
-                )}
-            </div>
+            )}
         </div>
-        </CompactCtx.Provider>
     );
 };
