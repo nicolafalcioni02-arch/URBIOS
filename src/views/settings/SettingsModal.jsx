@@ -5,9 +5,20 @@ import { InfoTab } from './tabs/InfoTab';
 import { SecurityTab } from './tabs/SecurityTab';
 import { DataExchangeTab } from './tabs/dataExchange/DataExchangeTab';
 import { ProfileTab } from './tabs/profile/ProfileTab';
+import { useCompact } from '../../hooks/useCompact';
+
+const SECTIONS = [
+    ['profilo', 'ph-user-circle', 'Profilo e studio', 'Dati, orari, sedi, contratto', '#3B5BDB'],
+    ['formule', 'ph-function', 'Formule', 'Equazioni per i calcoli', '#0C8F7E'],
+    ['dati', 'ph-arrows-left-right', 'Importa ed esporta', 'CSV, documenti, anonimo', '#C26A1B'],
+    ['sicurezza', 'ph-shield-check', 'Sicurezza e archivio', 'Cifratura e file', '#C23A64'],
+    ['info', 'ph-info', 'Info software', 'Versione e crediti', '#7C4DDB'],
+];
 
 export const SettingsModal = ({ db, onUpdateDb, onClose }) => {
-    const [tab, setTab] = useState('profilo');
+    const compact = useCompact(639);
+    // su telefono si parte dall'elenco delle sezioni (tab = null) e si entra con un tocco
+    const [tab, setTab] = useState(compact ? null : 'profilo');
     const [localUser, setLocalUser] = useState(db.utente);
 
     // Stato per la gestione delle formule
@@ -52,47 +63,102 @@ export const SettingsModal = ({ db, onUpdateDb, onClose }) => {
         }
     };
 
+    const current = SECTIONS.find((x) => x[0] === tab);
+    const body = (
+        <>
+            <ProfileTab handleSaveProfile={handleSaveProfile} localUser={localUser} tab={tab} updateUser={updateUser} />
+            <FormulasTab
+                db={db}
+                handleAddFormula={handleAddFormula}
+                handleDeleteFormula={handleDeleteFormula}
+                newFormula={newFormula}
+                setNewFormula={setNewFormula}
+                setShowAddFormula={setShowAddFormula}
+                showAddFormula={showAddFormula}
+                tab={tab}
+            />
+            <DataExchangeTab tab={tab} db={db} onUpdateDb={onUpdateDb} />
+            <SecurityTab tab={tab} onClose={onClose} />
+            <InfoTab tab={tab} />
+        </>
+    );
+
+    if (compact)
+        return ReactDOM.createPortal(
+            <div className="fixed inset-0 z-[9999] m-shell m-settings slide-in-right">
+                <header className="m-nav is-solid">
+                    <div className="m-nav-side">
+                        {tab ? (
+                            <button className="m-back" onClick={() => setTab(null)}>
+                                <i className="ph ph-caret-left"></i>Impostazioni
+                            </button>
+                        ) : null}
+                    </div>
+                    <span className="m-nav-title is-on">{current ? current[2] : 'Impostazioni'}</span>
+                    <div className="m-nav-side end">
+                        <button className="m-back" style={{ fontWeight: 600, paddingRight: 10 }} onClick={onClose}>
+                            Fine
+                        </button>
+                    </div>
+                </header>
+                <div className="m-scroll">
+                    {tab ? (
+                        <div key={tab} className="m-settings-body rise">
+                            {body}
+                        </div>
+                    ) : (
+                        <>
+                            <div className="m-large rise">
+                                <h1>Impostazioni</h1>
+                                <p>Il tuo studio, le formule e l'archivio</p>
+                            </div>
+                            <div className="m-group rise" style={{ animationDelay: '.06s', marginTop: 18 }}>
+                                {SECTIONS.map(([id, icon, label, sub, c]) => (
+                                    <button key={id} className="m-row" onClick={() => setTab(id)}>
+                                        <span className="m-ico" style={{ '--c': c }}>
+                                            <i className={`ph-fill ${icon}`}></i>
+                                        </span>
+                                        <span className="m-row-body">
+                                            <span className="m-row-text">
+                                                <span className="m-row-title">{label}</span>
+                                                <span className="m-row-sub">{sub}</span>
+                                            </span>
+                                            <i className="ph-bold ph-caret-right m-chev"></i>
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                            <p className="text-center text-[12px] text-[color:var(--muted)] mt-6">© URBIOS Software</p>
+                        </>
+                    )}
+                    <div style={{ height: 32 }}></div>
+                </div>
+            </div>,
+            document.body
+        );
+
     return ReactDOM.createPortal(
         <div className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4 fade-enter">
             <div className="bg-white w-full max-w-5xl h-full md:h-[85vh] rounded-none md:rounded-2xl shadow-2xl flex overflow-hidden">
                 {/* SIDEBAR */}
-                <div className="w-64 bg-gray-50 border-r border-gray-100 p-6 flex flex-col justify-between hidden md:flex">
+                <div className="w-72 bg-[var(--paper)] border-r border-[color:var(--line)] p-5 flex flex-col justify-between hidden md:flex">
                     <div>
-                        <h2 className="font-[Helvetica] text-xl font-bold mb-8">Impostazioni</h2>
-                        <nav className="space-y-2">
-                            <button
-                                onClick={() => setTab('profilo')}
-                                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all flex-row items-center ${tab === 'profilo' ? 'bg-black text-white shadow-lg' : 'text-gray-500 hover:bg-gray-100'}`}
-                            >
-                                <i className="ph ph-user-circle text-lg mr-2"></i> Profilo & Studio
-                            </button>
-                            <button
-                                onClick={() => setTab('formule')}
-                                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all flex-row items-center ${tab === 'formule' ? 'bg-black text-white shadow-lg' : 'text-gray-500 hover:bg-gray-100'}`}
-                            >
-                                <i className="ph ph-function text-lg mr-2"></i> Gestione Formule
-                            </button>
-                            <button
-                                onClick={() => setTab('dati')}
-                                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all flex-row items-center ${tab === 'dati' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:bg-gray-100'}`}
-                            >
-                                <i className="ph ph-arrows-left-right text-lg mr-2"></i> Importa & Esporta
-                            </button>
-                            <button
-                                onClick={() => setTab('sicurezza')}
-                                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all flex-row items-center ${tab === 'sicurezza' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:bg-gray-100'}`}
-                            >
-                                <i className="ph ph-shield-check text-lg mr-2"></i> Sicurezza & Archivio
-                            </button>
-                            <button
-                                onClick={() => setTab('info')}
-                                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all flex-row items-center  ${tab === 'info' ? 'bg-black text-white shadow-lg' : 'text-gray-500 hover:bg-gray-100'}`}
-                            >
-                                <i className="ph ph-info text-lg mr-2"></i> Info Software
-                            </button>
+                        <h2 className="text-[22px] font-semibold text-[color:var(--ink)] mb-6 px-2">Impostazioni</h2>
+                        <nav className="space-y-1">
+                            {SECTIONS.map(([id, icon, label, sub, c]) => (
+                                <button key={id} onClick={() => setTab(id)} className={`set-side ${tab === id ? 'on' : ''}`}>
+                                    <span className="m-ico" style={{ '--c': c }}>
+                                        <i className={`ph-fill ${icon}`}></i>
+                                    </span>
+                                    <span className="min-w-0 text-left">
+                                        <span className="block text-[14px] font-semibold leading-tight truncate">{label}</span>
+                                        <span className="block text-[11.5px] opacity-60 leading-tight truncate mt-0.5">{sub}</span>
+                                    </span>
+                                </button>
+                            ))}
                         </nav>
                     </div>
-                    <div className="text-xs text-gray-400 text-center"> © URBIOS Software</div>
+                    <div className="text-xs text-[color:var(--muted)] text-center"> © URBIOS Software</div>
                 </div>
 
                 {/* CONTENUTO */}

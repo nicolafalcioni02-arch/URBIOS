@@ -188,3 +188,22 @@ export const buildIcs = (db, items, withNames) => {
 };
 
 export const newApptId = () => 'a' + Math.random().toString(36).slice(2, 9);
+
+// ---- sede: ogni luogo ha il suo colore e la sua sigla; l'online ha il suo (viola, con la videocamera) ----
+// stessa famiglia dei colori dell'app (accent, ok, warn) piu' due toni di appoggio: tutti con la stessa luminosita'
+export const PLACE_COLORS = ['#2F54EB', '#1F8A5B', '#B7791F', '#B0476D', '#2C7F92'];
+export const ONLINE_COLOR = '#6A55D8';
+export const isOnline = (p) => /online|video|remot|meet|zoom|teams|skype/i.test(String(p || ''));
+export const placeColor = (places, p) => {
+    if (isOnline(p)) return ONLINE_COLOR;
+    const i = places.indexOf(String(p || '').trim());
+    if (i >= 0) return PLACE_COLORS[i % PLACE_COLORS.length];
+    // luogo scritto a mano (non nell'elenco delle sedi): colore stabile ricavato dal nome
+    let h = 0;
+    for (const ch of String(p || '').trim().toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return String(p || '').trim() ? PLACE_COLORS[h % PLACE_COLORS.length] : '#6E6D69';
+};
+export const placeMark = (p) => {
+    const w = String(p || '').replace(/^(studio|ambulatorio|sede|centro|poliambulatorio)\s+/i, '').trim().split(/[\s,.-]+/).filter(Boolean);
+    return ((w[0] || '?')[0] + (w[1] ? w[1][0] : (w[0] || '')[1] || '')).toUpperCase();
+};

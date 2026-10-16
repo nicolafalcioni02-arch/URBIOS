@@ -2,49 +2,35 @@
 // Gli orari di disponibilità, le durate e i luoghi arrivano dalle impostazioni del professionista (quelle del contratto).
 import React, { useMemo, useState } from 'react';
 import { useAgenda } from '../../components/agenda/useAgenda';
-import { addDays, apptTitle, buildIcs, dateKey, defaultDur, endOf, fmtTime, fromKey, isActive, mondayOf, newApptId, sameDay, startOf, timelineBounds, tipoOf } from '../../components/agenda/agendaLogic';
+import { addDays, apptTitle, buildIcs, dateKey, defaultDur, endOf, fmtTime, fromKey, isActive, mondayOf, newApptId, sameDay, startOf, timelineBounds, tipoOf, placeColor, placeMark, isOnline, ONLINE_COLOR } from '../../components/agenda/agendaLogic';
 import { AppointmentSheet } from './AppointmentSheet';
-import { DayTimeline } from './DayTimeline';
 import { MonthGrid } from './MonthGrid';
 import { agendaStyles } from './agendaStyles';
 import { AgendaMobile } from './AgendaMobile';
+import { DayList, WeekBoard } from './DayList';
 import { useCompact } from '../../hooks/useCompact';
 
 const MONTHS_IT = (d) => d.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 
-const MiniMonth = ({ date, onPick, marks }) => {
-    const [view, setView] = useState(new Date(date.getFullYear(), date.getMonth(), 1));
-    const start = mondayOf(view);
-    const weeks = Math.ceil((((view.getDay() + 6) % 7) + new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate()) / 7);
-    const days = Array.from({ length: weeks * 7 }, (_, i) => addDays(start, i));
-    return (
-        <div className="ag-card">
-            <div className="ag-mini-head">
-                <button className="ag-icon" style={{ width: 30, height: 30 }} onClick={() => setView(new Date(view.getFullYear(), view.getMonth() - 1, 1))} aria-label="Mese precedente">
-                    <i className="ph-bold ph-caret-left" />
-                </button>
-                <span>{MONTHS_IT(view)}</span>
-                <button className="ag-icon" style={{ width: 30, height: 30 }} onClick={() => setView(new Date(view.getFullYear(), view.getMonth() + 1, 1))} aria-label="Mese successivo">
-                    <i className="ph-bold ph-caret-right" />
-                </button>
-            </div>
-            <div className="ag-mini">
-                {['L', 'M', 'M', 'G', 'V', 'S', 'D'].map((d, i) => (
-                    <b key={i}>{d}</b>
-                ))}
-                {days.map((d) => (
-                    <button key={dateKey(d)} className={`${d.getMonth() !== view.getMonth() ? 'out' : ''} ${sameDay(d, new Date()) ? 'today' : ''} ${sameDay(d, date) ? 'sel' : ''}`} onClick={() => onPick(d)}>
-                        {d.getDate()}
-                        {marks[dateKey(d)] ? <i /> : null}
-                    </button>
-                ))}
-            </div>
-        </div>
-    );
-};
-
 export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onOpenSettings }) => {
-    const { items, settings, save, remove } = useAgenda(db, onUpdateDb);
+    const { items: allItems, settings, save, remove } = useAgenda(db, onUpdateDb);
+    // durata minima degli spazi liberi mostrati (si ricorda tra una visita e l'altra)
+    const [slotStep, setSlotStepState] = useState(() => {
+        try {
+            const v = Number(localStorage.getItem('urbios_slotstep'));
+            return [30, 45, 60, 90].includes(v) ? v : 30;
+        } catch (e) {
+            return 30;
+        }
+    });
+    const setSlotStep = (m) => {
+        setSlotStepState(m);
+        try {
+            localStorage.setItem('urbios_slotstep', String(m));
+        } catch (e) {} // eslint-disable-line no-empty
+    };
+    const [place, setPlace] = useState('all'); // filtro per sede (solo se ce n'e' piu' d'una)
+    const items = useMemo(() => (place === 'all' ? allItems : allItems.filter((a) => String(a.luogo || '').trim() === place)), [allItems, place]);
     const [date, setDate] = useState(() => (initial && initial.date ? fromKey(initial.date) : new Date()));
     const [view, setView] = useState('giorno');
     const [sheet, setSheet] = useState(null); // { draft, isNew }
@@ -56,16 +42,10 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
     React.useEffect(() => {
         if (!initial) return;
         if (initial.open) {
-            const a = items.find((x) => x.id === initial.open);
+            const a = allItems.find((x) => x.id === initial.open);
             if (a) setSheet({ draft: a, isNew: false });
         } else if (initial.newAppt) newAt(initial.date ? fromKey(initial.date) : new Date(), null);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-    const marks = useMemo(() => {
-        const m = {};
-        items.filter(isActive).forEach((a) => (m[a.start.slice(0, 10)] = true));
-        return m;
-    }, [items]);
 
     const weekDates = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(mondayOf(date), i)), [date]);
     const dates = view === 'settimana' ? weekDates : [date];
@@ -118,7 +98,7 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
                     isNew={sheet.isNew}
                     db={db}
                     settings={settings}
-                    items={items}
+                    items={allItems}
                     onClose={() => setSheet(null)}
                     onSave={(a) => {
                         save(a);
@@ -137,7 +117,7 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
         return (
             <>
                 <style>{agendaStyles}</style>
-                <AgendaMobile db={db} items={items} settings={settings} bounds={bounds} date={date} setDate={setDate} onNew={(d, min) => newAt(d, min)} onOpen={(a) => setSheet({ draft: a, isNew: false })} onExport={exportIcs} onOpenSettings={onOpenSettings} />
+                <AgendaMobile db={db} items={allItems} settings={settings} date={date} setDate={setDate} onNew={(d, min) => newAt(d, min)} onOpen={(a) => setSheet({ draft: a, isNew: false })} onExport={exportIcs} onOpenSettings={onOpenSettings} />
                 {sheetEl}
             </>
         );
@@ -186,28 +166,40 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
 
             <div className="ag-layout">
                 <aside className="ag-side">
-                    <MiniMonth date={date} marks={marks} onPick={(d) => setDate(d)} />
-                    <div className="ag-card">
+                    <div className="ag-card ag-next-card">
                         <h4>Prossimi</h4>
+                        {upcoming.length === 0 && (
+                            <p className="ag-empty">
+                                <i className="ph ph-calendar-blank" /> Nessun appuntamento in programma.
+                            </p>
+                        )}
                         <div className="ag-next">
-                            {upcoming.length === 0 && <p className="ag-empty">Nessun appuntamento in programma.</p>}
                             {upcoming.map((a) => {
                                 const d = startOf(a);
                                 const today = sameDay(d, new Date());
+                                const place = a.luogo && a.luogo.trim();
+                                const c = place ? placeColor(settings.places, place) : tipoOf(a.tipo).color;
                                 return (
                                     <button
                                         key={a.id}
+                                        style={{ '--p': c }}
                                         onClick={() => {
                                             setDate(d);
+                                            setView('giorno');
                                             setSheet({ draft: a, isNew: false });
                                         }}
                                     >
-                                        <span className="dot" style={{ '--c': tipoOf(a.tipo).color }} />
-                                        <span className="when">
-                                            <b>{today ? 'Oggi' : d.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric' })}</b>
-                                            {a.start.split('T')[1]}
+                                        <span className="tile">
+                                            <small>{today ? 'oggi' : d.toLocaleDateString('it-IT', { weekday: 'short' }).replace('.', '')}</small>
+                                            <b>{d.getDate()}</b>
                                         </span>
-                                        <span className="what">{apptTitle(db, a)}</span>
+                                        <span className="body">
+                                            <span className="what">{apptTitle(db, a)}</span>
+                                            <span className="meta">
+                                                {a.start.split('T')[1]} · {tipoOf(a.tipo).label}
+                                                {place && (isOnline(place) ? ' · Online' : ` · ${place}`)}
+                                            </span>
+                                        </span>
                                     </button>
                                 );
                             })}
@@ -215,23 +207,63 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
                     </div>
                     <div className="ag-card ag-set">
                         <h4>Il tuo studio</h4>
-                        <p>
-                            Oggi <b>{todayCount}</b> · settimana <b>{weekCount}</b>
-                        </p>
-                        <p>
-                            Disponibilità: <b>{settings.hoursDefault ? 'non impostata (uso lun–ven 9–18)' : settings.hoursText.replace(/\s*\n\s*/g, ' · ')}</b>
-                        </p>
-                        <p>
-                            Prima visita <b>{settings.durFirst}'</b> · controllo <b>{settings.durCheck}'</b>
-                        </p>
-                        {settings.policy && <p>Disdetta: {settings.policy}</p>}
+                        <div className="ag-stats">
+                            <div>
+                                <b>{todayCount}</b>
+                                <span>oggi</span>
+                            </div>
+                            <div>
+                                <b>{weekCount}</b>
+                                <span>questa settimana</span>
+                            </div>
+                        </div>
+                        <div className="ag-kv">
+                            <i className="ph ph-clock" />
+                            <span>{settings.hoursDefault ? 'Lun–Ven 9–18 (non impostato)' : settings.hoursText.replace(/\s*\n\s*/g, ' · ')}</span>
+                        </div>
+                        <div className="ag-kv">
+                            <i className="ph ph-timer" />
+                            <span>
+                                Prima visita <b>{settings.durFirst}'</b> · controllo <b>{settings.durCheck}'</b>
+                            </span>
+                        </div>
+                        {settings.places.length > 0 && (
+                            <div className="ag-sedi">
+                                {settings.places.map((p) => (
+                                    <span key={p} style={{ '--p': placeColor(settings.places, p) }}>
+                                        <em>{placeMark(p)}</em>
+                                        {p}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                        {settings.policy && (
+                            <div className="ag-kv">
+                                <i className="ph ph-prohibit" />
+                                <span>{settings.policy}</span>
+                            </div>
+                        )}
                         <button className="ag-link" onClick={onOpenSettings}>
-                            Modifica orari e durate →
+                            Modifica orari, durate e sedi →
                         </button>
                     </div>
                 </aside>
 
                 <section className="ag-main">
+                    {settings.places.length > 1 && (
+                        <div className="ag-places no-scrollbar">
+                            {[{ id: 'all', label: 'Tutte le sedi' }, ...settings.places.map((p) => ({ id: p, label: p }))].map((p) => (
+                                <button key={p.id} className={place === p.id ? 'on' : ''} onClick={() => setPlace(p.id)}>
+                                    {p.id !== 'all' && <span className="dot" style={{ background: placeColor(settings.places, p.id) }} />}
+                                    {p.label}
+                                </button>
+                            ))}
+                            <button className={place === 'Online' ? 'on' : ''} onClick={() => setPlace(place === 'Online' ? 'all' : 'Online')}>
+                                <span className="dot" style={{ background: ONLINE_COLOR }} />
+                                Online
+                            </button>
+                        </div>
+                    )}
                     <div className="ag-bar">
                         <button className="ag-icon" onClick={() => step(-1)} aria-label="Precedente">
                             <i className="ph-bold ph-caret-left" />
@@ -242,13 +274,18 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
                         <button className="vw-chip" onClick={() => setDate(new Date())}>
                             Oggi
                         </button>
-                        <h2>{title}</h2>
+                        <label className="ag-title-pick">
+                            <h2>{title}</h2>
+                            <i className="ph-bold ph-caret-down" />
+                            <input type="date" value={dateKey(date)} onChange={(e) => e.target.value && setDate(fromKey(e.target.value))} aria-label="Vai alla data" />
+                        </label>
                     </div>
                     {view === 'mese' ? (
                         <MonthGrid
                             date={date}
                             items={items}
                             db={db}
+                            settings={settings}
                             onPickDay={(d) => {
                                 setDate(d);
                                 setView('giorno');
@@ -256,7 +293,26 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
                             onOpen={(a) => setSheet({ draft: a, isNew: false })}
                         />
                     ) : (
-                        <DayTimeline dates={dates} items={items} db={db} settings={settings} bounds={bounds} onSlot={(d, min) => newAt(d, min)} onOpen={(a) => setSheet({ draft: a, isNew: false })} />
+                        view === 'settimana' ? (
+                            <WeekBoard
+                                step={slotStep}
+                                setStep={setSlotStep}
+                                dates={weekDates}
+                                items={items}
+                                db={db}
+                                settings={settings}
+                                onNew={(d, min) => newAt(d, min)}
+                                onOpen={(a) => setSheet({ draft: a, isNew: false })}
+                                onPickDay={(d) => {
+                                    setDate(d);
+                                    setView('giorno');
+                                }}
+                            />
+                        ) : (
+                            <div className="ag-daywrap">
+                                <DayList step={slotStep} day={visible} date={date} db={db} settings={settings} onNew={(d, min) => newAt(d, min)} onOpen={(a) => setSheet({ draft: a, isNew: false })} />
+                            </div>
+                        )
                     )}
                 </section>
             </div>

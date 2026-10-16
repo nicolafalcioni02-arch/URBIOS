@@ -1,8 +1,8 @@
 import React from 'react';
-import { dateKey, addDays, mondayOf, isActive, apptTitle, tipoOf, sameDay, birthdaysOn } from '../../components/agenda/agendaLogic';
+import { dateKey, addDays, mondayOf, isActive, apptTitle, tipoOf, sameDay, birthdaysOn, placeColor } from '../../components/agenda/agendaLogic';
 
 // Vista Mese: ogni giorno mostra gli appuntamenti (max 3); clic su un giorno = si apre quella giornata.
-export const MonthGrid = ({ date, items, db, onPickDay, onOpen }) => {
+export const MonthGrid = ({ date, items, db, settings, onPickDay, onOpen }) => {
     const first = new Date(date.getFullYear(), date.getMonth(), 1);
     const start = mondayOf(first);
     const weeks = Math.ceil(((first.getDay() + 6) % 7 + new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()) / 7);
@@ -29,7 +29,7 @@ export const MonthGrid = ({ date, items, db, onPickDay, onOpen }) => {
                             <button
                                 key={a.id}
                                 className="ag-chip"
-                                style={{ '--c': tipoOf(a.tipo).color }}
+                                style={{ '--c': tipoOf(a.tipo).color, '--p': a.luogo && a.luogo.trim() ? placeColor(settings.places, a.luogo) : tipoOf(a.tipo).color }}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     onOpen(a);

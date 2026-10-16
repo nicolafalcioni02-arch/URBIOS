@@ -1,7 +1,7 @@
 // Timeline a ore per uno o più giorni (vista Giorno e Settimana). Le fasce bianche sono la tua disponibilità
 // (dagli orari dello studio), il resto è grigio. Clic su uno spazio vuoto = nuovo appuntamento a quell'ora.
 import React, { useEffect, useRef, useState } from 'react';
-import { dateKey, startOf, isActive, layoutLanes, minutesOf, tipoOf, apptTitle, fmtTime, sameDay, birthdaysOn } from '../../components/agenda/agendaLogic';
+import { dateKey, startOf, isActive, layoutLanes, minutesOf, tipoOf, apptTitle, fmtTime, sameDay, birthdaysOn, isOnline, placeColor, placeMark } from '../../components/agenda/agendaLogic';
 
 const PPH = 60; // pixel per ora
 
@@ -81,18 +81,24 @@ export const DayTimeline = ({ dates, items, db, settings, bounds, onSlot, onOpen
                                     const t = tipoOf(a.tipo);
                                     const top = y(minutesOf(a));
                                     const h = Math.max(24, (a.dur || 30) * (PPH / 60) - 2);
+                                    const place = a.luogo && a.luogo.trim();
                                     return (
                                         <button
                                             key={a.id}
-                                            className={`ag-appt st-${a.stato || 'confermato'} ${ghost ? 'ghost' : ''}`}
-                                            style={{ top, height: h, left: `${(lane / n) * 100 + 1}%`, width: `${100 / n - 2}%`, '--c': t.color }}
+                                            className={`ag-appt st-${a.stato || 'confermato'} ${ghost ? 'ghost' : ''} ${h < 44 ? 'short' : ''}`}
+                                            style={{ top, height: h, left: `${(lane / n) * 100 + 1}%`, width: `${100 / n - 2}%`, '--c': t.color, '--p': place ? placeColor(settings.places, a.luogo) : t.color }}
                                             onClick={() => onOpen(a)}
                                         >
+                                            {place && n < 3 && (
+                                                <em className="ag-pmark" title={place}>
+                                                    {isOnline(place) ? <i className="ph-fill ph-video-camera" /> : placeMark(place)}
+                                                </em>
+                                            )}
                                             <b>{apptTitle(db, a)}</b>
                                             <span>
-                                                {a.start.split('T')[1]} · {a.dur}'{a.luogo && h > 56 ? ` · ${a.luogo.trim()}` : ''}
+                                                {a.start.split('T')[1]} · {a.dur}'{place && h > 56 ? ` · ${isOnline(place) ? 'Online' : place}` : ''}
                                             </span>
-                                            {a.stato === 'completato' && <i className="ph-fill ph-check-circle" />}
+                                            {a.stato === 'completato' && <i className="ph-fill ph-check-circle ag-done" />}
                                         </button>
                                     );
                                 })}
