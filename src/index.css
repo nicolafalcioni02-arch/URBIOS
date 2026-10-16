@@ -1115,3 +1115,41 @@ body .ag-sheet { max-height: calc(100dvh - var(--kb, 0px) - 32px); }
 .vw-filled { margin-left: 8px; display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border-radius: 999px; background: var(--soft); font-size: 12.5px; font-weight: 600; color: var(--ink); }
 .vw-progress { position: absolute; top: -1px; left: 0; right: 0; height: 2px; }
 .vw-progress span { display: block; height: 100%; border-radius: 0 3px 3px 0; background: var(--ink); transition: width .6s var(--ease); }
+
+/* Indietro in evidenza: dal primo passo riporta alla scelta della visita */
+.vw-back.is-strong { background: var(--surface); border: 1.5px solid var(--ink); font-weight: 600; box-shadow: 0 6px 16px -8px rgba(18, 19, 23, .35); }
+.vw-back.is-strong:hover:not(:disabled) { background: var(--ink); color: #fff; }
+.vw-back.is-strong:hover:not(:disabled) i { transform: translateX(-3px); }
+.vw-back i { transition: transform .3s var(--ease); }
+
+/* numeri: niente freccette su e giù dentro i campi (coprivano il valore) */
+input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+/* circonferenze bilaterali */
+.bil-head, .bil-row { display: grid; grid-template-columns: 88px minmax(0, 1fr) minmax(0, 1fr); gap: 6px; align-items: center; }
+.bil-head { margin-bottom: 6px; }
+.bil-head span { text-align: center; font-size: 12px; font-weight: 600; color: var(--muted); }
+.bil-label { font-size: 13px; font-weight: 500; line-height: 1.25; color: var(--ink); overflow-wrap: break-word; }
+.bil-fld { text-align: center; padding: 8px 6px !important; }
+
+/* Advanced: misure personalizzate */
+.cm-head { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 18px; transition: background-color .2s; }
+.cm-head:hover { background: #FBFAF8; }
+.cm-head b { display: block; font-size: 15px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
+.cm-head small { display: block; margin-top: 1px; font-size: 12.5px; color: var(--muted); }
+.cm-caret { color: var(--muted); transition: transform .3s var(--ease); }
+.cm-caret.is-open { transform: rotate(180deg); }
+.cm-body { display: grid; transition: grid-template-rows .45s var(--ease); }
+.cm-inner { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 4px 18px 18px; }
+.cm-empty { font-size: 13.5px; line-height: 1.5; color: var(--muted); max-width: 46ch; }
+.cm-rows { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.cm-cols, .cm-row { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, .7fr) minmax(0, .6fr) 36px; gap: 8px; align-items: center; }
+.cm-cols span { font-size: 12px; font-weight: 500; color: var(--muted); padding-left: 2px; }
+.cm-val, .cm-unit { text-align: center; }
+@media (max-width: 639px) {
+    .cm-cols { display: none; }
+    .cm-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 36px; }
+    .cm-row > :first-child { grid-column: 1 / -1; }
+    .cm-row > .hs-icon { grid-column: 3; grid-row: 2; }
+}

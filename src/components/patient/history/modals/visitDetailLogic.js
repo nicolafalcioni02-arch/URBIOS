@@ -99,6 +99,8 @@ export const TEXT_BLOCKS = [
 export const isHandled = (key) =>
     key === 'altezza' ||
     key === 'note' ||
+    key === 'misure_extra' ||
+    key === 'pliche_extra' ||
     key === 'pa_max' ||
     key === 'pa_min' ||
     key === 'hr' ||

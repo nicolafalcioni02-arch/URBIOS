@@ -68,6 +68,8 @@ export const VisitDetailContent = ({ selectedVisit, previousVisit, sesso }) => {
     if (has('pa_max') || has('pa_min')) vitals.push({ icon: 'ph-heartbeat', label: 'Pressione', value: `${fmt(d.pa_max, 0) || '–'}/${fmt(d.pa_min, 0) || '–'}`, unit: 'mmHg' });
     if (has('hr')) vitals.push({ icon: 'ph-pulse', label: 'Frequenza cardiaca', value: fmt(d.hr, 0), unit: 'bpm' });
     if (has('spo2')) vitals.push({ icon: 'ph-wind', label: 'Saturazione', value: fmt(d.spo2, 0), unit: '%' });
+    const customMeasures = Array.isArray(d.misure_extra) ? d.misure_extra.filter((m) => m && (String(m.nome || '').trim() || String(m.valore || '').trim())) : [];
+    const customFolds = Array.isArray(d.pliche_extra) ? d.pliche_extra.filter((m) => m && (String(m.nome || '').trim() || String(m.valore || '').trim())) : [];
     const lifestyle = LIFESTYLE.filter(([k]) => has(k));
     const texts = TEXT_BLOCKS.filter(([k]) => has(k));
     const extra = Object.entries(d).filter(([k, v]) => !isHandled(k) && v && typeof v !== 'object');
@@ -168,6 +170,22 @@ export const VisitDetailContent = ({ selectedVisit, previousVisit, sesso }) => {
                             </dl>
                         </div>
                     ))}
+                </Section>
+            )}
+
+            {(customMeasures.length > 0 || customFolds.length > 0) && (
+                <Section icon="ph-sliders-horizontal" title="Misure personalizzate" count={customMeasures.length + customFolds.length}>
+                    <dl className="vd-rows">
+                        {[...customMeasures, ...customFolds].map((m) => (
+                            <div key={m.id || m.nome}>
+                                <dt>{m.nome || 'Senza nome'}</dt>
+                                <dd>
+                                    {fmt(m.valore, 2)}
+                                    {m.unita && <small>{m.unita}</small>}
+                                </dd>
+                            </div>
+                        ))}
+                    </dl>
                 </Section>
             )}
 

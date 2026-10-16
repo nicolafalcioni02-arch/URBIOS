@@ -1,6 +1,7 @@
 import React from 'react';
 import { CollapsibleSection, Card } from '../../../components/ui/Card';
 import { InputGroup, BilateralInput } from '../../../components/ui/InputGroup';
+import { CustomMeasures } from './CustomMeasures';
 
 export const AnthropometrySection = ({ activeSection, sectionRefs, setActiveSection, updateDraft, visitDraft }) => {
     return (
@@ -35,16 +36,21 @@ export const AnthropometrySection = ({ activeSection, sectionRefs, setActiveSect
                     </Card>
                     <Card title="Lunghezze Segmentali" icon="ph-ruler">
                         <div className="grid grid-cols-2 gap-3">
-                            <InputGroup label="Alt. Seduto" unit="cm" name="len_seduto" value={visitDraft.len_seduto} onChange={updateDraft} />
-                            <InputGroup label="Span Braccia" unit="cm" name="len_span" value={visitDraft.len_span} onChange={updateDraft} />
-                            <InputGroup label="Lungh. Braccio" unit="cm" name="len_braccio" value={visitDraft.len_braccio} onChange={updateDraft} />
-                            <InputGroup label="Lungh. Avambr." unit="cm" name="len_avambr" value={visitDraft.len_avambr} onChange={updateDraft} />
-                            <InputGroup label="Lungh. Coscia" unit="cm" name="len_coscia" value={visitDraft.len_coscia} onChange={updateDraft} />
-                            <InputGroup label="Lungh. Gamba" unit="cm" name="len_gamba" value={visitDraft.len_gamba} onChange={updateDraft} />
+                            <InputGroup label="Alt. seduto" unit="cm" name="len_seduto" value={visitDraft.len_seduto} onChange={updateDraft} />
+                            <InputGroup label="Arm span" unit="cm" name="len_span" value={visitDraft.len_span} onChange={updateDraft} />
+                            <InputGroup label="Braccio" unit="cm" name="len_braccio" value={visitDraft.len_braccio} onChange={updateDraft} />
+                            <InputGroup label="Avambraccio" unit="cm" name="len_avambr" value={visitDraft.len_avambr} onChange={updateDraft} />
+                            <InputGroup label="Coscia" unit="cm" name="len_coscia" value={visitDraft.len_coscia} onChange={updateDraft} />
+                            <InputGroup label="Gamba" unit="cm" name="len_gamba" value={visitDraft.len_gamba} onChange={updateDraft} />
                         </div>
                     </Card>
                     <Card title="Arti Bilaterali (Circonferenze)" icon="ph-arrows-left-right">
-                        <div className="space-y-1">
+                        <div className="bil-head" aria-hidden="true">
+                            <span></span>
+                            <span>Sx</span>
+                            <span>Dx</span>
+                        </div>
+                        <div className="space-y-1.5">
                             <BilateralInput label="Braccio" name="circ_braccio" value={visitDraft.circ_braccio} onChange={updateDraft} />
                             <BilateralInput label="Avambraccio" name="circ_avambr" value={visitDraft.circ_avambr} onChange={updateDraft} />
                             <BilateralInput label="Polso" name="circ_polso" value={visitDraft.circ_polso} onChange={updateDraft} />
@@ -53,6 +59,7 @@ export const AnthropometrySection = ({ activeSection, sectionRefs, setActiveSect
                             <BilateralInput label="Caviglia" name="circ_caviglia" value={visitDraft.circ_caviglia} onChange={updateDraft} />
                         </div>
                     </Card>
+                    <CustomMeasures value={visitDraft.misure_extra} onChange={(v) => updateDraft('misure_extra', v)} />
                 </div>
             </CollapsibleSection>
         </div>

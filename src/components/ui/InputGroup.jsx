@@ -114,33 +114,13 @@ export const TextAreaGroup = ({ label, value: valueProp, placeholder, rows = 3, 
     );
 };
 
-// Aggiungiamo anche il BilateralInput
+// Riga sinistra / destra: il nome a sinistra e due caselle uguali (le intestazioni Sx / Dx stanno sopra, nella scheda)
 export const BilateralInput = ({ label, name, onChange }) => (
-    <div className="flex items-center justify-between gap-2 py-1.5">
-        <span className="text-sm font-medium text-gray-600 w-[34%] min-w-0 truncate">{label}</span>
-        <div className="flex gap-2 flex-1">
-            <div className="relative w-full">
-                <input
-                    type="number"
-                    placeholder=" "
-                    onBlur={(e) => onChange && onChange(`${name}_sx`, e.target.value)}
-                    className="fld text-center"
-                    style={{ padding: '8px 22px 8px 8px' }}
-                    inputMode="decimal"
-                />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-300 pointer-events-none">sx</span>
-            </div>
-            <div className="relative w-full">
-                <input
-                    type="number"
-                    placeholder=" "
-                    onBlur={(e) => onChange && onChange(`${name}_dx`, e.target.value)}
-                    className="fld text-center"
-                    style={{ padding: '8px 22px 8px 8px' }}
-                    inputMode="decimal"
-                />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-300 pointer-events-none">dx</span>
-            </div>
-        </div>
+    <div className="bil-row">
+        <span className="bil-label" title={label}>
+            {label}
+        </span>
+        <input type="text" inputMode="decimal" placeholder="–" aria-label={`${label} sinistro`} onBlur={(e) => onChange && onChange(`${name}_sx`, e.target.value)} className="fld bil-fld" />
+        <input type="text" inputMode="decimal" placeholder="–" aria-label={`${label} destro`} onBlur={(e) => onChange && onChange(`${name}_dx`, e.target.value)} className="fld bil-fld" />
     </div>
 );

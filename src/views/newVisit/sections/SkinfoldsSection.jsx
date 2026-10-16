@@ -2,6 +2,7 @@ import React from 'react';
 import { CollapsibleSection, Card } from '../../../components/ui/Card';
 import { InputGroup } from '../../../components/ui/InputGroup';
 import { ResultBlock } from '../../../components/ui/ResultBlock';
+import { CustomMeasures } from './CustomMeasures';
 
 export const SkinfoldsSection = ({
     activeSection,
@@ -43,6 +44,14 @@ export const SkinfoldsSection = ({
                             <InputGroup label="Polpaccio" unit="mm" name="pl_polpaccio" value={visitDraft.pl_polpaccio} onChange={updateDraft} />
                         </div>
                     </Card>
+                    <CustomMeasures
+                        value={visitDraft.pliche_extra}
+                        onChange={(v) => updateDraft('pliche_extra', v)}
+                        subtitle="Pliche personalizzate"
+                        defaultUnit="mm"
+                        placeholder="Es. Plica deltoidea"
+                        emptyText="Aggiungi una plica che non trovi sopra: nome e spessore in mm. Non entra nella somma delle pliche e nelle formule."
+                    />
                     <div className="md:col-span-2 rounded-[22px] p-4 sm:p-5 bg-[color:var(--soft)]">
                         <div className="flex justify-between items-end gap-3 mb-5">
                             <div>

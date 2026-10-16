@@ -25,7 +25,7 @@ export const SECTIONS = [
         title: 'Misure del corpo',
         hint: 'Peso e altezza bastano per iniziare. Il resto lo aggiungi se serve.',
         icon: 'ph-ruler',
-        match: (k) => /^(peso|altezza|cm_|dm_|len_|circ_)/.test(k),
+        match: (k) => /^(peso|altezza|cm_|dm_|len_|circ_|misure_extra)/.test(k),
     },
     {
         id: 'plicometria',
@@ -33,7 +33,7 @@ export const SECTIONS = [
         title: 'Pliche cutanee',
         hint: 'Inserisci gli spessori in mm. Densità e massa grassa si calcolano da sole.',
         icon: 'ph-person-simple',
-        match: (k) => /^pl_/.test(k),
+        match: (k) => /^(pl_|pliche_extra)/.test(k),
     },
     {
         id: 'bioimpedenza',

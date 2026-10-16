@@ -33,7 +33,7 @@ export const buildPanelsHtml = ({ bi, d, renderPanel, val, vr }) => {
             { l: 'Dm. Bi-iliaco', v: val(d.dm_biiliaco) },
             { l: 'Dm. Torace', v: val(d.dm_torace_trasv) },
             { l: 'Alt. Seduto', v: val(d.len_seduto) },
-            { l: 'Span Braccia', v: val(d.len_span) },
+            { l: 'Arm span', v: val(d.len_span) },
             { l: 'L. Braccio', v: val(d.len_braccio) },
             { l: 'L. Avambr', v: val(d.len_avambr) },
             { l: 'L. Coscia', v: val(d.len_coscia) },

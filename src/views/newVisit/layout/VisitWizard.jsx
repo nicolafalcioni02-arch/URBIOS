@@ -8,7 +8,6 @@ export const VisitWizard = ({ patient, visitDraft, sections: SECTIONS, title, st
     const topRef = useRef(null);
 
     const counts = useMemo(() => SECTIONS.map((s) => countFilled(s, visitDraft, patient)), [SECTIONS, visitDraft, patient]);
-    const started = counts.filter((c) => c > 0).length;
     const current = SECTIONS[step];
     const isLast = step === SECTIONS.length - 1;
 
@@ -26,41 +25,9 @@ export const VisitWizard = ({ patient, visitDraft, sections: SECTIONS, title, st
 
     return (
         <div className="visit-wizard max-w-5xl mx-auto w-full px-4 md:px-8 pt-4 md:pt-6 overflow-x-clip flex flex-col" style={{ minHeight: '100%' }} ref={topRef}>
-            {/* Intestazione */}
-            <div className="vw-head flex items-center gap-3 mb-4 rise">
-                <div className="vw-ring flex-none" title={`${started} passi su ${SECTIONS.length} con dati`}>
-                    <svg viewBox="0 0 44 44" width="48" height="48" aria-hidden="true">
-                        <circle cx="22" cy="22" r="18" fill="none" stroke="var(--soft)" strokeWidth="4" />
-                        <circle cx="22" cy="22" r="18" fill="none" stroke="var(--ink)" strokeWidth="4" strokeLinecap="round" strokeDasharray={`${(started / SECTIONS.length) * 113.1} 113.1`} transform="rotate(-90 22 22)" style={{ transition: 'stroke-dasharray .8s var(--ease)' }} />
-                    </svg>
-                    <span>{started}</span>
-                </div>
-                <div className="min-w-0 flex-1">
-                    <p className="vw-title font-semibold text-[18px] tracking-[-0.02em] leading-tight truncate text-[color:var(--ink)]">{title}</p>
-                    <p className="vw-who text-[13px] text-[color:var(--muted)] leading-tight mt-0.5">
-                        <span className="vw-who-name">{patient.nome} {patient.cognome}</span>
-                        {onChangeMode && (
-                            <button onClick={onChangeMode} className="ml-2 underline underline-offset-2 hover:text-[color:var(--ink)]">
-                                cambia
-                            </button>
-                        )}
-                    </p>
-                </div>
-                <div className="flex gap-2 flex-none">
-                    <button onClick={onAnalysis} className="vw-chip" title="Analisi clinica">
-                        <i className="ph ph-sparkle"></i>
-                        <span className="hidden sm:inline">Analisi</span>
-                    </button>
-                    <button onClick={onPreview} className="vw-chip" title="Anteprima del report">
-                        <i className="ph ph-file-text"></i>
-                        <span className="hidden sm:inline">Anteprima</span>
-                    </button>
-                </div>
-            </div>
-
-            {/* Indicatore dei passi: il passo attivo si allarga e mostra il nome */}
-            <nav className="vw-steps sticky top-0 z-30 -mx-4 md:-mx-8 px-4 md:px-8 py-2.5 mb-5" aria-label="Passi della visita">
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            {/* Passi a sinistra, Analisi e Anteprima a destra: il passo attivo si allarga e mostra il nome */}
+            <nav className="vw-steps sticky top-0 z-30 -mx-4 md:-mx-8 px-4 md:px-8 py-2.5 mb-5 flex items-center gap-3 rise" aria-label="Passi della visita">
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar min-w-0 flex-1">
                     {SECTIONS.map((s, i) => {
                         const active = i === step;
                         const done = counts[i] > 0;
@@ -71,6 +38,16 @@ export const VisitWizard = ({ patient, visitDraft, sections: SECTIONS, title, st
                             </button>
                         );
                     })}
+                </div>
+                <div className="flex gap-2 flex-none">
+                    <button onClick={onAnalysis} className="vw-chip" title="Analisi clinica">
+                        <i className="ph ph-sparkle"></i>
+                        <span className="hidden sm:inline">Analisi</span>
+                    </button>
+                    <button onClick={onPreview} className="vw-chip" title="Anteprima del report">
+                        <i className="ph ph-file-text"></i>
+                        <span className="hidden sm:inline">Anteprima</span>
+                    </button>
                 </div>
             </nav>
 
@@ -94,12 +71,22 @@ export const VisitWizard = ({ patient, visitDraft, sections: SECTIONS, title, st
                     <span style={{ width: `${((step + 1) / SECTIONS.length) * 100}%` }}></span>
                 </div>
                 <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
-                    <button onClick={() => go(step - 1)} disabled={step === 0} className="vw-back" aria-label="Passo precedente">
+                    {/* Indietro dal primo passo torna alla scelta di che visita è */}
+                    <button
+                        onClick={() => (step === 0 ? onChangeMode && onChangeMode() : go(step - 1))}
+                        disabled={step === 0 && !onChangeMode}
+                        className="vw-back is-strong"
+                        aria-label={step === 0 ? 'Torna alla scelta del tipo di visita' : 'Passo precedente'}
+                        title={step === 0 ? 'Torna a scegliere che visita è' : undefined}
+                    >
                         <i className="ph ph-arrow-left"></i>
                         <span>Indietro</span>
                     </button>
-                    <span className="hidden sm:block text-[13px] text-[color:var(--muted)]">
-                        Passo {step + 1} di {SECTIONS.length}
+                    <span className="hidden sm:block text-center leading-tight min-w-0">
+                        <span className="block text-[14px] font-semibold text-[color:var(--ink)] truncate">{title}</span>
+                        <span className="block text-[12.5px] text-[color:var(--muted)]">
+                            Passo {step + 1} di {SECTIONS.length}
+                        </span>
                     </span>
                     {isLast ? (
                         <button onClick={onSave} className="vw-next vw-save">
