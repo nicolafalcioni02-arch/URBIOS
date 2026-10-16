@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 
-export const InputGroup = ({ label, value: valueProp, placeholder, type = 'text', full = false, options = null, unit = null, onChange, name }) => {
+export const InputGroup = ({ label, value: valueProp, placeholder, type = 'text', full = false, options = null, unit = null, grow = false, inputClass = '', maxLength, onChange, name }) => {
     const [local, setLocal] = useState(valueProp ?? '');
+    const taRef = React.useRef(null);
+    // il campo "grow" è una riga che si allunga a capo invece di tagliare il testo
+    const fit = () => {
+        const el = taRef.current;
+        if (el) {
+            el.style.height = 'auto';
+            el.style.height = `${el.scrollHeight}px`;
+        }
+    };
+    useEffect(fit, [local, grow]);
 
     useEffect(() => {
         setLocal(valueProp ?? '');
@@ -33,6 +43,24 @@ export const InputGroup = ({ label, value: valueProp, placeholder, type = 'text'
                         </select>
                         <i className="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                     </div>
+                ) : grow ? (
+                    <textarea
+                        ref={taRef}
+                        rows={1}
+                        value={local}
+                        onChange={(e) => setLocal(e.target.value.replace(/\n/g, ' '))}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                commit(local);
+                                e.target.blur();
+                            }
+                        }}
+                        onBlur={() => commit(local)}
+                        placeholder={placeholder || ' '}
+                        className="fld resize-none overflow-hidden"
+                        style={{ lineHeight: 1.35 }}
+                    ></textarea>
                 ) : (
                     <input
                         type={type}
@@ -47,7 +75,8 @@ export const InputGroup = ({ label, value: valueProp, placeholder, type = 'text'
                         }}
                         onBlur={() => commit(local)}
                         placeholder={placeholder || ' '}
-                        className="fld"
+                        maxLength={maxLength}
+                        className={`fld ${inputClass}`}
                         style={unit ? { paddingRight: 40 } : undefined}
                         inputMode={type === 'number' ? 'decimal' : undefined}
                     />

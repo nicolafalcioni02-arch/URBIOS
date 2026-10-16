@@ -1,6 +1,6 @@
 // Documenti da far firmare al paziente e loro stato. Salvati in patient.documenti = { [id]: { stato, dataConsegna, dataFirma } }
 export const DOCS = [
-    { id: 'incarico', label: 'Lettera di incarico', hint: 'Contratto di prestazione professionale', icon: 'ph-file-signature' },
+    { id: 'incarico', label: 'Lettera di incarico', hint: 'Contratto di prestazione professionale', icon: 'ph-file-text' },
     { id: 'privacy', label: 'Informativa e consenso privacy', hint: 'Trattamento dati (GDPR)', icon: 'ph-shield-check' },
 ];
 

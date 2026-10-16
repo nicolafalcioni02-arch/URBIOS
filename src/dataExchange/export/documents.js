@@ -22,6 +22,7 @@ export const patientSheetBlocks = (p) => {
                 ['Fascia di età', p.fascia_eta],
                 ['Età', p.eta],
                 ['Luogo di nascita', p.luogoNascita],
+                ['Provincia di nascita', p.provinciaNascita],
                 ['Codice fiscale', p.cf],
                 ['Professione', p.professione],
                 ['Stato civile', p.statoCivile],

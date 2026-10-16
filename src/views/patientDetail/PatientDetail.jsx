@@ -12,7 +12,8 @@ import { docsSummary } from '../../components/patient/info/documentsLogic';
 export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = false, onOpenAgenda }) => {
     // un paziente senza visite parte dall'anagrafica, gli altri dallo storico
     const [view, setView] = useState(patient?.visite?.length ? 'history' : 'info');
-    const [status, setStatus] = useState(patient?.status || 'Attivo');
+    // lo stato è un dato del paziente (si cambia dall'Anagrafica)
+    const status = patient?.status || 'Attivo';
     const [dietViewMode, setDietViewMode] = useState('menu');
     // Dieta e Training si modificano dentro Nuova visita: le tab aprono il percorso gia' sul piano giusto
     const [visitStart, setVisitStart] = useState(null);

@@ -38,6 +38,7 @@ export const buildPatientTable = (db) => {
         'eta',
         'fascia_eta',
         'luogoNascita',
+        'provinciaNascita',
         'cf',
         'professione',
         'statoCivile',

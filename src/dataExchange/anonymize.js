@@ -14,6 +14,7 @@ export const PATIENT_FIELDS = [
     { key: 'cap', label: 'CAP', group: 'Luoghi', defaultRemove: true },
     { key: 'citta', label: 'Città di residenza', group: 'Luoghi', defaultRemove: true },
     { key: 'luogoNascita', label: 'Luogo di nascita', group: 'Luoghi', defaultRemove: true },
+    { key: 'provinciaNascita', label: 'Provincia di nascita', group: 'Luoghi', defaultRemove: true },
     { key: 'professione', label: 'Professione', group: 'Altri dati personali', defaultRemove: true },
     { key: 'statoCivile', label: 'Stato civile', group: 'Altri dati personali', defaultRemove: true },
     { key: 'anamnesi_familiare', label: 'Anamnesi familiare (testo libero)', group: 'Testi clinici liberi', defaultRemove: true },

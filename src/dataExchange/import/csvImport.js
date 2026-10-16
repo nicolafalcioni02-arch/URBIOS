@@ -120,6 +120,7 @@ export const CSV_TEMPLATES = {
             'sesso',
             'dataNascita',
             'luogoNascita',
+            'provinciaNascita',
             'cf',
             'professione',
             'cellulare',

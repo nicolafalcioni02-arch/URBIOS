@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { usePrintCenter } from '../../reports/printCenter/PrintCenterProvider';
 import { DOCS, STATI, docOf, docsSummary, fmtDate, missingForLetter, oggi } from './documentsLogic';
 
@@ -7,6 +7,7 @@ const TONE = { da_consegnare: 'var(--warn)', consegnato: 'var(--accent)', firmat
 // Contrattualistica: genera la lettera e tiene traccia di cosa e' stato consegnato e firmato
 export const DocumentsPanel = ({ patient, professionalData, updatePatientInfo }) => {
     const printCenter = usePrintCenter();
+    const [editing, setEditing] = useState({}); // documenti di cui si stanno modificando le date
     const { firmati, totale, completo } = docsSummary(patient);
     const missing = missingForLetter(patient);
 
@@ -42,74 +43,71 @@ export const DocumentsPanel = ({ patient, professionalData, updatePatientInfo })
     };
 
     return (
-        <div className="panel">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <div className="flex items-center gap-2.5">
-                    <i className="ph ph-file-signature text-[17px] text-[color:var(--muted)]"></i>
-                    <h4 className="font-semibold text-[15px] text-[color:var(--ink)]">Contrattualistica</h4>
-                    <span
-                        className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
-                        style={{ background: completo ? 'rgba(31,138,91,.12)' : 'rgba(183,121,31,.12)', color: completo ? 'var(--ok)' : 'var(--warn)' }}
-                    >
-                        {completo ? 'Tutto firmato' : `${firmati}/${totale} firmati`}
+        <section className="panel an-docs">
+            <div className="an-docs-head">
+                <h4 className="vd-h">
+                    <span className="vd-h-ico">
+                        <i className="ph ph-file-text"></i>
                     </span>
-                </div>
-                <div className="flex items-center gap-2">
-                    {!completo && (
-                        <button onClick={markAllSigned} className="vw-chip !h-9 text-[13px]">
-                            <i className="ph ph-check-circle"></i> Segna tutto firmato
-                        </button>
-                    )}
-                    <button
-                        onClick={() => printCenter && printCenter.open(['lettera'])}
-                        className="vw-chip !h-9 text-[13px]"
-                        style={{ background: 'var(--ink)', color: '#fff', borderColor: 'var(--ink)' }}
-                    >
+                    Documenti
+                    <span className="vd-h-count" style={{ color: completo ? 'var(--ok)' : 'var(--warn)', fontWeight: 600 }}>
+                        {firmati}/{totale}
+                    </span>
+                </h4>
+                <div className="an-actions">
+                    <button onClick={() => printCenter && printCenter.open(['lettera'])} className="vd-btn is-primary is-sm">
                         <i className="ph ph-printer"></i> Genera e stampa
                     </button>
+                    {!completo && (
+                        <button onClick={markAllSigned} className="vd-btn is-sm" title="Segna tutto firmato">
+                            <i className="ph ph-checks"></i> Tutti firmati
+                        </button>
+                    )}
                 </div>
             </div>
 
             {missing.length > 0 && (
-                <p className="text-[12.5px] mb-3 flex items-start gap-1.5" style={{ color: 'var(--warn)' }}>
-                    <i className="ph ph-warning mt-0.5"></i>
-                    <span>Nella lettera resteranno righe vuote: mancano {missing.join(', ')}.</span>
+                <p className="an-warn is-line" title="Nella lettera resteranno righe vuote">
+                    <i className="ph ph-warning"></i>
+                    <span>Alla lettera mancano: {missing.join(', ')}.</span>
                 </p>
             )}
 
-            <div className="divide-y" style={{ borderColor: 'var(--line)' }}>
+            <div className="an-docs-list">
                 {DOCS.map((d) => {
                     const doc = docOf(patient, d.id);
+                    const dates = doc.stato !== 'da_consegnare';
                     return (
-                        <div key={d.id} className="py-3 flex flex-col lg:flex-row lg:items-center gap-3 first:pt-0 last:pb-0">
-                            <div className="flex items-center gap-3 min-w-0 lg:w-[38%]">
-                                <span className="w-2 h-2 rounded-full flex-none" style={{ background: TONE[doc.stato] }}></span>
-                                <div className="min-w-0">
-                                    <div className="text-[14px] font-semibold text-[color:var(--ink)] truncate">{d.label}</div>
-                                    <div className="text-[12px] text-[color:var(--muted)] truncate">
-                                        {doc.stato === 'firmato' && `Firmato il ${fmtDate(doc.dataFirma)}`}
-                                        {doc.stato === 'consegnato' && `Consegnato il ${fmtDate(doc.dataConsegna)}, in attesa di firma`}
-                                        {doc.stato === 'da_consegnare' && d.hint}
-                                    </div>
-                                </div>
+                        <div key={d.id} className="an-doc" style={{ '--tone': TONE[doc.stato] }}>
+                            <div className="an-doc-top">
+                                <span className="an-doc-dot"></span>
+                                <p className="an-doc-title">{d.label}</p>
+                                {dates && (
+                                    <button className="an-doc-date" onClick={() => setEditing((e) => ({ ...e, [d.id]: !e[d.id] }))} aria-expanded={!!editing[d.id]}>
+                                        {doc.stato === 'firmato' ? `Firmato ${fmtDate(doc.dataFirma)}` : `Consegnato ${fmtDate(doc.dataConsegna)}`}
+                                        <i className="ph ph-pencil-simple-line"></i>
+                                    </button>
+                                )}
                             </div>
-                            <div className="seg flex-none self-start lg:self-auto">
-                                {STATI.map((s) => (
-                                    <button key={s.id} className={doc.stato === s.id ? 'on' : ''} style={{ padding: '6px 14px', fontSize: 13 }} onClick={() => setStato(d.id, s.id)}>
-                                        {s.label}
+
+                            <div className="an-seg" role="group" aria-label={d.label}>
+                                {STATI.map((x) => (
+                                    <button key={x.id} className={doc.stato === x.id ? 'on' : ''} aria-pressed={doc.stato === x.id} onClick={() => setStato(d.id, x.id)}>
+                                        {x.label}
                                     </button>
                                 ))}
                             </div>
-                            {doc.stato !== 'da_consegnare' && (
-                                <div className="flex items-center gap-2 text-[12px] text-[color:var(--muted)] lg:ml-auto">
-                                    <label className="flex items-center gap-1.5">
-                                        consegna
-                                        <input type="date" className="fld !py-1.5 !px-2 !w-auto text-[12px]" value={doc.dataConsegna || ''} onChange={(e) => setDate(d.id, 'dataConsegna', e.target.value)} />
+
+                            {dates && editing[d.id] && (
+                                <div className="an-dates">
+                                    <label>
+                                        <span>Consegna</span>
+                                        <input type="date" className="fld" value={doc.dataConsegna || ''} onChange={(e) => setDate(d.id, 'dataConsegna', e.target.value)} />
                                     </label>
                                     {doc.stato === 'firmato' && (
-                                        <label className="flex items-center gap-1.5">
-                                            firma
-                                            <input type="date" className="fld !py-1.5 !px-2 !w-auto text-[12px]" value={doc.dataFirma || ''} onChange={(e) => setDate(d.id, 'dataFirma', e.target.value)} />
+                                        <label>
+                                            <span>Firma</span>
+                                            <input type="date" className="fld" value={doc.dataFirma || ''} onChange={(e) => setDate(d.id, 'dataFirma', e.target.value)} />
                                         </label>
                                     )}
                                 </div>
@@ -118,7 +116,6 @@ export const DocumentsPanel = ({ patient, professionalData, updatePatientInfo })
                     );
                 })}
             </div>
-
-        </div>
+        </section>
     );
 };

@@ -15,7 +15,7 @@ export const buildLetterHtml = ({ patient, professional }) => {
                         <div style="margin-bottom: 30px; font-size: 11pt;">
                             <p style="margin: 5px 0;">Il/La sottoscritto/a <strong>${val(patient.nome)} ${val(patient.cognome)}</strong></p>
                             <p style="margin: 5px 0;">
-                                nato/a a <strong>${val(patient.luogoNascita)}</strong> 
+                                nato/a a <strong>${val(patient.luogoNascita)}${patient.provinciaNascita ? ` (${patient.provinciaNascita})` : ''}</strong> 
                                 il <strong>${val(patient.dataNascita)}</strong>
                             </p>
                             <p style="margin: 5px 0;">

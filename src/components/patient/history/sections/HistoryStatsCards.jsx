@@ -63,6 +63,14 @@ const WeightCurve = ({ visits }) => {
     );
 };
 
+// la luce sul vetro segue il puntatore (sul touch resta ferma)
+const followLight = (e) => {
+    if (e.pointerType === 'touch') return;
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+    e.currentTarget.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+};
+
 export const HistoryStatsCards = ({ stats, visits = [] }) => {
     const delta = Number(stats.deltaPeso);
     const weight = useCountUp(stats.currentWeight);
@@ -72,7 +80,8 @@ export const HistoryStatsCards = ({ stats, visits = [] }) => {
     const asc = [...visits].sort((a, b) => new Date(a.data) - new Date(b.data));
     return (
         <section className="hs-hero">
-            <div className="hs-main rise">
+            <div className="hs-main rise" onPointerMove={followLight}>
+              <div className="hs-glass">
                 <div className="hs-main-head">
                     <div>
                         <p className="hs-main-label">
@@ -89,6 +98,7 @@ export const HistoryStatsCards = ({ stats, visits = [] }) => {
                     </p>
                 </div>
                 <WeightCurve visits={asc} />
+              </div>
             </div>
 
             <div className="hs-side">
