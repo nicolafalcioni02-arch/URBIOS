@@ -7,6 +7,8 @@ import { AppointmentSheet } from './AppointmentSheet';
 import { DayTimeline } from './DayTimeline';
 import { MonthGrid } from './MonthGrid';
 import { agendaStyles } from './agendaStyles';
+import { AgendaMobile } from './AgendaMobile';
+import { useCompact } from '../../hooks/useCompact';
 
 const MONTHS_IT = (d) => d.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 
@@ -48,6 +50,7 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
     const [sheet, setSheet] = useState(null); // { draft, isNew }
     const [names, setNames] = useState(false); // nell'export .ics includere i nomi dei pazienti?
     const [menu, setMenu] = useState(false);
+    const compact = useCompact(639);
 
     // aperto da un widget: giornata scelta, eventuale appuntamento da aprire o nuovo da creare
     React.useEffect(() => {
@@ -97,8 +100,8 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
               ? `${weekDates[0].toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })} – ${weekDates[6].toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' })}`
               : date.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-    const exportIcs = () => {
-        const blob = new Blob([buildIcs(db, items.filter((a) => startOf(a) > addDays(new Date(), -1)), names)], { type: 'text/calendar;charset=utf-8' });
+    const exportIcs = (withNames = names) => {
+        const blob = new Blob([buildIcs(db, items.filter((a) => startOf(a) > addDays(new Date(), -1)), withNames)], { type: 'text/calendar;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const el = document.createElement('a');
         el.href = url;
@@ -107,6 +110,37 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
         setTimeout(() => URL.revokeObjectURL(url), 1000);
         setMenu(false);
     };
+
+    const sheetEl = sheet && (
+                <AppointmentSheet
+                    key={sheet.draft.id}
+                    draft={sheet.draft}
+                    isNew={sheet.isNew}
+                    db={db}
+                    settings={settings}
+                    items={items}
+                    onClose={() => setSheet(null)}
+                    onSave={(a) => {
+                        save(a);
+                        setDate(startOf(a));
+                        setSheet(null);
+                    }}
+                    onDelete={(id) => {
+                        remove(id);
+                        setSheet(null);
+                    }}
+                    onOpenPatient={onOpenPatient}
+                />
+    );
+
+    if (compact)
+        return (
+            <>
+                <style>{agendaStyles}</style>
+                <AgendaMobile db={db} items={items} settings={settings} bounds={bounds} date={date} setDate={setDate} onNew={(d, min) => newAt(d, min)} onOpen={(a) => setSheet({ draft: a, isNew: false })} onExport={exportIcs} onOpenSettings={onOpenSettings} />
+                {sheetEl}
+            </>
+        );
 
     return (
         <div className="ag-wrap font-sans">
@@ -134,7 +168,7 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
                         <>
                             <div style={{ position: 'fixed', inset: 0, zIndex: 20 }} onClick={() => setMenu(false)} />
                             <div className="ag-card" style={{ position: 'absolute', right: 0, top: 44, zIndex: 21, width: 260, boxShadow: '0 16px 40px rgba(0,0,0,.18)' }}>
-                                <button className="ag-link" onClick={exportIcs}>
+                                <button className="ag-link" onClick={() => exportIcs()}>
                                     <i className="ph ph-export" /> Esporta .ics (Apple, Google, Outlook)
                                 </button>
                                 <label style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginTop: 10, fontSize: 12.5, color: 'var(--muted)', cursor: 'pointer' }}>
@@ -227,27 +261,7 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
                 </section>
             </div>
 
-            {sheet && (
-                <AppointmentSheet
-                    key={sheet.draft.id}
-                    draft={sheet.draft}
-                    isNew={sheet.isNew}
-                    db={db}
-                    settings={settings}
-                    items={items}
-                    onClose={() => setSheet(null)}
-                    onSave={(a) => {
-                        save(a);
-                        setDate(startOf(a));
-                        setSheet(null);
-                    }}
-                    onDelete={(id) => {
-                        remove(id);
-                        setSheet(null);
-                    }}
-                    onOpenPatient={onOpenPatient}
-                />
-            )}
+            {sheetEl}
         </div>
     );
 };
