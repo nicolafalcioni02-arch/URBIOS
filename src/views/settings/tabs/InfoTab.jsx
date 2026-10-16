@@ -92,7 +92,7 @@ export const InfoTab = ({ tab }) => {
 
                 <p className="text-[16px] font-semibold leading-snug pt-2">Un vuoto da colmare, non un mercato da conquistare</p>
                 <p>URBIOS non nasce con un obiettivo commerciale e non è stato progettato per generare profitto. Non ci sono costi nascosti, abbonamenti ricorrenti, licenze proprietarie o versioni “premium” con funzioni bloccate.</p>
-                <p>Allo stesso tempo, la nostra non è una crociata contro le realtà private: non vogliamo sostituirci ai software attualmente sul mercato commerciale, perché crediamo con convinzione che il buon lavoro debba sempre essere riconosciuto e remunerato.</p>
+                <p>Allo stesso tempo, la nostra non è una crociata contro le realtà private: non vogliamo sostituirci ai software attualmente sul mercato, perché crediamo con convinzione che il buon lavoro debba sempre essere riconosciuto e remunerato.</p>
                 <p>URBIOS nasce per colmare un vuoto etico e pratico: offrire un’ancora di lancio e uno strumento solido a chi, in una fase iniziale, durante gli anni di studio o in condizioni di risorse limitate, non può permettersi soluzioni a pagamento. La nostra ricompensa non è economica, ma culturale: la consapevolezza che uno strumento concepito tra i banchi universitari possa sostenere il percorso formativo e lavorativo di un collega, abbattendo ogni ostacolo economico all'apprendimento.</p>
             </div>
 
