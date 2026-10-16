@@ -194,9 +194,9 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
     const btn3D = (layer) => (
         <button
             onClick={() => setShow3D(layer)}
-            className="mb-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-black text-white text-xs font-bold hover:bg-gray-800 active:scale-95 transition-all"
+            className="vw-chip mb-4"
         >
-            <i className="ph-bold ph-person-simple text-base"></i> 3D · misura sul corpo
+            <i className="ph ph-person-simple"></i> Misura sul modello 3D
         </button>
     );
 

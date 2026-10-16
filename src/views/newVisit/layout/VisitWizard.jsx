@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ShaderCanvas } from '../../../components/visuals/ShaderCanvas';
 import { countFilled } from '../data/visitSections';
 
 // Cornice dei rilievi di Nuova Visita: una sezione per schermata, indicatore di avanzamento in alto
@@ -25,23 +24,19 @@ export const VisitWizard = ({ patient, visitDraft, sections: SECTIONS, title, st
         if (box) box.scrollTo({ top: 0, behavior: 'smooth' });
     }, [step]);
 
-    // la sfera cresce man mano che la visita si riempie
-    const orbScale = 0.72 + 0.28 * (started / SECTIONS.length);
-
     return (
         <div className="visit-wizard max-w-5xl mx-auto w-full px-4 md:px-8 pt-4 md:pt-6 overflow-x-clip flex flex-col" style={{ minHeight: '100%' }} ref={topRef}>
             {/* Intestazione */}
             <div className="vw-head flex items-center gap-3 mb-4 rise">
-                <div className="vw-orb relative flex-none" style={{ width: 52, height: 52 }}>
-                    <div
-                        className="absolute inset-0 rounded-full overflow-hidden"
-                        style={{ transform: `scale(${orbScale})`, transition: 'transform .8s var(--ease)', background: '#fff', boxShadow: '0 6px 18px rgba(18,19,23,.10)' }}
-                    >
-                        <ShaderCanvas size={52} />
-                    </div>
+                <div className="vw-ring flex-none" title={`${started} passi su ${SECTIONS.length} con dati`}>
+                    <svg viewBox="0 0 44 44" width="48" height="48" aria-hidden="true">
+                        <circle cx="22" cy="22" r="18" fill="none" stroke="var(--soft)" strokeWidth="4" />
+                        <circle cx="22" cy="22" r="18" fill="none" stroke="var(--ink)" strokeWidth="4" strokeLinecap="round" strokeDasharray={`${(started / SECTIONS.length) * 113.1} 113.1`} transform="rotate(-90 22 22)" style={{ transition: 'stroke-dasharray .8s var(--ease)' }} />
+                    </svg>
+                    <span>{started}</span>
                 </div>
                 <div className="min-w-0 flex-1">
-                    <p className="vw-title font-semibold text-[17px] leading-tight truncate text-[color:var(--ink)]">{title}</p>
+                    <p className="vw-title font-semibold text-[18px] tracking-[-0.02em] leading-tight truncate text-[color:var(--ink)]">{title}</p>
                     <p className="vw-who text-[13px] text-[color:var(--muted)] leading-tight mt-0.5">
                         <span className="vw-who-name">{patient.nome} {patient.cognome}</span>
                         {onChangeMode && (
@@ -81,10 +76,10 @@ export const VisitWizard = ({ patient, visitDraft, sections: SECTIONS, title, st
 
             {/* Titolo del passo */}
             <div key={`h-${current.id}`} className={dir === 'fwd' ? 'step-fwd' : 'step-back'}>
-                <h2 className="text-[26px] sm:text-[30px] leading-[1.1] font-bold tracking-tight text-[color:var(--ink)]">{current.title}</h2>
+                <h2 className="text-[26px] sm:text-[32px] leading-[1.08] font-semibold tracking-[-0.04em] text-[color:var(--ink)]">{current.title}</h2>
                 <p className="text-[14px] text-[color:var(--muted)] mt-1.5 mb-5 max-w-xl">
                     {current.hint}
-                    {counts[step] > 0 && <span className="ml-2 text-[color:var(--ink)] font-medium">{counts[step]} compilati</span>}
+                    {counts[step] > 0 && <span className="vw-filled">{counts[step]} compilati</span>}
                 </p>
             </div>
 
@@ -95,6 +90,9 @@ export const VisitWizard = ({ patient, visitDraft, sections: SECTIONS, title, st
 
             {/* Barra di navigazione: sempre in fondo alla schermata */}
             <div className="visit-bar sticky bottom-0 z-30 -mx-4 md:-mx-8 px-4 md:px-8 pt-3 mt-8" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+                <div className="vw-progress" aria-hidden="true">
+                    <span style={{ width: `${((step + 1) / SECTIONS.length) * 100}%` }}></span>
+                </div>
                 <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
                     <button onClick={() => go(step - 1)} disabled={step === 0} className="vw-back" aria-label="Passo precedente">
                         <i className="ph ph-arrow-left"></i>

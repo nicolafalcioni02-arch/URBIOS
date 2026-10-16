@@ -3,6 +3,30 @@ import React, { createContext, useContext, useState } from 'react';
 // Dentro Nuova Visita ogni sezione e' una schermata a se': niente intestazione a fisarmonica, solo il contenuto.
 export const StepContext = createContext(false);
 
+// titoli in minuscolo dopo la prima lettera; sigle (NASH, TORCH) e numeri restano com'erano
+export const sentence = (t) =>
+    String(t || '')
+        .split(' ')
+        .map((w, i) => (i === 0 || /^\W*[A-Z]{2,}\W*$/.test(w) || /\d/.test(w) ? w : w.toLowerCase()))
+        .join(' ');
+
+// alcune icone della libreria non esistono nella versione caricata: in quel caso si ripiega su un cerchio, senza lasciare il riquadro vuoto
+const IconTile = ({ icon, tint }) => {
+    const ref = React.useRef(null);
+    const [cls, setCls] = useState(icon);
+    React.useLayoutEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const c = getComputedStyle(el, '::before').content;
+        if (!c || c === 'none' || c === 'normal' || c === '""') setCls('ph-circle');
+    }, [icon]);
+    return (
+        <span className="ct-ico" style={tint ? { color: tint } : undefined}>
+            <i ref={ref} className={`ph ${cls}`}></i>
+        </span>
+    );
+};
+
 export const Card = ({ children, title, icon, colorTheme = 'gray', className = '' }) => {
     // il colore del tema resta come prop per compatibilita', ma lo stile e' unico: carta bianca, filo sottile
     const tint = { red: '#C2413A', orange: '#B7791F', green: '#1F8A5B', blue: '#2F54EB' }[colorTheme];
@@ -10,9 +34,9 @@ export const Card = ({ children, title, icon, colorTheme = 'gray', className = '
     return (
         <div className={`panel ${className}`}>
             {title && (
-                <div className="flex items-center gap-2 mb-4">
-                    {icon && <i className={`ph ${icon} text-[17px]`} style={{ color: tint || 'var(--muted)' }}></i>}
-                    <h4 className="font-semibold text-[15px] text-[color:var(--ink)]">{title}</h4>
+                <div className="flex items-center gap-2.5 mb-4">
+                    {icon && <IconTile icon={icon} tint={tint} />}
+                    <h4 className="font-semibold text-[15px] tracking-[-0.01em] text-[color:var(--ink)]">{sentence(title)}</h4>
                 </div>
             )}
             {children}
@@ -33,8 +57,8 @@ export const CardCompattabile = ({ children, title, icon, colorTheme = 'gray', c
                     aria-expanded={isOpen}
                 >
                     <span className="flex items-center gap-2.5 min-w-0">
-                        {icon && <i className={`ph ${icon} text-[18px] text-[color:var(--muted)]`}></i>}
-                        <span className="font-semibold text-[15px] text-[color:var(--ink)] truncate">{title}</span>
+                        {icon && <IconTile icon={icon} />}
+                        <span className="font-semibold text-[15px] tracking-[-0.01em] text-[color:var(--ink)] truncate">{sentence(title)}</span>
                     </span>
                     <i className={`ph ph-plus text-[color:var(--muted)] transition-transform duration-300 ${isOpen ? 'rotate-45' : ''}`}></i>
                 </button>
