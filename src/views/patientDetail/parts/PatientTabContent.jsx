@@ -35,7 +35,7 @@ export const PatientTabContent = ({
     }, [view]);
 
     return (
-        <div className={`flex-1 overflow-y-auto relative ${['visit', 'diet', 'Allenamento'].includes(view) ? '' : 'p-4 md:p-8'} ${widgetsPad ? 'wd-padded' : ''}`}>
+        <div className={`flex-1 overflow-y-auto relative ${['visit', 'diet', 'Allenamento'].includes(view) ? '' : 'p-4 md:p-8'} ${widgetsPad ? 'wd-padded' : ''} ${view === 'history' ? 'hs-tab' : ''}`}>
             {view === 'info' && <ClinicalFolder patient={patient} updatePatientInfo={updatePatientInfo} professionalData={db.utente} />}
 
             {view === 'history' && <HistoryView patient={patient} onUpdateDb={onUpdateDb} onOpenDiet={onOpenDiet} />}

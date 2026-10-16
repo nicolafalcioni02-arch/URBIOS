@@ -2,39 +2,29 @@ import React from 'react';
 
 export const HistoryToolbar = ({ filteredVisits, searchTerm, setIsSearchCalendarOpen, setSearchTerm, setShowSmartPlot }) => {
     return (
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-            {/* Search pill — shows active filter */}
-            <div className="flex items-center gap-2">
-                {searchTerm && (
-                    <div className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-full text-xs font-bold">
-                        <i className="ph-bold ph-funnel text-sm"></i>
-                        <span>{new Date(searchTerm).toLocaleDateString('it-IT')}</span>
-                        <button onClick={() => setSearchTerm('')} className="ml-1 opacity-60 hover:opacity-100 transition-opacity">
-                            <i className="ph-bold ph-x text-xs"></i>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2 min-w-0">
+                <h3 className="text-[17px] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">Visite</h3>
+                {searchTerm ? (
+                    <span className="inline-flex items-center gap-1.5 h-7 pl-3 pr-1 rounded-full bg-[color:var(--soft)] text-[13px] font-medium text-[color:var(--ink)]">
+                        {new Date(searchTerm).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        <button onClick={() => setSearchTerm('')} className="w-5 h-5 !min-h-0 rounded-full grid place-items-center text-[color:var(--muted)] hover:bg-white hover:text-[color:var(--ink)]" aria-label="Togli il filtro per data">
+                            <i className="ph-bold ph-x text-[11px]"></i>
                         </button>
-                    </div>
-                )}
-                {!searchTerm && (
-                    <span className="text-xs text-gray-400 font-medium">
-                        {filteredVisits.length} visit{filteredVisits.length !== 1 ? 'e' : 'a'}
                     </span>
+                ) : (
+                    <span className="text-[13px] text-[color:var(--muted)] tabular-nums">{filteredVisits.length}</span>
                 )}
             </div>
 
             <div className="flex flex-wrap gap-2">
-                <button
-                    onClick={() => setIsSearchCalendarOpen(true)}
-                    className="flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-white border border-gray-200 rounded-full shadow-sm hover:border-gray-400 hover:shadow-md transition-all text-gray-700"
-                >
-                    <i className="ph-bold ph-calendar-blank text-base"></i>
-                    <span className="text-[11px] font-bold ">Filtra per data</span>
+                <button onClick={() => setIsSearchCalendarOpen(true)} className="vw-chip text-[13px] font-medium text-[color:var(--ink)]">
+                    <i className="ph ph-calendar-blank"></i>
+                    Filtra per data
                 </button>
-                <button
-                    onClick={() => setShowSmartPlot(true)}
-                    className="flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-[color:var(--ink)] text-white rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all"
-                >
-                    <i className="ph-fill ph-chart-line-up text-base"></i>
-                    <span className="text-[11px] font-bold ">Smart Plot</span>
+                <button onClick={() => setShowSmartPlot(true)} className="vw-chip text-[13px] font-medium" style={{ background: 'var(--ink)', borderColor: 'var(--ink)', color: '#fff' }}>
+                    <i className="ph ph-chart-line-up"></i>
+                    Smart Plot
                 </button>
             </div>
         </div>

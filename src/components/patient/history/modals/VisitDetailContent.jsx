@@ -1,101 +1,228 @@
 import React from 'react';
 import { DEFAULT_RANGE_EMATO } from '../../../../logic/db_defaults';
+import { BLOOD_GROUPS, MEASURE_GROUPS, LIFESTYLE, TEXT_BLOCKS, isHandled, prettyKey, num, fmt, bmiOf, bmiBand, rangeOf } from './visitDetailLogic';
+import { fmtDelta } from '../sections/historyFormat';
 
-export const VisitDetailContent = ({ selectedVisit }) => {
+const Section = ({ icon, title, count, children }) => (
+    <section className="vd-sec">
+        <h4 className="vd-h">
+            <span className="vd-h-ico">
+                <i className={`ph ${icon}`}></i>
+            </span>
+            {title}
+            {count ? <span className="vd-h-count">{count}</span> : null}
+        </h4>
+        {children}
+    </section>
+);
+
+const STATE_TEXT = { low: 'sotto il range', high: 'sopra il range', ok: 'nel range' };
+
+const BloodCell = ({ k, value, sesso }) => {
+    const cfg = DEFAULT_RANGE_EMATO[k];
+    const r = rangeOf(k, value, sesso);
+    return (
+        <div className={`vd-lab ${r ? `is-${r.state}` : ''}`}>
+            <p className="vd-lab-name" title={cfg.label}>
+                {cfg.label}
+            </p>
+            <p className="vd-lab-val">
+                {fmt(value, 2)}
+                {cfg.unit && <small>{cfg.unit}</small>}
+            </p>
+            {r ? (
+                <>
+                    <div className="vd-track" aria-hidden="true">
+                        <span className="vd-track-ok"></span>
+                        <span className="vd-track-dot" style={{ left: `${r.pos * 100}%` }}></span>
+                    </div>
+                    <p className="vd-lab-note">
+                        {r.state === 'ok' ? `${fmt(r.min, 2)}–${fmt(r.max, 2)}` : STATE_TEXT[r.state]}
+                    </p>
+                </>
+            ) : null}
+        </div>
+    );
+};
+
+export const VisitDetailContent = ({ selectedVisit, previousVisit, sesso }) => {
     if (!selectedVisit) return null;
-    const dettagli = selectedVisit.dettagli || {};
-    const ematoKeys = DEFAULT_RANGE_EMATO ? Object.keys(DEFAULT_RANGE_EMATO) : [];
-    const esamiCompilati = ematoKeys.filter((key) => dettagli[key] && dettagli[key] !== '');
-    const genericEntries = Object.entries(dettagli).filter(([key, val]) => {
-        if (ematoKeys.includes(key)) return false;
-        if (key === 'note') return false;
-        if (key.includes('risultati_metodo')) return false;
-        if (typeof val === 'object' && val !== null) return false;
-        if (!val) return false;
-        return true;
-    });
+    const d = selectedVisit.dettagli || {};
+
+    const bmi = bmiOf(selectedVisit.peso, d.altezza);
+    const band = bmiBand(bmi);
+    const delta = previousVisit && num(selectedVisit.peso) !== null && num(previousVisit.peso) !== null ? Number((selectedVisit.peso - previousVisit.peso).toFixed(1)) : null;
+
+    const has = (k) => d[k] !== undefined && d[k] !== null && d[k] !== '';
+    const bloodGroups = BLOOD_GROUPS.map((g) => ({ ...g, keys: Object.keys(DEFAULT_RANGE_EMATO).filter((k) => g.test(k) && has(k)) }));
+    const grouped = new Set(bloodGroups.flatMap((g) => g.keys));
+    const otherBlood = Object.keys(DEFAULT_RANGE_EMATO).filter((k) => has(k) && !grouped.has(k));
+    if (otherBlood.length) bloodGroups.push({ id: 'oth', title: 'Altri esami', keys: otherBlood });
+    const bloodShown = bloodGroups.filter((g) => g.keys.length);
+    const bloodCount = bloodShown.reduce((n, g) => n + g.keys.length, 0);
+
+    const measureShown = MEASURE_GROUPS.map((g) => ({ ...g, rows: g.items.filter(([k]) => has(k)) })).filter((g) => g.rows.length);
+    const whr = num(d.cm_vita_min) && num(d.cm_fianchi_max) ? num(d.cm_vita_min) / num(d.cm_fianchi_max) : null;
+
+    const vitals = [];
+    if (has('pa_max') || has('pa_min')) vitals.push({ icon: 'ph-heartbeat', label: 'Pressione', value: `${fmt(d.pa_max, 0) || '–'}/${fmt(d.pa_min, 0) || '–'}`, unit: 'mmHg' });
+    if (has('hr')) vitals.push({ icon: 'ph-pulse', label: 'Frequenza cardiaca', value: fmt(d.hr, 0), unit: 'bpm' });
+    if (has('spo2')) vitals.push({ icon: 'ph-wind', label: 'Saturazione', value: fmt(d.spo2, 0), unit: '%' });
+    const lifestyle = LIFESTYLE.filter(([k]) => has(k));
+    const texts = TEXT_BLOCKS.filter(([k]) => has(k));
+    const extra = Object.entries(d).filter(([k, v]) => !isHandled(k) && v && typeof v !== 'object');
+    const metodoA = d.risultati_metodo_A && typeof d.risultati_metodo_A === 'object' ? Object.entries(d.risultati_metodo_A) : [];
 
     return (
-        <div className="p-6 space-y-6 overflow-y-auto">
-            <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    <p className="text-xs font-bold text-gray-400">Peso</p>
-                    <p className="text-3xl font-bold text-gray-800">
-                        {selectedVisit.peso} <span className="text-sm font-normal text-gray-500">kg</span>
+        <div className="vd-body stagger">
+            <div className="vd-hero">
+                <div className="vd-weight">
+                    <p className="vd-weight-label">Peso</p>
+                    <p className="vd-weight-fig">
+                        {fmt(selectedVisit.peso)}
+                        <span>kg</span>
+                    </p>
+                    <p className="vd-weight-delta">
+                        {delta === null ? (
+                            'prima misura'
+                        ) : (
+                            <>
+                                <i className={`ph-bold ${delta < 0 ? 'ph-arrow-down-right' : delta > 0 ? 'ph-arrow-up-right' : 'ph-minus'}`}></i>
+                                {fmtDelta(delta)} kg dalla visita precedente
+                            </>
+                        )}
                     </p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    <p className="text-xs font-bold text-gray-400">BMI</p>
-                    <p className="text-3xl font-bold text-gray-800">
-                        {selectedVisit.peso && dettagli.altezza ? (selectedVisit.peso / (dettagli.altezza / 100) ** 2).toFixed(1) : '-'}
+                <div className="vd-tile">
+                    <p className="vd-tile-label">BMI</p>
+                    <p className="vd-tile-fig">{bmi === null ? '–' : fmt(bmi)}</p>
+                    {band && (
+                        <p className="vd-tile-note" style={{ '--tone': band.tone }}>
+                            <span className="vd-dot"></span>
+                            {band.label}
+                        </p>
+                    )}
+                </div>
+                <div className="vd-tile">
+                    <p className="vd-tile-label">Altezza</p>
+                    <p className="vd-tile-fig">
+                        {has('altezza') ? fmt(d.altezza, 0) : '–'}
+                        {has('altezza') && <small>cm</small>}
                     </p>
                 </div>
             </div>
 
-            {esamiCompilati.length > 0 && (
-                <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
-                    <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
-                        <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center">
-                            <i className="ph ph-drop text-lg"></i>
+            {vitals.length > 0 && (
+                <div className="vd-vitals">
+                    {vitals.map((v) => (
+                        <div key={v.label} className="vd-vital">
+                            <i className={`ph ${v.icon}`}></i>
+                            <div>
+                                <p className="vd-tile-label">{v.label}</p>
+                                <p className="vd-vital-val">
+                                    {v.value}
+                                    <small>{v.unit}</small>
+                                </p>
+                            </div>
                         </div>
-                        <h4 className="font-bold text-sm text-gray-700">Profilo Ematochimico</h4>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {esamiCompilati.map((key) => {
-                            const config = DEFAULT_RANGE_EMATO[key];
-                            const val = dettagli[key];
-                            return (
-                                <div key={key} className="bg-gray-50/50 border border-gray-100 p-3 rounded-lg">
-                                    <p className="text-xs font-bold text-gray-400 truncate" title={config.label}>
-                                        {config.label}
-                                    </p>
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-lg font-bold text-gray-800">{val}</span>
-                                        <span className="text-[10px] text-gray-500">{config.unit}</span>
+                    ))}
+                </div>
+            )}
+
+            {bloodCount > 0 && (
+                <Section icon="ph-drop" title="Esami del sangue" count={bloodCount}>
+                    {bloodShown.map((g) => (
+                        <div key={g.id} className="vd-group">
+                            <p className="vd-group-title">{g.title}</p>
+                            <div className="vd-labs">
+                                {g.keys.map((k) => (
+                                    <BloodCell key={k} k={k} value={d[k]} sesso={sesso} />
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </Section>
+            )}
+
+            {measureShown.length > 0 && (
+                <Section icon="ph-ruler" title="Misure corporee">
+                    {measureShown.map((g) => (
+                        <div key={g.id} className="vd-group">
+                            <p className="vd-group-title">{g.title}</p>
+                            <dl className="vd-rows">
+                                {g.rows.map(([k, label]) => (
+                                    <div key={k}>
+                                        <dt>{label}</dt>
+                                        <dd>
+                                            {fmt(d[k], 2)}
+                                            <small>{g.unit}</small>
+                                        </dd>
                                     </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
+                                ))}
+                                {g.id === 'circ' && whr !== null && (
+                                    <div>
+                                        <dt>Rapporto vita/fianchi</dt>
+                                        <dd>{whr.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</dd>
+                                    </div>
+                                )}
+                            </dl>
+                        </div>
+                    ))}
+                </Section>
             )}
 
-            {dettagli.risultati_metodo_A && (
-                <div className="mt-4">
-                    <h4 className="font-bold text-xs mb-2 text-blue-600">Analisi Metodo A</h4>
-                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 flex flex-col gap-1">
-                        {Object.entries(dettagli.risultati_metodo_A).map(([k, v]) => (
-                            <div key={k} className="flex justify-between items-center text-xs border-b border-blue-200/50 last:border-0 pb-1 last:pb-0">
-                                <span className="text-blue-800/70 font-medium capitalize">{k.replace(/_/g, ' ')}</span>
-                                <span className="font-bold text-blue-900">{v}</span>
+            {lifestyle.length > 0 && (
+                <Section icon="ph-moon-stars" title="Stile di vita">
+                    <dl className="vd-rows is-wide">
+                        {lifestyle.map(([k, label, unit]) => (
+                            <div key={k}>
+                                <dt>{label}</dt>
+                                <dd className={String(d[k]).length > 28 ? 'is-text' : ''}>
+                                    {fmt(d[k], 1)}
+                                    {unit && <small>{unit}</small>}
+                                </dd>
                             </div>
                         ))}
-                    </div>
-                </div>
+                    </dl>
+                </Section>
             )}
 
-            {genericEntries.length > 0 && (
-                <div>
-                    <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100 mt-6">
-                        <i className="ph ph-ruler text-gray-400 text-lg"></i>
-                        <h4 className="font-bold text-sm text-gray-700">Altre Misure</h4>
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
-                        {genericEntries.map(([key, val]) => (
-                            <div key={key} className="flex justify-between border-b border-gray-50 py-2">
-                                <span className="text-gray-500 capitalize">{key.replace(/_/g, ' ')}</span>
-                                <span className="font-bold text-gray-800">{val}</span>
+            {metodoA.length > 0 && (
+                <Section icon="ph-chart-bar" title="Analisi metodo A">
+                    <dl className="vd-rows">
+                        {metodoA.map(([k, v]) => (
+                            <div key={k}>
+                                <dt>{prettyKey(k)}</dt>
+                                <dd>{String(v)}</dd>
                             </div>
                         ))}
-                    </div>
-                </div>
+                    </dl>
+                </Section>
             )}
 
-            {selectedVisit.note && (
-                <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 text-amber-900 mt-4">
-                    <p className="text-xs font-bold text-amber-600 mb-1 opacity-70">Note</p>
-                    <p className="text-sm whitespace-pre-line">{selectedVisit.note}</p>
-                </div>
+            {extra.length > 0 && (
+                <Section icon="ph-list-bullets" title="Altri dati">
+                    <dl className="vd-rows">
+                        {extra.map(([k, v]) => (
+                            <div key={k}>
+                                <dt>{prettyKey(k)}</dt>
+                                <dd>{String(v)}</dd>
+                            </div>
+                        ))}
+                    </dl>
+                </Section>
+            )}
+
+            {texts.map(([k, title]) => (
+                <Section key={k} icon="ph-clipboard-text" title={title}>
+                    <p className="vd-text">{String(d[k])}</p>
+                </Section>
+            ))}
+
+            {selectedVisit.note && !selectedVisit.note.includes('Solo Dieta') && (
+                <Section icon="ph-note" title="Nota della visita">
+                    <p className="vd-text">{selectedVisit.note}</p>
+                </Section>
             )}
         </div>
     );

@@ -1,49 +1,58 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { DEFAULT_RANGE_EMATO } from '../../../../logic/db_defaults';
 import { VisitDetailContent } from './VisitDetailContent';
 
-export const VisitDetailModal = ({ selectedVisit, setSelectedVisit, onOpenAnalisi, onPrintCharts }) => {
-    return (
-        selectedVisit &&
-        ReactDOM.createPortal(
-            <div className="fixed top-0 left-0 w-screen h-screen z-[9999] flex items-center justify-center p-4">
-                <div className="absolute top-0 left-0 w-full h-full bg-black/60 backdrop-blur-sm" onClick={() => setSelectedVisit(null)}></div>
-                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden relative z-10 fade-enter flex flex-col">
-                    <div className="bg-white border-b border-gray-100 p-4 flex justify-between items-center z-20 sticky top-0">
-                        <div>
-                            <h3 className="font-bold text-lg">Dettaglio Visita</h3>
-                            <p className="text-xs text-gray-500">{new Date(selectedVisit.data).toLocaleDateString('it-IT', { dateStyle: 'full' })}</p>
-                        </div>
-                        <button
-                            onClick={() => setSelectedVisit(null)}
-                            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
-                        >
-                            <i className="ph ph-x text-lg"></i>
-                        </button>
+export const VisitDetailModal = ({ selectedVisit, setSelectedVisit, onOpenAnalisi, onPrintCharts, onOpenDiet, previousVisit, sesso, hasDiet, swap }) => {
+    useEffect(() => {
+        if (!selectedVisit) return undefined;
+        const onKey = (e) => e.key === 'Escape' && setSelectedVisit(null);
+        document.addEventListener('keydown', onKey);
+        return () => document.removeEventListener('keydown', onKey);
+    }, [selectedVisit, setSelectedVisit]);
+
+    if (!selectedVisit) return null;
+    const date = new Date(selectedVisit.data);
+    const title = date.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).replace(/^./, (c) => c.toUpperCase());
+
+    return ReactDOM.createPortal(
+        <div className={`vd-back ${swap ? 'is-swap' : ''}`} onClick={() => setSelectedVisit(null)}>
+            <div className={`vd-sheet ${swap ? `is-swap-${swap}` : ''}`} role="dialog" aria-modal="true" aria-label="Dettaglio visita" onClick={(e) => e.stopPropagation()}>
+                <header className="vd-head">
+                    <div className="min-w-0">
+                        <h3 className="vd-title">{title}</h3>
+                        <p className="vd-sub">{hasDiet ? 'Visita con piano alimentare' : 'Visita di controllo'}</p>
                     </div>
+                    <button onClick={() => setSelectedVisit(null)} className="hs-icon" aria-label="Chiudi">
+                        <i className="ph ph-x"></i>
+                    </button>
+                </header>
+
+                <div className="vd-actions">
                     {onOpenAnalisi && (
-                        <div className="px-6 pt-4 flex gap-2">
-                            <button
-                                onClick={() => onOpenAnalisi(selectedVisit)}
-                                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl font-bold text-sm hover:bg-gray-800 transition-all active:scale-[0.99]"
-                            >
-                                <i className="ph-bold ph-chart-pie-slice text-lg"></i> Analisi clinica avanzata
-                            </button>
-                            {onPrintCharts && (
-                                <button
-                                    onClick={() => onPrintCharts(selectedVisit)}
-                                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-800 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all active:scale-[0.99]"
-                                >
-                                    <i className="ph-bold ph-printer text-lg"></i> Stampa
-                                </button>
-                            )}
-                        </div>
+                        <button onClick={() => onOpenAnalisi(selectedVisit)} className="vd-btn is-primary">
+                            <i className="ph-bold ph-chart-pie-slice"></i>
+                            Analisi clinica avanzata
+                        </button>
                     )}
-                    {<VisitDetailContent selectedVisit={selectedVisit} />}
+                    {hasDiet && onOpenDiet && (
+                        <button onClick={() => onOpenDiet(selectedVisit)} className="vd-btn">
+                            <i className="ph ph-leaf"></i>
+                            Piano alimentare
+                        </button>
+                    )}
+                    {onPrintCharts && (
+                        <button onClick={() => onPrintCharts(selectedVisit)} className="vd-btn">
+                            <i className="ph ph-printer"></i>
+                            Stampa
+                        </button>
+                    )}
                 </div>
-            </div>,
-            document.body
-        )
+
+                <div className="vd-scroll">
+                    <VisitDetailContent selectedVisit={selectedVisit} previousVisit={previousVisit} sesso={sesso} />
+                </div>
+            </div>
+        </div>,
+        document.body
     );
 };

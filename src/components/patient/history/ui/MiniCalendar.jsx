@@ -1,85 +1,102 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
-// ─── Mini Calendar Component ──────────────────────────────────────────────────
-export const MiniCalendar = ({ visitDates, onSelectDate, onClose }) => {
+const MONTHS = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+const MONTHS_SHORT = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
+const DAYS = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+
+const ym = (iso) => {
+    const [y, m] = String(iso).split('-').map(Number);
+    return { y, m: m - 1 };
+};
+
+// Calendario del filtro: si apre sul mese dell'ultima visita (o del giorno già scelto), si sfoglia per mese o saltando ai mesi con visite
+export const MiniCalendar = ({ visitDates, selected, onSelectDate }) => {
     const today = new Date();
-    const [viewYear, setViewYear] = useState(today.getFullYear());
-    const [viewMonth, setViewMonth] = useState(today.getMonth());
+    const sorted = useMemo(() => [...new Set(visitDates)].sort(), [visitDates]);
+    const start = ym(selected || sorted[sorted.length - 1] || `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`);
+    const [view, setView] = useState(start);
+    const [dir, setDir] = useState('fwd');
 
-    const visitDateSet = useMemo(() => new Set(visitDates), [visitDates]);
+    const visitSet = useMemo(() => new Set(sorted), [sorted]);
+    const monthsWithVisits = useMemo(() => {
+        const seen = new Map();
+        sorted.forEach((iso) => {
+            const { y, m } = ym(iso);
+            const k = `${y}-${m}`;
+            seen.set(k, { y, m, n: (seen.get(k)?.n || 0) + 1 });
+        });
+        return [...seen.values()].reverse();
+    }, [sorted]);
 
-    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-    const firstDayOfWeek = new Date(viewYear, viewMonth, 1).getDay(); // 0=Sun
-    // shift so Monday=0
-    const startOffset = (firstDayOfWeek + 6) % 7;
-
-    const monthNames = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
-    const dayLabels = ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'];
-
-    const prevMonth = () => {
-        if (viewMonth === 0) {
-            setViewMonth(11);
-            setViewYear((y) => y - 1);
-        } else setViewMonth((m) => m - 1);
+    const go = (y, m) => {
+        setDir(y * 12 + m >= view.y * 12 + view.m ? 'fwd' : 'back');
+        setView({ y, m });
     };
-    const nextMonth = () => {
-        if (viewMonth === 11) {
-            setViewMonth(0);
-            setViewYear((y) => y + 1);
-        } else setViewMonth((m) => m + 1);
+    const step = (delta) => {
+        const t = view.y * 12 + view.m + delta;
+        go(Math.floor(t / 12), ((t % 12) + 12) % 12);
     };
 
-    const cells = [];
-    for (let i = 0; i < startOffset; i++) cells.push(null);
-    for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+    const daysInMonth = new Date(view.y, view.m + 1, 0).getDate();
+    const offset = (new Date(view.y, view.m, 1).getDay() + 6) % 7; // lunedì = 0
+    const cells = [...Array(offset).fill(null), ...Array.from({ length: daysInMonth }, (_, i) => i + 1)];
+    const iso = (d) => `${view.y}-${String(view.m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const monthVisits = cells.filter((d) => d && visitSet.has(iso(d))).length;
+    const isToday = (d) => d === today.getDate() && view.m === today.getMonth() && view.y === today.getFullYear();
 
     return (
-        <div className="p-2">
-            {/* Month navigation */}
-            <div className="flex items-center justify-between mb-3">
-                <button onClick={prevMonth} className="w-7 h-7 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors">
-                    <i className="ph-bold ph-caret-left text-xs"></i>
+        <div className="fc">
+            <div className="fc-nav">
+                <button onClick={() => step(-1)} className="hs-icon" aria-label="Mese precedente">
+                    <i className="ph-bold ph-caret-left"></i>
                 </button>
-                <span className="text-xs font-semibold text-gray-800">
-                    {monthNames[viewMonth]} {viewYear}
-                </span>
-                <button onClick={nextMonth} className="w-7 h-7 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors">
-                    <i className="ph-bold ph-caret-right text-xs"></i>
+                <p className="fc-month">
+                    {MONTHS[view.m]} <span>{view.y}</span>
+                </p>
+                <button onClick={() => step(1)} className="hs-icon" aria-label="Mese successivo">
+                    <i className="ph-bold ph-caret-right"></i>
                 </button>
             </div>
 
-            {/* Day labels */}
-            <div className="grid grid-cols-7 mb-1">
-                {dayLabels.map((d) => (
-                    <div key={d} className="text-center text-[11px] font-bold text-gray-400 py-1">
-                        {d}
-                    </div>
+            <div className="fc-week" aria-hidden="true">
+                {DAYS.map((d) => (
+                    <span key={d}>{d}</span>
                 ))}
             </div>
 
-            {/* Day cells */}
-            <div className="grid grid-cols-7 gap-y-0.5">
-                {cells.map((day, idx) => {
-                    if (!day) return <div key={`e-${idx}`} />;
-                    const iso = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    const hasVisit = visitDateSet.has(iso);
-                    const isToday = day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
-                    return (
-                        <button
-                            key={iso}
-                            onClick={() => hasVisit && onSelectDate(iso)}
-                            className={`
-                                relative mx-auto w-8 h-8 rounded-full text-xs font-semibold flex items-center justify-center transition-all
-                                ${hasVisit ? 'bg-black text-white hover:bg-gray-800 cursor-pointer shadow-sm' : 'text-gray-400 cursor-default'}
-                                ${isToday && !hasVisit ? 'ring-1 ring-gray-300' : ''}
-                            `}
-                        >
-                            {day}
-                            {hasVisit && <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-emerald-400 rounded-full"></span>}
+            <div key={`${view.y}-${view.m}`} className={`fc-grid ${dir === 'fwd' ? 'step-fwd' : 'step-back'}`}>
+                {cells.map((d, i) => {
+                    if (!d) return <span key={`e-${i}`} />;
+                    const has = visitSet.has(iso(d));
+                    const sel = selected === iso(d);
+                    const label = new Date(view.y, view.m, d).toLocaleDateString('it-IT', { dateStyle: 'long' });
+                    return has ? (
+                        <button key={d} onClick={() => onSelectDate(iso(d))} className={`fc-day is-visit ${sel ? 'is-sel' : ''}`} aria-label={`Visita del ${label}`} aria-pressed={sel}>
+                            {d}
                         </button>
+                    ) : (
+                        <span key={d} className={`fc-day ${isToday(d) ? 'is-today' : ''}`} aria-label={label}>
+                            {d}
+                        </span>
                     );
                 })}
             </div>
+
+            <p className="fc-count">{monthVisits === 0 ? 'Nessuna visita in questo mese' : monthVisits === 1 ? '1 visita in questo mese' : `${monthVisits} visite in questo mese`}</p>
+
+            {monthsWithVisits.length > 0 && (
+                <div className="fc-jump">
+                    <p>Salta a</p>
+                    <div>
+                        {monthsWithVisits.map((mv) => (
+                            <button key={`${mv.y}-${mv.m}`} onClick={() => go(mv.y, mv.m)} className={mv.y === view.y && mv.m === view.m ? 'is-on' : ''}>
+                                {MONTHS_SHORT[mv.m]} {String(mv.y).slice(2)}
+                                <b>{mv.n}</b>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

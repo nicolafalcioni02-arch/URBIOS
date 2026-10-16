@@ -8,6 +8,8 @@ import { DietPreviewModal } from './modals/DietPreviewModal';
 import { HistoryStatsCards } from './sections/HistoryStatsCards';
 import { HistoryToolbar } from './sections/HistoryToolbar';
 import { VisitList } from './sections/VisitList';
+import { isIndependent } from '../diet/guided/guidedLogic';
+import { statusById } from '../shared/planCommon';
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
@@ -19,6 +21,8 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
     const printCenter = usePrintCenter();
     const [analisiVisit, setAnalisiVisit] = useState(null); // visita di cui si apre l'analisi avanzata
     const [dietVisit, setDietVisit] = useState(null); // visita di cui si guarda l'anteprima della dieta
+    const [swap, setSwap] = useState(null); // 'fwd' | 'back' mentre si passa da dettaglio a piano (e ritorno): niente lampo, scorre solo il contenuto
+    const [dietFromDetail, setDietFromDetail] = useState(false); // l'anteprima è stata aperta dal dettaglio della visita: la freccia indietro ci torna
     const [toDelete, setToDelete] = useState(null); // visita da eliminare, in attesa di conferma
 
     useEffect(() => {
@@ -31,13 +35,17 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
     const visite = patient?.visite || [];
     const sortedVisits = useMemo(() => [...visite].sort((a, b) => new Date(b.data) - new Date(a.data)), [patient?.visite]);
 
+    // le visite "Solo Dieta" hanno un peso segnaposto: per peso, andamento e curva contano solo le visite misurate
+    const measured = useMemo(() => visite.filter((v) => !isIndependent(v)), [patient?.visite]);
+
     const stats = useMemo(() => {
         if (!visite.length) return null;
-        const asc = [...visite].sort((a, b) => new Date(a.data) - new Date(b.data));
+        const asc = [...measured].sort((a, b) => new Date(a.data) - new Date(b.data));
+        if (!asc.length) return { startWeight: null, currentWeight: null, deltaPeso: 0, lastDate: null, avgDelta: null, totalVisits: visite.length };
         const first = asc[0];
         const last = asc[asc.length - 1];
         const delta = (last.peso - first.peso).toFixed(1);
-        const avgDelta = visite.length > 1 ? (delta / (visite.length - 1)).toFixed(1) : null;
+        const avgDelta = asc.length > 1 ? (delta / (asc.length - 1)).toFixed(1) : null;
         return { startWeight: first.peso, currentWeight: last.peso, deltaPeso: delta, lastDate: last.data, avgDelta, totalVisits: visite.length };
     }, [patient?.visite]);
 
@@ -56,32 +64,28 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
     // ── Helpers ───────────────────────────────────────────────────────────────
     // il confronto è sempre con la visita precedente nello storico completo, anche quando la lista è filtrata
     const getWeightDelta = (visit, _index, allVisits) => {
-        const index = allVisits.findIndex((v) => v.id === visit.id);
-        if (index === -1 || index === allVisits.length - 1) return null;
-        const prev = allVisits[index + 1];
-        const diff = (visit.peso - prev.peso).toFixed(1);
-        return Number(diff);
+        if (isIndependent(visit)) return null;
+        const list = allVisits.filter((v) => !isIndependent(v));
+        const index = list.findIndex((v) => v.id === visit.id);
+        if (index === -1 || index === list.length - 1) return null;
+        const prev = list[index + 1];
+        return Number((visit.peso - prev.peso).toFixed(1));
     };
 
     // stessi stati di "Salva e Gestisci" (Dieta)
+    // stato del piano detto per esteso, con colore e icona di "Salva e Gestisci" e a che punto del percorso è (0-3)
     const getDietBadge = (status) => {
-        switch (status) {
-            case 'created':
-            case 'active':
-                return { label: 'Piano Attivo', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' };
-            case 'todo':
-                return { label: 'Da Creare', color: 'bg-red-50 text-red-600 border-red-200', dot: 'bg-red-500' };
-            case 'draft':
-                return { label: 'Da Finire', color: 'bg-amber-50 text-amber-700 border-amber-200', dot: 'bg-amber-500' };
-            case 'pending':
-                return { label: 'Da Inviare', color: 'bg-slate-100 text-slate-700 border-slate-300', dot: 'bg-slate-600' };
-            case 'delivery':
-                return { label: 'Consegnato', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' };
-            case 'edit':
-                return { label: 'Da Modificare', color: 'bg-rose-50 text-rose-700 border-rose-200', dot: 'bg-rose-500' };
-            default:
-                return { label: 'Controllo', color: 'bg-gray-100 text-gray-500 border-gray-200', dot: 'bg-gray-400' };
-        }
+        const st = statusById(status);
+        const words = {
+            todo: ['Non ancora iniziato', 0],
+            draft: ['In bozza', 1],
+            edit: ['Da correggere', 1],
+            pending: ['Pronto, da inviare', 2],
+            delivery: ['Consegnato', 3],
+            active: ['In corso', 3],
+        };
+        const [label, step] = words[st.id] || words.todo;
+        return { label, step, tone: st.color, bg: st.bg, icon: st.icon };
     };
 
     // conferma dentro l'app: confirm() del browser non funziona in tutte le finestre incorporate
@@ -103,18 +107,18 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
 
     if (!stats) {
         return (
-            <div className="p-20 text-center text-gray-400">
-                <i className="ph ph-clock-counter-clockwise text-4xl mb-4"></i>
-                <p>Nessuna visita registrata per questo paziente.</p>
+            <div className="max-w-md mx-auto text-center py-20 px-6">
+                <p className="text-[17px] font-semibold text-[color:var(--ink)]">Ancora nessuna visita</p>
+                <p className="text-[14px] text-[color:var(--muted)] mt-1">Le visite che registri compaiono qui, dalla più recente.</p>
             </div>
         );
     }
 
     // ── Render ────────────────────────────────────────────────────────────────
     return (
-        <div className="fade-enter max-w-5xl mx-auto pb-32 relative">
+        <div className="hs-root fade-enter max-w-5xl mx-auto pb-32 relative">
             {/* ── KPI CARDS ─────────────────────────────────────────────── */}
-            <HistoryStatsCards stats={stats} />
+            <HistoryStatsCards stats={stats} visits={measured} />
 
             {/* ── ACTION BAR ────────────────────────────────────────────── */}
             <HistoryToolbar
@@ -128,16 +132,25 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
             {showSmartPlot && <SmartPlotModal patient={patient} onClose={() => setShowSmartPlot(false)} />}
 
             {/* ── VISITS TIMELINE ───────────────────────────────────────── */}
-            <VisitList
-                filteredVisits={filteredVisits}
-                getDietBadge={getDietBadge}
-                getWeightDelta={getWeightDelta}
-                handleDelete={handleDelete}
-                onOpenDiet={setDietVisit}
-                setSearchTerm={setSearchTerm}
-                setSelectedVisit={setSelectedVisit}
-                sortedVisits={sortedVisits}
-            />
+            <div className="hs-scroll">
+                <VisitList
+                    filteredVisits={filteredVisits}
+                    getDietBadge={getDietBadge}
+                    getWeightDelta={getWeightDelta}
+                    handleDelete={handleDelete}
+                    onOpenDiet={(v) => {
+                    setSwap(null);
+                    setDietFromDetail(false);
+                    setDietVisit(v);
+                }}
+                    setSearchTerm={setSearchTerm}
+                    setSelectedVisit={(v) => {
+                        setSwap(null);
+                        setSelectedVisit(v);
+                    }}
+                    sortedVisits={sortedVisits}
+                />
+            </div>
 
             {/* ── SEARCH CALENDAR MODAL ─────────────────────────────────── */}
             {
@@ -145,14 +158,25 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
                     isSearchCalendarOpen={isSearchCalendarOpen}
                     setIsSearchCalendarOpen={setIsSearchCalendarOpen}
                     setSearchTerm={setSearchTerm}
+                    searchTerm={searchTerm}
                     visitDates={visitDates}
                 />
             }
 
             {/* ── VISIT DETAIL MODAL ────────────────────────────────────── */}
             {<VisitDetailModal
+                swap={swap}
                 selectedVisit={selectedVisit}
                 setSelectedVisit={setSelectedVisit}
+                previousVisit={selectedVisit ? sortedVisits.filter((v) => !isIndependent(v)).find((v) => new Date(v.data) < new Date(selectedVisit.data)) || null : null}
+                sesso={patient.sesso}
+                hasDiet={!!selectedVisit && Array.isArray(selectedVisit.dettagli?.diet_plan_data) && selectedVisit.dettagli.diet_plan_data.some((d) => (d.meals || []).some((m) => (m.items || []).length > 0))}
+                onOpenDiet={(v) => {
+                    setSwap('fwd');
+                    setSelectedVisit(null);
+                    setDietFromDetail(true);
+                    setDietVisit(v);
+                }}
                 onPrintCharts={
                     printCenter
                         ? (v) => {
@@ -179,8 +203,23 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
             )}
 
             <DietPreviewModal
+                swap={swap}
                 visit={dietVisit}
                 onClose={() => setDietVisit(null)}
+                onBack={() => {
+                    const v = dietVisit;
+                    setSwap(dietFromDetail ? 'back' : null);
+                    setDietVisit(null);
+                    if (dietFromDetail) setSelectedVisit(v);
+                }}
+                onPrint={
+                    printCenter
+                        ? (v) => {
+                              setDietVisit(null);
+                              printCenter.open([{ type: 'dieta', visitId: v.id }]);
+                          }
+                        : null
+                }
                 onEdit={(v) => {
                     setDietVisit(null);
                     onOpenDiet && onOpenDiet(v.id);
@@ -188,18 +227,18 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
             />
 
             {toDelete && (
-                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setToDelete(null)}>
-                    <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl p-6" onClick={(e) => e.stopPropagation()}>
-                        <h3 className="font-black text-base text-gray-900">Eliminare la visita?</h3>
-                        <p className="text-sm text-gray-500 mt-2">
+                <div className="sheet-back" onClick={() => setToDelete(null)}>
+                    <div className="sheet" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-[19px] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">Eliminare la visita?</h3>
+                        <p className="text-[14px] text-[color:var(--muted)] mt-2 leading-relaxed">
                             La visita del {new Date(toDelete.data).toLocaleDateString('it-IT', { dateStyle: 'long' })} ({toDelete.peso} kg) verrà eliminata definitivamente, con tutto ciò che contiene.
                         </p>
-                        <div className="flex justify-end gap-2 mt-5">
-                            <button onClick={() => setToDelete(null)} className="px-4 py-2 rounded-full text-xs font-bold bg-gray-100 hover:bg-gray-200 transition-colors">
+                        <div className="flex justify-end gap-2 mt-6">
+                            <button onClick={() => setToDelete(null)} className="vw-chip text-[14px] font-medium">
                                 Annulla
                             </button>
-                            <button onClick={confirmDelete} className="px-4 py-2 rounded-full text-xs font-bold bg-red-600 text-white hover:bg-red-700 transition-colors">
-                                Elimina
+                            <button onClick={confirmDelete} className="vw-chip text-[14px] font-semibold" style={{ background: 'var(--bad)', borderColor: 'var(--bad)', color: '#fff' }}>
+                                Elimina visita
                             </button>
                         </div>
                     </div>
