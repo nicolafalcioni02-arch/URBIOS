@@ -48,6 +48,8 @@ export const AgendaMobile = ({ db, items, settings, date, setDate, onNew, onOpen
         });
     };
     const recenter = useRef(false);
+    const touching = useRef(false); // dito sulla ghiera: non si cambia giorno ne' si muove nulla finche' non lo si toglie
+    const fromWheel = useRef(false); // il giorno e' cambiato perche' l'ha scelto la ghiera: non va ririportata la ghiera in posizione
     const onWheelScroll = () => {
         paint();
         const el0 = wheel.current;
@@ -62,14 +64,22 @@ export const AgendaMobile = ({ db, items, settings, date, setDate, onNew, onOpen
         clearTimeout(settle.current);
         settle.current = setTimeout(() => {
             const el = wheel.current;
-            if (!el) return;
+            if (!el || touching.current) return;
             const idx = Math.max(0, Math.min(WHEEL * 2, Math.round(el.scrollLeft / ITEM)));
             const d = wheelDays[idx];
-            if (d && !sameDay(d, date)) setDate(d);
-        }, 110);
+            if (d && !sameDay(d, date)) {
+                fromWheel.current = true;
+                setDate(d);
+            }
+        }, 140);
     };
     // quando la data cambia da fuori (Oggi, calendario del mese) la ghiera ruota fino a li'
     useEffect(() => {
+        if (fromWheel.current) {
+            fromWheel.current = false;
+            paint();
+            return;
+        }
         const el = wheel.current;
         const idx = diffDays(date) + WHEEL;
         if (idx < 0 || idx > WHEEL * 2) {
@@ -89,6 +99,67 @@ export const AgendaMobile = ({ db, items, settings, date, setDate, onNew, onOpen
             paint();
         }
     }, [anchor]); // eslint-disable-line react-hooks/exhaustive-deps
+    const latestScroll = useRef(null);
+    latestScroll.current = onWheelScroll;
+    // con il mouse (anteprima, tablet con trackpad) la ghiera si trascina e gira anche con la rotellina
+    useEffect(() => {
+        const el = wheel.current;
+        if (!el) return undefined;
+        let down = null;
+        let moved = false;
+        const onDown = (e) => {
+            if (e.pointerType !== 'mouse' || e.button !== 0) return;
+            down = { x: e.clientX, sl: el.scrollLeft };
+            moved = false;
+        };
+        const onMove = (e) => {
+            if (!down) return;
+            const dx = e.clientX - down.x;
+            if (!moved && Math.abs(dx) < 4) return;
+            if (!moved) {
+                moved = true;
+                touching.current = true;
+                el.style.scrollSnapType = 'none';
+                el.style.cursor = 'grabbing';
+            }
+            el.scrollLeft = down.sl - dx;
+        };
+        const onUp = () => {
+            if (!down) return;
+            down = null;
+            if (!moved) return;
+            el.style.scrollSnapType = '';
+            el.style.cursor = '';
+            touching.current = false;
+            el.scrollTo({ left: Math.round(el.scrollLeft / ITEM) * ITEM, behavior: 'smooth' });
+            latestScroll.current();
+        };
+        const onClickCap = (e) => {
+            if (moved) {
+                e.stopPropagation();
+                e.preventDefault();
+                moved = false;
+            }
+        };
+        const onWheelEv = (e) => {
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                el.scrollLeft += e.deltaY;
+            }
+        };
+        el.addEventListener('pointerdown', onDown);
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp);
+        el.addEventListener('click', onClickCap, true);
+        el.addEventListener('wheel', onWheelEv, { passive: false });
+        return () => {
+            el.removeEventListener('pointerdown', onDown);
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+            el.removeEventListener('click', onClickCap, true);
+            el.removeEventListener('wheel', onWheelEv);
+        };
+    }, [monthOpen]); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => () => clearTimeout(settle.current), []);
 
     // la giornata: appuntamenti + spazi liberi dentro gli orari di studio
@@ -165,7 +236,7 @@ export const AgendaMobile = ({ db, items, settings, date, setDate, onNew, onOpen
                 ) : (
                     <div className="agm-wheel">
                         <span className="agm-wheel-pick" aria-hidden="true"></span>
-                        <div className="agm-wheel-strip no-scrollbar" ref={wheel} onScroll={onWheelScroll}>
+                        <div className="agm-wheel-strip no-scrollbar" ref={wheel} onScroll={onWheelScroll} onTouchStart={() => (touching.current = true)} onTouchEnd={() => { touching.current = false; onWheelScroll(); }} onTouchCancel={() => (touching.current = false)}>
                             {wheelDays.map((d) => (
                                 <button key={dateKey(d)} className={`agm-wd ${sameDay(d, new Date()) ? 'today' : ''}`} onClick={() => setDate(d)} aria-label={d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}>
                                     <b>{d.toLocaleDateString('it-IT', { weekday: 'short' }).replace('.', '').slice(0, 3)}</b>

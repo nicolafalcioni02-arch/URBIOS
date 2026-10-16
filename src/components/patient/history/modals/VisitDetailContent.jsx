@@ -94,7 +94,7 @@ export const VisitDetailContent = ({ selectedVisit }) => {
             {selectedVisit.note && (
                 <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 text-amber-900 mt-4">
                     <p className="text-xs font-bold text-amber-600 mb-1 opacity-70">Note</p>
-                    <p className="text-sm italic">"{selectedVisit.note}"</p>
+                    <p className="text-sm whitespace-pre-line">{selectedVisit.note}</p>
                 </div>
             )}
         </div>

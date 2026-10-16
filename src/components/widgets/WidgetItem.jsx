@@ -55,7 +55,7 @@ export const WidgetItem = ({ item, rect, editing, lift, onItemDown, onHandleDown
             </div>
             {editing && (
                 <>
-                    {HANDLES.map((d) => (
+                    {!def.fixed && HANDLES.map((d) => (
                         <span key={d} className={`wd-h wd-h-${d}`} onPointerDown={(e) => onHandleDown(e, item, DIRS[d])} aria-hidden="true" />
                     ))}
                     <button className="wd-remove" onClick={() => store.remove(item.id)} aria-label="Togli il widget">

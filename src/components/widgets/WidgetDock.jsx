@@ -38,14 +38,19 @@ const Rail = ({ side, store, db, onOpenAgenda, editing, drag, ghost, preview, se
 
     // widget nuovi (o salvati con un formato vecchio): primo posto libero; se non c'è, la colonna è piena
     useLayoutEffect(() => {
-        const fresh = items.filter((i) => i.c == null || i.r == null || !i.w);
+        // i widget a misura bloccata tornano alla loro misura (anche se erano stati salvati ridimensionati)
+        const wrongSize = (i) => {
+            const d = widgetByType(i.type);
+            return !!d && d.fixed && (i.w !== d.size[0] || i.h !== d.size[1]);
+        };
+        const fresh = items.filter((i) => i.c == null || i.r == null || !i.w || wrongSize(i));
         if (!fresh.length) return;
-        const placed = items.filter((i) => i.c != null && i.r != null && i.w);
+        const placed = items.filter((i) => i.c != null && i.r != null && i.w && !wrongSize(i));
         const updates = {};
         const gone = [];
         fresh.forEach((it) => {
             const def = widgetByType(it.type);
-            const [w, h] = def ? [it.w || def.size[0], it.h || def.size[1]] : [2, 2];
+            const [w, h] = def ? (def.fixed ? def.size : [it.w || def.size[0], it.h || def.size[1]]) : [2, 2];
             const spot = firstFree(placed, g.rows, w, h);
             if (!spot) {
                 gone.push(it.id);

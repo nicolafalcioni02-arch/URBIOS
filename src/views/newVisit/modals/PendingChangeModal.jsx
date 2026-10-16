@@ -36,7 +36,7 @@ export const PendingChangeModal = ({ confirmSettingsChange, db, pendingChange, s
                         </div>
                     </div>
 
-                    <p className="text-xs text-gray-500 mb-6 italic">
+                    <p className="text-xs text-gray-500 mb-6">
                         Sei sicuro di voler salvare le nuove impostazioni? Questo aggiornerà il database per tutti i pazienti futuri.
                     </p>
 

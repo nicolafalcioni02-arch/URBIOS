@@ -64,7 +64,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                     <div className="pets-mark" aria-hidden="true">
                         <i className="ph-fill ph-dog"></i>
                     </div>
-                    <h2 className="text-[26px] leading-tight text-[color:var(--ink)]" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 600 }}>
+                    <h2 className="display text-[26px] text-[color:var(--ink)]">
                         Pets
                     </h2>
                     <p className="text-[16px] font-medium text-[color:var(--ink)] mt-2">Stessa cura, anche per chi ha quattro zampe.</p>
@@ -86,7 +86,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                     <div className="pets-mark" aria-hidden="true">
                         <i className="ph-fill ph-book-open-text"></i>
                     </div>
-                    <h2 className="text-[26px] leading-tight text-[color:var(--ink)]" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 600 }}>
+                    <h2 className="display text-[26px] text-[color:var(--ink)]">
                         Student
                     </h2>
                     <p className="text-[16px] font-medium text-[color:var(--ink)] mt-2">Si sta trasformando in qualcosa di nuovo.</p>
@@ -279,7 +279,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                 {/* Titolo e azione principale */}
                 <div className="flex flex-wrap items-end justify-between gap-4 mb-5 rise" style={{ animationDelay: '.05s' }}>
                     <div>
-                        <h1 style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 600 }} className="text-[40px] sm:text-[52px] leading-none text-[color:var(--ink)]">
+                        <h1 className="display text-[38px] sm:text-[48px] text-[color:var(--ink)]">
                             Pazienti
                         </h1>
                         <p className="text-[14px] text-[color:var(--muted)] mt-2">

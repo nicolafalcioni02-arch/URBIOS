@@ -245,7 +245,7 @@ export const Analisi = ({ onClose, patient, visitData, updateDraft, report, sess
                                                 style={{ whiteSpace: 'pre-wrap' }}
                                             />
                                         </div>
-                                        <p className="text-[10px] text-gray-400 mt-2 text-right italic">
+                                        <p className="text-[10px] text-gray-400 mt-2 text-right">
                                             Modifica i valori numerici per rigenerare il testo automaticamente.
                                         </p>
                                     </div>

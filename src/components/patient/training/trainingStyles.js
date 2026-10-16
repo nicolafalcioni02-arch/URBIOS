@@ -124,7 +124,7 @@ export const trainingCss = `
 
                 /* --- CARDS E ANIMAZIONI --- */
                 .t-week-wrapper { margin-bottom: 60px; scroll-margin-top: 20px; position: relative; }
-                .t-week-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-left: 15px; border-left: 4px solid var(--ink); }
+                .t-week-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
                 .t-week-title-input { font-size: 28px; font-weight: 800; border: none; background: transparent; width: 400px; max-width: 100%; outline: none; color: #1D1D1F; transition: color 0.3s; }
                 .t-week-title-input:focus { color: var(--ink); }
 

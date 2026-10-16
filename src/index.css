@@ -1,5 +1,5 @@
 /* 1. Importazione Font */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500;1,600;1,800&family=Inter:wght@300;400;500;600&family=Caveat:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500;1,600;1,800&family=Inter:wght@300;400;500;600;700&family=Caveat:wght@500;600&display=swap');
 
 /* 2. Direttive Tailwind (Obbligatorie) */
 @tailwind base;
@@ -48,6 +48,9 @@ html { font-size: 16px; }
     .step-fwd, .step-back, .rise, .pop, .stagger > * { animation: none !important; }
     * { scroll-behavior: auto !important; }
 }
+
+/* Titoli: stesso Inter del testo, peso e spaziatura stretta fanno la gerarchia */
+.display { font-weight: 600; letter-spacing: -.035em; line-height: 1.05; text-wrap: balance; }
 
 /* Campi di inserimento */
 .fld-label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin: 0 0 6px 2px; letter-spacing: 0; }
@@ -469,7 +472,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ink); }
 .m-pill.save { background: var(--bad); color: #fff; animation: pop .4s var(--ease) backwards; }
 
 .m-large { padding: 2px 20px 0; }
-.m-large h1 { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 42px; line-height: 1.05; letter-spacing: -.01em; color: var(--ink); }
+.m-large h1 { font-weight: 600; font-size: 36px; line-height: 1.05; letter-spacing: -.035em; color: var(--ink); }
 .m-large p { margin-top: 4px; font-size: 14px; color: var(--muted); }
 
 .m-search { position: relative; display: block; margin: 14px 16px 16px; }

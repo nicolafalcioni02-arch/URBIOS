@@ -22,7 +22,7 @@ export const ChangeVisitModal = ({ isChangeVisitOpen, listaVisite, selectedVisit
 
                     <div style={{ maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '4px' }}>
                         {listaVisite.filter((v) => v.dettagli && !v.note?.includes('Solo Dieta')).length === 0 ? (
-                            <div style={{ padding: '30px', textAlign: 'center', color: '#6E6D69', fontSize: '13px', fontWeight: 600, fontStyle: 'italic' }}>
+                            <div style={{ padding: '30px', textAlign: 'center', color: '#6E6D69', fontSize: '13px', fontWeight: 500 }}>
                                 Nessuna visita clinica (antropometrica) registrata per questo paziente.
                             </div>
                         ) : (

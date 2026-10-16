@@ -82,7 +82,7 @@ export const responsiveStyles = `
                 .d-c-fold i.open { transform: rotate(180deg); }
                 .d-c-charts { margin-top: 10px; }
                 .d-c-lock { margin: 24px 4px; padding: 28px 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; text-align: center; }
-                .d-c-lock h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; font-family: 'Playfair Display', serif; font-style: italic; }
+                .d-c-lock h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; letter-spacing: -.02em; }
                 .d-c-lock p { font-size: 14px; line-height: 1.5; color: var(--muted); margin-bottom: 20px; }
                 .d-c-primary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 52px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 15px; font-weight: 600; box-shadow: 0 10px 24px rgba(18, 19, 23, .2); }
                 .d-c-primary:active { transform: scale(.97); }

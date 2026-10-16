@@ -108,7 +108,7 @@ export const guidedCss = `
 
 @media (max-width: 560px) { .dg-root { --dg-sticky-top: 72px; } }
 /* titolo del passo (stesso stile di "Nuova visita") */
-.dg-title { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 32px; line-height: 1.05; color: var(--ink); margin: 4px 0 0; }
+.dg-title { font-weight: 600; font-size: 28px; line-height: 1.1; letter-spacing: -.03em; color: var(--ink); margin: 4px 0 0; }
 @media (min-width: 640px) { .dg-title { font-size: 38px; } }
 .dg-hint2 { font-size: 14px; color: var(--muted); margin: 6px 0 18px; max-width: 36rem; }
 .dg-fwd { animation: dgFwd .5s var(--ease) backwards; }

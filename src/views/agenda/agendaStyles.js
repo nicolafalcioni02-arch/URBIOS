@@ -1,7 +1,7 @@
 export const agendaStyles = `
 .ag-wrap { height: 100%; overflow-y: auto; background: var(--paper); }
 .ag-top { display: flex; align-items: center; gap: 12px; padding: 18px 24px 8px; max-width: 1400px; margin: 0 auto; flex-wrap: wrap; }
-.ag-title { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 38px; line-height: 1; color: var(--ink); }
+.ag-title { font-weight: 600; font-size: 34px; line-height: 1; letter-spacing: -.035em; color: var(--ink); }
 .ag-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 8px 24px 40px; max-width: 1400px; margin: 0 auto; align-items: start; }
 @media (max-width: 960px) { .ag-layout { grid-template-columns: 1fr; padding: 8px 14px 40px; } .ag-top { padding: 14px; } .ag-title { font-size: 30px; } }
 .ag-side { display: flex; flex-direction: column; gap: 14px; }
@@ -102,7 +102,7 @@ export const agendaStyles = `
 /* ---- telefono (AgendaMobile) ---- */
 .agm .m-nav { background: color-mix(in srgb, var(--paper) 80%, transparent); }
 .agm-today { background: var(--surface); color: var(--ink); border: .5px solid var(--line); margin-left: 6px; }
-.agm-month { display: flex; align-items: baseline; gap: 8px; padding: 6px 20px 2px; font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 34px; line-height: 1.1; color: var(--ink); }
+.agm-month { display: flex; align-items: baseline; gap: 8px; padding: 6px 20px 2px; font-weight: 600; font-size: 30px; line-height: 1.1; letter-spacing: -.035em; color: var(--ink); }
 .agm-month span { font-family: inherit; font-size: 20px; color: var(--muted); }
 .agm-month i { align-self: center; font-size: 15px; color: var(--muted); transition: transform .3s var(--ease); font-style: normal; }
 .agm-month i.up { transform: rotate(180deg); }

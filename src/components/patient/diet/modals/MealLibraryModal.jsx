@@ -119,7 +119,7 @@ export const MealLibraryModal = ({ isLibraryOpen, libFilter, loadFromLibrary, me
 
                                             {/* NOTE (se presenti) */}
                                             {libMeal.note && (
-                                                <p className="text-xs text-gray-600 italic mb-4 bg-amber-50/50 p-2.5 rounded-xl border border-amber-100/50 leading-relaxed">
+                                                <p className="text-xs text-gray-600 mb-4 bg-amber-50/50 p-2.5 rounded-xl border border-amber-100/50 leading-relaxed">
                                                     <i className="ph-fill ph-info mr-1.5 text-amber-500"></i>
                                                     {libMeal.note}
                                                 </p>

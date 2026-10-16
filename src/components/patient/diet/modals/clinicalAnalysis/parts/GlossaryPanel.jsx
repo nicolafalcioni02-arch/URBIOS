@@ -72,7 +72,7 @@ export const GlossaryPanel = ({ showGlossary }) => {
                             ))}
                         </div>
                         <div className="mt-6 pt-6 border-t border-gray-200">
-                            <p className="text-[9px] text-gray-400 italic leading-tight">
+                            <p className="text-[9px] text-gray-400 leading-tight">
                                 * Reference values (DRVs) are based on EFSA (European Food Safety Authority) and LARN 2024 standards.
                             </p>
                         </div>

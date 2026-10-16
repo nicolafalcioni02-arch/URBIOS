@@ -39,7 +39,7 @@ export const dashboardStyles = `
                 .report-card-title { font-size: 15px; font-weight: 800; color: #1D1D1F; margin: 0; }
                 .report-card-subtitle { font-size: 11px; color: #86868B; font-weight: 700; margin-top: 4px; display: block; }
                 
-                .report-comment-box { background: #FBFAF8; padding: 20px; border-radius: 16px; font-size: 13px; color: #1D1D1F; font-style: italic; border-left: 4px solid var(--ink); height: 100%; line-height: 1.6; overflow-y: auto; }
+                .report-comment-box { background: #FBFAF8; padding: 20px; border-radius: 16px; font-size: 13px; color: #1D1D1F; border: 1px solid var(--line); height: 100%; line-height: 1.6; overflow-y: auto; }
                 .btn-delete-report { background: transparent; border: none; color: #FF3B30; font-weight: 800; cursor: pointer; font-size: 16px; padding: 5px; opacity: 0.5; transition: 0.2s; }
                 .btn-delete-report:hover { opacity: 1; transform: scale(1.1); }
                 /* --- SOTTOBOX GIORNO E CARD RETTANGOLARI PASTI --- */

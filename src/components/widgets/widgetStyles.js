@@ -108,7 +108,7 @@ body.wd-resizing { cursor: nwse-resize; }
 
 /* ---- orologio ---- */
 .wd-clock { padding: 12px 12px 10px; } .wd-clock svg { width: 100%; display: block; }
-.wd-clock-date { text-align: center; margin-top: 4px; font-family: 'Playfair Display', serif; font-style: italic; font-size: 13px; color: var(--wd-mut); }
+.wd-clock-date { text-align: center; margin-top: 4px; font-size: 12.5px; font-weight: 500; color: var(--wd-mut); }
 
 /* ---- foglietto ---- */
 .wd-postit { min-height: 150px; padding: 26px 16px 12px; }
@@ -127,7 +127,7 @@ body.wd-resizing { cursor: nwse-resize; }
 
 /* ---- calendario ---- */
 .wd-cal { padding: 12px 12px 12px; }
-.wd-cal-head { display: flex; align-items: center; justify-content: space-between; font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 17px; margin-bottom: 6px; }
+.wd-cal-head { display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 15px; letter-spacing: -.01em; margin-bottom: 6px; }
 .wd-cal-head small { font-family: Inter, sans-serif; font-style: normal; font-weight: 500; font-size: 11px; color: var(--wd-mut); }
 .wd-cal-head button { width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; font-size: 12px; color: var(--wd-mut) !important; } .wd-cal-head button:hover { background: var(--wd-soft); color: var(--wd-fg) !important; }
 .wd-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; text-align: center; font-size: 12px; }
@@ -148,21 +148,22 @@ body.wd-resizing { cursor: nwse-resize; }
 /* ---- luna ---- */
 .wd-moon { padding: 14px 14px 12px; text-align: center; } .wd-moon svg { display: block; width: 78%; margin: 0 auto; }
 .wd-moon p { display: flex; flex-direction: column; gap: 1px; margin-top: 4px; }
-.wd-moon p b { font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; } .wd-moon p span { font-size: 11px; color: var(--wd-mut); }
+.wd-moon p b { font-size: 15px; font-weight: 600; letter-spacing: -.01em; } .wd-moon p span { font-size: 11px; color: var(--wd-mut); }
 
 /* ---- pensiero ---- */
-.wd-quote { padding: 26px 16px 14px; }
-.wd-qmark { position: absolute; top: 0; left: 12px; font-family: 'Playfair Display', serif; font-size: 54px; line-height: 1; color: var(--wd-acc); opacity: .55; }
-.wd-quote p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 15.5px; line-height: 1.35; position: relative; }
-.wd-quote small { display: block; margin-top: 8px; font-size: 11px; color: var(--wd-mut); }
+/* pensiero: misura bloccata, testo centrato e sempre intero */
+.wd-quote { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 22px 18px 14px; min-height: 148px; }
+.wd-qmark { position: absolute; top: -2px; left: 50%; transform: translateX(-50%); font-weight: 700; font-size: 48px; line-height: 1; color: var(--wd-acc); opacity: .5; }
+.wd-quote p { font-size: 14px; font-weight: 500; line-height: 1.42; letter-spacing: -.005em; position: relative; text-wrap: balance; margin-top: 8px; }
+.wd-quote small { display: block; margin-top: 8px; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--wd-mut); }
 .wd-quote button { position: absolute; right: 10px; bottom: 8px; color: var(--wd-mut) !important; opacity: 0; transition: opacity .2s; } .wd-quote:hover button { opacity: 1; }
 
 /* ---- acqua ---- */
 .wd-water-title { font-size: 12.5px; color: var(--wd-mut); display: flex; justify-content: space-between; } .wd-water-title b { color: var(--wd-acc); font-weight: 700; }
-.wd-glasses { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+.wd-glasses { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; margin-top: 12px; }
 .wd-glasses button svg { width: 100%; display: block; } .wd-glasses .water { opacity: 0; transform: translateY(8px); transition: all .35s var(--ease); }
 .wd-glasses .full .water { opacity: 1; transform: none; } .wd-glasses button { transition: transform .2s var(--ease); } .wd-glasses button:hover { transform: translateY(-3px); }
-.wd-water-sub { font-size: 12px; color: var(--wd-mut); text-align: center; margin-top: 8px; }
+.wd-water-sub { font-size: 12px; color: var(--wd-mut); text-align: center; margin-top: 10px; }
 
 /* ---- appuntamenti ---- */
 .wd-agenda ul, .wd-bday ul { list-style: none; margin: 0; padding: 0; }

@@ -78,7 +78,7 @@ export const InfoTab = ({ tab }) => {
             {/* manifesto */}
             <h2 className="mt-9 mb-3 text-left text-[12px] font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)]">Il nostro manifesto</h2>
             <div className="text-left space-y-3 text-[14px] leading-relaxed text-[color:var(--ink)]">
-                <p className="text-[22px] leading-tight" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 600 }}>
+                <p className="display text-[22px]">
                     Libertà. Cultura.
                 </p>
                 <p>
@@ -112,7 +112,7 @@ export const InfoTab = ({ tab }) => {
                     </li>
                 </ul>
                 <p>Ma c'è un segreto finale, un sigillo invisibile impresso nella parola stessa. Osserva l'inizio e la fine, la prima e l'ultima lettera che lo aprono e lo chiudono:</p>
-                <p className="text-center text-[30px] leading-none tracking-[0.18em]" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 600 }}>
+                <p className="text-center text-[30px] leading-none font-semibold tracking-[0.18em]">
                     <span style={{ color: 'var(--accent)' }}>U</span>
                     <span className="text-[color:var(--muted)] text-[22px]">RBIO</span>
                     <span style={{ color: 'var(--accent)' }}>S</span>
