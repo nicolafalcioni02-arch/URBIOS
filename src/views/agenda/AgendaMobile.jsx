@@ -1,6 +1,6 @@
 // Agenda su telefono: striscia della settimana (si scorre col dito), mese che si apre toccando il titolo,
 // filtro per sede quando ce n'e' piu' d'una, e la giornata come elenco con gli spazi liberi gia' pronti da prenotare.
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { addDays, apptTitle, isOnline, placeColor as placeColorOf, placeMark, dateKey, fmtTime, isActive, minutesOf, mondayOf, sameDay, startOf, tipoOf } from '../../components/agenda/agendaLogic';
 import { ActionSheet } from '../../components/mobile/MobileChrome';
 import { DayList } from './DayList';
@@ -27,18 +27,69 @@ export const AgendaMobile = ({ db, items, settings, date, setDate, onNew, onOpen
         return m;
     }, [visible]);
 
-    const week = Array.from({ length: 7 }, (_, i) => addDays(mondayOf(date), i));
-    const moveWeek = (dir) => {
-        setSlide(dir > 0 ? 'step-fwd' : 'step-back');
-        setDate(addDays(date, dir * 7));
+    // ghiera dei giorni: striscia che scorre con aggancio, il giorno al centro e' quello scelto
+    const WHEEL = 200; // giorni mostrati prima e dopo il punto di partenza; vicino ai bordi la striscia si ricentra, quindi non finisce mai
+    const ITEM = 52;
+    const [anchor, setAnchor] = useState(() => new Date(date.getFullYear(), date.getMonth(), date.getDate()));
+    const wheel = useRef(null);
+    const settle = useRef(null);
+    const dayMs = 86400000;
+    const diffDays = (d) => Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - anchor) / dayMs);
+    const wheelDays = useMemo(() => Array.from({ length: WHEEL * 2 + 1 }, (_, i) => addDays(anchor, i - WHEEL)), [anchor]);
+
+    const paint = () => {
+        const el = wheel.current;
+        if (!el) return;
+        const c = el.scrollLeft + el.clientWidth / 2;
+        el.querySelectorAll('.agm-wd').forEach((n) => {
+            const dist = Math.abs(n.offsetLeft + n.offsetWidth / 2 - c) / ITEM;
+            n.style.setProperty('--k', Math.min(dist, 3).toFixed(2));
+            n.classList.toggle('is-c', dist < 0.5);
+        });
     };
-    const onTouchStart = (e) => (touch.current = e.touches[0].clientX);
-    const onTouchEnd = (e) => {
-        if (touch.current == null) return;
-        const dx = e.changedTouches[0].clientX - touch.current;
-        touch.current = null;
-        if (Math.abs(dx) > 45) moveWeek(dx < 0 ? 1 : -1);
+    const recenter = useRef(false);
+    const onWheelScroll = () => {
+        paint();
+        const el0 = wheel.current;
+        if (el0) {
+            const i = Math.round(el0.scrollLeft / ITEM);
+            if ((i < 50 || i > WHEEL * 2 - 50) && wheelDays[i]) {
+                recenter.current = true;
+                setAnchor(wheelDays[i]);
+                return;
+            }
+        }
+        clearTimeout(settle.current);
+        settle.current = setTimeout(() => {
+            const el = wheel.current;
+            if (!el) return;
+            const idx = Math.max(0, Math.min(WHEEL * 2, Math.round(el.scrollLeft / ITEM)));
+            const d = wheelDays[idx];
+            if (d && !sameDay(d, date)) setDate(d);
+        }, 110);
     };
+    // quando la data cambia da fuori (Oggi, calendario del mese) la ghiera ruota fino a li'
+    useEffect(() => {
+        const el = wheel.current;
+        const idx = diffDays(date) + WHEEL;
+        if (idx < 0 || idx > WHEEL * 2) {
+            setAnchor(new Date(date.getFullYear(), date.getMonth(), date.getDate()));
+            return;
+        }
+        if (el && Math.abs(el.scrollLeft - idx * ITEM) > 2) el.scrollTo({ left: idx * ITEM, behavior: monthOpen || recenter.current ? 'auto' : 'smooth' });
+        paint();
+    }, [date, anchor, monthOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+    // dopo la ricentratura il giorno al centro resta lo stesso: si riporta lo scorrimento a meta' senza che si veda
+    useLayoutEffect(() => {
+        if (recenter.current && wheel.current) {
+            wheel.current.style.scrollSnapType = 'none';
+            wheel.current.scrollLeft = WHEEL * ITEM;
+            wheel.current.style.scrollSnapType = '';
+            recenter.current = false;
+            paint();
+        }
+    }, [anchor]); // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => () => clearTimeout(settle.current), []);
 
     // la giornata: appuntamenti + spazi liberi dentro gli orari di studio
     const day = useMemo(() => visible.filter((a) => a.start.slice(0, 10) === dateKey(date)).sort((a, b) => minutesOf(a) - minutesOf(b)), [visible, date]);
@@ -112,11 +163,12 @@ export const AgendaMobile = ({ db, items, settings, date, setDate, onNew, onOpen
                         </div>
                     </div>
                 ) : (
-                    <div className="agm-week" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-                        <div key={dateKey(week[0])} className={`agm-grid ${slide}`}>
-                            {week.map((d, i) => (
-                                <button key={dateKey(d)} className={`agm-d ${sameDay(d, new Date()) ? 'today' : ''} ${sameDay(d, date) ? 'sel' : ''}`} onClick={() => setDate(d)}>
-                                    <b>{WD[i]}</b>
+                    <div className="agm-wheel">
+                        <span className="agm-wheel-pick" aria-hidden="true"></span>
+                        <div className="agm-wheel-strip no-scrollbar" ref={wheel} onScroll={onWheelScroll}>
+                            {wheelDays.map((d) => (
+                                <button key={dateKey(d)} className={`agm-wd ${sameDay(d, new Date()) ? 'today' : ''}`} onClick={() => setDate(d)} aria-label={d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}>
+                                    <b>{d.toLocaleDateString('it-IT', { weekday: 'short' }).replace('.', '').slice(0, 3)}</b>
                                     <span>{d.getDate()}</span>
                                     {perDay[dateKey(d)] ? <i /> : <i className="none" />}
                                 </button>
@@ -148,7 +200,9 @@ export const AgendaMobile = ({ db, items, settings, date, setDate, onNew, onOpen
                     </div>
                 </div>
 
+                <div key={`${dateKey(date)}-${place}`} className="ag-content">
                 <DayList day={day} date={date} db={db} settings={settings} onNew={onNew} onOpen={onOpen} />
+                </div>
                 <div style={{ height: 24 }}></div>
             </div>
 

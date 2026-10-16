@@ -566,3 +566,9 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ink); }
 .set-side:hover { background: var(--soft); }
 .set-side:active { transform: scale(.98); }
 .set-side.on { background: var(--surface); box-shadow: inset 0 0 0 .5px var(--line), 0 1px 3px rgba(18,19,23,.06); }
+
+/* tastiera su telefono: i fogli si alzano sopra la tastiera (--kb la misura l'app) e scorrono se serve */
+.sheet-back { padding-bottom: var(--kb, 0px); transition: padding-bottom .25s var(--ease); }
+.sheet { max-height: calc(100dvh - var(--kb, 0px) - 12px); overflow-y: auto; overscroll-behavior: contain; }
+body .ag-back { padding-bottom: calc(16px + var(--kb, 0px)); transition: padding-bottom .25s var(--ease); }
+body .ag-sheet { max-height: calc(100dvh - var(--kb, 0px) - 32px); }

@@ -6,11 +6,13 @@ import { ArchiveProvider, useArchive } from './storage/ArchiveProvider';
 import { RecoveryCodeModal } from './components/archive/RecoveryCodeModal';
 import { ExitDialog } from './components/archive/ExitDialog';
 import { ArchiveStatusChip } from './components/archive/ArchiveStatusChip';
+import { useKeyboardInset } from './hooks/useKeyboardInset';
 
 // Il database NON è più salvato in chiaro nel browser: vive in memoria e nel file archivio dell'utente
 // (vedi src/storage/). Qui si decide solo quale schermata mostrare.
 const AppShell = () => {
     const a = useArchive();
+    useKeyboardInset();
     const [welcomeDone, setWelcomeDone] = useState(false);
     const finishWelcome = useCallback(() => setWelcomeDone(true), []);
 

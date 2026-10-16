@@ -6,8 +6,8 @@
 
 export const TIPI = [
     { id: 'prima', label: 'Prima visita', color: '#2F54EB' },
-    { id: 'controllo', label: 'Controllo', color: '#1F8A5B' },
-    { id: 'altro', label: 'Altro', color: '#B7791F' },
+    { id: 'controllo', label: 'Controllo', color: '#B8892B' },
+    { id: 'altro', label: 'Altro', color: '#8C5A2B' },
 ];
 export const STATI = [
     { id: 'confermato', label: 'Confermato' },
@@ -190,8 +190,8 @@ export const buildIcs = (db, items, withNames) => {
 export const newApptId = () => 'a' + Math.random().toString(36).slice(2, 9);
 
 // ---- sede: ogni luogo ha il suo colore e la sua sigla; l'online ha il suo (viola, con la videocamera) ----
-// stessa famiglia dei colori dell'app (accent, ok, warn) piu' due toni di appoggio: tutti con la stessa luminosita'
-export const PLACE_COLORS = ['#2F54EB', '#1F8A5B', '#B7791F', '#B0476D', '#2C7F92'];
+// palette: blu dell'app, oro e bronzo, piu' due toni di appoggio piu' due toni di appoggio: tutti con la stessa luminosita'
+export const PLACE_COLORS = ['#2F54EB', '#B8892B', '#8C5A2B', '#B0476D', '#2C7F92'];
 export const ONLINE_COLOR = '#6A55D8';
 export const isOnline = (p) => /online|video|remot|meet|zoom|teams|skype/i.test(String(p || ''));
 export const placeColor = (places, p) => {

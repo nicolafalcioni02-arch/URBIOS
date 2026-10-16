@@ -191,13 +191,13 @@ export const agendaStyles = `
 .ag-slotctl { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; background: #fff; } .ag-slotctl small { padding: 0 8px 0 10px; font-size: 11.5px; color: var(--muted); }
 .ag-slotctl button { height: 28px; min-width: 38px; padding: 0 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: var(--muted); transition: background-color .2s, color .2s; } .ag-slotctl button.on { background: var(--ink); color: #fff; }
 .ag-bcol .agm-free { gap: 0; }
-.ag-bcol .agm-free-body { min-height: 28px; padding: 0 5px; font-size: 10.5px; font-weight: 600; border-radius: 11px; gap: 3px; font-variant-numeric: tabular-nums; width: 100%; white-space: nowrap; letter-spacing: -.01em; overflow: hidden; background: color-mix(in srgb, var(--ok) 6%, transparent); border-color: color-mix(in srgb, var(--ok) 38%, #D6D3CC); color: color-mix(in srgb, var(--ok) 80%, #000); }
+.ag-bcol .agm-free-body { min-height: 28px; padding: 0 5px; font-size: 10.5px; font-weight: 600; border-radius: 11px; gap: 3px; font-variant-numeric: tabular-nums; width: 100%; white-space: nowrap; letter-spacing: -.01em; overflow: hidden; background: color-mix(in srgb, #B8892B 6%, transparent); border-color: color-mix(in srgb, #B8892B 38%, #D6D3CC); color: color-mix(in srgb, #B8892B 80%, #000); }
 
 /* slot liberi della settimana: griglia compatta di orari */
 .agm-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-.agm-slot { height: 24px; min-height: 0; border-radius: 9px; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; color: color-mix(in srgb, var(--ok) 80%, #000); background: color-mix(in srgb, var(--ok) 6%, transparent);
-    border: 1px dashed color-mix(in srgb, var(--ok) 40%, #D6D3CC); transition: background-color .15s, transform .15s var(--ease); }
-.agm-slot:hover { background: color-mix(in srgb, var(--ok) 16%, #fff); } .agm-slot:active { transform: scale(.94); }
+.agm-slot { height: 24px; min-height: 0; border-radius: 9px; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; color: color-mix(in srgb, #B8892B 80%, #000); background: color-mix(in srgb, #B8892B 6%, transparent);
+    border: 1px dashed color-mix(in srgb, #B8892B 40%, #D6D3CC); transition: background-color .15s, transform .15s var(--ease); }
+.agm-slot:hover { background: color-mix(in srgb, #B8892B 16%, #fff); } .agm-slot:active { transform: scale(.94); }
 .ag-board { align-items: stretch; }
 @media (min-width: 640px) { .ag-wrap:has(.ag-board) .ag-main { padding-bottom: 12px; } }
 
@@ -244,4 +244,54 @@ export const agendaStyles = `
     .agm-cards[style*="--n: 2"] .agm-who { font-size: 14.5px; }
     .agm-cards[style*="--n: 2"] .agm-card { padding-left: 12px; }
 }
+
+/* slot liberi: grigi, discreti */
+.agm-slot { color: var(--muted); background: transparent; border: 1px dashed #CFCBC2; }
+.agm-slot:hover { background: #fff; color: var(--ink); border-color: #A7A5A0; }
+.ag-bcol .agm-free-body, .agm-free-body { color: var(--muted); background: transparent; border-color: #D6D3CC; }
+.agm-free:hover .agm-free-body { background: #fff; color: var(--ink); border-color: #A7A5A0; }
+
+/* animazioni dell'agenda */
+@keyframes ag-in { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes ag-slot-in { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: none; } }
+.ag-content { animation: ag-in .45s var(--ease) backwards; }
+.agm-appt, .agm-chips { animation: ag-in .5s var(--ease) backwards; }
+.agm-list > :nth-child(1) { animation-delay: .02s; } .agm-list > :nth-child(2) { animation-delay: .06s; } .agm-list > :nth-child(3) { animation-delay: .10s; } .agm-list > :nth-child(4) { animation-delay: .14s; }
+.agm-list > :nth-child(5) { animation-delay: .18s; } .agm-list > :nth-child(6) { animation-delay: .22s; } .agm-list > :nth-child(n+7) { animation-delay: .26s; }
+.agm-slot { animation: ag-slot-in .35s var(--ease) backwards; }
+.agm-slots > :nth-child(2) { animation-delay: .03s; } .agm-slots > :nth-child(3) { animation-delay: .06s; } .agm-slots > :nth-child(4) { animation-delay: .09s; } .agm-slots > :nth-child(n+5) { animation-delay: .12s; }
+.ag-bcol { animation: ag-in .5s var(--ease) backwards; }
+.ag-bcol:nth-child(2) { animation-delay: .04s; } .ag-bcol:nth-child(3) { animation-delay: .08s; } .ag-bcol:nth-child(4) { animation-delay: .12s; } .ag-bcol:nth-child(5) { animation-delay: .16s; } .ag-bcol:nth-child(6) { animation-delay: .2s; } .ag-bcol:nth-child(7) { animation-delay: .24s; }
+.ag-cell { animation: ag-in .4s var(--ease) backwards; }
+.ag-next button { animation: ag-in .45s var(--ease) backwards; } .ag-next button:nth-child(2) { animation-delay: .05s; } .ag-next button:nth-child(3) { animation-delay: .1s; } .ag-next button:nth-child(n+4) { animation-delay: .15s; }
+.ag-card { animation: ag-in .5s var(--ease) backwards; } .ag-side .ag-card:nth-child(2) { animation-delay: .08s; }
+/* tasti: sollevamento al passaggio, pressione, rimbalzo */
+.agm-cardbtn .agm-card, .agm-chip, .agm-slot, .agm-free-body, .ag-bhead, .ag-badd, .ag-places button, .ag-slotctl button, .ag-views button, .ag-icon, .ag-link, .ag-next .tile {
+    transition: transform .25s var(--ease), box-shadow .25s var(--ease), background-color .2s, color .2s, border-color .2s; }
+@media (hover: hover) {
+    .agm-cardbtn:hover .agm-card { transform: translateY(-2px); box-shadow: inset 0 1.5px 0 #fff, inset 0 0 0 .5px color-mix(in srgb, var(--p) 30%, #e6e4de), 0 10px 20px -10px rgba(18,19,23,.28); }
+    .agm-chip:hover { transform: translateY(-1px) scale(1.02); }
+    .agm-slot:hover { transform: translateY(-1px) scale(1.06); }
+    .ag-next button:hover .tile { transform: scale(1.08) rotate(-2deg); }
+    .ag-bhead:hover { transform: translateX(2px); }
+    .ag-places button:hover:not(.on), .ag-slotctl button:hover:not(.on), .ag-views button:hover:not(.on) { transform: translateY(-1px); color: var(--ink); }
+    .ag-icon:hover { transform: scale(1.08); }
+}
+.ag-places button:active, .ag-slotctl button:active, .ag-views button:active, .ag-icon:active, .ag-bhead:active, .ag-badd:active, .agm-free:active .agm-free-body { transform: scale(.92); }
+.ag-views button.on, .ag-places button.on, .ag-slotctl button.on { animation: pop .35s var(--ease); }
+.ag-badd:hover { transform: scale(1.04); }
+@media (prefers-reduced-motion: reduce) { .ag-content, .agm-appt, .agm-chips, .agm-slot, .ag-bcol, .ag-cell, .ag-next button, .ag-card, .ag-views button.on, .ag-places button.on, .ag-slotctl button.on { animation: none !important; } }
+
+/* ghiera dei giorni (telefono) */
+.agm-wheel { position: relative; margin: 8px 0 2px; height: 78px; }
+.agm-wheel-pick { position: absolute; left: 50%; top: 4px; width: 46px; height: 70px; margin-left: -23px; border-radius: 23px; background: var(--ink); box-shadow: 0 8px 18px -8px rgba(18,19,23,.55), inset 0 1.5px 0 rgba(255,255,255,.18); pointer-events: none; }
+.agm-wheel-strip { position: relative; display: flex; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; padding-inline: calc(50% - 26px); -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22%, #000 78%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 22%, #000 78%, transparent 100%); }
+.agm-wd { --k: 3; flex: none; width: 52px; height: 100%; scroll-snap-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--ink);
+    transform: scale(calc(1.06 - var(--k) * .09)); opacity: calc(1 - var(--k) * .16); transition: color .15s; will-change: transform; }
+.agm-wd b { font-size: 11px; font-weight: 600; text-transform: capitalize; color: var(--muted); }
+.agm-wd span { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.agm-wd i { width: 5px; height: 5px; border-radius: 50%; background: var(--ink); opacity: .4; } .agm-wd i.none { opacity: 0; }
+.agm-wd.today span { color: var(--accent); }
+.agm-wd.is-c b { color: rgba(255,255,255,.7); } .agm-wd.is-c span, .agm-wd.today.is-c span { color: #fff; } .agm-wd.is-c i { background: #fff; }
 `;

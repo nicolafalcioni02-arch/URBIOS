@@ -280,6 +280,7 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
                             <input type="date" value={dateKey(date)} onChange={(e) => e.target.value && setDate(fromKey(e.target.value))} aria-label="Vai alla data" />
                         </label>
                     </div>
+                    <div key={`${view}-${dateKey(date)}-${slotStep}-${place}`} className="ag-content">
                     {view === 'mese' ? (
                         <MonthGrid
                             date={date}
@@ -314,6 +315,7 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
                             </div>
                         )
                     )}
+                    </div>
                 </section>
             </div>
 
