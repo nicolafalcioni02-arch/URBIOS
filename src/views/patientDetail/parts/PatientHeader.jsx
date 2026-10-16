@@ -7,7 +7,46 @@ const TABS = [
     { id: 'visit', label: 'Nuova visita', icon: 'ph-plus-circle' },
 ];
 
-export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly = false, onAi, widgets, printButton = null }) => {
+// Telefono: barra sottile con indietro, nome e due azioni; le schede vanno nella barra in basso (PatientDetail).
+const PatientNavMobile = ({ onBack, patient, status, view, readOnly, onAi, printButton, onCloseVisit }) => {
+    const inVisit = view === 'visit';
+    return (
+        <header className="m-nav is-solid">
+            <div className="m-nav-side">
+                {inVisit ? (
+                    <button className="m-back" onClick={onCloseVisit} aria-label="Torna alla scheda">
+                        <i className="ph ph-caret-left"></i>
+                        Scheda
+                    </button>
+                ) : (
+                    <button className="m-back" onClick={onBack} aria-label="Torna ai pazienti">
+                        <i className="ph ph-caret-left"></i>
+                        Pazienti
+                    </button>
+                )}
+            </div>
+            <span className="m-nav-title is-on">
+                {inVisit ? 'Nuova visita' : `${patient.nome} ${patient.cognome}`}
+                <span className="m-nav-sub">{inVisit ? `${patient.nome} ${patient.cognome}` : readOnly ? 'Caso dimostrativo' : status}</span>
+            </span>
+            <div className="m-nav-side end">
+                {printButton}
+                {onAi && !readOnly && (
+                    <button className="m-icon" onClick={onAi} aria-label="URBIOS AI">
+                        <i className="ph ph-sparkle"></i>
+                    </button>
+                )}
+            </div>
+        </header>
+    );
+};
+
+export const PatientHeader = ({ onBack, patient, setView, status, view, readOnly = false, onAi, widgets, printButton = null, compact = false, onCloseVisit }) => {
+    if (compact) return <PatientNavMobile {...{ onBack, patient, status, view, readOnly, onAi, printButton, onCloseVisit }} />;
+    return <PatientHeaderFull {...{ onBack, patient, setView, status, view, readOnly, onAi, widgets, printButton }} />;
+};
+
+const PatientHeaderFull = ({ onBack, patient, setView, status, view, readOnly = false, onAi, widgets, printButton = null }) => {
     const wrap = useRef(null);
     const [pill, setPill] = useState({ left: 0, width: 0, ready: false });
 

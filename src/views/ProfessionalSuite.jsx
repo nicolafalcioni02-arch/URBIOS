@@ -6,6 +6,9 @@ import { useArchive } from '../storage/ArchiveProvider';
 import { WidgetDock } from '../components/widgets/WidgetDock';
 import { AgendaView } from './agenda/AgendaView';
 import { dateKey, isActive, sameDay, startOf } from '../components/agenda/agendaLogic';
+import { useCompact } from '../hooks/useCompact';
+import { HomeMobile } from './home/HomeMobile';
+import { MobileTabBar, ActionSheet } from '../components/mobile/MobileChrome';
 
 export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const [selectedPatientId, setSelectedPatientId] = useState(null);
@@ -17,6 +20,8 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const [widgetsEditing, setWidgetsEditing] = useState(false);
     const [agenda, setAgenda] = useState(null); // null = chiusa, altrimenti { date, open?, newAppt? }
     const [query, setQuery] = useState('');
+    const [moreOpen, setMoreOpen] = useState(false);
+    const compact = useCompact(639); // telefono: cornice da app nativa
     const [form, setForm] = useState({ nome: '', cognome: '', sesso: 'M' });
     const { dirty, ephemeral, saveFile, openExitDialog } = useArchive();
 
@@ -50,6 +55,93 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
 
     const selectedPatient = useMemo(() => data.pazienti.find((p) => p.id === selectedPatientId), [data.pazienti, selectedPatientId]);
 
+    const sheets = (
+        <>
+        {/* Pets: in sviluppo */}
+        {petsOpen && (
+            <div className="sheet-back" onClick={() => setPetsOpen(false)}>
+                <div className="sheet text-center" onClick={(e) => e.stopPropagation()}>
+                    <div className="pets-mark" aria-hidden="true">
+                        <i className="ph-fill ph-dog"></i>
+                    </div>
+                    <h2 className="text-[26px] leading-tight text-[color:var(--ink)]" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 600 }}>
+                        Pets
+                    </h2>
+                    <p className="text-[16px] font-medium text-[color:var(--ink)] mt-2">Stessa cura, anche per chi ha quattro zampe.</p>
+                    <p className="text-[14px] text-[color:var(--muted)] mt-2 leading-relaxed">
+                        Stiamo sviluppando URBIOS Pets, pensato per gli animali da compagnia: schede, visite e piani alimentari per cani e gatti, con la stessa semplicità.
+                    </p>
+                    <span className="pets-soon pets-soon-lg">In arrivo</span>
+                    <button onClick={() => setPetsOpen(false)} className="pets-close">
+                        Ho capito
+                    </button>
+                </div>
+            </div>
+        )}
+
+        {/* Student: in arrivo, diventerà un libro */}
+        {studentSoonOpen && (
+            <div className="sheet-back" onClick={() => setStudentSoonOpen(false)}>
+                <div className="sheet text-center" onClick={(e) => e.stopPropagation()}>
+                    <div className="pets-mark" aria-hidden="true">
+                        <i className="ph-fill ph-book-open-text"></i>
+                    </div>
+                    <h2 className="text-[26px] leading-tight text-[color:var(--ink)]" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 600 }}>
+                        Student
+                    </h2>
+                    <p className="text-[16px] font-medium text-[color:var(--ink)] mt-2">Si sta trasformando in qualcosa di nuovo.</p>
+                    <p className="text-[14px] text-[color:var(--muted)] mt-2 leading-relaxed">La modalità Student è in pausa mentre la rivediamo da capo: tornerà presto, in una forma più completa.</p>
+                    <span className="pets-soon pets-soon-lg">In arrivo</span>
+                    <button onClick={() => setStudentSoonOpen(false)} className="pets-close">
+                        Ho capito
+                    </button>
+                </div>
+            </div>
+        )}
+
+        {/* Nuovo paziente: modulo leggero, al posto delle finestre del browser */}
+        {adding && (
+            <div className="sheet-back" onClick={() => setAdding(false)}>
+                <form className="sheet" onClick={(e) => e.stopPropagation()} onSubmit={submitPatient}>
+                    <div className="flex items-start justify-between mb-5">
+                        <div>
+                            <h2 className="font-semibold text-[20px] text-[color:var(--ink)]">Nuovo paziente</h2>
+                            <p className="text-[13px] text-[color:var(--muted)] mt-0.5">Il resto lo compili nell'anagrafica.</p>
+                        </div>
+                        <button type="button" onClick={() => setAdding(false)} className="vw-chip !px-0 w-9 !h-9 justify-center" aria-label="Chiudi">
+                            <i className="ph ph-x"></i>
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label className="fld-label">Nome</label>
+                            <input autoFocus className="fld" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+                        </div>
+                        <div>
+                            <label className="fld-label">Cognome</label>
+                            <input className="fld" value={form.cognome} onChange={(e) => setForm({ ...form, cognome: e.target.value })} />
+                        </div>
+                    </div>
+                    <div className="mb-6">
+                        <span className="fld-label">Sesso biologico</span>
+                        <div className="seg">
+                            {['M', 'F'].map((x) => (
+                                <button key={x} type="button" onClick={() => setForm({ ...form, sesso: x })} className={form.sesso === x ? 'on' : ''}>
+                                    {x === 'M' ? 'Maschio' : 'Femmina'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <button type="submit" disabled={!form.nome.trim() || !form.cognome.trim()} className="vw-next w-full disabled:opacity-40 disabled:pointer-events-none">
+                        <span>Crea e apri la scheda</span>
+                        <i className="ph ph-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        )}
+        </>
+    );
+
     // --- ROUTING ---
     if (studentMode) {
         return <StudentMode onExit={() => setStudentMode(false)} db={data} />;
@@ -64,7 +156,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                     db={data}
                     onUpdateDb={onUpdateDb}
                     initial={agenda}
-                    onBack={() => setAgenda(null)}
+                    onBack={compact && !selectedPatient ? null : () => setAgenda(null)} // su telefono l'Agenda e' una sezione della barra in basso
                     onOpenPatient={(id) => {
                         setAgenda(null);
                         setSelectedPatientId(id);
@@ -84,13 +176,56 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
             </>
         );
     }
-    if (agenda) return agendaView;
+    if (agenda && !compact) return agendaView;
 
     // --- SCHERMATA PRINCIPALE ---
     const q = query.trim().toLowerCase();
     const list = q ? data.pazienti.filter((p) => `${p.nome} ${p.cognome} ${p.id}`.toLowerCase().includes(q)) : data.pazienti;
     const todayAppts = (data.agenda || []).filter((a) => isActive(a) && sameDay(startOf(a), new Date())).length;
     const lastVisit = (p) => (p.visite.length ? new Date(p.visite[0].data).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Nessuna visita');
+
+    // --- TELEFONO: sezioni nella barra in basso, tutto il resto nel foglio "Altro" ---
+    if (compact) {
+        const showSave = !ephemeral && dirty;
+        const tabs = [
+            { id: 'patients', label: 'Pazienti', icon: 'ph-users-three' },
+            { id: 'agenda', label: 'Agenda', icon: 'ph-calendar-dots', badge: todayAppts || null },
+            { id: 'more', label: 'Altro', icon: 'ph-dots-three-circle', dot: showSave ? 'var(--bad)' : null },
+        ];
+        const pick = (id) => {
+            if (id === 'patients') setAgenda(null);
+            else if (id === 'agenda') setAgenda((a) => a || { date: dateKey(new Date()) });
+            else setMoreOpen(true);
+        };
+        return (
+            <div className="m-shell">
+                {agenda ? <div className="flex-1 min-h-0 overflow-hidden">{agendaView}</div> : (
+                    <HomeMobile patients={data.pazienti} list={list} query={query} setQuery={setQuery} onOpen={setSelectedPatientId} onAdd={() => setAdding(true)} lastVisit={lastVisit} showSave={showSave} onSave={handleSave} />
+                )}
+                <MobileTabBar items={tabs} active={agenda ? 'agenda' : 'patients'} onSelect={pick} />
+                {!agenda && showSettings && <SettingsModal db={data} onUpdateDb={onUpdateDb} onClose={() => setShowSettings(false)} />}
+                {moreOpen && (
+                    <ActionSheet
+                        title="URBIOS"
+                        subtitle={ephemeral ? 'Demo · nulla viene salvato' : dirty ? 'Ci sono modifiche non salvate' : 'Tutto salvato nel file'}
+                        onClose={() => setMoreOpen(false)}
+                        groups={[
+                            [
+                                ...(showSave ? [{ label: 'Salva ora', icon: 'ph-floppy-disk', onClick: handleSave }] : []),
+                                { label: 'Impostazioni', icon: 'ph-gear', onClick: () => setShowSettings(true) },
+                            ],
+                            [
+                                { label: 'Student', icon: 'ph-student', note: 'presto', onClick: () => setStudentSoonOpen(true) },
+                                { label: 'Pets', icon: 'ph-dog', note: 'presto', onClick: () => setPetsOpen(true) },
+                            ],
+                            [{ label: 'Esci', icon: 'ph-sign-out', tone: 'danger', onClick: openExitDialog }],
+                        ]}
+                    />
+                )}
+                {sheets}
+            </div>
+        );
+    }
 
     return (
         <div className="h-full w-full bg-[var(--paper)] overflow-y-auto font-sans">
@@ -201,88 +336,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                 </div>
             </div>
 
-            {/* Pets: in sviluppo */}
-            {petsOpen && (
-                <div className="sheet-back" onClick={() => setPetsOpen(false)}>
-                    <div className="sheet text-center" onClick={(e) => e.stopPropagation()}>
-                        <div className="pets-mark" aria-hidden="true">
-                            <i className="ph-fill ph-dog"></i>
-                        </div>
-                        <h2 className="text-[26px] leading-tight text-[color:var(--ink)]" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 600 }}>
-                            Pets
-                        </h2>
-                        <p className="text-[16px] font-medium text-[color:var(--ink)] mt-2">Stessa cura, anche per chi ha quattro zampe.</p>
-                        <p className="text-[14px] text-[color:var(--muted)] mt-2 leading-relaxed">
-                            Stiamo sviluppando URBIOS Pets, pensato per gli animali da compagnia: schede, visite e piani alimentari per cani e gatti, con la stessa semplicità.
-                        </p>
-                        <span className="pets-soon pets-soon-lg">In arrivo</span>
-                        <button onClick={() => setPetsOpen(false)} className="pets-close">
-                            Ho capito
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Student: in arrivo, diventerà un libro */}
-            {studentSoonOpen && (
-                <div className="sheet-back" onClick={() => setStudentSoonOpen(false)}>
-                    <div className="sheet text-center" onClick={(e) => e.stopPropagation()}>
-                        <div className="pets-mark" aria-hidden="true">
-                            <i className="ph-fill ph-book-open-text"></i>
-                        </div>
-                        <h2 className="text-[26px] leading-tight text-[color:var(--ink)]" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 600 }}>
-                            Student
-                        </h2>
-                        <p className="text-[16px] font-medium text-[color:var(--ink)] mt-2">Si sta trasformando in qualcosa di nuovo.</p>
-                        <p className="text-[14px] text-[color:var(--muted)] mt-2 leading-relaxed">La modalità Student è in pausa mentre la rivediamo da capo: tornerà presto, in una forma più completa.</p>
-                        <span className="pets-soon pets-soon-lg">In arrivo</span>
-                        <button onClick={() => setStudentSoonOpen(false)} className="pets-close">
-                            Ho capito
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Nuovo paziente: modulo leggero, al posto delle finestre del browser */}
-            {adding && (
-                <div className="sheet-back" onClick={() => setAdding(false)}>
-                    <form className="sheet" onClick={(e) => e.stopPropagation()} onSubmit={submitPatient}>
-                        <div className="flex items-start justify-between mb-5">
-                            <div>
-                                <h2 className="font-semibold text-[20px] text-[color:var(--ink)]">Nuovo paziente</h2>
-                                <p className="text-[13px] text-[color:var(--muted)] mt-0.5">Il resto lo compili nell'anagrafica.</p>
-                            </div>
-                            <button type="button" onClick={() => setAdding(false)} className="vw-chip !px-0 w-9 !h-9 justify-center" aria-label="Chiudi">
-                                <i className="ph ph-x"></i>
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3 mb-3">
-                            <div>
-                                <label className="fld-label">Nome</label>
-                                <input autoFocus className="fld" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
-                            </div>
-                            <div>
-                                <label className="fld-label">Cognome</label>
-                                <input className="fld" value={form.cognome} onChange={(e) => setForm({ ...form, cognome: e.target.value })} />
-                            </div>
-                        </div>
-                        <div className="mb-6">
-                            <span className="fld-label">Sesso biologico</span>
-                            <div className="seg">
-                                {['M', 'F'].map((x) => (
-                                    <button key={x} type="button" onClick={() => setForm({ ...form, sesso: x })} className={form.sesso === x ? 'on' : ''}>
-                                        {x === 'M' ? 'Maschio' : 'Femmina'}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        <button type="submit" disabled={!form.nome.trim() || !form.cognome.trim()} className="vw-next w-full disabled:opacity-40 disabled:pointer-events-none">
-                            <span>Crea e apri la scheda</span>
-                            <i className="ph ph-arrow-right"></i>
-                        </button>
-                    </form>
-                </div>
-            )}
+            {sheets}
         </div>
     );
 };

@@ -31,8 +31,8 @@ export const VisitWizard = ({ patient, visitDraft, sections: SECTIONS, title, st
     return (
         <div className="visit-wizard max-w-5xl mx-auto w-full px-4 md:px-8 pt-4 md:pt-6 overflow-x-clip flex flex-col" style={{ minHeight: '100%' }} ref={topRef}>
             {/* Intestazione */}
-            <div className="flex items-center gap-3 mb-4 rise">
-                <div className="relative flex-none" style={{ width: 52, height: 52 }}>
+            <div className="vw-head flex items-center gap-3 mb-4 rise">
+                <div className="vw-orb relative flex-none" style={{ width: 52, height: 52 }}>
                     <div
                         className="absolute inset-0 rounded-full overflow-hidden"
                         style={{ transform: `scale(${orbScale})`, transition: 'transform .8s var(--ease)', background: '#fff', boxShadow: '0 6px 18px rgba(18,19,23,.10)' }}
@@ -41,9 +41,9 @@ export const VisitWizard = ({ patient, visitDraft, sections: SECTIONS, title, st
                     </div>
                 </div>
                 <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-[17px] leading-tight truncate text-[color:var(--ink)]">{title}</p>
-                    <p className="text-[13px] text-[color:var(--muted)] leading-tight mt-0.5">
-                        {patient.nome} {patient.cognome}
+                    <p className="vw-title font-semibold text-[17px] leading-tight truncate text-[color:var(--ink)]">{title}</p>
+                    <p className="vw-who text-[13px] text-[color:var(--muted)] leading-tight mt-0.5">
+                        <span className="vw-who-name">{patient.nome} {patient.cognome}</span>
                         {onChangeMode && (
                             <button onClick={onChangeMode} className="ml-2 underline underline-offset-2 hover:text-[color:var(--ink)]">
                                 cambia

@@ -5,6 +5,9 @@ import { PatientTabContent } from './parts/PatientTabContent';
 import { UrbiosAiModal } from '../../ai/UrbiosAiModal';
 import { usePatientVisitActions } from './hooks/usePatientVisitActions';
 import { PrintCenterProvider, usePrintCenter } from '../../components/reports/printCenter/PrintCenterProvider';
+import { useCompact } from '../../hooks/useCompact';
+import { MobileTabBar } from '../../components/mobile/MobileChrome';
+import { docsSummary } from '../../components/patient/info/documentsLogic';
 
 export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = false, onOpenAgenda }) => {
     // un paziente senza visite parte dall'anagrafica, gli altri dallo storico
@@ -20,6 +23,9 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
     const [aiOpen, setAiOpen] = useState(false);
     const [widgetsEditing, setWidgetsEditing] = useState(false);
     const [headTop, setHeadTop] = useState(72);
+    const compact = useCompact(639);
+    // su telefono Nuova visita e' un percorso a tutto schermo: "Scheda" riporta alla scheda da cui si era partiti
+    const lastTab = useRef(view === 'visit' ? 'history' : view);
     const headRef = useRef(null);
     const widgetsHidden = !!(db && db.widgets && db.widgets.hidePatient);
     const canWidgets = !readOnly; // i casi dimostrativi non toccano il db
@@ -182,6 +188,7 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
             setVisitKey((k) => k + 1);
             setView('visit');
         } else {
+            if (id !== 'visit') lastTab.current = id;
             setView(id);
         }
     };
@@ -211,7 +218,9 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
                     readOnly={readOnly}
                     onAi={() => setAiOpen(true)}
                     widgets={canWidgets ? { editing: widgetsEditing, hidden: widgetsHidden, toggleEdit: () => setWidgetsEditing((v) => !v), toggleHidden } : null}
-                    printButton={<PrintButton />}
+                    printButton={<PrintButton compact={compact} />}
+                    compact={compact}
+                    onCloseVisit={() => setView(patient?.visite?.length ? lastTab.current : 'info')}
                 />
             </div>
             {canWidgets && <WidgetDock db={db} onUpdateDb={onUpdateDb} mode="patient" top={headTop} hidden={widgetsHidden} editing={widgetsEditing} onEditingChange={setWidgetsEditing} onOpenAgenda={onOpenAgenda} />}
@@ -244,6 +253,18 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
                 widgetsPad={canWidgets && !widgetsHidden}
             />
 
+            {compact && view !== 'visit' && (
+                <MobileTabBar
+                    active={view}
+                    onSelect={goTab}
+                    items={[
+                        { id: 'info', label: 'Anagrafica', icon: 'ph-user', dot: !readOnly && !docsSummary(patient).completo },
+                        { id: 'visit', label: 'Nuova visita', icon: 'ph-plus', primary: true },
+                        { id: 'history', label: 'Storico', icon: 'ph-clock-counter-clockwise' },
+                    ]}
+                />
+            )}
+
             {aiOpen && (
                 <UrbiosAiModal
                     patient={patient}
@@ -263,9 +284,15 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
 };
 
 // tasto stampante nella barra in alto: apre il Centro stampa
-const PrintButton = () => {
+const PrintButton = ({ compact = false }) => {
     const pc = usePrintCenter();
     if (!pc) return null;
+    if (compact)
+        return (
+            <button className="m-icon" onClick={() => pc.open()} aria-label="Centro stampa">
+                <i className="ph ph-printer"></i>
+            </button>
+        );
     return (
         <button className="vw-chip !px-0 w-10 !h-10 justify-center flex-none" onClick={() => pc.open()} title="Centro stampa: tutti i documenti del paziente, pronti da stampare o inviare" aria-label="Centro stampa">
             <i className="ph ph-printer"></i>

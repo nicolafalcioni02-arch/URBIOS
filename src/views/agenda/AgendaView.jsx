@@ -112,9 +112,11 @@ export const AgendaView = ({ db, onUpdateDb, initial, onBack, onOpenPatient, onO
         <div className="ag-wrap font-sans">
             <style>{agendaStyles}</style>
             <div className="ag-top">
-                <button className="ag-icon" onClick={onBack} aria-label="Indietro">
-                    <i className="ph ph-arrow-left" />
-                </button>
+                {onBack && (
+                    <button className="ag-icon" onClick={onBack} aria-label="Indietro">
+                        <i className="ph ph-arrow-left" />
+                    </button>
+                )}
                 <h1 className="ag-title">Agenda</h1>
                 <span style={{ flex: 1 }} />
                 <div className="ag-views" role="tablist">
