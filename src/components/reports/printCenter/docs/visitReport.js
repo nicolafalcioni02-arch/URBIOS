@@ -25,6 +25,14 @@ const kpi = (label, value, unit, hint = '') => (value ? `<div class="d-kpi"><spa
 
 const bmiClass = (b) => (b < 18.5 ? 'sottopeso' : b < 25 ? 'normopeso' : b < 30 ? 'sovrappeso' : 'obesità');
 
+// modi di mostrare il report (opzione "Come mostrarlo")
+export const VISIT_VIEWS = [
+    { id: 'completo', label: 'Completo', desc: 'Indici, profilo, misure in pannelli', icon: 'ph-article' },
+    { id: 'tabella', label: 'Tutto in una tabella', desc: 'Ogni valore in righe compatte', icon: 'ph-table' },
+    { id: 'cruscotto', label: 'Cruscotto', desc: 'Indici su scale con le fasce', icon: 'ph-gauge' },
+    { id: 'sintesi', label: 'Sintesi', desc: 'Una pagina: numeri e valutazione', icon: 'ph-note' },
+];
+
 // Report di visita ridisegnato: intestazione, indici in evidenza, profilo, misure in pannelli, valutazione e firma
 export const buildVisitReportHtml = ({ patient: p, prof, visit, opts = {} }) => {
     const d = visit.data || {};
@@ -33,11 +41,13 @@ export const buildVisitReportHtml = ({ patient: p, prof, visit, opts = {} }) => 
     const sesso = String(p.sesso || '').toUpperCase().startsWith('F') ? 'Donna' : p.sesso ? 'Uomo' : '';
 
     const helpers = createReportHelpers({ d, patient: p });
+    const panelData = [];
     const renderPanel = (title, items) => {
         const rows = items
             .filter((i) => i.v && !i.v.includes('color:#ccc;">-</span>'))
             .map((i) => `<tr><td>${i.l}</td><td>${i.v}</td></tr>`)
             .join('');
+        if (rows) panelData.push({ title, items: items.filter((i) => i.v && !i.v.includes('color:#ccc;">-</span>')) });
         return rows ? `<div class="d-panel"><div class="d-panel-h">${title}</div><table>${rows}</table></div>` : '';
     };
     const { allPanelsHTML } = buildPanelsHtml({ ...helpers, d, renderPanel });
@@ -64,6 +74,74 @@ export const buildVisitReportHtml = ({ patient: p, prof, visit, opts = {} }) => 
         .join('');
 
     const evaluation = String(d.valutazione_report ?? '').trim();
+    const evaluationHtml = `<div class="d-prose">${evaluation ? multiline(evaluation).split(/<br><br>/).map((x) => `<p>${x}</p>`).join('') : '<p class="d-placeholder">Scrivi qui la valutazione e i consigli per il paziente.</p>'}</div>`;
+    const disclaimer = prof.disclaimer_report || 'Il presente documento riporta misurazioni e valutazioni dello stato nutrizionale. Non costituisce diagnosi medica né sostituisce il parere del medico curante.';
+    const head = `${opts.masthead === false ? '' : mastheadHtml(prof)}
+${titleHtml({ kicker: 'Report di visita', title: `${p.nome || ''} ${p.cognome || ''}`.trim(), sub: [sesso, eta != null && `${eta} anni`, p.dataNascita && `nato/a il ${fmtDate(p.dataNascita)}`].filter(Boolean).join(' · '), dateLabel: 'Data della visita', date: fmtDate(visit.date) })}`;
+    const figures = [
+        ['Peso', fmt(k.peso), 'kg', ''],
+        ['BMI', fmt(k.bmi), '', k.bmi ? bmiClass(k.bmi) : ''],
+        ['Massa grassa', fmt(k.fm), '%', k.fmKg ? `${fmt(k.fmKg)} kg` : ''],
+        ['Massa magra', fmt(k.ffm), 'kg', ''],
+        ['Angolo di fase', fmt(k.pha), '°', ''],
+        ['Vita / altezza', fmt(k.whtr, 2), '', k.whtr ? (k.whtr < 0.5 ? 'nella norma' : 'da migliorare') : ''],
+    ].filter(([, v]) => v);
+    const view = VISIT_VIEWS.some((x) => x.id === opts.view) ? opts.view : 'completo';
+
+    // tutto in una tabella: due coppie parametro/valore per riga, gruppi con un titolo
+    if (view === 'tabella') {
+        const groups = [
+            ['Indici principali', figures.map(([l, v, u, h]) => [l, `<b>${v}</b>${u ? ` ${u}` : ''}${h ? ` <small>${esc(h)}</small>` : ''}`])],
+            ['Profilo e obiettivi', profile.map(([l, v]) => [l, multiline(v)])],
+            ...['A', 'B']
+                .map((m) => [m, d[`risultati_metodo_${m}`]])
+                .filter(([, r]) => r && parseFloat(r.fm_percent) > 0)
+                .map(([m, r]) => [`Composizione · metodo ${m}`, [['Formule', esc([r.formula_densita, r.formula_conv].filter(Boolean).join(' · '))], ['Grasso', `${esc(r.fm_percent)} %`], ['Massa grassa', `${esc(r.fm_kg)} kg`], ['Massa magra', `${esc(r.ffm_kg)} kg`]]]),
+            ...panelData.map((g) => [g.title, g.items.map((i) => [i.l, i.v])]),
+            ['Note della visita', notes.map(([l, v]) => [l, multiline(v)])],
+        ].filter(([, rows]) => rows.length);
+        const body = groups
+            .map(([t, rows]) => {
+                const pairs = [];
+                for (let i = 0; i < rows.length; i += 2) pairs.push([rows[i], rows[i + 1]]);
+                return `<tr class="d-all-g"><th colspan="4">${t}</th></tr>${pairs.map(([a, b]) => `<tr><td class="l">${a[0]}</td><td>${a[1]}</td><td class="l">${b ? b[0] : ''}</td><td>${b ? b[1] : ''}</td></tr>`).join('')}`;
+            })
+            .join('');
+        return `<div class="d-doc">${head}<table class="d-table d-all"><tbody>${body}</tbody></table><h2 class="d-h">Valutazione del professionista</h2>${evaluationHtml}${signHtml(prof, disclaimer)}</div>`;
+    }
+
+    // cruscotto: ogni indice su una scala con le fasce di riferimento
+    if (view === 'cruscotto') {
+        const F = sesso === 'Donna';
+        const gauges = [
+            k.bmi && { l: 'BMI', v: k.bmi, d: 1, u: '', min: 15, max: 40, cuts: [18.5, 25, 30], names: ['sottopeso', 'normopeso', 'sovrappeso', 'obesità'], good: 1 },
+            k.fm && { l: 'Massa grassa', v: k.fm, d: 1, u: '%', min: F ? 10 : 4, max: F ? 50 : 40, cuts: F ? [21, 33, 39] : [8, 20, 25], names: ['bassa', 'adeguata', 'alta', 'molto alta'], good: 1 },
+            k.whtr && { l: 'Vita / altezza', v: k.whtr, d: 2, u: '', min: 0.35, max: 0.75, cuts: [0.4, 0.5, 0.6], names: ['bassa', 'nella norma', 'da migliorare', 'alta'], good: 1 },
+            k.pha && { l: 'Angolo di fase', v: k.pha, d: 1, u: '°', min: 3, max: 9, cuts: [4.5, 5.5, 6.5], names: ['basso', 'sotto la media', 'buono', 'ottimo'], good: 3 },
+        ].filter(Boolean);
+        const pct = (g, x) => Math.max(0, Math.min(100, ((x - g.min) / (g.max - g.min)) * 100));
+        const gaugeHtml = (g) => {
+            const zone = g.cuts.filter((c) => g.v >= c).length;
+            const edges = [g.min, ...g.cuts, g.max];
+            const segs = edges.slice(0, -1).map((e, i) => `<i class="${i === g.good ? 'ok' : ''}" style="width:${pct(g, edges[i + 1]) - pct(g, e)}%"></i>`).join('');
+            return `<div class="d-gauge"><div class="d-gauge-h"><span>${g.l}</span><b>${fmt(g.v, g.d)}<small>${g.u}</small></b><em>${g.names[zone]}</em></div><div class="d-gauge-bar">${segs}<u style="left:${pct(g, g.v)}%"></u></div><div class="d-gauge-sc">${g.cuts.map((c) => `<span style="left:${pct(g, c)}%">${fmt(c, g.d)}</span>`).join('')}</div></div>`;
+        };
+        const big = [figures.find((f) => f[0] === 'Peso'), figures.find((f) => f[0] === 'Massa magra'), k.fmKg && ['Massa grassa', fmt(k.fmKg), 'kg', '']].filter(Boolean);
+        return `<div class="d-doc">${head}
+<div class="d-dash">${big.map(([l, v, u]) => `<div class="d-dash-n"><span>${l}</span><b>${v}</b><small>${u}</small></div>`).join('')}</div>
+${gauges.length ? `<h2 class="d-h">Dove ti trovi</h2><div class="d-gauges">${gauges.map(gaugeHtml).join('')}</div>` : ''}
+${allPanelsHTML.trim() ? `<h2 class="d-h">Misure e parametri</h2><div class="d-grid d-grid-4">${allPanelsHTML}</div>` : ''}
+<h2 class="d-h">Valutazione del professionista</h2>${evaluationHtml}${signHtml(prof, disclaimer)}</div>`;
+    }
+
+    // sintesi: una pagina con gli indici e la valutazione
+    if (view === 'sintesi') {
+        return `<div class="d-doc d-brief">${head}
+<div class="d-strip">${figures.map(([l, v, u, h]) => `<div><span>${l}</span><b>${v}<small>${u}</small></b>${h ? `<em>${esc(h)}</em>` : ''}</div>`).join('')}</div>
+${p.obiettivo ? `<p class="d-goal"><span>Obiettivo</span> ${multiline(p.obiettivo)}</p>` : ''}
+<h2 class="d-h">In sintesi</h2>${evaluationHtml}
+${signHtml(prof, disclaimer)}</div>`;
+    }
 
     return `<div class="d-doc">
 ${opts.masthead === false ? '' : mastheadHtml(prof)}

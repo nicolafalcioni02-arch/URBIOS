@@ -90,22 +90,29 @@ export const paginateHtml = async (html, { body, flow, limits, isCancelled = () 
     // chiude la pagina corrente e ne apre una nuova con gli stessi contenitori aperti
     const breakPage = () => {
         const depth = chain.length;
-        // un titolo rimasto in fondo alla pagina va con quello che segue
-        let carry = null;
-        const parent = cur[depth];
-        const last = parent.lastChild;
-        if (placed > 1 && last && keepWithNext(last)) {
-            carry = last;
-            parent.removeChild(last);
-        }
-        // i contenitori rimasti vuoti in fondo alla pagina si tolgono (e la pagina dopo non li considera continuazioni)
+        // i contenitori rimasti vuoti in fondo alla pagina si tolgono (e la pagina dopo non li considera continuazioni);
+        // una tabella con la sola intestazione conta come vuota: l'intestazione da sola in fondo non serve
+        const emptyNode = (el) =>
+            [...el.childNodes].every((n) => isBlank(n) || (n.nodeType === 1 && (n.hasAttribute('data-pc-rep') || (el.tagName === 'TABLE' && (n.tagName === 'THEAD' || n.tagName === 'COLGROUP')))));
         const fresh = new Array(depth + 1).fill(false);
         for (let k = depth; k >= 1; k--) {
             const el = cur[k];
-            if ([...el.childNodes].every((n) => isBlank(n) || (n.nodeType === 1 && n.hasAttribute('data-pc-rep')))) {
+            if (emptyNode(el)) {
                 el.remove();
                 fresh[k] = true;
             } else break;
+        }
+        // un titolo rimasto in fondo alla pagina va con quello che segue (anche se il salto è avvenuto più in profondità)
+        let carry = null;
+        let carryAt = depth;
+        while (carryAt > 0 && fresh[carryAt]) carryAt--;
+        const host = cur[carryAt];
+        let last = host.lastChild;
+        while (last && last.nodeType === 3 && isBlank(last)) last = last.previousSibling;
+        if (last && keepWithNext(last)) {
+            host.removeChild(last);
+            if (flow.textContent.trim() || flow.querySelector('img, svg, canvas')) carry = last;
+            else host.appendChild(last); // sulla pagina c'era solo il titolo: resta dov'è
         }
         pages.push(flow.innerHTML);
         pageNo += 1;
@@ -117,6 +124,12 @@ export const paginateHtml = async (html, { body, flow, limits, isCancelled = () 
             const k = i + 1;
             const c = shell(srcEl, !fresh[k]);
             if (srcEl.tagName === 'TABLE') {
+                // le larghezze delle colonne restano uguali anche sulla pagina dopo
+                [...srcEl.children].filter((x) => x.tagName === 'COLGROUP').forEach((cg) => {
+                    const x = cg.cloneNode(true);
+                    if (!fresh[k]) x.setAttribute('data-pc-rep', '1'); // copia: sparisce quando le pagine si ricuciono
+                    c.appendChild(x);
+                });
                 const th = [...srcEl.children].find((x) => x.tagName === 'THEAD');
                 if (th) {
                     const t = th.cloneNode(true);
@@ -133,7 +146,9 @@ export const paginateHtml = async (html, { body, flow, limits, isCancelled = () 
         });
         cur = next;
         if (carry) {
-            cur[depth].appendChild(carry);
+            const after = cur[carryAt + 1];
+            if (after && after.parentNode === cur[carryAt]) cur[carryAt].insertBefore(carry, after);
+            else cur[carryAt].appendChild(carry);
             placed = 1;
         }
     };
@@ -189,6 +204,8 @@ export const paginateHtml = async (html, { body, flow, limits, isCancelled = () 
         }
         if (node.nodeType !== 1) return;
         const parent = cur[chain.length];
+        // le misure delle colonne una volta sola (sulla pagina nuova le ha già messe la continuazione della tabella)
+        if (node.tagName === 'COLGROUP' && parent.querySelector(':scope > colgroup')) return;
         let clone = node.cloneNode(true);
         parent.appendChild(clone);
         if (placed > 0 && forcedBefore(clone)) {

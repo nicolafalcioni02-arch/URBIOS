@@ -35,7 +35,7 @@ export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true
             {bare ? (
                 children
             ) : (
-                <div className="pc-body" style={{ top: `${top}mm`, left: `${m.s}mm`, width: `${g.contentW}mm`, height: `${g.heightMm(withHead)}mm` }}>
+                <div className="pc-body" style={{ top: `${top}mm`, left: `${m.s}mm`, width: `${g.contentW}mm`, height: `${g.heightMm(withHead)}mm`, '--pc-body-h': `${g.heightMm(withHead)}mm` }}>
                     {children}
                 </div>
             )}

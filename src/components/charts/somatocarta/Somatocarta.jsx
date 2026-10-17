@@ -4,6 +4,28 @@ import { svgContent } from './assets/somatochartSvg';
 const BASE_W = 680;
 const BASE_H = 642;
 
+// Stessa calibrazione del grafico a schermo (area 680×642), usata anche dalla versione per la stampa
+const pointOf = (endo, meso, ecto) => {
+    const sx = ecto - endo;
+    const sy = 2 * meso - (endo + ecto);
+    return { x: BASE_W / 2 - 20 + sx * 18.9 * 2, y: BASE_H / 2 - 2 - sy * 18.9 };
+};
+
+// Versione per la stampa: disegno e pallino nello stesso SVG, si adatta alla larghezza del riquadro senza tagli
+// (l'SVG originale è 172,5×169,4 mm, cioè 652×640 px, appoggiato in alto a sinistra dell'area 680×642)
+const printSvg = svgContent.replace(/width="172\.51172mm"/, 'width="652.01"').replace(/height="169\.39137mm"/, 'height="640.21"');
+export const SomatocartaPrint = ({ endo = 0, meso = 0, ecto = 0 }) => {
+    const p = pointOf(endo, meso, ecto);
+    const x = Math.max(8, Math.min(BASE_W - 8, p.x));
+    const y = Math.max(8, Math.min(BASE_H - 8, p.y));
+    return (
+        <svg viewBox={`0 0 ${BASE_W} ${BASE_H}`} width="100%" style={{ display: 'block' }} role="img" aria-label={`Somatotipo: endo ${endo.toFixed(1)}, meso ${meso.toFixed(1)}, ecto ${ecto.toFixed(1)}`}>
+            <g opacity="0.8" dangerouslySetInnerHTML={{ __html: printSvg }} />
+            <circle cx={x} cy={y} r="13" fill="#dc2626" stroke="#fff" strokeWidth="5" />
+        </svg>
+    );
+};
+
 export const Somatocarta = ({ endo = 0, meso = 0, ecto = 0 }) => {
     // Il grafico è disegnato a misura fissa (680×642): su schermi stretti lo si rimpicciolisce in proporzione
     // (il pallino è calcolato nelle stesse coordinate, quindi resta al suo posto).

@@ -4,7 +4,7 @@ import { ChartsPage } from '../../../views/analisi/ChartsReport';
 import { buildBodyModel } from '../../../views/analisi/logic/bodyModel';
 import { computeSomatotype } from '../../../views/analisi/logic/somatotype';
 import { DOCS, docOf, oggi } from '../../patient/info/documentsLogic';
-import { DOC_TYPES, PRESETS, availability, buildHtml, defaultOptions, fixedPages, hasMasthead } from './catalog';
+import { DOC_TYPES, PRESETS, availability, buildHtml, currentView, defaultOptions, fixedPages, hasMasthead } from './catalog';
 import { cleanHtml, mergeFragments, paginateHtml } from './logic/paginate';
 import { DEFAULT_THEME, MM, geometry, layoutById, loadLayoutFonts, themeKey } from './logic/theme';
 import { ageAt, findVisit, fmtDate, freshPatient, sexOf } from './logic/visits';
@@ -179,7 +179,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     };
     const applyPreset = (p) => {
         const hasEdits = items.some((it) => it.edited);
-        if (hasEdits && !window.confirm('Cambiando pacchetto le modifiche fatte a mano andranno perse. Continuare?')) return;
+        if (hasEdits && !window.confirm('Cambiando gruppo di documenti le modifiche fatte a mano andranno perse. Continuare?')) return;
         setPresetId(p.id);
         dirty.current.clear();
         setItems(fromTypes(p.types));
@@ -187,16 +187,16 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     };
     const savePreset = (name) => {
         if (!canSave) {
-            flash('Nei casi dimostrativi i pacchetti non si salvano', 'ph-info');
+            flash('Nella demo i gruppi non si salvano', 'ph-info');
             return;
         }
         const p = { id: `u${Date.now().toString(36)}`, label: name, icon: 'ph-bookmark-simple', types: items.map((it) => it.type) };
         onUpdateDb((prev) => ({ ...prev, stampa: { ...(prev.stampa || {}), pacchetti: [...((prev.stampa || {}).pacchetti || []), p] } }));
         setPresetId(p.id);
-        flash(`Pacchetto «${name}» salvato`);
+        flash(`Gruppo «${name}» salvato`);
     };
     const deletePreset = (p) => {
-        if (!canSave || !window.confirm(`Eliminare il pacchetto «${p.label}»?`)) return;
+        if (!canSave || !window.confirm(`Eliminare il gruppo «${p.label}»?`)) return;
         onUpdateDb((prev) => ({ ...prev, stampa: { ...(prev.stampa || {}), pacchetti: ((prev.stampa || {}).pacchetti || []).filter((x) => x.id !== p.id) } }));
     };
     const toggle = (id) => update((list) => list.map((it) => (it.id === id ? { ...it, on: !it.on } : it)));
@@ -219,6 +219,22 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
         update((list) => (type === 'copertina' ? [it, ...list] : [...list, it]));
         setPresetId(null);
         setTimeout(() => goTo(it.id), 350);
+        return it.id;
+    };
+    // stessa visita e stesse scelte, subito dopo l'originale: per affiancare due viste dello stesso documento
+    const duplicate = (id, patch = {}) => {
+        const src = items.find((x) => x.id === id);
+        if (!src) return null;
+        const it = { ...src, id: newId(), on: true, edited: false, opts: { ...src.opts, ...patch } };
+        if (DOC_TYPES[it.type].kind === 'flow') it.html = cleanHtml(buildHtml(it, ctx));
+        update((list) => {
+            const n = [...list];
+            n.splice(list.findIndex((x) => x.id === id) + 1, 0, it);
+            return n;
+        });
+        setPresetId(null);
+        setTimeout(() => goTo(it.id), 350);
+        return it.id;
     };
     const setOpts = (id, patch) => {
         const it = items.find((x) => x.id === id);
@@ -364,6 +380,9 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     const renderPage = (p, idx) => {
         const it = p.item;
         const label = DOC_TYPES[it.type].label;
+        const same = items.filter((x) => x.type === it.type); // stessa numerazione della barra laterale
+        const view = currentView(it);
+        const pageLabel = `${label}${same.length > 1 ? ` ${same.indexOf(it) + 1}` : ''}${view ? ` · ${view.label}` : ''}`;
         const num = idx + 1;
         const firstOfItem = ranges[it.id][0] === num;
         let sheet;
@@ -442,7 +461,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                 }}
             >
                 <div className="pc-pagelabel">
-                    <span>{label}</span>
+                    <span>{pageLabel}</span>
                     <span>
                         {num} / {total}
                     </span>
@@ -544,6 +563,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                     onMove={move}
                     onRemove={remove}
                     onAdd={add}
+                    onDuplicate={duplicate}
                     onSetOpts={setOpts}
                     onRegenerate={regenerate}
                     ranges={ranges}

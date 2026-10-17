@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Somatocarta } from '../../components/charts/somatocarta/Somatocarta';
+import { SomatocartaPrint } from '../../components/charts/somatocarta/Somatocarta';
 import { BodyCompositionCharts } from './sections/BodyCompositionCharts';
 import { snapshotBody } from './sections/Body3D';
 import { PLI_SITES } from './sections/measureSites';
@@ -137,11 +137,7 @@ export const ChartsPage = ({ page, patient, visitData, report, sesso, eta, model
                     {hasSomato && (
                         <div className="cr-box">
                             <strong>Somatotipo</strong>
-                            <div style={{ width: '100%', aspectRatio: '1.33', overflow: 'hidden', position: 'relative' }}>
-                                <div style={{ zoom: 0.3, position: 'absolute', left: 0, top: 0 }}>
-                                    <Somatocarta endo={somatoValues.endo} meso={somatoValues.meso} ecto={somatoValues.ecto} />
-                                </div>
-                            </div>
+                            <SomatocartaPrint endo={somatoValues.endo} meso={somatoValues.meso} ecto={somatoValues.ecto} />
                             <span className="cr-somato">
                                 Endo <b>{somatoValues.endo.toFixed(1)}</b> · Meso <b>{somatoValues.meso.toFixed(1)}</b> · Ecto <b>{somatoValues.ecto.toFixed(1)}</b>
                             </span>

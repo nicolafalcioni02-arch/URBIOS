@@ -43,6 +43,13 @@ const delta = (a, b, unit, d = 1) => {
     return `${s}${fmt(Math.abs(x), d)}${unit}`;
 };
 
+// modi di mostrare i progressi (opzione "Come mostrarlo")
+export const PROGRESS_VIEWS = [
+    { id: 'completo', label: 'Completo', desc: 'Variazioni, grafici e tabella', icon: 'ph-chart-line-up' },
+    { id: 'tabella', label: 'Tabella completa', desc: 'Ogni visita, ogni valore', icon: 'ph-table' },
+    { id: 'confronto', label: 'Prima e ora', desc: 'Inizio e ultima visita a confronto', icon: 'ph-arrows-left-right' },
+];
+
 // "I tuoi progressi": riepilogo dall'inizio, grafici e tabella di tutte le visite
 export const buildProgressHtml = ({ patient: p, prof, draft, opts = {} }) => {
     const visits = visitsOf(p, draft)
@@ -66,6 +73,36 @@ export const buildProgressHtml = ({ patient: p, prof, draft, opts = {} }) => {
         .filter((s) => s.pts.length >= 2 && ['peso', 'fm', 'ffm', 'vita'].includes(s.key))
         .map((s) => `<div class="d-kpi"><span>${s.label}</span><b>${delta(s.pts[0].v, s.pts[s.pts.length - 1].v, '')}<small> ${s.unit}</small></b><em>da ${fmt(s.pts[0].v)} a ${fmt(s.pts[s.pts.length - 1].v)} ${s.unit}</em></div>`)
         .join('');
+
+    const view = PROGRESS_VIEWS.some((x) => x.id === opts.view) ? opts.view : 'completo';
+    const head = `${opts.masthead === false ? '' : mastheadHtml(prof)}
+${titleHtml({ kicker: 'Andamento nel tempo', title: 'I tuoi progressi', sub: `${p.nome || ''} ${p.cognome || ''} · ${visits.length} ${visits.length === 1 ? 'visita' : 'visite'}${visits.length > 1 ? ` dal ${fmtDate(first.date)} al ${fmtDate(last.date)}` : ''}`, dateLabel: 'Aggiornato al', date: fmtDate(last.date) })}`;
+    const note = `<p class="d-foot-note">I valori sono quelli rilevati durante le visite in studio. Piccole variazioni da una visita all'altra sono normali: conta la tendenza.</p>`;
+
+    // tabella completa: tutte le visite e tutti gli indici, con la variazione totale in fondo
+    if (view === 'tabella') {
+        const cols = [['peso', 'Peso', 'kg', 1], ['bmi', 'BMI', '', 1], ['fm', 'Grasso', '%', 1], ['fmKg', 'Grasso', 'kg', 1], ['ffm', 'Magra', 'kg', 1], ['pha', 'PhA', '°', 1], ['vita', 'Vita', 'cm', 1], ['fianchi', 'Fianchi', 'cm', 1], ['whtr', 'Vita/alt.', '', 2]].filter(([key]) => visits.some((v) => v.k[key] > 0));
+        const firstOf = (key) => visits.find((v) => v.k[key] > 0)?.k[key];
+        const lastOf = (key) => [...visits].reverse().find((v) => v.k[key] > 0)?.k[key];
+        return `<div class="d-doc">${head}
+<table class="d-table d-table-num d-prog"><thead><tr><th>Data</th>${cols.map(([, l, u]) => `<th>${l}${u ? `<small> ${u}</small>` : ''}</th>`).join('')}</tr></thead><tbody>
+${visits.map((v) => `<tr><td>${fmtDate(v.date, 'short')}${v.id === 'draft' ? ' <small>(in corso)</small>' : ''}</td>${cols.map(([key, , , d]) => `<td>${fmt(v.k[key], d)}</td>`).join('')}</tr>`).join('')}
+${visits.length > 1 ? `<tr class="d-prog-tot"><td>Variazione</td>${cols.map(([key, , , d]) => `<td>${delta(firstOf(key), lastOf(key), '', d)}</td>`).join('')}</tr>` : ''}
+</tbody></table>${note}</div>`;
+    }
+
+    // prima e ora: per ogni indice il primo e l'ultimo valore, e quanto è cambiato
+    if (view === 'confronto') {
+        const cmp = series.filter((s) => s.pts.length >= 2);
+        const row = (s) => {
+            const a = s.pts[0];
+            const b = s.pts[s.pts.length - 1];
+            return `<div class="d-cmp-r"><div class="d-cmp-l">${s.label}</div><div class="d-cmp-v"><span>${fmtDate(a.date, 'short')}</span><b>${fmt(a.v)}<small> ${s.unit}</small></b></div><div class="d-cmp-arrow">→</div><div class="d-cmp-v now"><span>${fmtDate(b.date, 'short')}</span><b>${fmt(b.v)}<small> ${s.unit}</small></b></div><div class="d-cmp-d">${delta(a.v, b.v, ` ${s.unit}`)}</div></div>`;
+        };
+        return `<div class="d-doc">${head}
+${cmp.length ? `<h2 class="d-h">Dalla prima visita a oggi</h2><div class="d-cmp">${cmp.map(row).join('')}</div>` : '<p class="d-placeholder">Servono almeno due visite per il confronto.</p>'}
+${note}</div>`;
+    }
 
     const charts = opts.charts !== false ? series.filter((s) => s.pts.length >= 2).slice(0, 6) : [];
     const rows = [...visits].reverse();
