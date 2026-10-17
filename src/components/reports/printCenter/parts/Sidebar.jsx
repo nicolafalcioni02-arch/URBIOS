@@ -277,11 +277,11 @@ export const Sidebar = ({ open, items, ctx, theme, setTheme, presets, presetId, 
                                     onClick={() => setTheme({ layout: l.id, accent: l.accent, scale: l.scale || 1, margins: l.margins || 'normali' })}
                                     style={{ '--c': l.accent }}
                                 >
-                                    <div className="pc-lay-prev">
+                                    <div className={`pc-lay-prev pv-${l.id}`}>
                                         <div className="pg">
-                                            {l.deco === 'band' && <div className="band" />}
-                                            {l.deco === 'frame' && <div className="frame" />}
-                                            <div className="t" style={l.deco === 'serif' ? { borderRadius: 0, height: 3 } : null} />
+                                            <i className="d1" />
+                                            <i className="d2" />
+                                            <div className="t" />
                                             {[17, 23, 27, 31, 37, 41, 45].map((y) => (
                                                 <div key={y} className="l" style={{ top: y, right: y % 2 ? 9 : 5 }} />
                                             ))}

@@ -10,7 +10,8 @@ printCenter/
 ├── catalog.jsx               cosa si può stampare (tipi, disponibilità, opzioni, pacchetti pronti)
 ├── docs/                     grafica dei documenti (report visita, progressi, piano alimentare)
 ├── logic/paginate.js         motore di impaginazione A4 (spezza blocchi, tabelle, paragrafi; ricuce le modifiche)
-├── logic/theme.js            layout, colori, margini (salvati in db.stampa.tema)
+├── logic/theme.js            elenco dei layout, colori, margini (salvati in db.stampa.tema)
+├── layoutStyles.js           grafica dei 10 layout (Elegante, Giocoso, Planner, Energia, Geometrico, Naturale, Editoriale, Istituzionale, Pastello, Fresco)
 ├── logic/visits.js           visite e indici nel formato dei documenti
 ├── parts/                    foglio A4 e copertina, barra laterale, barra di scrittura
 └── printCenterStyles.js      CSS (interfaccia, foglio, documenti, layout, stampa)

@@ -6,7 +6,7 @@ import { computeSomatotype } from '../../../views/analisi/logic/somatotype';
 import { DOCS, docOf, oggi } from '../../patient/info/documentsLogic';
 import { DOC_TYPES, PRESETS, availability, buildHtml, defaultOptions, fixedPages, hasMasthead } from './catalog';
 import { cleanHtml, mergeFragments, paginateHtml } from './logic/paginate';
-import { DEFAULT_THEME, MM, geometry, layoutById, themeKey } from './logic/theme';
+import { DEFAULT_THEME, MM, geometry, layoutById, loadLayoutFonts, themeKey } from './logic/theme';
 import { ageAt, findVisit, fmtDate, freshPatient, sexOf } from './logic/visits';
 import { CoverPage, FitBox, Sheet } from './parts/Sheet';
 import { Sidebar } from './parts/Sidebar';
@@ -116,6 +116,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     useEffect(() => {
         let cancelled = false;
         const run = async () => {
+            await loadLayoutFonts(layout);
             if (document.fonts && document.fonts.ready) await document.fonts.ready;
             const todo = items.filter((it) => it.on && DOC_TYPES[it.type].kind === 'flow');
             for (const it of todo) {

@@ -8,8 +8,11 @@ export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true
     const top = m.t + (withHead ? g.head : 0);
     const studio = [prof.nome, prof.cognome].filter(Boolean).join(' ');
     return (
-        <div className={`pc-sheet pc-theme ${layoutClass}`} style={{ '--accent': accent, '--pc-scale': theme.scale }}>
-            <div className="pc-deco" />
+        <div className={`pc-sheet pc-theme ${layoutClass}`} style={{ '--accent': accent, '--pc-scale': theme.scale, '--m-t': `${m.t}mm`, '--m-s': `${m.s}mm`, '--m-b': `${m.b}mm` }}>
+            <div className="pc-deco">
+                <i />
+                <i />
+            </div>
             {!bare && withHead && (
                 <div className="pc-head" style={{ top: `${m.t}mm`, left: `${m.s}mm`, right: `${m.s}mm` }}>
                     <span>
