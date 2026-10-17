@@ -5,7 +5,6 @@ import { fmtDate } from '../logic/visits';
 // Marchio URBIOS con copyright, in fondo a ogni foglio
 const BrandMark = ({ style }) => (
     <span className="pc-bm" style={style}>
-        <i className="pc-bm-orb" />
         <b>URBIOS</b>
         <span>© 2026</span>
     </span>

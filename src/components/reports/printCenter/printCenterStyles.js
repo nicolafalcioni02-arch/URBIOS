@@ -172,7 +172,6 @@ const sheetCss = `
 .pc-sheet.pc-theme .pc-bm, .pc-sheet.pc-theme .pc-bm * { font-family: 'Inter', system-ui, sans-serif !important; font-style: normal !important; }
 .pc-bm { display: inline-flex; align-items: center; gap: 1.3mm; font-size: 6.5pt; color: #8a8a90; white-space: nowrap; line-height: 1; z-index: 2; }
 .pc-bm b { font-size: 6.5pt; font-weight: 600; letter-spacing: .3em; color: #1b1b1f; margin-right: -.3em; }
-.pc-bm-orb { width: 2.6mm; height: 2.6mm; border-radius: 50%; flex: none; background: radial-gradient(circle at 34% 30%, #fff 0, #e6e6ea 22%, #8e8e96 60%, #26262b 100%); box-shadow: inset -.2mm -.2mm .4mm rgba(0,0,0,.35); }
 .pc-sheet > .pc-bm { background: rgba(255,255,255,.88); padding: 1mm 2.4mm; border-radius: 3mm; }
 .pc-deco { position: absolute; inset: 0; pointer-events: none; }
 .pc-fit { transform-origin: top left; }
