@@ -134,6 +134,7 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
             {/* ── VISITS TIMELINE ───────────────────────────────────────── */}
             <div className="hs-scroll">
                 <VisitList
+                    patient={patient}
                     filteredVisits={filteredVisits}
                     getDietBadge={getDietBadge}
                     getWeightDelta={getWeightDelta}

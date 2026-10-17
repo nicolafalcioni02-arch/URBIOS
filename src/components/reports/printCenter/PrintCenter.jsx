@@ -12,6 +12,7 @@ import { CoverPage, FitBox, Sheet } from './parts/Sheet';
 import { Sidebar } from './parts/Sidebar';
 import { TextTools } from './parts/TextTools';
 import { printCenterCss } from './printCenterStyles';
+import { professionalFor } from '../../../storage/example/example';
 
 let seq = 0;
 const newId = () => `d${Date.now().toString(36)}${seq++}`;
@@ -20,7 +21,7 @@ const newId = () => `d${Date.now().toString(36)}${seq++}`;
 // Ogni documento nasce dai dati, si impagina da solo in fogli A4 veri e resta modificabile direttamente sul foglio.
 export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = false, draft = null, initial = null, onClose }) => {
     const patient = useMemo(() => freshPatient(db, patient0), [db, patient0]);
-    const prof = db?.utente || {};
+    const prof = professionalFor(patient, db);
     const ctx = useMemo(() => ({ patient, db, prof, draft }), [patient, db, prof, draft]);
     const stored = db?.stampa || {};
     const canSave = !!onUpdateDb && !readOnly;

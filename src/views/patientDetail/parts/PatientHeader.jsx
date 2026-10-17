@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { docsSummary } from '../../../components/patient/info/documentsLogic';
+import { isExample } from '../../../storage/example/example';
 
 const TABS = [
     { id: 'info', label: 'Anagrafica', icon: 'ph-user' },
@@ -90,6 +91,7 @@ const PatientHeaderFull = ({ onBack, patient, setView, status, view, readOnly = 
                 <div className="min-w-0">
                     <h2 className="text-[19px] sm:text-[22px] font-semibold leading-tight text-[color:var(--ink)] truncate">
                         {patient.nome} {patient.cognome}
+                        {isExample(patient) && <span className="ex-badge" title="Paziente di esempio: le modifiche non si salvano">Esempio</span>}
                     </h2>
                     <p className="flex items-center gap-2 text-[13px] text-[color:var(--muted)]">
                         <span className="flex items-center gap-1.5">
@@ -97,7 +99,7 @@ const PatientHeaderFull = ({ onBack, patient, setView, status, view, readOnly = 
                             {status}
                         </span>
                         <span aria-hidden="true">·</span>
-                        <span>n. {patient.id}</span>
+                        <span>{isExample(patient) ? 'esempio · non si salva' : `n. ${patient.id}`}</span>
                         {readOnly && (
                             <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'var(--ink)', color: '#fff' }}>
                                 Caso dimostrativo

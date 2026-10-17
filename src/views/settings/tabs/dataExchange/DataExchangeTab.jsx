@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ExportSection } from './ExportSection';
 import { ImportSection } from './ImportSection';
+import { stripExample } from '../../../../storage/example/example'; // il paziente di esempio non si esporta
 
 // Impostazioni → "Importa & Esporta"
 export const DataExchangeTab = ({ tab, db, onUpdateDb }) => {
@@ -26,7 +27,7 @@ export const DataExchangeTab = ({ tab, db, onUpdateDb }) => {
                     </button>
                 ))}
             </div>
-            {part === 'export' ? <ExportSection db={db} /> : <ImportSection db={db} onUpdateDb={onUpdateDb} />}
+            {part === 'export' ? <ExportSection db={stripExample(db)} /> : <ImportSection db={db} onUpdateDb={onUpdateDb} />}
         </div>
     );
 };

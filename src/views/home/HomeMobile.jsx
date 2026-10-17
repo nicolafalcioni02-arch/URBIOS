@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { isExample } from '../../storage/example/example';
 
 // Elenco pazienti su telefono: titolo grande che si ritira nella barra scorrendo, ricerca sempre a portata,
 // righe raggruppate. Le azioni secondarie stanno nella barra in basso (vedi ProfessionalSuite).
@@ -53,6 +54,7 @@ export const HomeMobile = ({ patients, list, query, setQuery, onOpen, onAdd, las
                                     <span className="m-row-text">
                                         <span className="m-row-title">
                                             {p.nome} {p.cognome}
+                                            {isExample(p) && <span className="ex-badge" title="Paziente di esempio: le modifiche non si salvano">Esempio</span>}
                                         </span>
                                         <span className="m-row-sub">{lastVisit(p)}</span>
                                     </span>

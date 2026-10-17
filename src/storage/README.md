@@ -32,3 +32,10 @@ e non devono restare su un computer che non è più il proprio.
 - **Mai** usare `localStorage` / `sessionStorage` per dati dell'utente: tutto va dentro il `db` (finisce nel file).
 - Nuova chiave nel db? Va bene, viene conservata. Cambio di struttura? Alza `SCHEMA_VERSION` e gestiscilo in `normalizeDb`.
 - "Entra (Demo)" esiste solo in sviluppo (`npm run dev`) o con `npm run build:demo`; `npm run build` è la versione ufficiale.
+
+## Paziente di esempio
+
+`example/` contiene il paziente di esempio (Pino Citosi) e le ricette di esempio, generati da `node archivio_demo/genera.mjs`.
+`ArchiveProvider` li aggiunge alla vista del database (`db` del contesto) in ogni archivio, ma il database salvato
+(copia di lavoro e file) contiene solo i dati veri: ogni modifica passa da `splitExample`, che tiene in memoria la parte
+di esempio. Così l'esempio non crea "modifiche non salvate", non si esporta e torna com'era a ogni apertura.

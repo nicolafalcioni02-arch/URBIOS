@@ -1,13 +1,14 @@
 // Gestione dell'archivio: aprire, creare, salvare, bloccare, uscire.
 // Il database vive in memoria (`db`). Il browser tiene solo una copia di lavoro (cifrata se l'archivio è cifrato)
 // e il FILE scaricato resta la fonte di verità.
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createVault, unlockVault, rewrapPassword, rewrapRecovery, isCryptoAvailable } from './cryptoVault';
 import { buildEncryptedText, buildPlainText, parseArchiveText, openEncrypted } from './archiveFile';
 import { createEmptyDb, normalizeDb } from './schema';
 import { saveWorking, loadWorking, clearWorking } from './workingCopy';
 import { saveTextFile } from './fileIO';
 import { hasLegacyData, readLegacyDb, wipeLegacy } from './legacy';
+import { freshExample, splitExample, stripExample, withExample } from './example/example';
 
 const ArchiveContext = createContext(null);
 export const useArchive = () => useContext(ArchiveContext);
@@ -60,7 +61,23 @@ export const ArchiveProvider = ({ children }) => {
         setEncryptedState(v);
     };
 
-    const setDb = useCallback((upd) => setDbState((prev) => (typeof upd === 'function' ? upd(prev) : upd)), []);
+    // paziente e ricette di esempio: l'app li vede in ogni archivio, ma restano fuori dal db salvato (vedi example/example.js)
+    const [example, setExampleState] = useState(null);
+    const exampleRef = useRef(null);
+    const view = useMemo(() => withExample(db, example), [db, example]);
+
+    // l'app modifica la vista: la parte vera va nel db (e nel file), quella di esempio resta in memoria
+    const setDb = useCallback(
+        (upd) =>
+            setDbState((prev) => {
+                const next = typeof upd === 'function' ? upd(withExample(prev, exampleRef.current)) : upd;
+                const parts = splitExample(next, prev);
+                exampleRef.current = parts.ex;
+                setExampleState(parts.ex);
+                return parts.db;
+            }),
+        []
+    );
 
     // ---- avvio: c'è qualcosa da riprendere? ----
     useEffect(() => {
@@ -87,7 +104,13 @@ export const ArchiveProvider = ({ children }) => {
         setEncrypted(enc);
         setFileName(name);
         setEphemeral(eph);
-        setDbState(newDb);
+        // un archivio che contiene già l'esempio (es. l'archivio demo) lo perde qui: l'esempio arriva sempre fresco
+        const clean = stripExample(newDb);
+        if (fileHash && fileHash === dbHash(newDb)) fileHashRef.current = dbHash(clean);
+        const ex = freshExample();
+        exampleRef.current = ex;
+        setExampleState(ex);
+        setDbState(clean);
         setStatus('open');
     };
 
@@ -213,8 +236,14 @@ export const ArchiveProvider = ({ children }) => {
         setLegacyFound(false);
     };
 
-    const enterDemo = () => {
-        activate({ db: createEmptyDb(), enc: false, fileHash: null, eph: true });
+    // demo: l'archivio di esempio completo (profilo, pazienti, agenda); nulla viene salvato
+    const enterDemo = async () => {
+        try {
+            const demo = await import('../../archivio_demo/URBIOS_demo.json');
+            activate({ db: normalizeDb((demo.default || demo).data), enc: false, fileHash: null, eph: true });
+        } catch {
+            activate({ db: createEmptyDb(), enc: false, fileHash: null, eph: true });
+        }
     };
 
     // Salva su file (sovrascrive lo stesso file dove possibile, altrimenti scarica)
@@ -316,7 +345,7 @@ export const ArchiveProvider = ({ children }) => {
     const value = {
         ready,
         status,
-        db,
+        db: view,
         setDb,
         encrypted,
         dirty,

@@ -9,6 +9,7 @@ import { dateKey, isActive, sameDay, startOf } from '../components/agenda/agenda
 import { useCompact } from '../hooks/useCompact';
 import { HomeMobile } from './home/HomeMobile';
 import { MobileTabBar, ActionSheet } from '../components/mobile/MobileChrome';
+import { isExample } from '../storage/example/example';
 
 export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const [selectedPatientId, setSelectedPatientId] = useState(null);
@@ -312,6 +313,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                             <span className="min-w-0 flex-1 text-left">
                                 <span className="block font-semibold text-[16px] text-[color:var(--ink)] truncate">
                                     {p.nome} {p.cognome}
+                                    {isExample(p) && <span className="ex-badge" title="Paziente di esempio: le modifiche non si salvano">Esempio</span>}
                                 </span>
                                 <span className="block text-[13px] text-[color:var(--muted)] truncate">{lastVisit(p)}</span>
                             </span>

@@ -4,6 +4,7 @@ import { HistoryView } from '../../../components/patient/history/HistoryView';
 import { NewVisitView } from '../../newVisit/NewVisitView';
 import { TrainingPlan } from '../../../components/patient/training/TrainingPlan';
 import { DietPlan } from '../../../components/patient/diet/DietPlan';
+import { professionalFor } from '../../../storage/example/example';
 
 export const PatientTabContent = ({
     configA,
@@ -36,7 +37,7 @@ export const PatientTabContent = ({
 
     return (
         <div className={`flex-1 overflow-y-auto relative ${['visit', 'diet', 'Allenamento'].includes(view) ? '' : 'p-4 md:p-8'} ${widgetsPad ? 'wd-padded' : ''} ${view === 'history' ? 'hs-tab' : ''}`}>
-            {view === 'info' && <ClinicalFolder patient={patient} updatePatientInfo={updatePatientInfo} professionalData={db.utente} />}
+            {view === 'info' && <ClinicalFolder patient={patient} updatePatientInfo={updatePatientInfo} professionalData={professionalFor(patient, db)} />}
 
             {view === 'history' && <HistoryView patient={patient} onUpdateDb={onUpdateDb} onOpenDiet={onOpenDiet} />}
 

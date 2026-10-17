@@ -2,7 +2,19 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { fmtKg, fmtDelta } from './historyFormat';
 
-export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handleDelete, onOpenDiet, setSearchTerm, setSelectedVisit, sortedVisits }) => {
+// che cosa è stato fatto in una visita: documenti firmati quel giorno, misure, esami, piano alimentare, scheda di allenamento
+const MEASURE_KEYS = /^(peso|altezza|cm_|circ_|pl_|dm_|biva_)/;
+const LAB_KEYS = /^(bg_|bl_|br_)/;
+const doneIn = (visit, patient, hasDiet) => {
+    const d = visit.dettagli || {};
+    const day = String(visit.data || '').slice(0, 10);
+    const filled = (re) => visit.peso || Object.keys(d).some((k) => re.test(k) && String(d[k] ?? '').trim() !== '');
+    const docs = Object.values(patient?.documenti || {}).some((x) => x && [x.dataFirma, x.dataConsegna].some((t) => String(t || '').slice(0, 10) === day));
+    const plan = (patient?.allenamento?.schede || []).some((sc) => String(sc.data || '').slice(0, 10) === day);
+    return [docs && 'documenti', filled(MEASURE_KEYS) && 'misure', Object.keys(d).some((k) => LAB_KEYS.test(k) && String(d[k] ?? '').trim() !== '') && 'esami', hasDiet && 'dieta', plan && 'scheda'].filter(Boolean);
+};
+
+export const VisitList = ({ patient, filteredVisits, getDietBadge, getWeightDelta, handleDelete, onOpenDiet, setSearchTerm, setSelectedVisit, sortedVisits }) => {
     const [noteVisit, setNoteVisit] = useState(null); // visita di cui si legge la nota
     const stop = (fn) => (e) => {
         e.stopPropagation();
@@ -23,11 +35,14 @@ export const VisitList = ({ filteredVisits, getDietBadge, getWeightDelta, handle
                 // una voce "solo piano" non è una visita: si apre il piano, non il dettaglio clinico
                 const open = () => (isIndipendente ? onOpenDiet && onOpenDiet(visit) : setSelectedVisit(visit));
                 // che cosa è stata questa voce, detto per esteso
+                // la prima visita è la più vecchia tra le visite vere (le voci "solo piano" non contano)
+                const firstVisit = [...sortedVisits].reverse().find((v) => !v.note?.includes('Solo Dieta'));
+                const done = doneIn(visit, patient, hasDiet);
                 const kind = isIndipendente
                     ? { name: 'Solo piano alimentare', desc: String(visit.dettagli?.diet_meta?.name || '').trim() || 'senza visita', icon: 'ph-carrot' }
-                    : hasDiet
-                      ? { name: 'Visita con dieta', desc: 'misure e piano alimentare', icon: 'ph-calendar-check' }
-                      : { name: 'Controllo', desc: 'solo misure, senza piano', icon: 'ph-stethoscope' };
+                    : firstVisit && firstVisit.id === visit.id
+                      ? { name: 'Prima visita', desc: done.join(' · ') || 'anamnesi e misure', icon: 'ph-handshake' }
+                      : { name: 'Controllo', desc: done.join(' · ') || 'solo misure', icon: 'ph-stethoscope' };
 
                 return (
                     <div key={visit.id} className={`hs-step ${latest ? 'is-latest' : ''}`}>
