@@ -2,6 +2,15 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 import { DOC_TYPES } from '../catalog';
 import { fmtDate } from '../logic/visits';
 
+// Marchio URBIOS con copyright, in fondo a ogni foglio
+const BrandMark = ({ style }) => (
+    <span className="pc-bm" style={style}>
+        <i className="pc-bm-orb" />
+        <b>URBIOS</b>
+        <span>© 2026</span>
+    </span>
+);
+
 // Foglio A4 con intestazione e piè di pagina; il contenuto sta in .pc-body, nell'area utile calcolata dal tema
 export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true, page, total, patientName, prof, title, children, bare = false }) => {
     const m = g.m;
@@ -34,6 +43,7 @@ export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true
             {!bare && withFoot && theme.footer && (
                 <div className="pc-foot" style={{ bottom: `${m.b}mm`, left: `${m.s}mm`, right: `${m.s}mm` }}>
                     <span>Documento personale e riservato · {fmtDate(new Date())}</span>
+                    <BrandMark />
                     {theme.numbers && (
                         <span className="num">
                             Pagina {page} di {total}
@@ -41,6 +51,8 @@ export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true
                     )}
                 </div>
             )}
+            {/* senza piè di pagina (copertina o piè disattivato) il marchio resta in fondo da solo */}
+            {(bare || !withFoot || !theme.footer) && <BrandMark style={{ position: 'absolute', left: '50%', bottom: `${Math.max(4, m.b - 4)}mm`, transform: 'translateX(-50%)' }} />}
         </div>
     );
 };
