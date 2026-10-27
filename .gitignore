@@ -1,3 +1,6 @@
 node_modules
 dist
 .DS_Store
+
+# materiale non di sviluppo (video di lancio, file pesanti): fuori da git
+extra/
