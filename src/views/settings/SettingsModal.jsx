@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { FormulasTab } from './tabs/FormulasTab';
 import { InfoTab } from './tabs/InfoTab';
+import { CiteTab } from './tabs/CiteTab';
+import { LookTab } from './tabs/LookTab';
 import { SecurityTab } from './tabs/SecurityTab';
 import { DataExchangeTab } from './tabs/dataExchange/DataExchangeTab';
 import { ProfileTab } from './tabs/profile/ProfileTab';
@@ -9,9 +11,11 @@ import { useCompact } from '../../hooks/useCompact';
 
 const SECTIONS = [
     ['profilo', 'ph-user-circle', 'Profilo e studio', 'Dati, orari, sedi, contratto', '#3B5BDB'],
+    ['aspetto', 'ph-paint-brush', 'Aspetto', 'Classico o Vetro', '#B59A12'],
     ['formule', 'ph-function', 'Formule', 'Equazioni per i calcoli', '#0C8F7E'],
     ['dati', 'ph-arrows-left-right', 'Importa ed esporta', 'CSV, documenti, anonimo', '#C26A1B'],
     ['sicurezza', 'ph-shield-check', 'Sicurezza e archivio', 'Cifratura e file', '#C23A64'],
+    ['cita', 'ph-quotes', 'Come citarci', 'Per tesi e pubblicazioni', '#0C8F7E'],
     ['info', 'ph-info', 'Info software', 'Versione e crediti', '#7C4DDB'],
 ];
 
@@ -80,6 +84,8 @@ export const SettingsModal = ({ db, onUpdateDb, onClose }) => {
             <DataExchangeTab tab={tab} db={db} onUpdateDb={onUpdateDb} />
             <SecurityTab tab={tab} onClose={onClose} />
             <InfoTab tab={tab} />
+            <CiteTab tab={tab} />
+            <LookTab tab={tab} db={db} onUpdateDb={onUpdateDb} />
         </>
     );
 
@@ -167,9 +173,11 @@ export const SettingsModal = ({ db, onUpdateDb, onClose }) => {
                     <div className="md:hidden sticky -top-4 z-40 -mx-4 -mt-4 mb-4 h-16 flex items-center gap-2 pl-4 pr-16 bg-white/95 backdrop-blur border-b border-gray-100 overflow-x-auto no-scrollbar">
                         {[
                             ['profilo', 'ph-user-circle', 'Profilo'],
+                            ['aspetto', 'ph-paint-brush', 'Aspetto'],
                             ['formule', 'ph-function', 'Formule'],
                             ['dati', 'ph-arrows-left-right', 'Dati'],
                             ['sicurezza', 'ph-shield-check', 'Sicurezza'],
+                            ['cita', 'ph-quotes', 'Citaci'],
                             ['info', 'ph-info', 'Info'],
                         ].map(([id, icon, label]) => (
                             <button
@@ -214,6 +222,8 @@ export const SettingsModal = ({ db, onUpdateDb, onClose }) => {
                     <SecurityTab tab={tab} onClose={onClose} />
 
                     {<InfoTab tab={tab} />}
+                    <CiteTab tab={tab} />
+                    <LookTab tab={tab} db={db} onUpdateDb={onUpdateDb} />
                 </div>
             </div>
         </div>,

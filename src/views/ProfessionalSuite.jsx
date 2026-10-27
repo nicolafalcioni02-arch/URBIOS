@@ -10,6 +10,7 @@ import { useCompact } from '../hooks/useCompact';
 import { HomeMobile } from './home/HomeMobile';
 import { MobileTabBar, ActionSheet } from '../components/mobile/MobileChrome';
 import { isExample } from '../storage/example/example';
+import { Research } from '../research/Research';
 
 export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const [selectedPatientId, setSelectedPatientId] = useState(null);
@@ -22,6 +23,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const [agenda, setAgenda] = useState(null); // null = chiusa, altrimenti { date, open?, newAppt? }
     const [query, setQuery] = useState('');
     const [moreOpen, setMoreOpen] = useState(false);
+    const [research, setResearch] = useState(false); // unità Ricerca (src/research/)
     const compact = useCompact(639); // telefono: cornice da app nativa
     const [form, setForm] = useState({ nome: '', cognome: '', sesso: 'M' });
     const { dirty, ephemeral, saveFile, openExitDialog } = useArchive();
@@ -147,6 +149,9 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     if (studentMode) {
         return <StudentMode onExit={() => setStudentMode(false)} db={data} />;
     }
+    if (research) {
+        return <Research db={data} onBack={() => setResearch(false)} />;
+    }
 
     const agendaView = agenda && (
         <>
@@ -214,6 +219,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                             [
                                 ...(showSave ? [{ label: 'Salva ora', icon: 'ph-floppy-disk', onClick: handleSave }] : []),
                                 { label: 'Impostazioni', icon: 'ph-gear', onClick: () => setShowSettings(true) },
+                                { label: 'Ricerca', icon: 'ph-chart-line', onClick: () => setResearch(true) },
                             ],
                             [
                                 { label: 'Student', icon: 'ph-student', note: 'presto', onClick: () => setStudentSoonOpen(true) },
@@ -237,7 +243,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
 
             <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-6 sm:pt-12 pb-24">
                 {/* Barra alta: marchio a sinistra, azioni secondarie a destra */}
-                <div className="flex items-center justify-between mb-8 sm:mb-12 rise">
+                <div className="home-bar flex items-center justify-between mb-8 sm:mb-12 rise">
                     <span className="text-[13px] font-semibold tracking-[0.32em] text-[color:var(--ink)]">URBIOS</span>
                     <div className="flex items-center gap-1">
                         {/* Student: bloccata per ora (codice intatto in StudentMode.jsx). Per riattivarla: setStudentMode(true) al posto di setStudentSoonOpen(true) */}
@@ -254,6 +260,10 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                         <button onClick={() => setWidgetsEditing((v) => !v)} className="home-quiet max-[1359px]:!hidden" title="Modifica i widget laterali (tieni premuto su un widget per fare lo stesso)">
                             <i className={`ph ${widgetsEditing ? 'ph-check' : 'ph-squares-four'}`}></i>
                             <span>{widgetsEditing ? 'Fine' : 'Widget'}</span>
+                        </button>
+                        <button onClick={() => setResearch(true)} className="home-quiet" title="Ricerca: statistica sui dati dei pazienti">
+                            <i className="ph ph-chart-line"></i>
+                            <span className="hidden sm:inline">Ricerca</span>
                         </button>
                         <button onClick={() => setAgenda({ date: dateKey(new Date()) })} className="home-quiet" title="Agenda e appuntamenti">
                             <i className="ph ph-calendar-dots"></i>
@@ -279,7 +289,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
 
                 {/* Titolo e azione principale */}
                 <div className="flex flex-wrap items-end justify-between gap-4 mb-5 rise" style={{ animationDelay: '.05s' }}>
-                    <div>
+                    <div className="home-title">
                         <h1 className="display text-[38px] sm:text-[48px] text-[color:var(--ink)]">
                             Pazienti
                         </h1>
@@ -303,7 +313,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                 )}
 
                 {/* Elenco */}
-                <div className="stagger flex flex-col gap-2">
+                <div className="home-list stagger flex flex-col gap-2">
                     {list.map((p) => (
                         <button key={p.id} onClick={() => setSelectedPatientId(p.id)} className="patient-row group">
                             <span className="patient-avatar">
