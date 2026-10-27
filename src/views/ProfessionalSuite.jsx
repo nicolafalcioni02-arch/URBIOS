@@ -20,8 +20,10 @@ const BarBtn = ({ icon, label, note, badge, onClick, className = '' }) => (
             {badge && <span className="hq-badge">{badge}</span>}
         </span>
         <span className="hq-text">
-            <span className="hq-name">{label}</span>
-            {note && <span className="hq-note">{note}</span>}
+            <span className="hq-tip">
+                <span className="hq-name">{label}</span>
+                {note && <span className="hq-note">{note}</span>}
+            </span>
         </span>
     </button>
 );

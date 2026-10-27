@@ -334,22 +334,22 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: #000; b
 .home-quiet:hover { background: var(--soft); color: var(--ink); }
 .home-quiet:active { transform: scale(.95); }
 
-/* Barra alta: solo icone. Al passaggio la voce si ingrandisce come sotto una lente:
-   lo sfondo nasce piccolo, si deforma e si assesta, l'icona cresce e il nome si apre accanto (con la nota sotto). */
-.hq { position: relative; isolation: isolate; gap: 0; padding: 0 10px; background: transparent !important;
-    transition: gap .5s var(--ease), padding .5s var(--ease), color .2s, transform .2s var(--ease); }
+/* Barra alta: solo icone, tasti di misura fissa (niente si sposta sotto il puntatore).
+   Al passaggio dietro l'icona nasce la "lente" (si deforma e si assesta) e sotto compare il nome, con la nota. */
+.hq { position: relative; isolation: isolate; justify-content: center; width: 38px; padding: 0; background: transparent !important; transition: color .2s; }
 .hq::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 999px; background: var(--soft);
     opacity: 0; transform: scale(.5); transition: opacity .25s, transform .5s var(--ease); }
-.hq:is(:hover, :focus-visible) { gap: 8px; padding: 0 15px 0 12px; color: var(--ink); }
+.hq:is(:hover, :focus-visible) { color: var(--ink); }
 .hq:is(:hover, :focus-visible)::before { opacity: 1; transform: none; animation: hq-lens .75s var(--ease); }
 .hq-ico { position: relative; display: inline-grid; place-items: center; }
-.hq-ico i { transition: font-size .5s var(--ease); }
-.hq:is(:hover, :focus-visible) .hq-ico i { font-size: 23px; }
-.hq-text { display: flex; flex-direction: column; align-items: flex-start; max-width: 0; overflow: hidden; white-space: nowrap; line-height: 1.05;
-    opacity: 0; transition: max-width .5s var(--ease), opacity .2s; }
-.hq:is(:hover, :focus-visible) .hq-text { max-width: 130px; opacity: 1; }
-.hq-note { margin-top: 3px; height: 13px; padding: 0 5px; border-radius: 999px; background: var(--ink); color: var(--surface);
-    font-size: 9px; font-weight: 600; letter-spacing: .02em; display: inline-flex; align-items: center; }
+/* etichetta: centrata con l'impaginazione (niente translate, che la mette su mezzo pixel e sfoca il testo) */
+.hq-text { position: absolute; top: calc(100% + 6px); left: -70px; right: -70px; z-index: 20; pointer-events: none;
+    display: flex; justify-content: center; opacity: 0; visibility: hidden; transition: opacity .15s, visibility 0s .15s; }
+.hq:is(:hover, :focus-visible) .hq-text { opacity: 1; visibility: visible; transition: opacity .15s; }
+.hq-tip { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 12px; white-space: nowrap; line-height: 1.05; font-size: 14.5px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 8px 24px rgba(18, 19, 23, .08); color: var(--ink); }
+.hq-note { height: 15px; padding: 0 6px; border-radius: 999px; background: var(--ink); color: var(--surface);
+    font-size: 10px; font-weight: 600; letter-spacing: .02em; display: inline-flex; align-items: center; }
 .hq-badge { position: absolute; top: -6px; right: -9px; min-width: 15px; height: 15px; padding: 0 4px; border-radius: 999px;
     background: var(--ink); color: var(--surface); font-size: 9.5px; font-weight: 600; display: grid; place-items: center; }
 @keyframes hq-lens {

@@ -261,3 +261,7 @@ html[data-look='vetro'] body :is(.vw-back, .vw-next, .vw-chip, .home-quiet, .m-i
 /* barra alta: il vetro della voce sta nella "lente" (::before, vedi .hq in index.css), non sul tasto */
 html[data-look='vetro'] .home-quiet.hq:hover { box-shadow: none; }
 html[data-look='vetro'] .hq::before { background: var(--lg-fill-hover); box-shadow: var(--lg-rim), var(--lg-drop); }
+/* niente vetro su vetro: l'etichetta sta dentro la barra, quindi materiale chiaro e testo nitido */
+html[data-look='vetro'] .hq-tip { background: rgba(255, 255, 255, 0.92); border: 0; box-shadow: var(--lg-rim), var(--lg-drop); font-weight: 400; }
+/* la pillola di vetro ha 8px di bordo attorno ai tasti: l'etichetta scende un po' di più per staccarsi */
+html[data-look='vetro'] .hq-text { top: calc(100% + 18px); }
