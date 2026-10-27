@@ -30,8 +30,7 @@ const Preview = ({ look }) => {
     );
 };
 
-export const LookTab = ({ tab, db, onUpdateDb }) => {
-    if (tab !== 'aspetto') return null;
+export const LookTab = ({ db, onUpdateDb }) => {
     const current = lookOf(db);
     const pick = (id) => onUpdateDb((prev) => ({ ...prev, aspetto: id }));
 
