@@ -1,5 +1,7 @@
 import React from 'react';
-import { LOOKS, lookOf } from '../../../looks/looks';
+import { LOOKS, lookOf } from '../../../../looks/looks';
+import { Page } from '../../ui/kit';
+import { Icon } from '../../ui/icons';
 
 // Mini anteprima disegnata con i colori dell'aspetto (niente immagini)
 const Preview = ({ look }) => {
@@ -34,11 +36,7 @@ export const LookTab = ({ tab, db, onUpdateDb }) => {
     const pick = (id) => onUpdateDb((prev) => ({ ...prev, aspetto: id }));
 
     return (
-        <div className="fade-enter">
-            <h3 className="text-[22px] font-semibold text-[color:var(--ink)]">Aspetto</h3>
-            <p className="text-[14px] text-[color:var(--muted)] mt-1 mb-6">
-                Cambia solo l'aspetto delle schermate: dati, funzioni e stampe restano gli stessi. La scelta si salva nel file archivio.
-            </p>
+        <Page title="Aspetto" intro="Cambia solo l'aspetto delle schermate: dati, funzioni e stampe restano gli stessi. La scelta si salva nel file archivio.">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {LOOKS.map((look) => {
                     const on = look.id === current;
@@ -46,8 +44,8 @@ export const LookTab = ({ tab, db, onUpdateDb }) => {
                         <button
                             key={look.id}
                             onClick={() => pick(look.id)}
-                            className="text-left rounded-2xl p-3 bg-white transition-all"
-                            style={{ border: on ? '2px solid var(--ink)' : '2px solid transparent', boxShadow: on ? '0 10px 30px -12px rgba(0,0,0,.35)' : undefined }}
+                            className="text-left rounded-2xl p-3 transition-all"
+                            style={{ background: 'var(--surface)', border: on ? '1.5px solid var(--ink)' : '1.5px solid var(--line)' }}
                         >
                             <Preview look={look} />
                             <div className="flex items-center justify-between gap-2 mt-3 px-1">
@@ -56,16 +54,16 @@ export const LookTab = ({ tab, db, onUpdateDb }) => {
                                     <div className="text-[12.5px] text-[color:var(--muted)] leading-snug">{look.sub}</div>
                                 </div>
                                 <span
-                                    className="flex-none w-6 h-6 rounded-full grid place-items-center text-[13px]"
+                                    className="flex-none w-6 h-6 rounded-full grid place-items-center"
                                     style={{ background: on ? 'var(--ink)' : 'transparent', color: '#fff', border: on ? 'none' : '1.5px solid #CFCCC5' }}
                                 >
-                                    {on && <i className="ph-bold ph-check"></i>}
+                                    {on && <Icon name="check" size={14} stroke={2.2} />}
                                 </span>
                             </div>
                         </button>
                     );
                 })}
             </div>
-        </div>
+        </Page>
     );
 };

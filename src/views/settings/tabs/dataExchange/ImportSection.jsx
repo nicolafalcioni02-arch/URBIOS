@@ -4,7 +4,7 @@ import { mergeIncoming, defaultMergeOptions } from '../../../../dataExchange/imp
 import { CSV_TEMPLATES } from '../../../../dataExchange/import/csvImport';
 import { toCsv } from '../../../../dataExchange/csv';
 import { readFileAsText, downloadBlob } from '../../../../storage/fileIO';
-import { Section, Check, Radio, Btn } from './ui';
+import { Group as Section, Check, Radio, Btn, Note } from '../../ui/kit';
 
 const errText = (e) =>
     ({
@@ -95,21 +95,21 @@ export const ImportSection = ({ db, onUpdateDb }) => {
                 hint="URBIOS riconosce da solo il contenuto: archivio o esportazione URBIOS (.json), tabelle CSV di pazienti, visite, alimenti, esercizi e formule. I dati vengono UNITI a quelli attuali, senza cancellare nulla."
             >
                 <input ref={input} type="file" accept=".json,.csv,.txt,text/csv,application/json" onChange={onFile} className="hidden" />
-                <Btn onClick={() => input.current.click()} disabled={busy}>
+                <Btn icon="upload" onClick={() => input.current.click()} disabled={busy}>
                     {busy ? 'Lettura…' : 'Scegli un file…'}
                 </Btn>
-                {file && <span className="ml-3 text-sm text-gray-600">{file.name}</span>}
-                {error && <p className="text-sm text-red-600 mt-3">{error}</p>}
+                {file && <span className="ml-3 st-hint">{file.name}</span>}
+                {error && <p className="st-error mt-3">{error}</p>}
 
                 {res && res.needsSecret && (
                     <div className="mt-4">
-                        <p className="text-sm text-gray-700 mb-2">Questo archivio è protetto: inserisci la sua password.</p>
+                        <p className="st-text mb-2">Questo archivio è protetto: inserisci la sua password.</p>
                         <input
                             type="password"
                             value={secret}
                             onChange={(e) => setSecret(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && analyze(file, secret)}
-                            className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm mr-2 outline-none focus:border-black"
+                            className="fld !w-auto mr-2"
                             placeholder="Password dell'archivio"
                             autoComplete="off"
                         />
@@ -120,22 +120,22 @@ export const ImportSection = ({ db, onUpdateDb }) => {
                 )}
 
                 {res && res.kind === 'sconosciuto' && (
-                    <p className="text-sm text-red-600 mt-3">
+                    <p className="st-error mt-3">
                         Formato non riconosciuto. Controlla che sia un file URBIOS o un CSV con le intestazioni dei modelli qui sotto.
                     </p>
                 )}
 
                 {inc && (
-                    <div className="mt-4 bg-white border border-gray-200 rounded-2xl p-4">
-                        <p className="text-sm font-bold text-gray-900">{KIND_LABEL[res.kind]}</p>
-                        <p className="text-xs text-gray-600 mb-3">
+                    <div className="mt-4 st-box">
+                        <p className="text-[14px] font-semibold text-[color:var(--ink)]">{KIND_LABEL[res.kind]}</p>
+                        <p className="st-hint mb-3">
                             {describe(inc)}
                             {res.anonymized ? ' · esportazione ANONIMA' : ''}
                         </p>
 
                         {inc.pazienti && (
                             <>
-                                <p className="text-[11px] font-bold text-gray-500 mb-1">Se un paziente esiste già</p>
+                                <p className="st-sub">Se un paziente esiste già</p>
                                 <Radio
                                     name="conf"
                                     value="merge"
@@ -165,14 +165,14 @@ export const ImportSection = ({ db, onUpdateDb }) => {
                                     onChange={(v) => setOpts({ ...opts, conflict: v })}
                                     label="Importa come nuovo paziente (duplicato)"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="st-hint mt-1">
                                     Lo stesso paziente viene riconosciuto da ID, codice fiscale oppure nome + cognome + data di nascita.
                                 </p>
                             </>
                         )}
                         {hasLib && (
                             <div className="mt-3">
-                                <p className="text-[11px] font-bold text-gray-500 mb-1">
+                                <p className="st-sub">
                                     Archivi (si aggiungono solo le voci mancanti)
                                 </p>
                                 {inc.diet_food_db && <Check label="Alimenti" checked={opts.libraries.foods} onChange={lib('foods')} />}
@@ -195,9 +195,10 @@ export const ImportSection = ({ db, onUpdateDb }) => {
                         {!inc.pazienti && res.kind !== 'archivio' && null}
 
                         {preview && (
-                            <div className="mt-3 text-sm bg-gray-50 rounded-xl p-3 border border-gray-200">
-                                <p className="font-bold text-gray-800 mb-1">Anteprima: cosa succederà</p>
-                                <ul className="list-disc pl-5 text-gray-700">
+                            <div className="mt-3 st-note">
+                                <div className="min-w-0">
+                                <p className="st-note-title">Anteprima: cosa succederà</p>
+                                <ul className="list-disc pl-5">
                                     {preview.patientsAdded > 0 && <li>{preview.patientsAdded} pazienti nuovi</li>}
                                     {preview.patientsMerged > 0 && <li>{preview.patientsMerged} pazienti già presenti aggiornati</li>}
                                     {preview.patientsReplaced > 0 && <li>{preview.patientsReplaced} pazienti sostituiti</li>}
@@ -206,7 +207,7 @@ export const ImportSection = ({ db, onUpdateDb }) => {
                                     {preview.visitsAdded > 0 && <li>{preview.visitsAdded} visite aggiunte</li>}
                                     {preview.visitsSkipped > 0 && <li>{preview.visitsSkipped} visite già presenti (ignorate)</li>}
                                     {preview.orphans > 0 && (
-                                        <li className="text-red-700">
+                                        <li className="text-[color:var(--bad)]">
                                             {preview.orphans} visite ignorate: il paziente non esiste (importa prima la tabella pazienti)
                                         </li>
                                     )}
@@ -219,16 +220,17 @@ export const ImportSection = ({ db, onUpdateDb }) => {
                                     {Object.entries(preview).every(([k, v]) => k === 'possibleDuplicates' || !v) && <li>Niente di nuovo da importare.</li>}
                                 </ul>
                                 {preview.possibleDuplicates.length > 0 && (
-                                    <p className="text-xs text-amber-800 mt-1">
+                                    <p className="mt-1 text-[color:var(--warn)]">
                                         Riconosciuti come già presenti (ID diverso): {preview.possibleDuplicates.slice(0, 5).join(', ')}
                                     </p>
                                 )}
+                                </div>
                             </div>
                         )}
                         <div className="mt-4 flex gap-2">
-                            <Btn onClick={apply}>Importa</Btn>
+                            <Btn icon="check" onClick={apply}>Importa</Btn>
                             <Btn
-                                variant="light"
+                                variant="secondary"
                                 onClick={() => {
                                     setRes(null);
                                     setFile(null);
@@ -241,12 +243,11 @@ export const ImportSection = ({ db, onUpdateDb }) => {
                 )}
 
                 {done && (
-                    <div className="mt-4 bg-green-50 border border-green-200 rounded-2xl p-4 text-sm text-green-900">
-                        <p className="font-bold">Importazione completata.</p>
+                    <Note tone="ok" title="Importazione completata." className="mt-4">
                         <p>
                             Ricorda di <strong>salvare l'archivio</strong> (pulsante in basso a sinistra) per rendere le modifiche permanenti nel tuo file.
                         </p>
-                    </div>
+                    </Note>
                 )}
             </Section>
 
@@ -256,7 +257,7 @@ export const ImportSection = ({ db, onUpdateDb }) => {
             >
                 <div className="flex flex-wrap gap-2">
                     {Object.keys(CSV_TEMPLATES).map((k) => (
-                        <Btn key={k} variant="light" onClick={() => template(k)}>
+                        <Btn key={k} variant="secondary" size="sm" icon="download" onClick={() => template(k)}>
                             Modello {k}
                         </Btn>
                     ))}

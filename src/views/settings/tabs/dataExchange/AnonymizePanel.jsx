@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { PATIENT_FIELDS, BIRTH_MODES, DATE_MODES, ID_MODES, detectFreeTextKeys, defaultAnonOptions } from '../../../../dataExchange/anonymize';
-import { Check, Select, Btn } from './ui';
+import { Check, Select, Btn, Note } from '../../ui/kit';
 
 const groups = PATIENT_FIELDS.reduce((acc, f) => ((acc[f.group] = acc[f.group] || []).push(f), acc), {});
 
@@ -20,20 +20,20 @@ export const AnonymizePanel = ({ db, value, onChange }) => {
         });
 
     return (
-        <div className="mt-4 bg-white border border-gray-200 rounded-2xl p-5">
+        <div className="mt-3 st-box">
             <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="text-xs font-bold text-gray-600">Impostazioni di partenza:</span>
-                <Btn variant="light" onClick={() => onChange(defaultAnonOptions())}>
+                <span className="st-sub !mb-0 mr-1">Parti da:</span>
+                <Btn variant="secondary" size="sm" onClick={() => onChange(defaultAnonOptions())}>
                     Rigorosa (consigliata)
                 </Btn>
-                <Btn variant="light" onClick={loose}>
+                <Btn variant="secondary" size="sm" onClick={loose}>
                     Solo anagrafica
                 </Btn>
             </div>
 
             {Object.entries(groups).map(([g, fields]) => (
                 <div key={g} className="mb-3">
-                    <p className="text-[11px] font-bold text-gray-500 mb-1">{g} · spunta ciò che va RIMOSSO</p>
+                    <p className="st-sub">{g} · spunta ciò che va rimosso</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
                         {fields.map((f) => (
                             <Check key={f.key} label={f.label} checked={value.removeFields[f.key]} onChange={(v) => setField(f.key, v)} />
@@ -44,15 +44,15 @@ export const AnonymizePanel = ({ db, value, onChange }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
                 <div>
-                    <p className="text-[11px] font-bold text-gray-500 mb-1">Data di nascita</p>
+                    <p className="st-sub">Data di nascita</p>
                     <Select value={value.birth} onChange={(v) => set({ birth: v })} options={BIRTH_MODES} />
                 </div>
                 <div>
-                    <p className="text-[11px] font-bold text-gray-500 mb-1">Date delle visite</p>
+                    <p className="st-sub">Date delle visite</p>
                     <Select value={value.dates} onChange={(v) => set({ dates: v })} options={DATE_MODES} />
                 </div>
                 <div>
-                    <p className="text-[11px] font-bold text-gray-500 mb-1">ID paziente</p>
+                    <p className="st-sub">ID paziente</p>
                     <Select value={value.idMode} onChange={(v) => set({ idMode: v })} options={ID_MODES} />
                 </div>
             </div>
@@ -68,7 +68,7 @@ export const AnonymizePanel = ({ db, value, onChange }) => {
                     {detected.map((k) => (
                         <Check
                             key={k}
-                            label={<code className="text-xs">{k}</code>}
+                            label={<code className="st-mono">{k}</code>}
                             checked={keys.includes(k)}
                             onChange={(v) => set({ freeTextKeys: v ? [...new Set([...keys, k])] : keys.filter((x) => x !== k) })}
                         />
@@ -83,11 +83,11 @@ export const AnonymizePanel = ({ db, value, onChange }) => {
             />
             <Check label="Includi i dati del professionista / studio" checked={value.includeProfessional} onChange={(v) => set({ includeProfessional: v })} />
 
-            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3 mt-3">
+            <Note tone="warn" className="mt-3">
                 Togliere i nomi non rende i dati <strong>anonimi in senso assoluto</strong>: età, patologia e città insieme possono rendere riconoscibile una
                 persona. Per la ricerca tieni il minimo necessario. Le date esatte e gli ID visita (che nascondono data e ora) vengono comunque
                 rimossi/rinumerati quando scegli le date relative.
-            </p>
+            </Note>
         </div>
     );
 };

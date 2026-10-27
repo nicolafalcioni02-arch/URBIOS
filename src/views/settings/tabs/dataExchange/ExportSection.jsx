@@ -3,7 +3,7 @@ import { buildExport, packExport, keyTableCsv, defaultExportOptions } from '../.
 import { defaultAnonOptions } from '../../../../dataExchange/anonymize';
 import { downloadBlob } from '../../../../storage/fileIO';
 import { AnonymizePanel } from './AnonymizePanel';
-import { Section, Check, Radio, Btn } from './ui';
+import { Group as Section, Check, Radio, Btn, Note } from '../../ui/kit';
 
 const PRESETS = {
     excel: {
@@ -107,7 +107,7 @@ export const ExportSection = ({ db }) => {
                             key={k}
                             onClick={() => applyPreset(k)}
                             title={p.hint}
-                            className="px-4 py-2 rounded-xl border border-gray-300 bg-white text-sm font-bold hover:bg-black hover:text-white transition-all"
+                            className="st-btn is-secondary is-sm"
                         >
                             {p.label}
                         </button>
@@ -157,22 +157,22 @@ export const ExportSection = ({ db }) => {
                 <Radio name="scope" value="all" current={mode} onChange={setMode} label={`Tutti i pazienti (${patients.length})`} />
                 <Radio name="scope" value="selected" current={mode} onChange={setMode} label="Solo alcuni pazienti" />
                 {mode === 'selected' && (
-                    <div className="mt-2 bg-white border border-gray-200 rounded-xl p-3">
+                    <div className="mt-2 st-box">
                         <div className="flex gap-2 mb-2 flex-wrap">
                             <input
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Cerca per nome o ID…"
-                                className="flex-1 min-w-[10rem] border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-black"
+                                className="fld flex-1 min-w-[10rem]"
                             />
-                            <Btn variant="light" onClick={() => setSelected([...new Set([...selected, ...shown.map((p) => String(p.id))])])}>
+                            <Btn variant="secondary" size="sm" onClick={() => setSelected([...new Set([...selected, ...shown.map((p) => String(p.id))])])}>
                                 Seleziona i visibili
                             </Btn>
-                            <Btn variant="light" onClick={() => setSelected([])}>
+                            <Btn variant="secondary" size="sm" onClick={() => setSelected([])}>
                                 Nessuno
                             </Btn>
                         </div>
-                        <div className="max-h-52 overflow-y-auto divide-y divide-gray-100">
+                        <div className="max-h-52 overflow-y-auto st-list">
                             {shown.map((p) => (
                                 <Check
                                     key={p.id}
@@ -182,9 +182,9 @@ export const ExportSection = ({ db }) => {
                                     onChange={(v) => setSelected(v ? [...selected, String(p.id)] : selected.filter((x) => x !== String(p.id)))}
                                 />
                             ))}
-                            {shown.length === 0 && <p className="text-xs text-gray-500 py-2">Nessun paziente trovato.</p>}
+                            {shown.length === 0 && <p className="st-hint py-2">Nessun paziente trovato.</p>}
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">{selected.length} selezionati</p>
+                        <p className="st-hint mt-2">{selected.length} selezionati</p>
                     </div>
                 )}
             </Section>
@@ -199,22 +199,21 @@ export const ExportSection = ({ db }) => {
                 {anonOn && <AnonymizePanel db={db} value={anon} onChange={setAnon} />}
             </Section>
 
-            <div className="flex flex-wrap items-center gap-3">
-                <Btn onClick={run} disabled={busy || (mode === 'selected' && selected.length === 0 && !include.archivi)}>
+            <div className="flex flex-wrap items-center gap-3 mt-5">
+                <Btn icon="download" onClick={run} disabled={busy || (mode === 'selected' && selected.length === 0 && !include.archivi)}>
                     {busy ? 'Preparazione…' : `Esporta${anonOn ? ' (anonimo)' : ''} · ${count} pazienti`}
                 </Btn>
-                {error && <span className="text-sm text-red-600">{error}</span>}
+                {error && <span className="st-error">{error}</span>}
             </div>
 
             {last && (
-                <div className="mt-4 bg-green-50 border border-green-200 rounded-2xl p-4 text-sm text-gray-800">
-                    <p className="font-bold text-green-800 mb-1">Esportazione pronta: {last.name}</p>
+                <Note tone="ok" title={`Esportazione pronta: ${last.name}`} className="mt-4">
                     <p>
                         {last.res.stats.patients} pazienti · {last.res.stats.visits} visite · {last.res.files.length - 1} file
                     </p>
                     {last.res.report && (
-                        <div className="mt-2 text-xs text-gray-700">
-                            <p className="font-bold">Anonimizzazione applicata:</p>
+                        <div className="mt-2">
+                            <p className="font-semibold">Anonimizzazione applicata:</p>
                             <ul className="list-disc pl-5">
                                 {Object.entries(last.res.report.removedFields).map(([k, n]) => (
                                     <li key={k}>
@@ -224,21 +223,21 @@ export const ExportSection = ({ db }) => {
                                 {last.res.report.maskedHits > 0 && <li>Nomi/identificativi mascherati nei testi rimasti: {last.res.report.maskedHits}</li>}
                             </ul>
                             {last.res.report.warnings.map((w) => (
-                                <p key={w} className="text-amber-800 mt-1">
-                                    ⚠ {w}
+                                <p key={w} className="mt-1 text-[color:var(--warn)]">
+                                    {w}
                                 </p>
                             ))}
                         </div>
                     )}
                     {last.res.keyTable.length > 0 && (
                         <div className="mt-3">
-                            <Btn variant="light" onClick={downloadKey}>
+                            <Btn variant="secondary" size="sm" onClick={downloadKey}>
                                 Scarica la tabella di corrispondenza codici ↔ pazienti
                             </Btn>
-                            <p className="text-xs text-red-700 mt-1">Tienila separata e NON condividerla: permette di risalire ai pazienti.</p>
+                            <p className="st-hint mt-1">Tienila separata e NON condividerla: permette di risalire ai pazienti.</p>
                         </div>
                     )}
-                </div>
+                </Note>
             )}
         </div>
     );

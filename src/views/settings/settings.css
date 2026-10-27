@@ -1,0 +1,101 @@
+/* Impostazioni: tutto lo stile delle schede (prefisso st-). Solo token di index.css, cosi' anche l'aspetto Vetro funziona. */
+
+.st-svg { flex: none; }
+
+/* --- guscio (PC/tablet) --- */
+.st-shell { background: var(--surface); }
+.st-side { background: var(--paper); border-right: 1px solid var(--line); }
+.st-side-group + .st-side-group { margin-top: 18px; }
+.st-side-label { padding: 0 10px 6px; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.st-side .set-side { padding: 8px 10px; gap: 11px; }
+.st-side .set-side .st-svg { color: var(--muted); flex: none; transition: color .2s; }
+.st-side .set-side.on .st-svg, .st-side .set-side:hover .st-svg { color: var(--ink); }
+.st-side .set-side .st-side-text { font-size: 14px; font-weight: 500; line-height: 1.2; }
+.st-side .set-side.on .st-side-text { font-weight: 600; }
+
+/* icona monocroma delle righe su telefono (al posto dei quadratini colorati) */
+.st-ico { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border-radius: 9px; background: var(--soft); color: var(--ink); }
+
+/* --- pagina --- */
+.st-page { max-width: 760px; margin: 0 auto; padding-bottom: 48px; }
+.st-page.is-narrow { max-width: 580px; }
+.st-page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; padding-right: 48px; }
+.st-title { font-size: 24px; font-weight: 600; letter-spacing: -.02em; line-height: 1.15; color: var(--ink); }
+.st-intro { margin-top: 6px; font-size: 14px; line-height: 1.5; color: var(--muted); max-width: 60ch; }
+.st-page-actions { display: flex; gap: 8px; flex: none; }
+.m-settings .st-page-head { padding-right: 0; }
+.m-settings .st-title { display: none; } /* su telefono il titolo e' gia' nella barra in alto */
+
+/* --- gruppi --- */
+.st-group + .st-group, .st-page > .st-note + .st-group, .st-group + .st-note { margin-top: 14px; }
+.st-group-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+.st-group-head:last-child { margin-bottom: 0; }
+.st-group-ico { color: var(--muted); margin-top: 1px; flex: none; }
+.st-group-title { font-size: 15px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
+.st-hint { margin-top: 3px; font-size: 13px; line-height: 1.45; color: var(--muted); }
+.st-label { font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.st-sub { font-size: 12.5px; font-weight: 600; color: var(--muted); margin: 0 0 6px; }
+.st-text { font-size: 14px; line-height: 1.55; color: var(--ink); }
+.st-muted { color: var(--muted); }
+.st-divider { height: 1px; background: var(--line); margin: 16px 0; }
+.st-box { border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: var(--surface); }
+.st-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+
+/* --- bottoni --- */
+.st-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 40px; padding: 0 16px; border-radius: 12px; font-size: 14px; font-weight: 500; white-space: nowrap;
+    transition: background-color .15s, border-color .15s, color .15s, transform .12s var(--ease); }
+.st-btn:active:not(:disabled) { transform: scale(.97); }
+.st-btn:disabled { opacity: .45; cursor: not-allowed; }
+.st-btn.is-sm { height: 32px; padding: 0 12px; font-size: 13px; border-radius: 10px; }
+.st-btn.is-primary { background: var(--ink); color: #fff; }
+.st-btn.is-primary:hover:not(:disabled) { background: #2a2b30; }
+.st-btn.is-secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.st-btn.is-secondary:hover:not(:disabled) { border-color: var(--ink); }
+.st-btn.is-ghost { color: var(--ink); padding: 0 10px; }
+.st-btn.is-ghost:hover:not(:disabled) { background: var(--soft); }
+.st-btn.is-danger { background: var(--surface); color: var(--bad); border: 1px solid var(--line); }
+.st-btn.is-danger:hover:not(:disabled) { border-color: var(--bad); }
+.st-iconbtn { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 999px; color: var(--muted); transition: background-color .15s, color .15s; }
+.st-iconbtn:hover { background: var(--soft); color: var(--ink); }
+.st-iconbtn.is-close { background: var(--soft); color: var(--ink); }
+.st-iconbtn.is-close:hover { background: var(--line); }
+.st-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* --- scelte --- */
+.st-choice { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; font-size: 14px; color: var(--ink); cursor: pointer; }
+.st-choice.is-off { opacity: .5; cursor: default; }
+.st-choice input { margin-top: 2px; width: 16px; height: 16px; flex: none; accent-color: var(--ink); }
+.st-choice-hint { display: block; font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+.st-seg { display: inline-flex; padding: 3px; border-radius: 12px; background: var(--soft); }
+.st-seg button { height: 34px; padding: 0 18px; border-radius: 9px; font-size: 14px; font-weight: 500; color: var(--muted); transition: background-color .2s, color .2s, box-shadow .2s; }
+.st-seg button.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(18,19,23,.1); }
+
+/* --- note e stati (colore solo nel filo e nell'icona) --- */
+.st-note { display: flex; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--soft); border-left: 2px solid var(--muted); font-size: 13px; line-height: 1.5; color: var(--ink); }
+.st-note-ico { flex: none; margin-top: 1px; color: var(--muted); }
+.st-note-title { font-weight: 600; margin-bottom: 2px; }
+.st-note.is-ok { border-left-color: var(--ok); } .st-note.is-ok .st-note-ico { color: var(--ok); }
+.st-note.is-warn { border-left-color: var(--warn); } .st-note.is-warn .st-note-ico { color: var(--warn); }
+.st-note.is-bad { border-left-color: var(--bad); } .st-note.is-bad .st-note-ico { color: var(--bad); }
+.st-status { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 500; color: var(--ink); }
+.st-status::before { content: ''; width: 7px; height: 7px; border-radius: 99px; background: var(--muted); }
+.st-status.is-ok::before { background: var(--ok); }
+.st-status.is-warn::before { background: var(--warn); }
+.st-status.is-bad::before { background: var(--bad); }
+.st-error { font-size: 13px; color: var(--bad); }
+
+/* --- elenco (formule, pazienti) --- */
+.st-list { display: flex; flex-direction: column; }
+.st-list > * + * { border-top: 1px solid var(--line); }
+.st-item { position: relative; padding: 14px 44px 14px 0; }
+.st-item .st-item-del { position: absolute; top: 10px; right: 0; opacity: 0; transition: opacity .15s; }
+.st-item:hover .st-item-del, .st-item .st-item-del:focus-visible { opacity: 1; }
+@media (hover: none) { .st-item .st-item-del { opacity: 1; } }
+.st-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; background: var(--soft); font-size: 11.5px; font-weight: 500; color: var(--muted); }
+.st-code { margin-top: 8px; padding: 8px 10px; border-radius: 9px; background: var(--paper); border: 1px solid var(--line); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: var(--ink); overflow-x: auto; }
+.st-empty { padding: 32px 16px; text-align: center; font-size: 14px; color: var(--muted); border: 1px dashed var(--line); border-radius: 14px; }
+
+@media (max-width: 639px) {
+    .st-page { padding-bottom: 24px; }
+    .st-page-head { margin-bottom: 14px; }
+}

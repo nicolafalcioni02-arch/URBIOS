@@ -1,14 +1,14 @@
 import React from 'react';
-import { Card } from '../../../../../components/ui/Card';
+import { Group } from '../../../ui/kit';
 import { TextAreaGroup } from '../../../../../components/ui/InputGroup';
 
 export const ReportTextsSection = ({ localUser, updateUser }) => {
     return (
-        <Card title="4. Testi per Report & Documenti" icon="ph-file-text">
+        <Group title="Testi di report e documenti" icon="document" hint="Compaiono in fondo e in apertura dei documenti stampati.">
             <div className="space-y-4">
-                <TextAreaGroup label="Testo Footer Report (Piè di pagina)" rows={2} value={localUser.footer} name="footer" onChange={updateUser} />
+                <TextAreaGroup label="Testo footer report (piè di pagina)" rows={2} value={localUser.footer} name="footer" onChange={updateUser} />
                 <TextAreaGroup
-                    label="Disclaimer Medico / Legale"
+                    label="Disclaimer medico / legale"
                     placeholder="Es. Il presente piano non sostituisce..."
                     rows={3}
                     value={localUser.disclaimer_report}
@@ -16,7 +16,7 @@ export const ReportTextsSection = ({ localUser, updateUser }) => {
                     onChange={updateUser}
                 />
                 <TextAreaGroup
-                    label="Testo Standard Relazioni Cliniche"
+                    label="Testo standard relazioni cliniche"
                     placeholder="Intro standard..."
                     rows={3}
                     value={localUser.testo_relazioni}
@@ -24,6 +24,6 @@ export const ReportTextsSection = ({ localUser, updateUser }) => {
                     onChange={updateUser}
                 />
             </div>
-        </Card>
+        </Group>
     );
 };

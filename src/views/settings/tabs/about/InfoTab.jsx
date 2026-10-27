@@ -1,5 +1,6 @@
 import React from 'react';
-import { ShaderCanvas } from '../../../components/visuals/ShaderCanvas';
+import { ShaderCanvas } from '../../../../components/visuals/ShaderCanvas';
+import { Label } from '../../ui/kit';
 
 const TEAM = [
     { name: 'Nicola Falcioni', title: 'Dott.', role: 'Chief Executive Officer' },
@@ -31,8 +32,7 @@ const Laurel = ({ flip }) => {
 };
 const initials = (n) => n.split(' ').map((w) => w[0]).join('');
 
-export const InfoTab = ({ tab }) => {
-    if (tab !== 'info') return null;
+export const InfoTab = () => {
     return (
         <div className="fade-enter max-w-xl mx-auto py-6 md:py-10 text-center">
             <div className="mx-auto rounded-full overflow-hidden" style={{ width: 112, height: 112, boxShadow: '0 14px 34px rgba(18,19,23,.14)' }}>
@@ -42,12 +42,12 @@ export const InfoTab = ({ tab }) => {
             <p className="mt-2 text-[15px] text-[color:var(--muted)]">La piattaforma per nutrizionisti che vogliono crescere</p>
 
             {/* riconoscimento */}
-            <div className="mt-8 rounded-[22px] px-4 py-6 text-center" style={{ background: 'radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--warn) 22%, #fff), transparent 70%), var(--surface)', boxShadow: 'inset 0 0 0 .5px color-mix(in srgb, var(--warn) 35%, var(--line))' }}>
-                <div className="flex items-center justify-center gap-2" style={{ color: 'color-mix(in srgb, var(--warn) 70%, #fff)' }}>
+            <div className="panel mt-8 !py-6 text-center">
+                <div className="flex items-center justify-center gap-2" style={{ color: 'var(--muted)' }}>
                     <Laurel />
                     <div className="min-w-0 text-center">
                         <p className="text-[11px] font-semibold tracking-[0.3em] text-[color:var(--muted)]">VINCITORE</p>
-                        <p className="mt-1 text-[22px] font-semibold leading-tight" style={{ color: 'var(--warn)' }}>
+                        <p className="mt-1 text-[22px] font-semibold leading-tight text-[color:var(--ink)]">
                             Impresa in Aula
                         </p>
                     </div>
@@ -58,7 +58,7 @@ export const InfoTab = ({ tab }) => {
             </div>
 
             {/* team */}
-            <h2 className="mt-9 mb-3 text-left text-[12px] font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)]">Il team</h2>
+            <Label className="mt-9 text-left">Il team</Label>
             <div className="m-group !mx-0 text-left">
                 {TEAM.map((p) => (
                     <div key={p.name} className="m-row !cursor-default" >
@@ -76,7 +76,7 @@ export const InfoTab = ({ tab }) => {
             </div>
 
             {/* manifesto */}
-            <h2 className="mt-9 mb-3 text-left text-[12px] font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)]">Il nostro manifesto</h2>
+            <Label className="mt-9 text-left">Il nostro manifesto</Label>
             <div className="text-left space-y-3 text-[14px] leading-relaxed text-[color:var(--ink)]">
                 <p className="display text-[22px]">
                     Libertà. Cultura.
@@ -97,7 +97,7 @@ export const InfoTab = ({ tab }) => {
             </div>
 
             {/* identita' del nome */}
-            <h2 className="mt-9 mb-3 text-left text-[12px] font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)]">L'identità del nome</h2>
+            <Label className="mt-9 text-left">L'identità del nome</Label>
             <div className="text-left space-y-3 text-[14px] leading-relaxed text-[color:var(--ink)]">
                 <p>URBIOS non è un nome scelto per caso, ma l’esatta sintesi della sua identità e della sua missione.</p>
                 <ul className="space-y-2">
@@ -113,9 +113,9 @@ export const InfoTab = ({ tab }) => {
                 </ul>
                 <p>Ma c'è un segreto finale, un sigillo invisibile impresso nella parola stessa. Osserva l'inizio e la fine, la prima e l'ultima lettera che lo aprono e lo chiudono:</p>
                 <p className="text-center text-[30px] leading-none font-semibold tracking-[0.18em]">
-                    <span style={{ color: 'var(--accent)' }}>U</span>
+                    <span>U</span>
                     <span className="text-[color:var(--muted)] text-[22px]">RBIO</span>
-                    <span style={{ color: 'var(--accent)' }}>S</span>
+                    <span>S</span>
                 </p>
                 <p className="text-center text-[17px] font-semibold">US. Noi.</p>
                 <p>Non è una coincidenza. URBIOS non è «mio» né «tuo»: è un’entità plurale e corale. È il <b>Noi</b> degli studenti che hanno rifiutato di arrendersi ai limiti imposti dai costi; è il <b>Noi</b> dei docenti che credono nella formazione libera; è il <b>Noi</b> dei professionisti che domani utilizzeranno questo strumento per fare la differenza sul territorio.</p>
@@ -124,7 +124,7 @@ export const InfoTab = ({ tab }) => {
             </div>
 
             {/* ringraziamento */}
-            <h2 className="mt-9 mb-3 text-left text-[12px] font-semibold uppercase tracking-[0.12em] text-[color:var(--muted)]">Con il sostegno di</h2>
+            <Label className="mt-9 text-left">Con il sostegno di</Label>
             <p className="text-left text-[14px] leading-relaxed text-[color:var(--ink)]">
                 Tutto il team di <b>Impresa in Aula</b>, a cui va la nostra più profonda gratitudine, dell'Università degli Studi di Urbino «Carlo Bo».
             </p>
@@ -132,7 +132,7 @@ export const InfoTab = ({ tab }) => {
             <p className="mt-10 text-[12px] text-[color:var(--muted)] leading-relaxed">
                 Versione 1 · © 2026 URBIOS Software · Tutti i diritti riservati.
             </p>
-            <p className="mt-3 text-[11px] text-[#A09E98] max-w-md mx-auto leading-relaxed">
+            <p className="mt-3 text-[11px] text-[color:var(--muted)] max-w-md mx-auto leading-relaxed">
                 Figure degli esercizi: <em>free-exercise-db</em> (github.com/yuhonas/free-exercise-db), dataset di pubblico dominio (Unlicense).
             </p>
         </div>
