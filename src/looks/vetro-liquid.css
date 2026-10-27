@@ -257,3 +257,7 @@ html[data-look='vetro'] body :is(.vw-back, .vw-next, .vw-chip, .home-quiet, .m-i
     html[data-look='vetro'] body :is(.vw-back, .vw-next, .vw-chip, .home-quiet, .m-icon, .m-back, .m-pill, .m-tab, .seg button):active { transform: none; }
     html[data-look='vetro'] body :is(.vw-back, .vw-next, .vw-chip, .home-quiet, .m-icon, .m-back, .m-pill, .m-tab, .seg button) { transition-timing-function: ease; }
 }
+
+/* barra alta: il vetro della voce sta nella "lente" (::before, vedi .hq in index.css), non sul tasto */
+html[data-look='vetro'] .home-quiet.hq:hover { box-shadow: none; }
+html[data-look='vetro'] .hq::before { background: var(--lg-fill-hover); box-shadow: var(--lg-rim), var(--lg-drop); }

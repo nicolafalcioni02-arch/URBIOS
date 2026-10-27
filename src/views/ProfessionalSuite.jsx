@@ -12,6 +12,20 @@ import { MobileTabBar, ActionSheet } from '../components/mobile/MobileChrome';
 import { isExample } from '../storage/example/example';
 import { Research } from '../research/Research';
 
+// Voce della barra alta (desktop): solo icona; al passaggio si ingrandisce come sotto una lente e mostra il nome (stile .hq in index.css)
+const BarBtn = ({ icon, label, note, badge, onClick, className = '' }) => (
+    <button onClick={onClick} className={`home-quiet hq ${className}`} aria-label={note ? `${label} (${note})` : label}>
+        <span className="hq-ico">
+            <i className={`ph ${icon}`}></i>
+            {badge && <span className="hq-badge">{badge}</span>}
+        </span>
+        <span className="hq-text">
+            <span className="hq-name">{label}</span>
+            {note && <span className="hq-note">{note}</span>}
+        </span>
+    </button>
+);
+
 export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const [selectedPatientId, setSelectedPatientId] = useState(null);
     const [showSettings, setShowSettings] = useState(false);
@@ -247,43 +261,19 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                     <span className="text-[13px] font-semibold tracking-[0.32em] text-[color:var(--ink)]">URBIOS</span>
                     <div className="flex items-center gap-1">
                         {/* Student: bloccata per ora (codice intatto in StudentMode.jsx). Per riattivarla: setStudentMode(true) al posto di setStudentSoonOpen(true) */}
-                        <button onClick={() => setStudentSoonOpen(true)} className="home-quiet" title="Student: in arrivo">
-                            <i className="ph ph-student"></i>
-                            <span className="hidden sm:inline">Student</span>
-                            <span className="pets-soon">presto</span>
-                        </button>
-                        <button onClick={() => setPetsOpen(true)} className="home-quiet" title="Pets: in arrivo">
-                            <i className="ph ph-dog"></i>
-                            <span>Pets</span>
-                            <span className="pets-soon">presto</span>
-                        </button>
-                        <button onClick={() => setWidgetsEditing((v) => !v)} className="home-quiet max-[1359px]:!hidden" title="Modifica i widget laterali (tieni premuto su un widget per fare lo stesso)">
-                            <i className={`ph ${widgetsEditing ? 'ph-check' : 'ph-squares-four'}`}></i>
-                            <span>{widgetsEditing ? 'Fine' : 'Widget'}</span>
-                        </button>
-                        <button onClick={() => setResearch(true)} className="home-quiet" title="Ricerca: statistica sui dati dei pazienti">
-                            <i className="ph ph-chart-line"></i>
-                            <span className="hidden sm:inline">Ricerca</span>
-                        </button>
-                        <button onClick={() => setAgenda({ date: dateKey(new Date()) })} className="home-quiet" title="Agenda e appuntamenti">
-                            <i className="ph ph-calendar-dots"></i>
-                            <span className="hidden sm:inline">Agenda</span>
-                            {todayAppts > 0 && <span className="pets-soon">{todayAppts}</span>}
-                        </button>
-                        <button onClick={() => setShowSettings(true)} className="home-quiet" title="Impostazioni e formule">
-                            <i className="ph ph-gear"></i>
-                            <span className="hidden sm:inline">Impostazioni</span>
-                        </button>
+                        <BarBtn icon="ph-student" label="Student" note="presto" onClick={() => setStudentSoonOpen(true)} />
+                        <BarBtn icon="ph-dog" label="Pets" note="presto" onClick={() => setPetsOpen(true)} />
+                        <BarBtn icon={widgetsEditing ? 'ph-check' : 'ph-squares-four'} label={widgetsEditing ? 'Fine' : 'Widget'} onClick={() => setWidgetsEditing((v) => !v)} className="max-[1359px]:!hidden" />
+                        <BarBtn icon="ph-chart-line" label="Ricerca" note="anteprima" onClick={() => setResearch(true)} />
+                        <BarBtn icon="ph-calendar-dots" label="Agenda" badge={todayAppts || null} onClick={() => setAgenda({ date: dateKey(new Date()) })} />
+                        <BarBtn icon="ph-gear" label="Impostazioni" onClick={() => setShowSettings(true)} />
                         {!ephemeral && dirty && (
                             <button onClick={handleSave} className="home-quiet" style={{ color: 'var(--bad)' }}>
                                 <i className="ph ph-floppy-disk"></i>
                                 <span>Salva</span>
                             </button>
                         )}
-                        <button onClick={openExitDialog} className="home-quiet" title="Esci">
-                            <i className="ph ph-sign-out"></i>
-                            <span className="hidden sm:inline">Esci</span>
-                        </button>
+                        <BarBtn icon="ph-sign-out" label="Esci" onClick={openExitDialog} />
                     </div>
                 </div>
 

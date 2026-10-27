@@ -334,6 +334,35 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: #000; b
 .home-quiet:hover { background: var(--soft); color: var(--ink); }
 .home-quiet:active { transform: scale(.95); }
 
+/* Barra alta: solo icone. Al passaggio la voce si ingrandisce come sotto una lente:
+   lo sfondo nasce piccolo, si deforma e si assesta, l'icona cresce e il nome si apre accanto (con la nota sotto). */
+.hq { position: relative; isolation: isolate; gap: 0; padding: 0 10px; background: transparent !important;
+    transition: gap .5s var(--ease), padding .5s var(--ease), color .2s, transform .2s var(--ease); }
+.hq::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 999px; background: var(--soft);
+    opacity: 0; transform: scale(.5); transition: opacity .25s, transform .5s var(--ease); }
+.hq:is(:hover, :focus-visible) { gap: 8px; padding: 0 15px 0 12px; color: var(--ink); }
+.hq:is(:hover, :focus-visible)::before { opacity: 1; transform: none; animation: hq-lens .75s var(--ease); }
+.hq-ico { position: relative; display: inline-grid; place-items: center; }
+.hq-ico i { transition: font-size .5s var(--ease); }
+.hq:is(:hover, :focus-visible) .hq-ico i { font-size: 23px; }
+.hq-text { display: flex; flex-direction: column; align-items: flex-start; max-width: 0; overflow: hidden; white-space: nowrap; line-height: 1.05;
+    opacity: 0; transition: max-width .5s var(--ease), opacity .2s; }
+.hq:is(:hover, :focus-visible) .hq-text { max-width: 130px; opacity: 1; }
+.hq-note { margin-top: 3px; height: 13px; padding: 0 5px; border-radius: 999px; background: var(--ink); color: var(--surface);
+    font-size: 9px; font-weight: 600; letter-spacing: .02em; display: inline-flex; align-items: center; }
+.hq-badge { position: absolute; top: -6px; right: -9px; min-width: 15px; height: 15px; padding: 0 4px; border-radius: 999px;
+    background: var(--ink); color: var(--surface); font-size: 9.5px; font-weight: 600; display: grid; place-items: center; }
+@keyframes hq-lens {
+    0%   { transform: scale(.5); border-radius: 999px; }
+    35%  { transform: scale(1.14, .88); border-radius: 46% 54% 40% 60% / 62% 42% 58% 38%; }
+    60%  { transform: scale(.95, 1.07); border-radius: 58% 42% 56% 44% / 40% 60% 44% 56%; }
+    80%  { transform: scale(1.02, .98); border-radius: 50% 50% 48% 52% / 52% 48% 50% 50%; }
+    100% { transform: none; border-radius: 999px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .hq, .hq *, .hq::before { transition: opacity .2s !important; animation: none !important; }
+}
+
 .patient-row { display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
     transition: transform .3s var(--ease), border-color .2s, box-shadow .3s var(--ease); }
 .patient-row:hover { transform: translateY(-2px); border-color: #D2CFC7; box-shadow: 0 10px 28px rgba(18, 19, 23, .06); }
