@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { DOC_TYPES } from '../catalog';
 import { fmtDate } from '../logic/visits';
+import { artVars } from '../logic/printArt';
 
 // Marchio URBIOS con copyright, in fondo a ogni foglio
 const BrandMark = ({ style }) => (
@@ -16,7 +17,7 @@ export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true
     const top = m.t + (withHead ? g.head : 0);
     const studio = [prof.nome, prof.cognome].filter(Boolean).join(' ');
     return (
-        <div className={`pc-sheet pc-theme ${layoutClass}`} style={{ '--accent': accent, '--pc-scale': theme.scale, '--m-t': `${m.t}mm`, '--m-s': `${m.s}mm`, '--m-b': `${m.b}mm` }}>
+        <div className={`pc-sheet pc-theme ${layoutClass}`} style={{ '--accent': accent, ...artVars(accent), '--pc-scale': theme.scale, '--m-t': `${m.t}mm`, '--m-s': `${m.s}mm`, '--m-b': `${m.b}mm` }}>
             <div className="pc-deco">
                 <i />
                 <i />

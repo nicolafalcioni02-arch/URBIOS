@@ -80,7 +80,7 @@ export const TrainingGuided = ({
     const nDays = weeks.reduce((n, w) => n + w.days.length, 0);
     const setupDone = !!header.tipo && !!header.livello;
     const sub = {
-        setup: setupDone ? `${goalShort(header.tipo)} · ${levelShort(header.livello)}` : 'da impostare',
+        setup: setupDone ? [goalShort(header.tipo), levelShort(header.livello)].filter(Boolean).join(' · ') || 'impostato' : 'da impostare',
         program: blank ? 'vuota' : `${weeks.length} ${weeks.length === 1 ? 'sett.' : 'sett.'} · ${nDays} sedute`,
         deliver: st.label,
     };

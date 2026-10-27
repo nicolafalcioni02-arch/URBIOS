@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { DayEditor } from './DayEditor';
 import { move } from './trainingGuidedLogic';
+import { useCompact } from '../../../../hooks/useCompact';
+import { ActionSheet } from '../../../mobile/MobileChrome';
 
 // Passo 2 — Scheda: settimane → sedute → esercizi, tutto nella stessa pagina.
-// Settimane e sedute si riordinano trascinando (o con le frecce, comode sul telefono).
+// Settimane e sedute si riordinano trascinando (o con le frecce).
+// Su telefono le azioni di settimana e seduta (sposta, duplica, scarico, elimina) stanno in un foglio dal basso, come nel resto dell'app.
 
-const Tabs = ({ items, current, onSelect, onMove, onAdd, addLabel, badge }) => {
+const Tabs = ({ items, current, onSelect, onMove, onAdd, addLabel, badge, onMore }) => {
     const [dragId, setDragId] = useState(null);
     const [overId, setOverId] = useState(null);
     const idx = Math.min(current, items.length - 1);
@@ -43,7 +47,11 @@ const Tabs = ({ items, current, onSelect, onMove, onAdd, addLabel, badge }) => {
                     <i className="ph ph-plus"></i> {addLabel}
                 </button>
             </div>
-            {items.length > 1 && (
+            {onMore ? (
+                <button className="dg-ghost t-more" aria-label={`Azioni: ${addLabel}`} onClick={onMore}>
+                    <i className="ph-bold ph-dots-three"></i>
+                </button>
+            ) : items.length > 1 && (
                 <div className="flex gap-1 flex-none">
                     <button className="dg-ghost" title="Sposta prima" aria-label={`Sposta prima: ${addLabel}`} disabled={idx === 0} style={idx === 0 ? { opacity: 0.3 } : undefined} onClick={() => onMove(idx, idx - 1)}>
                         <i className="ph ph-arrow-left"></i>
@@ -61,6 +69,12 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
     const [wi, setWi] = useState(0);
     const [di, setDi] = useState(0);
     const [confirmDel, setConfirmDel] = useState(null); // 'week' | 'day'
+    const compact = useCompact(639);
+    // foglio di azioni aperto su telefono; il token tiene separati un foglio e quello che lo sostituisce (es. la conferma)
+    const [sheet, setSheet] = useState(null); // { kind: 'week' | 'day' | 'delWeek' | 'delDay', token }
+    const openSheet = (kind) => setSheet({ kind, token: Date.now() + Math.random() });
+    // la conferma si apre quando il foglio precedente ha finito di chiudersi: lo stesso tocco non la chiude subito
+    const thenSheet = (kind) => setTimeout(() => openSheet(kind), 280);
 
     const week = weeks[Math.min(wi, weeks.length - 1)];
     const day = week && week.days[Math.min(di, week.days.length - 1)];
@@ -89,18 +103,18 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
     return (
         <div className="max-w-3xl mx-auto dg-in">
             {/* strumenti del passo */}
-            <div className="dg-toolbar" style={{ marginTop: 0 }}>
+            <div className={`dg-toolbar ${compact ? 't-toolrow no-scrollbar' : ''}`} style={{ marginTop: 0 }}>
                 <button className="dg-sm" onClick={onExercises}>
-                    <i className="ph ph-list-magnifying-glass"></i> Database esercizi
+                    <i className="ph ph-list-magnifying-glass"></i> {compact ? 'Esercizi' : 'Database esercizi'}
                 </button>
                 <button className="dg-sm" onClick={onTools}>
-                    <i className="ph ph-calculator"></i> Massimali e calcolatori
+                    <i className="ph ph-calculator"></i> {compact ? 'Massimali' : 'Massimali e calcolatori'}
                 </button>
                 <button className="dg-sm" onClick={onProgression}>
-                    <i className="ph ph-trend-up"></i> Genera progressione
+                    <i className="ph ph-trend-up"></i> {compact ? 'Progressione' : 'Genera progressione'}
                 </button>
                 <button className="dg-sm" onClick={onAnalysis}>
-                    <i className="ph ph-chart-bar"></i> Analisi della scheda
+                    <i className="ph ph-chart-bar"></i> {compact ? 'Analisi' : 'Analisi della scheda'}
                 </button>
             </div>
 
@@ -121,7 +135,11 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                 }}
                 addLabel="Settimana"
                 badge={(w) => (w.kind === 'deload' ? 'scarico' : '')}
+                onMore={compact ? () => openSheet('week') : undefined}
             />
+            {compact ? (
+                <input className="fld mt-2" value={week.title} onChange={(e) => ops.updateWeekField(week.id, 'title', e.target.value)} aria-label="Nome della settimana" placeholder="Nome della settimana" />
+            ) : (
             <div className="flex flex-wrap items-center gap-2 mt-2">
                 <input className="fld !w-auto min-w-[170px]" value={week.title} onChange={(e) => ops.updateWeekField(week.id, 'title', e.target.value)} aria-label="Nome della settimana" />
                 <label className="flex items-center gap-2 text-[13.5px] cursor-pointer" title="Meno volume e/o carico per recuperare">
@@ -146,6 +164,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                     </button>
                 )}
             </div>
+            )}
 
             {/* sedute */}
             <p className="text-[12px] font-semibold tracking-wider uppercase text-[color:var(--muted)] mt-6 mb-2">Seduta</p>
@@ -163,6 +182,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                         setDi(week.days.length);
                     }}
                     addLabel="Seduta"
+                    onMore={compact ? () => openSheet('day') : undefined}
                 />
             ) : (
                 <button className="dg-add" onClick={() => ops.addDay(week.id)}>
@@ -171,8 +191,9 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
             )}
 
             {day && (
-                <section className="dg-card">
-                    <DayEditor week={week} day={day} exerciseDB={exerciseDB} suggestions={suggestions} massimali={massimali} analysisCtx={analysisCtx} ops={ops} />
+                <section className="dg-card t-day-sec">
+                    <DayEditor week={week} day={day} exerciseDB={exerciseDB} suggestions={suggestions} massimali={massimali} analysisCtx={analysisCtx} ops={ops} compact={compact} />
+                    {!compact && (
                     <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-[color:var(--line)]">
                         <button className="dg-sm" onClick={() => { ops.duplicateDay(week.id, day.id); setDi(week.days.length); }}>
                             <i className="ph ph-copy"></i> Duplica la seduta
@@ -192,17 +213,77 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                             </button>
                         )}
                     </div>
+                    )}
                 </section>
             )}
 
             <div className="dg-foot">
-                <button className="vw-back" onClick={onSetup}>
-                    <i className="ph ph-arrow-left"></i> Obiettivo
+                <button className="vw-back" onClick={onSetup} aria-label="Torna all'obiettivo">
+                    <i className="ph ph-arrow-left"></i> <span>Obiettivo</span>
                 </button>
                 <button className="vw-next" onClick={onNext}>
                     Verifica e consegna <i className="ph ph-arrow-right"></i>
                 </button>
             </div>
+
+            {sheet && (() => {
+                const wIdx = weeks.indexOf(week);
+                const dIdx = day ? week.days.indexOf(day) : -1;
+                const moveWeek = (to) => {
+                    setWeeks((w) => move(w, wIdx, to));
+                    setWi(to);
+                };
+                const moveDay = (to) => {
+                    setWeeks((ws) => ws.map((w) => (w.id === week.id ? { ...w, days: move(w.days, dIdx, to) } : w)));
+                    setDi(to);
+                };
+                const cfg = {
+                    week: {
+                        title: week.title || `Settimana ${wIdx + 1}`,
+                        subtitle: `${week.days.length} ${week.days.length === 1 ? 'seduta' : 'sedute'}${week.kind === 'deload' ? ' · scarico' : ''}`,
+                        groups: [
+                            [
+                                { label: 'Sposta prima', icon: 'ph-arrow-left', disabled: wIdx <= 0, onClick: () => moveWeek(wIdx - 1) },
+                                { label: 'Sposta dopo', icon: 'ph-arrow-right', disabled: wIdx >= weeks.length - 1, onClick: () => moveWeek(wIdx + 1) },
+                            ],
+                            [
+                                {
+                                    label: week.kind === 'deload' ? 'Togli lo scarico' : 'Segna come scarico',
+                                    icon: 'ph-battery-low',
+                                    onClick: () => ops.updateWeekField(week.id, 'kind', week.kind === 'deload' ? '' : 'deload'),
+                                },
+                                { label: 'Duplica la settimana', icon: 'ph-copy', onClick: () => { ops.duplicateWeek(week.id); setWi(weeks.length); } },
+                            ],
+                            [{ label: 'Elimina la settimana', icon: 'ph-trash', tone: 'danger', disabled: weeks.length < 2, onClick: () => thenSheet('delWeek') }],
+                        ],
+                    },
+                    day: day && {
+                        title: day.title || `Seduta ${dIdx + 1}`,
+                        subtitle: `${day.exercises.length} ${day.exercises.length === 1 ? 'esercizio' : 'esercizi'}`,
+                        groups: [
+                            [
+                                { label: 'Sposta prima', icon: 'ph-arrow-left', disabled: dIdx <= 0, onClick: () => moveDay(dIdx - 1) },
+                                { label: 'Sposta dopo', icon: 'ph-arrow-right', disabled: dIdx >= week.days.length - 1, onClick: () => moveDay(dIdx + 1) },
+                            ],
+                            [{ label: 'Duplica la seduta', icon: 'ph-copy', onClick: () => { ops.duplicateDay(week.id, day.id); setDi(week.days.length); } }],
+                            [{ label: 'Elimina la seduta', icon: 'ph-trash', tone: 'danger', onClick: () => thenSheet('delDay') }],
+                        ],
+                    },
+                    delWeek: {
+                        title: `Eliminare ${week.title || 'la settimana'}?`,
+                        subtitle: 'Sedute ed esercizi della settimana andranno persi.',
+                        groups: [[{ label: 'Elimina la settimana', icon: 'ph-trash', tone: 'danger', onClick: () => { ops.removeWeek(week.id); setWi(0); } }], [{ label: 'Annulla', icon: 'ph-x', onClick: () => {} }]],
+                    },
+                    delDay: day && {
+                        title: `Eliminare ${day.title || 'la seduta'}?`,
+                        subtitle: 'Gli esercizi della seduta andranno persi.',
+                        groups: [[{ label: 'Elimina la seduta', icon: 'ph-trash', tone: 'danger', onClick: () => { ops.removeDay(week.id, day.id); setDi(0); } }], [{ label: 'Annulla', icon: 'ph-x', onClick: () => {} }]],
+                    },
+                }[sheet.kind];
+                if (!cfg) return null;
+                // sul body: il contenitore animato del passo farebbe da riferimento al foglio fisso e lo taglierebbe
+                return createPortal(<ActionSheet key={sheet.token} {...cfg} onClose={() => setSheet((s) => (s && s.token === sheet.token ? null : s))} />, document.body);
+            })()}
         </div>
     );
 };

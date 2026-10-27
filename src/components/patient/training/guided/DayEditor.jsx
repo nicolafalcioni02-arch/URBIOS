@@ -13,7 +13,7 @@ const Stat = ({ k, v, hint }) => (
 );
 const fmtKg = (x) => (x >= 1000 ? `${(x / 1000).toFixed(2).replace('.', ',')} t` : `${Math.round(x)} kg`);
 
-export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analysisCtx, ops }) => {
+export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analysisCtx, ops, compact = false }) => {
     const A = useMemo(() => analyzeDay(day, analysisCtx), [day, analysisCtx]);
     // sigla delle superserie: A1, A2, B1…
     const labels = {};
@@ -28,23 +28,23 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
     return (
         <div>
             {/* riepilogo del giorno */}
-            <div className="dg-sticky">
+            <div className="dg-sticky t-day-stats">
                 {A.trains ? (
-                    <div className="flex gap-2 flex-wrap">
-                        <Stat k="Serie di lavoro" v={A.workSets} hint="Riscaldamento escluso" />
+                    <div className="flex gap-2 flex-wrap t-stats">
+                        <Stat k={compact ? 'Serie' : 'Serie di lavoro'} v={A.workSets} hint="Riscaldamento escluso" />
                         <Stat k="Durata" v={`${Math.round(A.minutes)} min${A.overridden ? '' : ' ~'}`} hint="Tempo sotto tensione + recuperi + cambi attrezzo + riscaldamento/defaticamento" />
                         <Stat k="Volume" v={A.volumeLoad ? fmtKg(A.volumeLoad) : '–'} hint="Tonnellaggio: Σ ripetizioni × carico" />
                         <Stat k="RPE medio" v={A.avgRpe !== null ? (Math.round(A.avgRpe * 10) / 10).toString().replace('.', ',') : '–'} />
                         <Stat k="Intensità" v={A.avgPct !== null ? `${Math.round(A.avgPct)}% 1RM` : '–'} hint="Serve il massimale o la % scritta" />
-                        <Stat k="Energia" v={A.kcal !== null ? `${Math.round(A.kcal)} kcal` : 'peso mancante'} hint="Stima con i MET" />
+                        <Stat k="Energia" v={A.kcal !== null ? `${Math.round(A.kcal)} kcal` : compact ? '–' : 'peso mancante'} hint="Stima con i MET" />
                     </div>
                 ) : (
                     <p className="text-[13.5px] text-[color:var(--muted)]">Compila ripetizioni (o durata) per vedere serie, durata, volume ed energia della seduta.</p>
                 )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-[1fr_130px_130px] gap-3 mt-4">
-                <div>
+            <div className="grid grid-cols-2 sm:grid-cols-[1fr_130px_130px] gap-3 mt-4">
+                <div className="col-span-2 sm:col-span-1">
                     <label className="fld-label">Nome della seduta</label>
                     <input className="fld" placeholder="es. Upper body, Gambe, Full body" value={day.title} onChange={(e) => ops.updateDayTitle(week.id, day.id, e.target.value)} />
                 </div>
@@ -66,7 +66,7 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
 
             <div className="mt-4">
                 {day.exercises.map((ex) => (
-                    <ExerciseCard key={ex.id} ex={ex} label={labels[ex.id]} weekId={week.id} dayId={day.id} exerciseDB={exerciseDB} suggestions={suggestions} oneRm={oneRmFor(massimali, ex.name)} ops={ops} />
+                    <ExerciseCard key={ex.id} ex={ex} label={labels[ex.id]} weekId={week.id} dayId={day.id} exerciseDB={exerciseDB} suggestions={suggestions} oneRm={oneRmFor(massimali, ex.name)} ops={ops} compact={compact} />
                 ))}
             </div>
             <button className="dg-add" onClick={() => ops.addExercise(week.id, day.id)}>

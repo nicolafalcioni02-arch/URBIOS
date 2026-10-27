@@ -43,3 +43,49 @@ export const SetRow = ({ set, index, cardio, oneRm, onChange, onRemove }) => {
         </tr>
     );
 };
+
+// La stessa serie su telefono: in alto i numeri che si toccano di più (reps, kg, %1RM, RPE),
+// sotto tempo, recupero e nota con la loro etichetta. Niente tabella da scorrere di lato.
+export const SetRowCompact = ({ set, index, cardio, oneRm, onChange, onRemove }) => {
+    const tipo = set.tipo || '';
+    const b = BADGE[tipo] || BADGE[''];
+    const nextTipo = () => TIPI[(TIPI.findIndex(([t]) => t === tipo) + 1) % TIPI.length][0];
+    const derivedLoad = oneRm && set.pct && !set.load ? loadFromPct(oneRm, parseFloat(String(set.pct).replace(',', '.')), 0.5) : null;
+    const derivedPct = oneRm && set.load && !set.pct ? pctFromLoad(oneRm, parseFloat(String(set.load).replace(',', '.'))) : null;
+    const inp = (field, placeholder, label) => (
+        <input type="text" inputMode={['load', 'pct', 'rpe'].includes(field) ? 'decimal' : undefined} value={set[field] ?? ''} placeholder={placeholder} aria-label={label} onChange={(e) => onChange(field, e.target.value)} />
+    );
+    const extra = (field, label, placeholder) => (
+        <label className={`t-setc-f ${field === 'note' ? 'wide' : field === 'rec' ? 'rec' : ''}`}>
+            <span>{label}</span>
+            <input type="text" value={set[field] ?? ''} placeholder={placeholder} onChange={(e) => onChange(field, e.target.value)} />
+        </label>
+    );
+    return (
+        <div className={`t-setc ${tipo === 'riscaldamento' ? 'warm' : ''}`}>
+            <div className={`t-setc-row ${cardio ? 'cardio' : ''}`}>
+                <button
+                    type="button"
+                    className="t-set-badge"
+                    aria-label={`${TIPI.find(([t]) => t === tipo)[1]}: tocca per cambiare tipo`}
+                    style={{ background: b.bg, color: b.fg }}
+                    onClick={() => onChange('tipo', nextTipo())}
+                >
+                    {tipo === 'riscaldamento' ? 'R' : tipo === 'drop' ? 'D' : index + 1}
+                </button>
+                {inp('reps', cardio ? "20'" : '10', cardio ? 'Durata' : 'Ripetizioni')}
+                {!cardio && inp('load', derivedLoad !== null ? String(derivedLoad) : 'kg', 'Carico in kg')}
+                {!cardio && inp('pct', derivedPct !== null ? String(Math.round(derivedPct)) : '%', 'Percentuale del massimale')}
+                {inp('rpe', '8', 'RPE')}
+                <button type="button" className="t-setc-del" onClick={onRemove} aria-label="Elimina la serie">
+                    <i className="ph ph-x"></i>
+                </button>
+            </div>
+            <div className="t-setc-more">
+                {!cardio && extra('tempo', 'Tempo', '3-1-1-0')}
+                {extra('rec', 'Rec.', "90''")}
+                {extra('note', 'Nota', cardio ? 'zona FC...' : '')}
+            </div>
+        </div>
+    );
+};

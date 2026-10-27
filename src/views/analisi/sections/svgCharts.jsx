@@ -148,17 +148,10 @@ export const MiniTrend = ({ pts, unit = '', color = '#4f46e5', height = 110 }) =
     const y = (v) => P.t + ((hi - v) * (height - P.t - P.b)) / (hi - lo);
     const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
     const area = `${line} L${x(pts.length - 1).toFixed(1)},${height - P.b} L${x(0).toFixed(1)},${height - P.b} Z`;
-    const id = `g${Math.round(Math.random() * 1e9)}`;
     const d = pts.length > 1 ? pts[pts.length - 1].v - pts[0].v : 0;
     const short = (dt) => new Date(dt).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
     return (
         <svg viewBox={`0 0 ${W} ${height}`} width="100%" style={{ display: 'block' }}>
-            <defs>
-                <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0" stopColor={color} stopOpacity="0.22" />
-                    <stop offset="1" stopColor={color} stopOpacity="0" />
-                </linearGradient>
-            </defs>
             {[0, 0.5, 1].map((f) => {
                 const v = lo + pad + (hi - lo - 2 * pad) * f;
                 return (
@@ -170,7 +163,8 @@ export const MiniTrend = ({ pts, unit = '', color = '#4f46e5', height = 110 }) =
                     </g>
                 );
             })}
-            <path d={area} fill={`url(#${id})`} />
+            {/* tinta piatta e non sfumatura trasparente: Safari in PDF la renderebbe piena */}
+            <path d={area} fill={color} fillOpacity="0.1" />
             <path d={line} fill="none" stroke={color} strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
             {pts.map((p, i) => (
                 <circle key={i} cx={x(i)} cy={y(p.v)} r={i === pts.length - 1 ? 4.2 : 2.8} fill={i === pts.length - 1 ? color : '#fff'} stroke={color} strokeWidth="1.8" />

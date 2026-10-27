@@ -347,4 +347,64 @@ export const trainingCss = `
                     .t-dayedit-bar .main { background: var(--ink); color: #fff; }
                 }
                 body:has(.t-c-bar) .archive-chip { display: none; }
+
+                /* ==================== TELEFONO (< 640px): in linea con Nuova visita, Agenda e Home ==================== */
+                /* serie in formato a righe (solo telefono, vedi SetRowCompact) */
+                .t-setc-list { display: flex; flex-direction: column; }
+                .t-setc-row { display: grid; grid-template-columns: 30px repeat(4, minmax(0, 1fr)) 30px; gap: 5px; align-items: center; }
+                .t-setc-row.cardio { grid-template-columns: 30px repeat(2, minmax(0, 1fr)) 30px; }
+                .t-setc-head span { font-size: 11.5px; font-weight: 600; color: var(--muted); text-align: center; }
+                .t-setc { padding: 6px 0 8px; border-bottom: 1px solid #EFEDE8; }
+                .t-setc:last-child { border-bottom: 0; }
+                .t-setc.warm { background: #FFFBF2; border-radius: 12px; }
+                .t-setc-row input { width: 100%; min-width: 0; height: 40px; padding: 0 4px; border: 1px solid #E6E4DE; border-radius: 10px; background: #fff; text-align: center; font-weight: 600; color: var(--ink); outline: none; }
+                .t-setc-row input::placeholder { color: #B5B3AE; font-weight: 400; }
+                .t-setc input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(18,19,23,.08); }
+                .t-setc .t-set-badge { width: 28px !important; height: 28px !important; min-width: 0; min-height: 0; padding: 0; margin: 0 auto; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+                .t-setc-del { width: 30px; height: 40px; display: grid; place-items: center; color: #C2413A; border-radius: 10px; }
+                .t-setc-del:active { background: var(--soft); }
+                .t-setc-more { display: flex; gap: 5px; margin-top: 5px; }
+                .t-setc-f { flex: 1.6 1 0; min-width: 0; display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px; border-radius: 10px; background: #fff; border: 1px solid #EFEDE8; }
+                .t-setc-f.wide { flex: 1.1 1 0; }
+                .t-setc-f.rec { flex: 1 1 0; }
+                .t-setc-f span { flex: none; font-size: 10.5px; font-weight: 600; color: var(--muted); }
+                .t-setc-f input { flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; outline: none; font-weight: 500; color: var(--ink); padding: 0; }
+                .t-setc-f:focus-within { border-color: var(--ink); }
+
+                @media (max-width: 639px) {
+                    /* testata: il piano a tutta larghezza, gli strumenti su una riga, niente sfera (come Nuova visita) */
+                    .t-root .dg-head { gap: 8px; margin-bottom: 8px; }
+                    .t-root .dg-orb, .t-root .dg-kicker { display: none; }
+                    .t-root .dg-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+                    .t-root .dg-tools .dg-tool { min-width: 0; padding: 0 6px; gap: 5px; height: 40px; overflow: hidden; }
+                    .t-root .dg-title { font-size: 26px; }
+                    .t-root .dg-hint2 { font-size: 13.5px; margin: 4px 0 14px; }
+
+                    /* strumenti del passo: una sola riga che scorre */
+                    .t-root .t-toolrow { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 0 16px 2px; }
+                    .t-root .t-toolrow .dg-sm { flex: none; height: 36px; }
+                    .t-root .t-more { width: 40px; height: 40px; background: #fff; border: 1px solid var(--line); color: var(--ink); }
+
+                    /* la seduta non sta in una scatola dentro la scatola: tutta la larghezza va agli esercizi */
+                    .t-root .t-day-sec { margin-top: 12px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none !important; }
+                    .t-root .t-day-stats { position: static; padding: 10px; border-radius: 18px; backdrop-filter: none; -webkit-backdrop-filter: none; background: #fff; box-shadow: none; }
+                    .t-root .t-stats { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px !important; }
+                    .t-root .t-stats .dg-stat2 { min-width: 0; padding: 6px 9px; border-radius: 12px; background: #FBFAF8; border-color: #F0EEE9; }
+                    .t-root .t-stats .dg-stat2 small { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                    .t-root .t-stats .dg-stat2 b { font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+                    /* esercizio: nome in alto, poi gruppo · superserie · elimina, poi le foto */
+                    .t-root .t-exercise-item { padding: 14px !important; margin-bottom: 12px !important; border-radius: 18px !important; background: #fff !important; }
+                    .t-root .t-ex-head { gap: 8px !important; margin-bottom: 12px !important; }
+                    .t-root .t-ex-name { order: 0; flex: 1 1 100% !important; }
+                    .t-root .t-ex-meta { order: 1; flex: 1 1 100% !important; }
+                    .t-root .t-ex-photos { order: 2; }
+                    .t-root .t-ex-photos img { width: 44px !important; }
+                    .t-root .t-ex-meta select { max-width: 42%; }
+
+                    /* barra Indietro / Avanti: come in Nuova visita, indietro solo freccia e avanti a tutta larghezza */
+                    .t-root .dg-foot .vw-back { width: 46px; padding: 0; flex: none; }
+                    .t-root .dg-foot .vw-back span { display: none; }
+                    .t-root .dg-foot .vw-next { flex: 1; min-width: 0; }
+                }
             `;

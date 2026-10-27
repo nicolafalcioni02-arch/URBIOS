@@ -14,6 +14,7 @@ src/
 │   ├── reports/                       stampe: printCenter/ = Centro stampa (unico motore: compone, impagina in A4, modifica, stampa/PDF)
 │   ├── visuals/                       effetti grafici (shader)
 │   └── patient/                       moduli della scheda paziente (Storico, Training, Dieta...)
+├── research/                          RICERCA: statistica anonima per tesi e studi (vedi research/DIARIO.md)
 ├── dataExchange/                      IMPORT/EXPORT: CSV, documenti, ZIP, anonimizzazione, unione dati (vedi dataExchange/README.md)
 ├── storage/                           ARCHIVIO: cifratura, file, copia di lavoro, login/logout (vedi storage/README.md)
 └── logic/                             funzioni pure condivise e dati di default (niente React)

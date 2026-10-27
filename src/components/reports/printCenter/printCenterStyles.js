@@ -471,6 +471,8 @@ const printCss = `
   .pc-sheet.overflow::after { display: none !important; }
   .pc-flow[contenteditable] { box-shadow: none !important; }
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  /* Safari in PDF non ritaglia la sfumatura sul testo (esce una barra piena): titoli di Energia a tinta unita */
+  .pc-safari .pc-l-energia .d-title, .pc-safari .pc-l-energia .d-studio, .pc-safari .pc-l-energia .d-day-title, .pc-safari .pc-l-energia .pc-cover-title { background: none !important; -webkit-background-clip: border-box !important; background-clip: border-box !important; color: var(--accent) !important; }
 }
 `;
 

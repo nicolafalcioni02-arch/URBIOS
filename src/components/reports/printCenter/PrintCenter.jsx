@@ -14,6 +14,9 @@ import { TextTools } from './parts/TextTools';
 import { printCenterCss } from './printCenterStyles';
 import { professionalFor } from '../../../storage/example/example';
 
+// Safari (e ogni browser su iPhone/iPad) salva i PDF con il motore WebKit: alcuni effetti vanno semplificati in stampa
+const IS_SAFARI = typeof navigator !== 'undefined' && /Apple/.test(navigator.vendor || '');
+
 let seq = 0;
 const newId = () => `d${Date.now().toString(36)}${seq++}`;
 
@@ -473,7 +476,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     };
 
     return ReactDOM.createPortal(
-        <div className="pc-overlay" style={{ '--accent-ui': theme.accent }}>
+        <div className={`pc-overlay${IS_SAFARI ? ' pc-safari' : ''}`} style={{ '--accent-ui': theme.accent }}>
             <style>{printCenterCss}</style>
 
             <div className="pc-top">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SetRow } from './SetRow';
+import { SetRow, SetRowCompact } from './SetRow';
 import { getExerciseImages } from '../../logic/exerciseMedia';
 import { isCardio } from '../../logic/analysis';
 import { estimate1RM } from '../../logic/science/oneRm';
@@ -22,7 +22,7 @@ const chip = {
 };
 
 // Una scheda-esercizio: nome (con suggerimenti), figure, superserie, serie con carico/%/RPE/tempo, riscaldamento, 1RM.
-export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions, oneRm, ops }) => {
+export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions, oneRm, ops, compact = false }) => {
     const imgs = getExerciseImages(ex.name, exerciseDB);
     const cardio = isCardio(ex);
     const workWithLoad = ex.sets.filter((s) => s.tipo !== 'riscaldamento' && numOrNull(s.load) && numOrNull(s.reps) && numOrNull(s.reps) <= 10);
@@ -37,8 +37,8 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
             className="t-exercise-item"
             style={{ marginBottom: 16, padding: 18, borderRadius: 20, background: '#FBFAF8', border: '1px solid #EDEBE5', position: 'relative' }}
         >
-            <div style={{ display: 'flex', gap: 10, marginBottom: 14, position: 'relative', alignItems: 'center', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'center' }}>
+            <div className="t-ex-head" style={{ display: 'flex', gap: 10, marginBottom: 14, position: 'relative', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div className="t-ex-photos" style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'center' }}>
                     {imgs.slice(0, 2).map((src, i) => (
                         <img key={i} src={src} alt="" style={{ width: 56, height: 'auto', borderRadius: 10, border: '1px solid #E6E4DE' }} />
                     ))}
@@ -51,7 +51,7 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                         {imgs.length > 2 ? `+${imgs.length - 2}` : imgs.length ? '' : 'Foto'}
                     </button>
                 </div>
-                <div style={{ flex: '2 1 200px', position: 'relative', minWidth: 0 }}>
+                <div className="t-ex-name" style={{ flex: '2 1 200px', position: 'relative', minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         {label && (
                             <span style={{ background: '#121317', color: '#fff', borderRadius: 6, padding: '3px 7px', fontSize: 12, fontWeight: 700 }}>
@@ -77,7 +77,7 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                         </div>
                     )}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 1 240px', minWidth: 0 }}>
+                <div className="t-ex-meta" style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 1 240px', minWidth: 0 }}>
                     <input
                         type="text"
                         className="t-ex-input"
@@ -94,7 +94,7 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                     >
                         {SS.map((l) => (
                             <option key={l} value={l}>
-                                {l ? `Superserie ${l}` : 'Singolo'}
+                                {l ? (compact ? `Super ${l}` : `Superserie ${l}`) : 'Singolo'}
                             </option>
                         ))}
                     </select>
@@ -122,6 +122,29 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                 </div>
             )}
 
+            {compact ? (
+                <div className="t-setc-list">
+                    <div className={`t-setc-row t-setc-head ${cardio ? 'cardio' : ''}`} aria-hidden="true">
+                        <span>#</span>
+                        <span>{cardio ? 'Durata' : 'Reps'}</span>
+                        {!cardio && <span>Kg</span>}
+                        {!cardio && <span>%1RM</span>}
+                        <span>RPE</span>
+                        <span></span>
+                    </div>
+                    {ex.sets.map((s, i) => (
+                        <SetRowCompact
+                            key={s.id}
+                            set={s}
+                            index={ex.sets.filter((x, k) => k < i && x.tipo !== 'riscaldamento').length}
+                            cardio={cardio}
+                            oneRm={oneRm}
+                            onChange={set(s.id)}
+                            onRemove={() => ops.removeSet(weekId, dayId, ex.id, s.id)}
+                        />
+                    ))}
+                </div>
+            ) : (
             <div className="t-table-scroll">
             <table className="t-sets-table">
                 <thead>
@@ -164,6 +187,7 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                 </tbody>
             </table>
             </div>
+            )}
 
             <div style={{ marginTop: 14, display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
                 <button style={{ ...chip, color: '#121317', borderColor: '#CFCBC2' }} onClick={() => ops.addSet(weekId, dayId, ex.id)}>
