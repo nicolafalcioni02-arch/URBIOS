@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DayEditor } from './DayEditor';
 import { GridView } from './GridView';
-import { ExerciseCard } from '../views/dayEditor/ExerciseCard';
-import { oneRmFor } from '../logic/analysis';
+import { CellPanel } from './CellPanel';
+import { blankExercise, cloneWeeks, genId } from '../logic/trainingModel';
 import { move } from './trainingGuidedLogic';
 import { useCompact } from '../../../../hooks/useCompact';
 import { ActionSheet } from '../../../mobile/MobileChrome';
@@ -73,7 +73,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
     const [di, setDi] = useState(0);
     const [confirmDel, setConfirmDel] = useState(null); // 'week' | 'day'
     const [mode, setMode] = useState('list'); // 'list' | 'grid'
-    const [cell, setCell] = useState(null); // casella della griglia aperta: { weekId, dayId, exId }
+    const [cell, setCell] = useState(null); // casella della griglia aperta: { weekId, dayIndex, exKey }
     const compact = useCompact(639);
     // foglio di azioni aperto su telefono; il token tiene separati un foglio e quello che lo sostituisce (es. la conferma)
     const [sheet, setSheet] = useState(null); // { kind: 'week' | 'day' | 'delWeek' | 'delDay', token }
@@ -136,7 +136,9 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                 </button>
             </div>
             {mode === 'grid' ? (
-                <GridView weeks={weeks} di={di} onDay={setDi} onOpen={(weekId, dayId, exId) => setCell({ weekId, dayId, exId })} />
+                <GridView weeks={weeks} di={di} onDay={setDi} onOpen={(weekId, dayIndex, exKey) => setCell({ weekId, dayIndex, exKey })}
+                    onAddWeek={() => setWeeks((prev) => (prev.length ? [...prev, { ...cloneWeeks([prev[prev.length - 1]])[0], title: `Settimana ${prev.length + 1}`, kind: '' }] : prev))}
+                    onAddExercise={(dayIndex, name) => setWeeks((prev) => prev.map((w) => (w.days[dayIndex] ? { ...w, days: w.days.map((d, i) => (i === dayIndex ? { ...d, exercises: [...d.exercises, { ...blankExercise(), id: genId(), name }] } : d)) } : w)))} />
             ) : (<>
             {/* settimane */}
             <p className="text-[12px] font-semibold tracking-wider uppercase text-[color:var(--muted)] mt-1 mb-2 t-lab">Settimana</p>
@@ -256,32 +258,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                 </button>
             </div>
 
-            {cell && (() => {
-                const cw = weeks.find((w) => w.id === cell.weekId);
-                const cd = cw && cw.days.find((d) => d.id === cell.dayId);
-                const ce = cd && cd.exercises.find((e) => e.id === cell.exId);
-                if (!ce) return null;
-                return createPortal(
-                    <div className="sheet-back" onClick={() => setCell(null)}>
-                        <div className="sheet t-cellsheet" onClick={(e) => e.stopPropagation()}>
-                            <div className="t-cell-head">
-                                <div className="min-w-0">
-                                    <p>{cw.title}{cw.kind === 'deload' ? ' · scarico' : ''}</p>
-                                    <span>{cd.title}</span>
-                                </div>
-                                <button className="dg-ghost" onClick={() => setCell(null)} aria-label="Chiudi">
-                                    <i className="ph-bold ph-x"></i>
-                                </button>
-                            </div>
-                            <div className="t-root dg-page">
-                                <ExerciseCard ex={ce} weekId={cw.id} dayId={cd.id} exerciseDB={exerciseDB} suggestions={suggestions} oneRm={oneRmFor(massimali, ce.name)} ops={ops} compact />
-                            </div>
-                            <button className="vw-next t-cell-done" onClick={() => setCell(null)}>Fatto</button>
-                        </div>
-                    </div>,
-                    document.body
-                );
-            })()}
+            {cell && <CellPanel weeks={weeks} setWeeks={setWeeks} dayIndex={cell.dayIndex} exKey={cell.exKey} startWeekId={cell.weekId} massimali={massimali} ops={ops} onClose={() => setCell(null)} />}
 
             {sheet && (() => {
                 const wIdx = weeks.indexOf(week);

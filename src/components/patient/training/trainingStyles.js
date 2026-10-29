@@ -265,6 +265,16 @@ export const trainingCss = `
                 .t-cell-head p { font-size: 17px; font-weight: 700; line-height: 1.2; }
                 .t-cell-head span { font-size: 13px; color: var(--muted); }
                 .t-cellsheet .t-exercise-item { margin-bottom: 12px !important; }
+                .t-cell-weeks { display: flex; gap: 6px; overflow-x: auto; padding: 0 4px 10px; }
+                .t-cell-weeks .dg-chip.row { min-height: 40px; padding: 0 14px; }
+                .t-cell-body { padding: 0 !important; max-height: 52dvh; overflow-y: auto; }
+                .t-cell-actions { display: flex; gap: 8px; margin: 12px 0 14px; }
+                .t-cell-empty { padding: 18px 4px 22px; color: var(--muted); font-size: 14.5px; }
+                .t-cell-empty .dg-sm { margin-top: 12px; }
+                .t-grid-add { display: inline-flex; align-items: center; gap: 4px; height: 34px; min-height: 0; padding: 0 12px; border-radius: 999px; border: 1.5px dashed #CFCCC3; font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+                .t-grid-new { display: flex; gap: 8px; align-items: center; margin-top: 14px; }
+                .t-grid-new .fld { flex: 1; min-width: 0; }
+                .t-grid-new .dg-sm { height: 46px; flex: none; }
                 .t-cell-done { width: 100%; height: 52px; border-radius: 16px; }
                 /* ---- vista a griglia: settimane in colonne ---- */
                 .t-mode { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--soft); margin: 0 0 12px; }

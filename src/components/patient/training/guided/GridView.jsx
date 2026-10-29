@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { summarizeSets } from '../logic/trainingModel';
 
 // Vista a griglia: gli esercizi di una seduta (A, B, C…) in righe, le settimane in colonne.
 // Serve a leggere la progressione (serie, carico, RPE) a colpo d'occhio; un tocco su una cella apre quella settimana per modificarla.
 const norm = (s) => String(s || '').trim().toLowerCase();
 
-export const GridView = ({ weeks, di, onDay, onOpen }) => {
+export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise }) => {
+    const [name, setName] = useState('');
     const maxDays = Math.max(...weeks.map((w) => w.days.length), 0);
     const d = Math.min(di, Math.max(0, maxDays - 1));
     // esercizi in ordine di comparsa, uniti per nome
@@ -46,6 +47,11 @@ export const GridView = ({ weeks, di, onDay, onOpen }) => {
                                         {w.kind === 'deload' && <em>scarico</em>}
                                     </th>
                                 ))}
+                                <th>
+                                    <button className="t-grid-add" onClick={onAddWeek} aria-label="Aggiungi una settimana (copia l’ultima)">
+                                        <i className="ph-bold ph-plus"></i> Sett.
+                                    </button>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -58,7 +64,7 @@ export const GridView = ({ weeks, di, onDay, onOpen }) => {
                                         return (
                                             <td key={w.id}>
                                                 {S && S.serie ? (
-                                                    <button onClick={() => onOpen(w.id, w.days[d].id, ex.id)} aria-label={`Modifica ${r.name}, ${w.title}`}>
+                                                    <button onClick={() => onOpen(w.id, d, r.k)} aria-label={`Modifica ${r.name}, ${w.title}`}>
                                                         <b>{S.serie}</b>
                                                         {S.load && <span>{S.load} kg</span>}
                                                         {S.rpe && <small>RPE {S.rpe}</small>}
@@ -69,12 +75,27 @@ export const GridView = ({ weeks, di, onDay, onOpen }) => {
                                             </td>
                                         );
                                     })}
+                                    <td></td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             )}
+            <form
+                className="t-grid-new"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!name.trim()) return;
+                    onAddExercise(d, name.trim());
+                    setName('');
+                }}
+            >
+                <input className="fld" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nuovo esercizio (es. Squat)" aria-label="Nome del nuovo esercizio" />
+                <button type="submit" className="dg-sm" disabled={!name.trim()}>
+                    <i className="ph ph-plus"></i> Esercizio
+                </button>
+            </form>
             <p className="dg-hint mt-3">Tocca una cella per modificare l’esercizio in quella settimana.</p>
         </div>
     );
