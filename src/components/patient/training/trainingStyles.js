@@ -259,6 +259,25 @@ export const trainingCss = `
                         to { opacity: 1; transform: scale(1) translateY(0); } 
                     }
 
+
+                /* ---- vista a griglia: settimane in colonne ---- */
+                .t-mode { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--soft); margin: 0 0 12px; }
+                .t-mode button { display: inline-flex; align-items: center; gap: 6px; height: 36px; min-height: 0; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); }
+                .t-mode button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(18,19,23,.12); }
+                .t-grid-wrap { margin: 12px -16px 0; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0 16px 6px; }
+                .t-grid { border-collapse: separate; border-spacing: 0; min-width: 100%; font-size: 14px; }
+                .t-grid th, .t-grid td { padding: 0; border-bottom: 1px solid var(--line); vertical-align: middle; }
+                .t-grid thead th { font-size: 12.5px; font-weight: 600; color: var(--muted); text-align: center; padding: 8px 10px; white-space: nowrap; }
+                .t-grid thead th em { display: block; font-style: normal; font-size: 11px; color: var(--warn); }
+                .t-grid tbody th { position: sticky; left: 0; z-index: 2; background: var(--paper); text-align: left; font-weight: 600; padding: 10px 12px 10px 0; min-width: 96px; max-width: 110px; font-size: 13.5px; line-height: 1.25; }
+                .t-grid thead th:first-child { position: sticky; left: 0; z-index: 3; background: var(--paper); text-align: left; padding-left: 0; }
+                .t-grid td button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 100%; min-width: 76px; min-height: 64px; padding: 6px 4px; text-align: center; }
+                .t-grid td button:active { background: var(--soft); }
+                .t-grid td b { font-size: 14px; white-space: nowrap; font-weight: 600; color: var(--ink); }
+                .t-grid td span { font-size: 13.5px; white-space: nowrap; color: var(--ink); }
+                .t-grid td small { font-size: 12px; color: var(--muted); }
+                .t-grid td button.empty { color: var(--muted); }
+
                 /* ==================== ADATTAMENTO A TABLET E TELEFONO ==================== */
                 @media (max-width: 1100px) {
                     .t-client-header-card { grid-template-columns: repeat(2, minmax(0, 1fr)); }

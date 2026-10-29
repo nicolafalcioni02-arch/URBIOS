@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DayEditor } from './DayEditor';
+import { GridView } from './GridView';
 import { move } from './trainingGuidedLogic';
 import { useCompact } from '../../../../hooks/useCompact';
 import { ActionSheet } from '../../../mobile/MobileChrome';
@@ -69,6 +70,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
     const [wi, setWi] = useState(0);
     const [di, setDi] = useState(0);
     const [confirmDel, setConfirmDel] = useState(null); // 'week' | 'day'
+    const [mode, setMode] = useState('list'); // 'list' | 'grid'
     const compact = useCompact(639);
     // foglio di azioni aperto su telefono; il token tiene separati un foglio e quello che lo sostituisce (es. la conferma)
     const [sheet, setSheet] = useState(null); // { kind: 'week' | 'day' | 'delWeek' | 'delDay', token }
@@ -122,6 +124,17 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                 </button>
             </div>}
 
+            <div className="t-mode" role="tablist" aria-label="Vista">
+                <button role="tab" aria-selected={mode === 'list'} className={mode === 'list' ? 'on' : ''} onClick={() => setMode('list')}>
+                    <i className="ph ph-list"></i> Lista
+                </button>
+                <button role="tab" aria-selected={mode === 'grid'} className={mode === 'grid' ? 'on' : ''} onClick={() => setMode('grid')}>
+                    <i className="ph ph-table"></i> Griglia
+                </button>
+            </div>
+            {mode === 'grid' ? (
+                <GridView weeks={weeks} di={di} onDay={setDi} onOpen={(w, d) => { setWi(w); setDi(d); setMode('list'); }} />
+            ) : (<>
             {/* settimane */}
             <p className="text-[12px] font-semibold tracking-wider uppercase text-[color:var(--muted)] mt-1 mb-2 t-lab">Settimana</p>
             {compact ? (
@@ -228,6 +241,8 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                     )}
                 </section>
             )}
+
+            </>)}
 
             <div className="dg-foot">
                 <button className="vw-back" onClick={onSetup} aria-label="Torna all'obiettivo">
