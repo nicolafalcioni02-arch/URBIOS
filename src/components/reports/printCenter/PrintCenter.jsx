@@ -57,12 +57,29 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     const busyRef = useRef(false);
     const [activeFlow, setActiveFlow] = useState(null);
     const [sideOpen, setSideOpen] = useState(false);
+    const [tab, setTab] = useState('contenuto');
+    // telefono: i pannelli si aprono dalla barra in basso (raggiungibile col pollice)
+    const openPanel = (t) => {
+        setMenu(false);
+        if (sideOpen && tab === t) setSideOpen(false);
+        else {
+            setTab(t);
+            setSideOpen(true);
+        }
+    };
     const [menu, setMenu] = useState(false);
     const [toast, setToast] = useState(null);
     const [zoom, setZoom] = useState('fit');
     const [grid, setGrid] = useState(false); // vista d'insieme: tutti i fogli affiancati
     const [fitZoom, setFitZoom] = useState(1);
     const [overflow, setOverflow] = useState({});
+    const [fontsRev, setFontsRev] = useState(0); // un carattere arrivato in ritardo cambia le misure: si reimpagina
+    useEffect(() => {
+        if (!document.fonts || !document.fonts.addEventListener) return undefined;
+        const on = () => setFontsRev((n) => n + 1);
+        document.fonts.addEventListener('loadingdone', on);
+        return () => document.fonts.removeEventListener('loadingdone', on);
+    }, []);
     const editRefs = useRef({});
     const dirty = useRef(new Set());
     const deskRef = useRef(null);
@@ -124,7 +141,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
             if (document.fonts && document.fonts.ready) await document.fonts.ready;
             const todo = items.filter((it) => it.on && DOC_TYPES[it.type].kind === 'flow');
             for (const it of todo) {
-                const key = `${tKey}|${theme.header}|${it.html}`;
+                const key = `${tKey}|${theme.header}|${it.html}|${fontsRev}`;
                 if (fragCache.current[it.id]?.key === key) continue;
                 busyRef.current = true;
                 setBusy(true);
@@ -143,7 +160,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
             cancelled = true;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [items, tKey, theme.header]);
+    }, [items, tKey, theme.header, fontsRev]);
 
     // ---- elenco delle pagine ----
     const visible = items.filter((it) => it.on);
@@ -154,7 +171,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
         else if (kind === 'fixed') fixedPages(it).forEach((n, i) => pages.push({ kind, item: it, n, i, key: `${it.id}:f${n}` }));
         else {
             const f = frags[it.id];
-            if (!f || fragCache.current[it.id]?.key !== `${tKey}|${theme.header}|${it.html}`) {
+            if (!f || fragCache.current[it.id]?.key !== `${tKey}|${theme.header}|${it.html}|${fontsRev}`) {
                 // in attesa dell'impaginazione: si mostrano le pagine di prima (se ci sono) o un segnaposto
                 (f || [null]).forEach((html, i) => pages.push({ kind: 'flow', item: it, i, html, stale: true, key: `${it.id}:${i}` }));
             } else f.forEach((html, i) => pages.push({ kind: 'flow', item: it, i, html, key: `${it.id}:${i}` }));
@@ -280,6 +297,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
         return () => ro && ro.disconnect();
     }, []);
     const z = zoom === 'fit' ? fitZoom : zoom;
+    const zz = grid ? Math.min(z, 0.34) : z;
     const stepZoom = (d) => setZoom(Math.min(2, Math.max(0.3, Math.round((z + d) * 10) / 10)));
 
     // ---- stampa / PDF ----
@@ -464,13 +482,19 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                     }
                 }}
             >
-                <div className="pc-pagelabel">
+                <div className="pc-pagelabel" style={IS_SAFARI && grid ? { fontSize: 30 * zz, top: -46 * zz } : undefined}>
                     <span>{pageLabel}</span>
                     <span>
                         {num} / {total}
                     </span>
                 </div>
-                {sheet}
+                {IS_SAFARI ? (
+                    <div className="pc-zfit" style={{ width: 210 * MM * zz, height: 297 * MM * zz }}>
+                        <div className="pc-zfit-in" style={{ transform: `scale(${zz})`, transformOrigin: '0 0', width: 210 * MM, height: 297 * MM }}>{sheet}</div>
+                    </div>
+                ) : (
+                    sheet
+                )}
             </div>
         );
     };
@@ -514,31 +538,6 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                         <span className="lbl">PDF e invio</span>
                         <i className="ph ph-caret-down" style={{ fontSize: 13 }}></i>
                     </button>
-                    {menu && (
-                        <div className="pc-menu" role="menu">
-                            <button onClick={() => doPrint(true)}>
-                                <i className="ph ph-file-pdf"></i>
-                                <span>
-                                    <b>Salva come PDF</b>
-                                    <small>Un unico file, già con il nome del paziente</small>
-                                </span>
-                            </button>
-                            <button onClick={sendMail}>
-                                <i className="ph ph-envelope-simple"></i>
-                                <span>
-                                    <b>Scrivi al paziente</b>
-                                    <small>{patient.email ? `Apre l'email per ${patient.email} con il messaggio pronto` : "Apre l'email con il messaggio pronto (manca l'indirizzo in anagrafica)"}</small>
-                                </span>
-                            </button>
-                            <button onClick={copyText}>
-                                <i className="ph ph-copy"></i>
-                                <span>
-                                    <b>Copia il messaggio</b>
-                                    <small>Per WhatsApp o un'altra app</small>
-                                </span>
-                            </button>
-                        </div>
-                    )}
                 </div>
                 <button className="pc-btn primary" onClick={() => doPrint(false)} disabled={!total}>
                     <i className="ph ph-printer"></i>
@@ -548,6 +547,32 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                     <i className="ph ph-x"></i>
                 </button>
             </div>
+
+            {menu && total > 0 && (
+                <div className="pc-menu" role="menu">
+                    <button onClick={() => doPrint(true)}>
+                        <i className="ph ph-file-pdf"></i>
+                        <span>
+                            <b>Salva come PDF</b>
+                            <small>Un unico file, già con il nome del paziente</small>
+                        </span>
+                    </button>
+                    <button onClick={sendMail}>
+                        <i className="ph ph-envelope-simple"></i>
+                        <span>
+                            <b>Scrivi al paziente</b>
+                            <small>{patient.email ? `Apre l'email per ${patient.email} con il messaggio pronto` : "Apre l'email con il messaggio pronto (manca l'indirizzo in anagrafica)"}</small>
+                        </span>
+                    </button>
+                    <button onClick={copyText}>
+                        <i className="ph ph-copy"></i>
+                        <span>
+                            <b>Copia il messaggio</b>
+                            <small>Per WhatsApp o un'altra app</small>
+                        </span>
+                    </button>
+                </div>
+            )}
 
             <TextTools active={!!activeFlow} />
 
@@ -572,11 +597,13 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                     onRegenerate={regenerate}
                     ranges={ranges}
                     onGoTo={goTo}
+                    tab={tab}
+                    setTab={setTab}
                 />
                 <div className={`pc-scrim ${sideOpen ? 'open' : ''}`} onClick={() => setSideOpen(false)} />
                 <div className="pc-desk" ref={deskRef}>
                     {total > 0 ? (
-                        <div className={`pc-pages ${grid ? 'grid' : ''}`} style={{ zoom: grid ? Math.min(z, 0.34) : z }}>
+                        <div className={`pc-pages ${grid ? 'grid' : ''}`} style={IS_SAFARI ? undefined : { zoom: zz }}>
                             {pages.map(renderPage)}
                         </div>
                     ) : (
@@ -594,6 +621,24 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                     </div>
                 )}
             </div>
+
+
+            <nav className="pc-bar" aria-label="Azioni">
+                <button className={sideOpen && tab === 'contenuto' ? 'on' : ''} onClick={() => openPanel('contenuto')}>
+                    <i className="ph ph-files"></i>
+                    <span>Documenti</span>
+                </button>
+                <button className={sideOpen && tab === 'stile' ? 'on' : ''} onClick={() => openPanel('stile')}>
+                    <i className="ph ph-palette"></i>
+                    <span>Aspetto</span>
+                </button>
+                <button className="pc-bar-more" onClick={() => { setSideOpen(false); setMenu((m) => !m); }} disabled={!total} aria-label="PDF e invio">
+                    <i className="ph ph-share-network"></i>
+                </button>
+                <button className="pc-bar-print" onClick={() => doPrint(false)} disabled={!total}>
+                    <i className="ph ph-printer"></i> Stampa
+                </button>
+            </nav>
 
             {/* foglio di misura: stessa larghezza, caratteri e layout dei fogli veri */}
             <div className={`pc-theme pc-measure ${layoutClass}`} style={{ '--accent': theme.accent, '--pc-scale': theme.scale, width: `${g.contentW}mm` }} aria-hidden="true">

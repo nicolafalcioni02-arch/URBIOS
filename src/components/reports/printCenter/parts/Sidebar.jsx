@@ -362,8 +362,7 @@ const Help = ({ onClose }) => (
     </div>
 );
 
-export const Sidebar = ({ open, items, ctx, theme, setTheme, presets, presetId, onPreset, onSavePreset, onDeletePreset, onToggle, onMove, onRemove, onAdd, onDuplicate, onSetOpts, onRegenerate, ranges, onGoTo }) => {
-    const [tab, setTab] = useState('contenuto');
+export const Sidebar = ({ open, items, ctx, theme, setTheme, presets, presetId, onPreset, onSavePreset, onDeletePreset, onToggle, onMove, onRemove, onAdd, onDuplicate, onSetOpts, onRegenerate, ranges, onGoTo, tab, setTab }) => {
     const [openId, setOpenId] = useState(null);
     const [help, setHelp] = useState(false);
     const [drag, setDrag] = useState(null);

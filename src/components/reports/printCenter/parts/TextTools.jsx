@@ -56,7 +56,7 @@ export const TextTools = ({ active }) => {
     };
 
     return (
-        <div className="pc-tools" role="toolbar" aria-label="Formattazione del testo">
+        <div className={`pc-tools ${active ? 'act' : ''}`} role="toolbar" aria-label="Formattazione del testo">
             <B icon="ph-arrow-u-up-left" title="Annulla" onClick={() => exec('undo')} />
             <B icon="ph-arrow-u-up-right" title="Ripeti" onClick={() => exec('redo')} />
             <span className="sep" />
