@@ -260,6 +260,12 @@ export const trainingCss = `
                     }
 
 
+                .t-cellsheet { max-width: 520px; padding: 14px 14px calc(16px + env(safe-area-inset-bottom)); max-height: 88dvh; }
+                .t-cell-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 2px 4px 12px; }
+                .t-cell-head p { font-size: 17px; font-weight: 700; line-height: 1.2; }
+                .t-cell-head span { font-size: 13px; color: var(--muted); }
+                .t-cellsheet .t-exercise-item { margin-bottom: 12px !important; }
+                .t-cell-done { width: 100%; height: 52px; border-radius: 16px; }
                 /* ---- vista a griglia: settimane in colonne ---- */
                 .t-mode { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--soft); margin: 0 0 12px; }
                 .t-mode button { display: inline-flex; align-items: center; gap: 6px; height: 36px; min-height: 0; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); }
@@ -461,7 +467,10 @@ export const trainingCss = `
                     .t-det i { color: var(--muted); transition: transform .3s var(--ease); }
                     .t-det i.open { transform: rotate(180deg); }
                     .t-root .t-exercise-item .t-ex-input { font-size: 18px; min-height: 44px; }
-                    .t-root .dg-foot { gap: 8px; }
+                    /* il tasto Consegna resta sempre in fondo allo schermo, anche con poco contenuto */
+                    .t-root .dg-foot { position: fixed; left: 0; right: 0; bottom: 0; margin: 0; gap: 8px; padding: 10px 16px max(12px, env(safe-area-inset-bottom)); }
+                    .t-root .dg-body { padding-bottom: 96px; }
+                    .t-root .dg-in { animation-fill-mode: backwards; } /* a fine animazione niente transform: altrimenti il fixed resta intrappolato */
                     .t-root .dg-foot .vw-back { height: 52px; border-radius: 16px; }
                     .t-root .dg-foot .vw-next { height: 52px; border-radius: 16px; font-size: 16px; }
 

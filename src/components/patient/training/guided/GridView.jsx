@@ -58,13 +58,13 @@ export const GridView = ({ weeks, di, onDay, onOpen }) => {
                                         return (
                                             <td key={w.id}>
                                                 {S && S.serie ? (
-                                                    <button onClick={() => onOpen(wi, d)} aria-label={`Modifica ${r.name}, ${w.title}`}>
+                                                    <button onClick={() => onOpen(w.id, w.days[d].id, ex.id)} aria-label={`Modifica ${r.name}, ${w.title}`}>
                                                         <b>{S.serie}</b>
                                                         {S.load && <span>{S.load} kg</span>}
                                                         {S.rpe && <small>RPE {S.rpe}</small>}
                                                     </button>
                                                 ) : (
-                                                    <button className="empty" onClick={() => onOpen(wi, d)} aria-label={`Apri ${w.title}`}>–</button>
+                                                    <span className="empty">–</span>
                                                 )}
                                             </td>
                                         );
@@ -75,7 +75,7 @@ export const GridView = ({ weeks, di, onDay, onOpen }) => {
                     </table>
                 </div>
             )}
-            <p className="dg-hint mt-3">Tocca una cella per modificare quella settimana.</p>
+            <p className="dg-hint mt-3">Tocca una cella per modificare l’esercizio in quella settimana.</p>
         </div>
     );
 };

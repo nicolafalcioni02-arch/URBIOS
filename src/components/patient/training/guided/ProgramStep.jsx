@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DayEditor } from './DayEditor';
 import { GridView } from './GridView';
+import { ExerciseCard } from '../views/dayEditor/ExerciseCard';
+import { oneRmFor } from '../logic/analysis';
 import { move } from './trainingGuidedLogic';
 import { useCompact } from '../../../../hooks/useCompact';
 import { ActionSheet } from '../../../mobile/MobileChrome';
@@ -71,6 +73,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
     const [di, setDi] = useState(0);
     const [confirmDel, setConfirmDel] = useState(null); // 'week' | 'day'
     const [mode, setMode] = useState('list'); // 'list' | 'grid'
+    const [cell, setCell] = useState(null); // casella della griglia aperta: { weekId, dayId, exId }
     const compact = useCompact(639);
     // foglio di azioni aperto su telefono; il token tiene separati un foglio e quello che lo sostituisce (es. la conferma)
     const [sheet, setSheet] = useState(null); // { kind: 'week' | 'day' | 'delWeek' | 'delDay', token }
@@ -133,7 +136,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                 </button>
             </div>
             {mode === 'grid' ? (
-                <GridView weeks={weeks} di={di} onDay={setDi} onOpen={(w, d) => { setWi(w); setDi(d); setMode('list'); }} />
+                <GridView weeks={weeks} di={di} onDay={setDi} onOpen={(weekId, dayId, exId) => setCell({ weekId, dayId, exId })} />
             ) : (<>
             {/* settimane */}
             <p className="text-[12px] font-semibold tracking-wider uppercase text-[color:var(--muted)] mt-1 mb-2 t-lab">Settimana</p>
@@ -252,6 +255,33 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                     {compact ? 'Consegna' : 'Verifica e consegna'} <i className="ph ph-arrow-right"></i>
                 </button>
             </div>
+
+            {cell && (() => {
+                const cw = weeks.find((w) => w.id === cell.weekId);
+                const cd = cw && cw.days.find((d) => d.id === cell.dayId);
+                const ce = cd && cd.exercises.find((e) => e.id === cell.exId);
+                if (!ce) return null;
+                return createPortal(
+                    <div className="sheet-back" onClick={() => setCell(null)}>
+                        <div className="sheet t-cellsheet" onClick={(e) => e.stopPropagation()}>
+                            <div className="t-cell-head">
+                                <div className="min-w-0">
+                                    <p>{cw.title}{cw.kind === 'deload' ? ' · scarico' : ''}</p>
+                                    <span>{cd.title}</span>
+                                </div>
+                                <button className="dg-ghost" onClick={() => setCell(null)} aria-label="Chiudi">
+                                    <i className="ph-bold ph-x"></i>
+                                </button>
+                            </div>
+                            <div className="t-root dg-page">
+                                <ExerciseCard ex={ce} weekId={cw.id} dayId={cd.id} exerciseDB={exerciseDB} suggestions={suggestions} oneRm={oneRmFor(massimali, ce.name)} ops={ops} compact />
+                            </div>
+                            <button className="vw-next t-cell-done" onClick={() => setCell(null)}>Fatto</button>
+                        </div>
+                    </div>,
+                    document.body
+                );
+            })()}
 
             {sheet && (() => {
                 const wIdx = weeks.indexOf(week);
