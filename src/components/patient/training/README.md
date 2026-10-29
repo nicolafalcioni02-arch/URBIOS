@@ -65,3 +65,6 @@ Incorporate nell'app (offline). L'abbinamento è per **nome esatto** (o alias): 
 ## Stampa
 Anteprima con opzioni: tutta la scheda o una settimana, figure, un giorno per pagina, note, riepilogo seduta (durata/volume/kcal), legenda, intestazione studio.
 Le colonne Carico/RPE/Tempo compaiono solo se compilate. L'impaginazione la fa il browser (`break-inside: avoid`, intestazione ripetuta). Verificata con PDF A4 da Chrome.
+
+## Telefono (< 640 px)
+Gerarchia a una mano: in vista subito settimane/sedute, riepilogo (3 numeri), esercizi con Reps · Kg · RPE; dietro un tocco "Dettagli" (%1RM, tempo, rec., note, dati seduta), la chiave inglese in basso (strumenti) e "…" (rinomina, scarico, sposta). Stili in `trainingStyles.js` (blocco "iPhone"), logica `compact` in `guided/ProgramStep.jsx`, `guided/DayEditor.jsx`, `views/dayEditor/ExerciseCard.jsx`.

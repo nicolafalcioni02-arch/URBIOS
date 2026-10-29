@@ -35,8 +35,8 @@ export const GuidedHead = ({ plan, tools, progress = 0, kicker }) => {
             </div>
             <div className="dg-tools">
                 {tools.map((t) => (
-                    <button key={t.label} className={`dg-tool ${t.primary ? 'ai' : ''}`} onClick={t.onClick} title={t.title}>
-                        <i className={`ph ${t.icon}`}></i> {t.label}
+                    <button key={t.label} className={`dg-tool ${t.primary ? 'ai' : ''}`} onClick={t.onClick} title={t.title} aria-label={t.label}>
+                        <i className={`ph ${t.icon}`}></i> <span className="dg-tool-l">{t.label}</span>
                     </button>
                 ))}
             </div>

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ExerciseCard } from '../views/dayEditor/ExerciseCard';
 import { analyzeDay, oneRmFor } from '../logic/analysis';
 
@@ -14,6 +14,7 @@ const Stat = ({ k, v, hint }) => (
 const fmtKg = (x) => (x >= 1000 ? `${(x / 1000).toFixed(2).replace('.', ',')} t` : `${Math.round(x)} kg`);
 
 export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analysisCtx, ops, compact = false }) => {
+    const [more, setMore] = useState(false); // su telefono nome, durata, RPE e note della seduta stanno dietro "Dettagli"
     const A = useMemo(() => analyzeDay(day, analysisCtx), [day, analysisCtx]);
     // sigla delle superserie: A1, A2, B1…
     const labels = {};
@@ -28,8 +29,12 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
     return (
         <div>
             {/* riepilogo del giorno */}
-            <div className="dg-sticky t-day-stats">
-                {A.trains ? (
+            <div className={`dg-sticky t-day-stats ${compact ? 'hidden' : ''}`}>
+                {A.trains && compact ? (
+                    <p className="t-sumline">
+                        <b>{A.workSets}</b> serie · <b>{Math.round(A.minutes)}</b> min{A.volumeLoad ? <> · <b>{fmtKg(A.volumeLoad)}</b></> : null}
+                    </p>
+                ) : A.trains ? (
                     <div className="flex gap-2 flex-wrap t-stats">
                         <Stat k={compact ? 'Serie' : 'Serie di lavoro'} v={A.workSets} hint="Riscaldamento escluso" />
                         <Stat k="Durata" v={`${Math.round(A.minutes)} min${A.overridden ? '' : ' ~'}`} hint="Tempo sotto tensione + recuperi + cambi attrezzo + riscaldamento/defaticamento" />
@@ -43,7 +48,16 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
                 )}
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-[1fr_130px_130px] gap-3 mt-4">
+            {compact && (
+                <button className="t-det" onClick={() => setMore(!more)} aria-expanded={more}>
+                    <span>
+                        <b>{A.trains ? `${A.workSets} serie · ${Math.round(A.minutes)} min${A.volumeLoad ? ` · ${fmtKg(A.volumeLoad)}` : ''}` : 'Seduta vuota'}</b>
+                        <small>Nome, durata, note</small>
+                    </span>
+                    <i className={`ph ph-caret-down ${more ? 'open' : ''}`}></i>
+                </button>
+            )}
+            <div className={`grid grid-cols-2 sm:grid-cols-[1fr_130px_130px] gap-3 mt-4 ${compact && !more ? 'hidden' : ''}`}>
                 <div className="col-span-2 sm:col-span-1">
                     <label className="fld-label">Nome della seduta</label>
                     <input className="fld" placeholder="es. Upper body, Gambe, Full body" value={day.title} onChange={(e) => ops.updateDayTitle(week.id, day.id, e.target.value)} />
@@ -73,8 +87,8 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
                 <i className="ph ph-plus-circle"></i> Aggiungi esercizio
             </button>
 
-            <label className="fld-label mt-5">Note della seduta (riscaldamento, mobilità, indicazioni)</label>
-            <textarea className="fld" rows={2} style={{ height: 'auto', padding: 14 }} placeholder="Es. 10 min di riscaldamento generale + mobilità spalle. Defaticamento con stretching." value={day.note || ''} onChange={(e) => ops.updateDayField(week.id, day.id, 'note', e.target.value)} />
+            <label className={`fld-label mt-5 ${compact && !more ? 'hidden' : ''}`}>Note della seduta (riscaldamento, mobilità, indicazioni)</label>
+            <textarea className={`fld ${compact && !more ? 'hidden' : ''}`} rows={2} style={{ height: 'auto', padding: 14 }} placeholder="Es. 10 min di riscaldamento generale + mobilità spalle. Defaticamento con stretching." value={day.note || ''} onChange={(e) => ops.updateDayField(week.id, day.id, 'note', e.target.value)} />
         </div>
     );
 };

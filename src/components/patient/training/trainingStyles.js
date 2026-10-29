@@ -351,21 +351,21 @@ export const trainingCss = `
                 /* ==================== TELEFONO (< 640px): in linea con Nuova visita, Agenda e Home ==================== */
                 /* serie in formato a righe (solo telefono, vedi SetRowCompact) */
                 .t-setc-list { display: flex; flex-direction: column; }
-                .t-setc-row { display: grid; grid-template-columns: 30px repeat(4, minmax(0, 1fr)) 30px; gap: 5px; align-items: center; }
-                .t-setc-row.cardio { grid-template-columns: 30px repeat(2, minmax(0, 1fr)) 30px; }
+                .t-setc-row { display: grid; grid-template-columns: 32px repeat(3, minmax(0, 1fr)) 36px; gap: 5px; align-items: center; }
+                .t-setc-row.cardio { grid-template-columns: 32px repeat(2, minmax(0, 1fr)) 36px; }
                 .t-setc-head span { font-size: 11.5px; font-weight: 600; color: var(--muted); text-align: center; }
                 .t-setc { padding: 6px 0 8px; border-bottom: 1px solid #EFEDE8; }
                 .t-setc:last-child { border-bottom: 0; }
                 .t-setc.warm { background: #FFFBF2; border-radius: 12px; }
-                .t-setc-row input { width: 100%; min-width: 0; height: 40px; padding: 0 4px; border: 1px solid #E6E4DE; border-radius: 10px; background: #fff; text-align: center; font-weight: 600; color: var(--ink); outline: none; }
+                .t-setc-row input { width: 100%; min-width: 0; height: 46px; padding: 0 4px; border: 1px solid #E6E4DE; border-radius: 12px; background: #fff; text-align: center; font-weight: 600; font-size: 17px; color: var(--ink); outline: none; }
                 .t-setc-row input::placeholder { color: #B5B3AE; font-weight: 400; }
                 .t-setc input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(18,19,23,.08); }
                 .t-setc .t-set-badge { width: 28px !important; height: 28px !important; min-width: 0; min-height: 0; padding: 0; margin: 0 auto; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
-                .t-setc-del { width: 30px; height: 40px; display: grid; place-items: center; color: #C2413A; border-radius: 10px; }
+                .t-setc-del { width: 36px; height: 46px; display: grid; place-items: center; color: #C2413A; border-radius: 10px; }
                 .t-setc-del:active { background: var(--soft); }
-                .t-setc-more { display: flex; gap: 5px; margin-top: 5px; }
-                .t-setc-f { flex: 1.6 1 0; min-width: 0; display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px; border-radius: 10px; background: #fff; border: 1px solid #EFEDE8; }
-                .t-setc-f.wide { flex: 1.1 1 0; }
+                .t-setc-more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin-top: 5px; }
+                .t-setc-f { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px; border-radius: 10px; background: #fff; border: 1px solid #EFEDE8; }
+                .t-setc-f.wide { flex: 1 1 0; }
                 .t-setc-f.rec { flex: 1 1 0; }
                 .t-setc-f span { flex: none; font-size: 10.5px; font-weight: 600; color: var(--muted); }
                 .t-setc-f input { flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; outline: none; font-weight: 500; color: var(--ink); padding: 0; }
@@ -387,7 +387,7 @@ export const trainingCss = `
 
                     /* la seduta non sta in una scatola dentro la scatola: tutta la larghezza va agli esercizi */
                     .t-root .t-day-sec { margin-top: 12px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none !important; }
-                    .t-root .t-day-stats { position: static; padding: 10px; border-radius: 18px; backdrop-filter: none; -webkit-backdrop-filter: none; background: #fff; box-shadow: none; }
+                    .t-root .t-day-stats { position: static; padding: 6px 0 0; background: transparent !important; border: 0 !important; border-radius: 18px; backdrop-filter: none; -webkit-backdrop-filter: none; background: #fff; box-shadow: none; }
                     .t-root .t-stats { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px !important; }
                     .t-root .t-stats .dg-stat2 { min-width: 0; padding: 6px 9px; border-radius: 12px; background: #FBFAF8; border-color: #F0EEE9; }
                     .t-root .t-stats .dg-stat2 small { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -401,6 +401,50 @@ export const trainingCss = `
                     .t-root .t-ex-photos { order: 2; }
                     .t-root .t-ex-photos img { width: 44px !important; }
                     .t-root .t-ex-meta select { max-width: 42%; }
+
+
+                    /* ---- iPhone: prima ciò che serve con una mano, il resto dietro un tocco ---- */
+                    .t-root.dg-page { padding-top: 6px; }
+                    .t-root .dg-head { flex-wrap: nowrap; align-items: center; }
+                    .t-root .dg-headmain { min-width: 0; }
+                    .t-root .dg-planbtn { width: 100%; min-height: 44px; padding: 0 12px; gap: 7px; }
+                    .t-root .dg-planbtn .dg-edit { display: none; }
+                    .t-root .dg-planbtn .dg-stat { font-size: 11px; padding: 2px 8px; }
+                    .t-root .dg-tools { display: flex; gap: 6px; flex: none; width: auto; }
+                    .t-root .dg-tools .dg-tool { width: 44px; height: 44px; padding: 0; justify-content: center; border-radius: 14px; }
+                    .t-root .dg-tools .dg-tool-l { display: none; }
+                    .t-root .dg-tools .dg-tool i { font-size: 20px; }
+                    .t-root .dg-step .dg-dot { display: none; }
+                    .t-root .dg-step small { display: none; }
+                    .t-root .dg-step { justify-content: center; min-height: 44px; }
+                    .t-root .dg-step b { font-size: 15px; text-align: center; }
+                    /* settimane = livello secondario (piccole, chiare); sedute = livello principale (grandi) */
+                    .t-root .t-tier-week .dg-chip.row { min-height: 34px; padding: 0 14px; font-size: 13.5px; background: transparent; border-color: transparent; color: var(--muted); }
+                    .t-root .t-tier-week .dg-chip.row.on { background: var(--soft); color: var(--ink); border-color: transparent; }
+                    .t-root .t-tier-week .t-more { width: 34px; height: 34px; min-height: 0; border: 0; background: transparent; }
+                    .t-root .t-tier-day { margin-top: 4px; }
+                    .t-weekpill { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 4px; font-size: 15px; font-weight: 600; color: var(--ink); }
+                    .t-weekpill small { color: var(--muted); font-weight: 500; font-size: 13px; }
+                    .t-weekpill i { color: var(--muted); }
+                    .t-sumline { font-size: 14px; color: var(--muted); padding: 2px 4px; }
+                    .t-sumline b { color: var(--ink); font-weight: 600; }
+                    .t-root .dg-step { padding: 8px 10px; border-radius: 14px; }
+                    .t-root .dg-body[data-step="program"] .dg-title, .t-root .dg-body[data-step="program"] .dg-hint2 { display: none; }
+                    .t-root .dg-body .dg-hint2 { margin-bottom: 10px; }
+                    .t-root .t-lab { display: none; }
+                    .t-root .dg-chip.row { min-height: 46px; padding: 0 18px; font-size: 15px; }
+                    .t-root .t-more { width: 46px; height: 46px; border-radius: 14px; }
+                    .t-root .t-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+                    .t-root .t-stats .dg-stat2:nth-child(n+4) { display: none; }
+                    .t-det { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; margin-top: 10px; padding: 10px 14px; min-height: 52px; border-radius: 16px; background: #fff; border: 1px solid var(--line); text-align: left; }
+                    .t-det b { display: block; font-size: 14.5px; font-weight: 600; }
+                    .t-det small { display: block; font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 62vw; }
+                    .t-det i { color: var(--muted); transition: transform .3s var(--ease); }
+                    .t-det i.open { transform: rotate(180deg); }
+                    .t-root .t-exercise-item .t-ex-input { font-size: 18px; min-height: 44px; }
+                    .t-root .dg-foot { gap: 8px; }
+                    .t-root .dg-foot .vw-back { height: 52px; border-radius: 16px; }
+                    .t-root .dg-foot .vw-next { height: 52px; border-radius: 16px; font-size: 16px; }
 
                     /* barra Indietro / Avanti: come in Nuova visita, indietro solo freccia e avanti a tutta larghezza */
                     .t-root .dg-foot .vw-back { width: 46px; padding: 0; flex: none; }

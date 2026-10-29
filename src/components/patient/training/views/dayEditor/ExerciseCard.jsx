@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SetRow, SetRowCompact } from './SetRow';
 import { getExerciseImages } from '../../logic/exerciseMedia';
 import { isCardio } from '../../logic/analysis';
@@ -30,6 +30,8 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
         ? workWithLoad.reduce((a, s) => (numOrNull(s.load) * (1 + numOrNull(s.reps) / 30) > numOrNull(a.load) * (1 + numOrNull(a.reps) / 30) ? s : a))
         : null;
     const est = best ? estimate1RM(numOrNull(best.load), numOrNull(best.reps)) : null;
+    // su telefono tempo, recupero, %1RM e nota di serie stanno dietro "Dettagli": aperti da soli se già compilati
+    const [detail, setDetail] = useState(() => ex.sets.some((s) => s.tempo || s.rec || s.note || s.pct));
     const set = (setId) => (field, value) => ops.updateSetFieldValue(weekId, dayId, ex.id, setId, field, value);
 
     return (
@@ -128,7 +130,6 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                         <span>#</span>
                         <span>{cardio ? 'Durata' : 'Reps'}</span>
                         {!cardio && <span>Kg</span>}
-                        {!cardio && <span>%1RM</span>}
                         <span>RPE</span>
                         <span></span>
                     </div>
@@ -139,6 +140,7 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                             index={ex.sets.filter((x, k) => k < i && x.tipo !== 'riscaldamento').length}
                             cardio={cardio}
                             oneRm={oneRm}
+                            detail={detail}
                             onChange={set(s.id)}
                             onRemove={() => ops.removeSet(weekId, dayId, ex.id, s.id)}
                         />
@@ -193,6 +195,11 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                 <button style={{ ...chip, color: '#121317', borderColor: '#CFCBC2' }} onClick={() => ops.addSet(weekId, dayId, ex.id)}>
                     <i className="ph ph-plus-circle"></i> Aggiungi serie
                 </button>
+                {compact && (
+                    <button style={chip} aria-expanded={detail} onClick={() => setDetail(!detail)}>
+                        <i className={`ph ${detail ? 'ph-caret-up' : 'ph-sliders-horizontal'}`}></i> {detail ? 'Meno' : 'Dettagli'}
+                    </button>
+                )}
                 {!cardio && (
                     <button
                         style={chip}
@@ -208,7 +215,7 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                     onChange={(e) => ops.updateExValue(weekId, dayId, ex.id, 'note', e.target.value)}
                     placeholder="Nota sull'esecuzione"
                     title="Si stampa sotto l'esercizio"
-                    style={{ flex: '1 1 200px', border: '1px solid #E6E4DE', borderRadius: 10, padding: '9px 12px', fontSize: 13, background: '#fff', outline: 'none' }}
+                    style={{ display: compact && !detail && !ex.note ? 'none' : undefined, flex: '1 1 200px', border: '1px solid #E6E4DE', borderRadius: 10, padding: '9px 12px', fontSize: 13, background: '#fff', outline: 'none' }}
                 />
                 {!cardio && oneRm && (
                     <span style={{ fontSize: 13, color: '#555' }}>

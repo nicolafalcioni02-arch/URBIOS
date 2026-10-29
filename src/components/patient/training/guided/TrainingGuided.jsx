@@ -10,6 +10,8 @@ import { PlanPanel } from './PlanPanel';
 import { BookModal } from './BookModal';
 import { MeasuresModal } from '../../MeasuresModal';
 import { HelpModal } from './HelpModal';
+import { useCompact } from '../../../../hooks/useCompact';
+import { ActionSheet } from '../../../mobile/MobileChrome';
 import { goalShort, levelShort, schedaLabel } from './trainingGuidedLogic';
 
 // Training — un'unica schermata guidata, uguale alla Dieta. Gerarchia (dall'alto):
@@ -63,6 +65,8 @@ export const TrainingGuided = ({
     const [bookOpen, setBookOpen] = useState(false);
     const [measuresOpen, setMeasuresOpen] = useState(false);
     const [helpOpen, setHelpOpen] = useState(false);
+    const compact = useCompact(639);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     // cambiando scheda si riparte dal passo giusto
     useEffect(() => {
@@ -103,7 +107,9 @@ export const TrainingGuided = ({
                 progress={progress}
                 kicker="Scheda di allenamento"
                 plan={{ label: schedaLabel(header), status: st, onClick: () => setPlanOpen(true), title: 'Nome, data e stato della scheda; altre schede del paziente', icon: 'ph-barbell' }}
-                tools={[
+                tools={compact ? [
+                    { label: 'Altro', icon: 'ph-dots-three-outline', onClick: () => setMenuOpen(true), title: 'Strumenti, libro schede, misure' },
+                ] : [
                     { label: 'Misure', icon: 'ph-ruler', onClick: () => setMeasuresOpen(true), title: 'Le misure del paziente registrate in archivio' },
                     { label: 'Libro schede', icon: 'ph-books', onClick: () => setBookOpen(true), title: 'Le schede già fatte, da riusare' },
                     { label: 'Aiuto AI', icon: 'ph-sparkle', onClick: () => setHelpOpen(true), primary: true, title: "Fatti aiutare dall'intelligenza artificiale" },
@@ -111,7 +117,7 @@ export const TrainingGuided = ({
             />
             <GuidedSteps progress={progress} current={step} onGo={setStep} steps={STEPS.map((s) => ({ ...s, sub: sub[s.id], done: (s.id === 'setup' && setupDone) || (s.id === 'program' && !blank) }))} />
 
-            <div className="dg-body">
+            <div className="dg-body" data-step={step}>
                 <div key={step} className={dir}>
                 <StepTitle id={step} dir="" title={TITLES[step][0]} hint={TITLES[step][1]} />
                 {step === 'setup' && <SetupStep header={header} setHeader={setHeader} weeks={weeks} setWeeks={setWeeks} onDone={() => setStep('program')} />}
@@ -138,6 +144,26 @@ export const TrainingGuided = ({
                 </div>
             </div>
 
+            {menuOpen && (
+                <ActionSheet
+                    title="Altro"
+                    subtitle="Strumenti e archivio"
+                    onClose={() => setMenuOpen(false)}
+                    groups={[
+                        [{ label: 'Aiuto AI', icon: 'ph-sparkle', note: 'crea o rivedi la scheda', onClick: () => setHelpOpen(true) }],
+                        [
+                            { label: 'Database esercizi', icon: 'ph-list-magnifying-glass', onClick: onExercises },
+                            { label: 'Massimali e calcolatori', icon: 'ph-calculator', onClick: onTools },
+                            { label: 'Genera progressione', icon: 'ph-trend-up', onClick: onProgression },
+                            { label: 'Analisi della scheda', icon: 'ph-chart-bar', onClick: onAnalysis },
+                        ],
+                        [
+                            { label: 'Libro schede', icon: 'ph-books', note: 'da riusare', onClick: () => setBookOpen(true) },
+                            { label: 'Misure del paziente', icon: 'ph-ruler', onClick: () => setMeasuresOpen(true) },
+                        ],
+                    ]}
+                />
+            )}
             {planOpen && (
                 <PlanPanel patient={patient} schedaId={schedaId} header={header} setHeader={setHeader} weeks={weeks} onOpen={openScheda} onNew={newScheda} onDuplicate={duplicateScheda} onDelete={deleteScheda} onClose={() => setPlanOpen(false)} />
             )}

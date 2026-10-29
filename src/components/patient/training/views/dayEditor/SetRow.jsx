@@ -46,7 +46,7 @@ export const SetRow = ({ set, index, cardio, oneRm, onChange, onRemove }) => {
 
 // La stessa serie su telefono: in alto i numeri che si toccano di più (reps, kg, %1RM, RPE),
 // sotto tempo, recupero e nota con la loro etichetta. Niente tabella da scorrere di lato.
-export const SetRowCompact = ({ set, index, cardio, oneRm, onChange, onRemove }) => {
+export const SetRowCompact = ({ set, index, cardio, oneRm, onChange, onRemove, detail = false }) => {
     const tipo = set.tipo || '';
     const b = BADGE[tipo] || BADGE[''];
     const nextTipo = () => TIPI[(TIPI.findIndex(([t]) => t === tipo) + 1) % TIPI.length][0];
@@ -75,17 +75,17 @@ export const SetRowCompact = ({ set, index, cardio, oneRm, onChange, onRemove })
                 </button>
                 {inp('reps', cardio ? "20'" : '10', cardio ? 'Durata' : 'Ripetizioni')}
                 {!cardio && inp('load', derivedLoad !== null ? String(derivedLoad) : 'kg', 'Carico in kg')}
-                {!cardio && inp('pct', derivedPct !== null ? String(Math.round(derivedPct)) : '%', 'Percentuale del massimale')}
                 {inp('rpe', '8', 'RPE')}
                 <button type="button" className="t-setc-del" onClick={onRemove} aria-label="Elimina la serie">
                     <i className="ph ph-x"></i>
                 </button>
             </div>
-            <div className="t-setc-more">
+            {detail && <div className="t-setc-more">
+                {!cardio && extra('pct', '%1RM', derivedPct !== null ? String(Math.round(derivedPct)) : '%')}
                 {!cardio && extra('tempo', 'Tempo', '3-1-1-0')}
                 {extra('rec', 'Rec.', "90''")}
                 {extra('note', 'Nota', cardio ? 'zona FC...' : '')}
-            </div>
+            </div>}
         </div>
     );
 };

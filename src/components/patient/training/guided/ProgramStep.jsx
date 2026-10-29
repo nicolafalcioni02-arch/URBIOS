@@ -9,12 +9,12 @@ import { ActionSheet } from '../../../mobile/MobileChrome';
 // Settimane e sedute si riordinano trascinando (o con le frecce).
 // Su telefono le azioni di settimana e seduta (sposta, duplica, scarico, elimina) stanno in un foglio dal basso, come nel resto dell'app.
 
-const Tabs = ({ items, current, onSelect, onMove, onAdd, addLabel, badge, onMore }) => {
+const Tabs = ({ items, current, onSelect, onMove, onAdd, addLabel, badge, onMore, cls = '' }) => {
     const [dragId, setDragId] = useState(null);
     const [overId, setOverId] = useState(null);
     const idx = Math.min(current, items.length - 1);
     return (
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${cls}`}>
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 flex-1 min-w-0">
                 {items.map((it, i) => (
                     <button
@@ -74,6 +74,10 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
     const [sheet, setSheet] = useState(null); // { kind: 'week' | 'day' | 'delWeek' | 'delDay', token }
     const openSheet = (kind) => setSheet({ kind, token: Date.now() + Math.random() });
     // la conferma si apre quando il foglio precedente ha finito di chiudersi: lo stesso tocco non la chiude subito
+    const thenRename = (id, cur) => setTimeout(() => {
+        const v = window.prompt('Nome della settimana', cur || '');
+        if (v !== null) ops.updateWeekField(id, 'title', v);
+    }, 280);
     const thenSheet = (kind) => setTimeout(() => openSheet(kind), 280);
 
     const week = weeks[Math.min(wi, weeks.length - 1)];
@@ -103,7 +107,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
     return (
         <div className="max-w-3xl mx-auto dg-in">
             {/* strumenti del passo */}
-            <div className={`dg-toolbar ${compact ? 't-toolrow no-scrollbar' : ''}`} style={{ marginTop: 0 }}>
+            {!compact && <div className="dg-toolbar" style={{ marginTop: 0 }}>
                 <button className="dg-sm" onClick={onExercises}>
                     <i className="ph ph-list-magnifying-glass"></i> {compact ? 'Esercizi' : 'Database esercizi'}
                 </button>
@@ -116,10 +120,17 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                 <button className="dg-sm" onClick={onAnalysis}>
                     <i className="ph ph-chart-bar"></i> {compact ? 'Analisi' : 'Analisi della scheda'}
                 </button>
-            </div>
+            </div>}
 
             {/* settimane */}
-            <p className="text-[12px] font-semibold tracking-wider uppercase text-[color:var(--muted)] mt-5 mb-2">Settimana</p>
+            <p className="text-[12px] font-semibold tracking-wider uppercase text-[color:var(--muted)] mt-1 mb-2 t-lab">Settimana</p>
+            {compact ? (
+                <button className="t-weekpill" onClick={() => openSheet('weeks')}>
+                    <span>{week.title || `Settimana ${wi + 1}`}{week.kind === 'deload' ? ' · scarico' : ''}</span>
+                    <small>{weeks.length > 1 ? `${wi + 1} di ${weeks.length}` : ''}</small>
+                    <i className="ph ph-caret-down"></i>
+                </button>
+            ) : (
             <Tabs
                 items={weeks}
                 current={wi}
@@ -134,12 +145,12 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                     setDi(0);
                 }}
                 addLabel="Settimana"
+                cls="t-tier-week"
                 badge={(w) => (w.kind === 'deload' ? 'scarico' : '')}
                 onMore={compact ? () => openSheet('week') : undefined}
             />
-            {compact ? (
-                <input className="fld mt-2" value={week.title} onChange={(e) => ops.updateWeekField(week.id, 'title', e.target.value)} aria-label="Nome della settimana" placeholder="Nome della settimana" />
-            ) : (
+            )}
+            {compact ? null : (
             <div className="flex flex-wrap items-center gap-2 mt-2">
                 <input className="fld !w-auto min-w-[170px]" value={week.title} onChange={(e) => ops.updateWeekField(week.id, 'title', e.target.value)} aria-label="Nome della settimana" />
                 <label className="flex items-center gap-2 text-[13.5px] cursor-pointer" title="Meno volume e/o carico per recuperare">
@@ -167,7 +178,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
             )}
 
             {/* sedute */}
-            <p className="text-[12px] font-semibold tracking-wider uppercase text-[color:var(--muted)] mt-6 mb-2">Seduta</p>
+            <p className="text-[12px] font-semibold tracking-wider uppercase text-[color:var(--muted)] mt-4 mb-2 t-lab">Seduta</p>
             {week.days.length > 0 ? (
                 <Tabs
                     items={week.days}
@@ -182,6 +193,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                         setDi(week.days.length);
                     }}
                     addLabel="Seduta"
+                    cls="t-tier-day"
                     onMore={compact ? () => openSheet('day') : undefined}
                 />
             ) : (
@@ -222,7 +234,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                     <i className="ph ph-arrow-left"></i> <span>Obiettivo</span>
                 </button>
                 <button className="vw-next" onClick={onNext}>
-                    Verifica e consegna <i className="ph ph-arrow-right"></i>
+                    {compact ? 'Consegna' : 'Verifica e consegna'} <i className="ph ph-arrow-right"></i>
                 </button>
             </div>
 
@@ -238,6 +250,17 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                     setDi(to);
                 };
                 const cfg = {
+                    weeks: {
+                        title: 'Settimane',
+                        subtitle: 'Scegli quale modificare',
+                        groups: [
+                            weeks.map((w, i) => ({ label: w.title || `Settimana ${i + 1}`, icon: i === wIdx ? 'ph-check-circle' : 'ph-circle', note: w.kind === 'deload' ? 'scarico' : '', onClick: () => setWi(i) })),
+                            [
+                                { label: 'Nuova settimana', icon: 'ph-plus', onClick: () => { ops.addNewWeek(); setWi(weeks.length); setDi(0); } },
+                                { label: 'Opzioni di questa settimana', icon: 'ph-dots-three', onClick: () => thenSheet('week') },
+                            ],
+                        ],
+                    },
                     week: {
                         title: week.title || `Settimana ${wIdx + 1}`,
                         subtitle: `${week.days.length} ${week.days.length === 1 ? 'seduta' : 'sedute'}${week.kind === 'deload' ? ' · scarico' : ''}`,
@@ -247,6 +270,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                                 { label: 'Sposta dopo', icon: 'ph-arrow-right', disabled: wIdx >= weeks.length - 1, onClick: () => moveWeek(wIdx + 1) },
                             ],
                             [
+                                { label: 'Rinomina', icon: 'ph-pencil-simple', note: week.title || `Settimana ${wIdx + 1}`, onClick: () => thenRename(week.id, week.title) },
                                 {
                                     label: week.kind === 'deload' ? 'Togli lo scarico' : 'Segna come scarico',
                                     icon: 'ph-battery-low',
