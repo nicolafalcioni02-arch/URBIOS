@@ -68,6 +68,7 @@ export const CellPanel = ({ weeks, setWeeks, dayIndex, exKey, startWeekId, massi
                                     />
                                 ))}
                             </div>
+                            <p className="t-hint">Tocca il numero della serie per cambiarne il tipo: lavoro, <b>R</b> riscaldamento, <b>D</b> drop set.</p>
                             <div className="t-cell-actions">
                                 <button className="dg-sm" onClick={() => ops.addSet(week.id, day.id, ex.id)}>
                                     <i className="ph ph-plus"></i> Serie

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { DayEditor } from './DayEditor';
 import { GridView } from './GridView';
 import { CellPanel } from './CellPanel';
+import { WeekPanel } from './WeekPanel';
 import { blankExercise, cloneWeeks, genId } from '../logic/trainingModel';
 import { move } from './trainingGuidedLogic';
 import { useCompact } from '../../../../hooks/useCompact';
@@ -73,6 +74,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
     const [di, setDi] = useState(0);
     const [confirmDel, setConfirmDel] = useState(null); // 'week' | 'day'
     const [mode, setMode] = useState('list'); // 'list' | 'grid'
+    const [weekPanel, setWeekPanel] = useState(null); // id della settimana aperta dalla griglia
     const [cell, setCell] = useState(null); // casella della griglia aperta: { weekId, dayIndex, exKey }
     const compact = useCompact(639);
     // foglio di azioni aperto su telefono; il token tiene separati un foglio e quello che lo sostituisce (es. la conferma)
@@ -137,6 +139,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
             </div>
             {mode === 'grid' ? (
                 <GridView weeks={weeks} di={di} onDay={setDi} onOpen={(weekId, dayIndex, exKey) => setCell({ weekId, dayIndex, exKey })}
+                    onWeek={setWeekPanel}
                     onAddWeek={() => setWeeks((prev) => (prev.length ? [...prev, { ...cloneWeeks([prev[prev.length - 1]])[0], title: `Settimana ${prev.length + 1}`, kind: '' }] : prev))}
                     onAddExercise={(dayIndex, name) => setWeeks((prev) => prev.map((w) => (w.days[dayIndex] ? { ...w, days: w.days.map((d, i) => (i === dayIndex ? { ...d, exercises: [...d.exercises, { ...blankExercise(), id: genId(), name }] } : d)) } : w)))} />
             ) : (<>
@@ -258,6 +261,7 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
                 </button>
             </div>
 
+            {weekPanel && <WeekPanel weeks={weeks} setWeeks={setWeeks} weekId={weekPanel} ops={ops} onClose={() => setWeekPanel(null)} />}
             {cell && <CellPanel weeks={weeks} setWeeks={setWeeks} dayIndex={cell.dayIndex} exKey={cell.exKey} startWeekId={cell.weekId} massimali={massimali} ops={ops} onClose={() => setCell(null)} />}
 
             {sheet && (() => {

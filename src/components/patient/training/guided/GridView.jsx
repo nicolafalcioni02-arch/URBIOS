@@ -5,7 +5,7 @@ import { summarizeSets } from '../logic/trainingModel';
 // Serve a leggere la progressione (serie, carico, RPE) a colpo d'occhio; un tocco su una cella apre quella settimana per modificarla.
 const norm = (s) => String(s || '').trim().toLowerCase();
 
-export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise }) => {
+export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, onWeek }) => {
     const [name, setName] = useState('');
     const maxDays = Math.max(...weeks.map((w) => w.days.length), 0);
     const d = Math.min(di, Math.max(0, maxDays - 1));
@@ -43,8 +43,10 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise })
                                 <th>Esercizio</th>
                                 {weeks.map((w, wi) => (
                                     <th key={w.id}>
-                                        {w.title || `Sett. ${wi + 1}`}
-                                        {w.kind === 'deload' && <em>scarico</em>}
+                                        <button className="t-grid-wk" onClick={() => onWeek(w.id)} aria-label={`Opzioni di ${w.title || `settimana ${wi + 1}`}`}>
+                                            <span>{w.title || `Sett. ${wi + 1}`} <i className="ph ph-caret-down"></i></span>
+                                            {w.kind === 'deload' && <em>scarico</em>}
+                                        </button>
                                     </th>
                                 ))}
                                 <th>
@@ -96,7 +98,7 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise })
                     <i className="ph ph-plus"></i> Esercizio
                 </button>
             </form>
-            <p className="dg-hint mt-3">Tocca una cella per modificare l’esercizio in quella settimana.</p>
+            <p className="dg-hint mt-3">Tocca una cella per modificare l’esercizio, il nome di una settimana per rinominarla, duplicarla o eliminarla.</p>
         </div>
     );
 };

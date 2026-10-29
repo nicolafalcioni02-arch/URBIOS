@@ -145,6 +145,7 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                             onRemove={() => ops.removeSet(weekId, dayId, ex.id, s.id)}
                         />
                     ))}
+                    <p className="t-hint">Tocca il numero della serie per cambiarne il tipo: lavoro, <b>R</b> riscaldamento, <b>D</b> drop set.</p>
                 </div>
             ) : (
             <div className="t-table-scroll">

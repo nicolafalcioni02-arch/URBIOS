@@ -280,13 +280,32 @@ export const trainingCss = `
                 .t-mode { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--soft); margin: 0 0 12px; }
                 .t-mode button { display: inline-flex; align-items: center; gap: 6px; height: 36px; min-height: 0; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); }
                 .t-mode button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(18,19,23,.12); }
-                .t-grid-wrap { margin: 12px -16px 0; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0 16px 6px; }
+                .t-grid-wrap { margin: 12px -16px 0; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0 0 6px; }
                 .t-grid { border-collapse: separate; border-spacing: 0; min-width: 100%; font-size: 14px; }
                 .t-grid th, .t-grid td { padding: 0; border-bottom: 1px solid var(--line); vertical-align: middle; }
                 .t-grid thead th { font-size: 12.5px; font-weight: 600; color: var(--muted); text-align: center; padding: 8px 10px; white-space: nowrap; }
                 .t-grid thead th em { display: block; font-style: normal; font-size: 11px; color: var(--warn); }
-                .t-grid tbody th { position: sticky; left: 0; z-index: 2; background: var(--paper); text-align: left; font-weight: 600; padding: 10px 12px 10px 0; min-width: 96px; max-width: 110px; font-size: 13.5px; line-height: 1.25; }
-                .t-grid thead th:first-child { position: sticky; left: 0; z-index: 3; background: var(--paper); text-align: left; padding-left: 0; }
+                .t-grid tbody th { position: sticky; left: 0; z-index: 2; background: var(--paper); text-align: left; font-weight: 600; padding: 10px 10px 10px 16px; min-width: 112px; max-width: 126px; box-shadow: 6px 0 8px -6px rgba(18,19,23,.14); font-size: 13.5px; line-height: 1.25; }
+                .t-grid thead th:first-child { position: sticky; left: 0; z-index: 3; background: var(--paper); text-align: left; padding-left: 16px; box-shadow: 6px 0 8px -6px rgba(18,19,23,.14); }
+                .t-grid tr > :last-child { padding-right: 16px; }
+                .t-grid thead th button.t-grid-wk { display: flex; flex-direction: column; align-items: center; gap: 1px; width: 100%; min-height: 44px; padding: 4px 6px; border-radius: 10px; font-size: 12.5px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+                .t-grid thead th button.t-grid-wk:active { background: var(--soft); }
+                .t-grid thead th button.t-grid-wk i { font-size: 12px; opacity: .7; }
+                .t-hint { font-size: 12.5px; color: var(--muted); margin: 8px 2px 0; line-height: 1.35; }
+                .t-wk-field { margin-bottom: 12px; }
+                .t-wk-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; min-height: 56px; border-radius: 16px; background: #fff; border: 1px solid var(--line); cursor: pointer; }
+                .t-wk-switch b { display: block; font-size: 15px; font-weight: 600; }
+                .t-wk-switch small { display: block; font-size: 12.5px; color: var(--muted); }
+                .t-wk-switch input { width: 22px; height: 22px; flex: none; }
+                .t-wk-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+                .t-wk-actions .dg-sm { height: 42px; }
+                .t-wk-actions .dg-sm:disabled { opacity: .35; }
+                .t-wk-delbtn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; border-radius: 14px; color: #C2413A; font-weight: 600; font-size: 15px; margin-bottom: 10px; }
+                .t-wk-del { padding: 12px 14px; border-radius: 16px; background: #FDF1F0; margin-bottom: 10px; }
+                .t-wk-del p { font-size: 14px; color: #8A2B25; margin-bottom: 10px; }
+                .t-wk-del div { display: flex; gap: 8px; }
+                .t-wk-del .dg-sm { height: 42px; flex: 1; justify-content: center; }
+                .t-danger { background: #C2413A; color: #fff; }
                 .t-grid td button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 100%; min-width: 76px; min-height: 64px; padding: 6px 4px; text-align: center; }
                 .t-grid td button:active { background: var(--soft); }
                 .t-grid td b { font-size: 14px; white-space: nowrap; font-weight: 600; color: var(--ink); }
