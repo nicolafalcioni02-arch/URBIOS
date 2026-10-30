@@ -272,6 +272,7 @@ export const trainingCss = `
                 .t-cell-empty { padding: 18px 4px 22px; color: var(--muted); font-size: 14.5px; }
                 .t-cell-empty .dg-sm { margin-top: 12px; }
                 .t-grid-sig { display: inline-block; margin-right: 6px; padding: 1px 6px; border-radius: 6px; background: #E8730C; color: #fff; font-size: 11.5px; }
+                .t-chip-add { border-style: dashed; color: var(--muted); }
                 .t-grid-actions { display: flex; gap: 8px; margin-top: 14px; }
                 .t-grid-actions .dg-sm { flex: 1; justify-content: center; height: 46px; border-radius: 14px; background: #fff; border-color: var(--line); }
                 .t-grid-actions .dg-sm.t-on { background: var(--ink); color: #fff; border-color: var(--ink); }

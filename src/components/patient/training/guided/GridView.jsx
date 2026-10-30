@@ -60,6 +60,9 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
                         {titleOf(i)}
                     </button>
                 ))}
+                <button className="dg-chip row t-chip-add" onClick={() => { setName(''); setAsk('day'); }}>
+                    <i className="ph ph-plus"></i> Seduta
+                </button>
             </div>
             {rows.length === 0 ? (
                 <p className="dg-sub mt-4">Questa seduta non ha ancora esercizi con un nome.</p>
@@ -136,9 +139,6 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
             <div className="t-grid-actions">
                 <button className="dg-sm" onClick={() => { setName(''); setAsk('ex'); }}>
                     <i className="ph ph-plus"></i> Esercizio
-                </button>
-                <button className="dg-sm" onClick={() => { setName(''); setAsk('day'); }}>
-                    <i className="ph ph-plus"></i> Seduta
                 </button>
                 {rows.length > 1 && (
                     <button className={`dg-sm ${ssMode ? 't-on' : ''}`} onClick={() => { setSsMode(!ssMode); setSel([]); }} aria-pressed={ssMode}>
