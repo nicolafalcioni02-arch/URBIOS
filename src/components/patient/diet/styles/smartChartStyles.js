@@ -40,8 +40,17 @@ export const smartChartStyles = `
 @media (max-width: 760px) {
   .sr-overlay { padding: 0; }
   .sr-modal { height: 100%; max-width: none; border-radius: 0; border: 0; }
-  .sr-body { grid-template-columns: 1fr; grid-template-rows: auto minmax(320px, 1fr); overflow-y: auto; }
-  .sr-panel { border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
-  .sr-chart-area { padding: 14px 16px; min-height: 340px; }
+  .sr-body { display: flex; flex-direction: column; }
+  .sr-chart-area { order: -1; }
+  .sr-panel { border-right: 0; border-top: 1px solid var(--line); }
+  .sr-body { overflow-y: auto; }
+  .sr-chart-area { padding: 14px 12px 4px; flex: none; }
+  .sr-panel { flex: none; }
+  .sr-chart { flex: none; height: 380px; }
+  .sr-panel { overflow: visible; }
+  .sr-sub { display: none; }
+  .sr-types button, .sr-seg button { min-height: 44px; }
+  .sr-select { min-height: 46px; font-size: 16px; }
+  .sr-notes { font-size: 16px; min-height: 110px; }
 }
 `;

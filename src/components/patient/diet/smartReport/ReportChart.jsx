@@ -23,7 +23,7 @@ export const ReportChart = ({ model, compact = false }) => {
             .then((P) => {
                 if (!alive) return;
                 Plotly = P;
-                const { data, layout, config } = buildFigure(model, readTheme(), compact);
+                const { data, layout, config } = buildFigure(model, readTheme(), compact, el.clientWidth < 520);
                 return P.react(el, data, layout, config).then(() => {
                     if (!alive || typeof ResizeObserver === 'undefined') return;
                     ro = new ResizeObserver(() => P.Plots.resize(el));

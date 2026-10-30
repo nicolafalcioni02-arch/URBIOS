@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { ActionSheet } from '../../../mobile/MobileChrome';
+import { SupplementSheet } from './MealSheets';
 import { confetti } from '../../shared/fx';
-import { STATUSES, dayStatus, dayTotals, setPlanStatus, statusOf } from './guidedLogic';
+import { STATUSES, dayStatus, dayTotals, patchVisit, setPlanStatus, statusOf } from './guidedLogic';
 
 // Passo 3 — Consegna: controllo finale, poi stampa, analisi e stato del piano.
 
@@ -22,6 +25,8 @@ export const DeliverStep = ({ patient, targets, dietDays, visitaAttiva, onUpdate
     const det = visitaAttiva?.dettagli || {};
     const supplements = Array.isArray(det.diet_supplements) ? det.diet_supplements : [];
     const advice = Array.isArray(det.diet_notes) ? det.diet_notes : [];
+    const [suppSheet, setSuppSheet] = useState(null); // { index | -1 (nuovo), kind: 'form' | 'del' }
+    const saveSupps = (list) => patchVisit(onUpdateDb, patient.id, visitaAttiva.id, (v) => ({ ...v, dettagli: { ...v.dettagli, diet_supplements: list } }));
 
     return (
         <div className="max-w-3xl mx-auto dg-in">
@@ -54,21 +59,31 @@ export const DeliverStep = ({ patient, targets, dietDays, visitaAttiva, onUpdate
                 )}
             </section>
 
-            {supplements.length > 0 && (
-                <section className="dg-card">
-                    <p className="dg-q">Integratori consigliati</p>
-                    {supplements.map((s) => (
-                        <div key={s.id || s.name} className="dg-row" style={{ display: 'block' }}>
+            <section className="dg-card">
+                <p className="dg-q">Integratori</p>
+                {supplements.length === 0 && <p className="text-[14px] text-[color:var(--muted)] mb-1">Nessun integratore. Aggiungine uno se serve.</p>}
+                {supplements.map((s, i) => (
+                    <div key={s.id || `${s.name}-${i}`} className="dg-row" style={{ alignItems: 'flex-start' }}>
+                        <div className="flex-1 min-w-0" style={{ flex: '1 1 0' }}>
                             <p className="text-[14.5px] font-medium">
                                 {s.name} {s.dose && <span className="text-[color:var(--muted)] font-normal">· {s.dose}</span>}
                             </p>
                             {s.when && <p className="text-[12.5px] text-[color:var(--muted)]">Quando: {s.when}</p>}
                             {s.why && <p className="text-[12.5px] text-[color:var(--muted)]">Perché: {s.why}</p>}
                         </div>
-                    ))}
-                    <p className="dg-hint mt-2">Suggerimenti generati da un’AI: valuta tu l’opportunità clinica prima della consegna.</p>
-                </section>
-            )}
+                        <button className="dg-ghost" aria-label={`Modifica ${s.name}`} onClick={() => setSuppSheet({ index: i, kind: 'form' })}>
+                            <i className="ph ph-pencil-simple"></i>
+                        </button>
+                        <button className="dg-ghost" aria-label={`Elimina ${s.name}`} onClick={() => setSuppSheet({ index: i, kind: 'del' })}>
+                            <i className="ph ph-trash"></i>
+                        </button>
+                    </div>
+                ))}
+                <button className="dg-add" onClick={() => setSuppSheet({ index: -1, kind: 'form' })}>
+                    <i className="ph ph-plus-circle"></i> Aggiungi integratore
+                </button>
+                {supplements.length > 0 && <p className="dg-hint mt-2">Se i suggerimenti sono generati da un’AI, valuta tu l’opportunità clinica prima della consegna.</p>}
+            </section>
             {advice.length > 0 && (
                 <section className="dg-card">
                     <p className="dg-q">Consigli per il paziente</p>
@@ -102,6 +117,26 @@ export const DeliverStep = ({ patient, targets, dietDays, visitaAttiva, onUpdate
             <p className="dg-hint text-center mt-6">
                 <i className="ph ph-cloud-check"></i> Le modifiche si salvano da sole nella visita.
             </p>
+
+            {suppSheet && suppSheet.kind === 'form' && (
+                <SupplementSheet
+                    initial={suppSheet.index >= 0 ? supplements[suppSheet.index] : null}
+                    onSubmit={(v) => saveSupps(suppSheet.index >= 0 ? supplements.map((x, i) => (i === suppSheet.index ? { ...x, ...v } : x)) : [...supplements, { id: 'sup-' + Date.now(), ...v }])}
+                    onClose={() => setSuppSheet(null)}
+                />
+            )}
+            {suppSheet && suppSheet.kind === 'del' && supplements[suppSheet.index] && createPortal(
+                <ActionSheet
+                    title={`Eliminare ${supplements[suppSheet.index].name}?`}
+                    subtitle="L'integratore verrà tolto dal piano."
+                    onClose={() => setSuppSheet(null)}
+                    groups={[
+                        [{ label: 'Elimina l’integratore', icon: 'ph-trash', tone: 'danger', onClick: () => saveSupps(supplements.filter((_, i) => i !== suppSheet.index)) }],
+                        [{ label: 'Annulla', icon: 'ph-x', onClick: () => {} }],
+                    ]}
+                />,
+                document.body
+            )}
         </div>
     );
 };

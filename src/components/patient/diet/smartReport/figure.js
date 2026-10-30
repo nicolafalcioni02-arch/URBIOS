@@ -32,7 +32,7 @@ const rgba = (hex, a) => {
     return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`;
 };
 
-export const buildFigure = (model, t, compact = false) => {
+export const buildFigure = (model, t, compact = false, narrow = false) => {
     const palette = [t.accent, t.ink, t.ok, t.warn, t.muted, t.bad];
     const color = (i) => palette[i % palette.length];
     const { type, labels, series, refs, percent } = model;
@@ -43,16 +43,16 @@ export const buildFigure = (model, t, compact = false) => {
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
         font,
-        margin: compact ? { t: 8, l: 36, r: 8, b: 28 } : { t: 24, l: 56, r: 24, b: multi ? 84 : 56 },
+        margin: compact ? { t: 8, l: 36, r: 8, b: 28 } : narrow ? { t: 16, l: 44, r: 10, b: 40 } : { t: 24, l: 56, r: 24, b: multi ? 84 : 56 },
         showlegend: multi && !compact && series.length <= 12,
-        legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.2, font: { size: 11, color: t.ink } },
+        legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: narrow ? -0.3 : -0.2, font: { size: 11, color: t.ink } },
         hoverlabel: { bgcolor: t.ink, font: { color: '#fff', family: font.family, size: 12 }, bordercolor: t.ink },
     };
     const unit = percent ? '%' : model.unit;
     const data = [];
 
     if (type === 'bar' || type === 'line') {
-        const showText = !compact && labels.length * series.length <= 16;
+        const showText = !compact && !narrow && labels.length * series.length <= 16;
         series.forEach((s, i) => {
             const c = color(i);
             const hover = `<b>%{x}</b><br>${s.name}: %{y:.2f} ${s.unit}<extra></extra>`;
@@ -76,9 +76,9 @@ export const buildFigure = (model, t, compact = false) => {
         layout.yaxis = {
             gridcolor: t.line, zeroline: false, showline: false, rangemode: 'tozero',
             range: [0, peak > 0 ? peak * (showText ? 1.18 : 1.1) : 1],
-            title: compact ? undefined : { text: unit, font: { size: 12 } },
+            title: compact || narrow ? undefined : { text: unit, font: { size: 12 } },
         };
-        layout.xaxis = { gridcolor: 'rgba(0,0,0,0)', zeroline: false, showline: true, linecolor: t.line, tickangle: labels.length > 6 ? -35 : 0, automargin: true };
+        layout.xaxis = { gridcolor: 'rgba(0,0,0,0)', zeroline: false, showline: true, linecolor: t.line, tickangle: labels.length > (narrow ? 3 : 6) ? -35 : 0, automargin: true };
 
         layout.shapes = refs.map((r) => ({
             type: 'line', xref: 'paper', x0: 0, x1: 1, y0: r.value, y1: r.value,
@@ -94,11 +94,12 @@ export const buildFigure = (model, t, compact = false) => {
         data.push({
             type: 'pie', labels: kept.map((s) => s.l), values: kept.map((s) => s.v), hole: 0.5, sort: false,
             marker: { colors: kept.map((_, i) => color(i)), line: { color: '#fff', width: 2 } },
-            textinfo: compact ? 'percent' : 'label+percent', textfont: { color: '#fff', size: compact ? 10 : 12 },
+            textinfo: compact || narrow ? 'percent' : 'label+percent', textfont: { color: '#fff', size: compact ? 10 : 12 },
             hovertemplate: `<b>%{label}</b><br>%{value:.2f} ${unit}<br>%{percent}<extra></extra>`,
         });
-        layout.showlegend = false;
-        layout.margin = { t: 12, l: 12, r: 12, b: 12 };
+        layout.showlegend = narrow;
+        layout.legend = { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.05, font: { size: 11, color: t.ink } };
+        layout.margin = { t: 12, l: 12, r: 12, b: narrow ? 70 : 12 };
     } else if (type === 'radar') {
         const closed = (a) => (a.length ? [...a, a[0]] : a);
         if (multi) {
@@ -123,9 +124,9 @@ export const buildFigure = (model, t, compact = false) => {
         layout.polar = {
             bgcolor: 'rgba(0,0,0,0)',
             radialaxis: { visible: true, range: [0, peak * 1.1 || 1], gridcolor: t.line, linecolor: t.line, ticksuffix: percent ? '%' : '', tickfont: { size: 10 } },
-            angularaxis: { gridcolor: t.line, linecolor: t.line, tickfont: { size: compact ? 9 : 11, color: t.ink } },
+            angularaxis: { gridcolor: t.line, linecolor: t.line, tickfont: { size: compact || narrow ? 9 : 11, color: t.ink } },
         };
-        layout.margin = compact ? { t: 16, l: 24, r: 24, b: 16 } : { t: 32, l: 48, r: 48, b: multi ? 64 : 32 };
+        layout.margin = compact ? { t: 16, l: 24, r: 24, b: 16 } : narrow ? { t: 20, l: 36, r: 36, b: multi ? 60 : 20 } : { t: 32, l: 48, r: 48, b: multi ? 64 : 32 };
     }
     return { data, layout, config: { displayModeBar: false, responsive: true, staticPlot: compact } };
 };

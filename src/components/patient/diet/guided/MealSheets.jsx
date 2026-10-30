@@ -222,3 +222,43 @@ export const AddMealSheet = ({ library, day, tdee, gT, onAdd, onClose }) => {
         document.body
     );
 };
+
+// Integratore: nome, dose, quando e perché (solo il nome è obbligatorio).
+export const SupplementSheet = ({ initial, onSubmit, onClose }) => {
+    const [f, setF] = useState({ name: initial?.name || '', dose: initial?.dose || '', when: initial?.when || '', why: initial?.why || '' });
+    const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+    return createPortal(
+        <div className="sheet-back" onClick={onClose}>
+            <form
+                className="sheet t-cellsheet"
+                onClick={(e) => e.stopPropagation()}
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!f.name.trim()) return;
+                    onSubmit({ ...f, name: f.name.trim(), dose: f.dose.trim(), when: f.when.trim(), why: f.why.trim() });
+                    onClose();
+                }}
+            >
+                <Head title={initial ? 'Modifica integratore' : 'Aggiungi un integratore'} onClose={onClose} />
+                <label className="fld-label">Nome</label>
+                <input className="fld" autoFocus value={f.name} onChange={set('name')} placeholder="Es. Vitamina D3" />
+                <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <label className="fld-label">Dose</label>
+                        <input className="fld" value={f.dose} onChange={set('dose')} placeholder="Es. 2000 UI" />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <label className="fld-label">Quando</label>
+                        <input className="fld" value={f.when} onChange={set('when')} placeholder="Es. A colazione" />
+                    </div>
+                </div>
+                <label className="fld-label" style={{ marginTop: 10 }}>Perché (facoltativo)</label>
+                <input className="fld" value={f.why} onChange={set('why')} placeholder="Es. Carenza documentata" />
+                <button type="submit" className="vw-next t-cell-done" style={{ marginTop: 14 }} disabled={!f.name.trim()}>
+                    {initial ? 'Salva' : 'Aggiungi'}
+                </button>
+            </form>
+        </div>,
+        document.body
+    );
+};
