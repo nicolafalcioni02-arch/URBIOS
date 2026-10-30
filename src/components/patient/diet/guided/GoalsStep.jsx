@@ -54,6 +54,8 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
     const mealsN = g.meals || (MEAL_PRESETS[calcData.distribution?.length] ? calcData.distribution.length : 0);
     const [customMacro, setCustomMacro] = useState(macroId === 'custom');
     const [editP, setEditP] = useState(false);
+    // sesso non indicato in anagrafica: il valore di partenza è Uomo, ma va segnalato finché non lo si conferma
+    const sexMissing = !['M', 'F'].includes(String(patient?.sesso || '').toUpperCase()) && !(calcData.guided || {}).sexChecked;
     const diff = g.dayMode === 'diff';
     const perType = diff && !!g.distByType; // ripartizione dei pasti diversa per tipo di giornata
     const types = getTypes(calcData);
@@ -103,6 +105,18 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
         <div className="max-w-3xl mx-auto dg-in">
             <section className="dg-card">
                 <p className="dg-q">1 · Paziente</p>
+                {sexMissing && (
+                    <div className="dg-warn" style={{ marginTop: 0, marginBottom: 12 }} role="alert">
+                        <b>Il sesso non è indicato nella scheda del paziente.</b> Ho messo <b>{calcData.sex === 'F' ? 'Donna' : 'Uomo'}</b>: controlla, perché cambia il fabbisogno di circa 160 kcal.
+                        <div className="flex gap-2 mt-2">
+                            {['M', 'F'].map((sx) => (
+                                <button key={sx} type="button" className={`dg-chip row ${calcData.sex === sx ? 'on' : ''}`} onClick={() => setG({ sexChecked: true }, { sex: sx })}>
+                                    {sx === 'M' ? 'Uomo' : 'Donna'}{calcData.sex === sx ? ' · confermo' : ''}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
                 {!editP && missing.length === 0 ? (
                     <div className="gm-sum">
                         <span>
@@ -116,7 +130,7 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
                             <Field label="Sesso">
                                 <div className="flex gap-2">
                                     {['M', 'F'].map((sx) => (
-                                        <Chip key={sx} on={calcData.sex === sx} onClick={() => set({ sex: sx })}>
+                                        <Chip key={sx} on={calcData.sex === sx} onClick={() => setG({ sexChecked: true }, { sex: sx })}>
                                             {sx === 'M' ? 'Uomo' : 'Donna'}
                                         </Chip>
                                     ))}
