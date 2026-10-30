@@ -166,6 +166,7 @@ select.lafm-name { appearance: none; -webkit-appearance: none; background: var(-
 .lafi-sexnote b { color: var(--ink); }
 .lafi-cols .me { color: var(--ink); }
 .lafi-row b.me { background: var(--soft); border-radius: 8px; padding: 4px 0; }
-.lafi-only { display: block; font-size: 11.5px; font-weight: 600; color: #9A5B00; margin-top: 1px; }
-.lafm-warn { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; color: #9A5B00; background: #FFF6E5; border-radius: 10px; padding: 6px 10px; margin-top: 8px; line-height: 1.3; }
+.lafi-only { display: block; font-size: 11.5px; font-weight: 500; color: var(--muted); margin-top: 1px; }
+.lafm-warn { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; color: var(--muted); background: var(--soft); border-radius: 10px; padding: 6px 10px; margin-top: 8px; line-height: 1.3; }
+.lafm-warn i { margin-top: 1px; flex: none; }
 `;

@@ -220,7 +220,7 @@ const LafBody = ({ onUseLaf, applyLafTemplate, calcData, calculatedLAF, lafActiv
                                         <i className="ph ph-trash"></i>
                                     </button>
                                 </div>
-                                {a.note && <p className="lafm-warn"><i className="ph ph-warning"></i> {a.note}</p>}
+                                {a.note && <p className="lafm-warn"><i className="ph ph-info"></i> {a.note}</p>}
                                 <div className="lafm-row">
                                     <label className="lafm-pal">
                                         <small>Coefficiente (PAL)</small>
