@@ -41,11 +41,134 @@ export const NameSheet = ({ title, subtitle, initial = '', placeholder, confirmL
     );
 };
 
-export const AddMealSheet = ({ library, onAdd, onClose }) => {
+const R = (x) => Math.round(x);
+
+// barra "oggi → dopo": quanto c'è già (scuro), quanto aggiunge il pasto (accento), rispetto all'obiettivo (tacca)
+const DeltaBar = ({ label, cur, add, target, unit }) => {
+    const after = cur + add;
+    const max = Math.max(target, after, 1) * 1.05;
+    const over = target > 0 && after > target * 1.08;
+    return (
+        <div className="t-delta">
+            <div className="t-delta-top">
+                <span>{label}</span>
+                <b style={over ? { color: '#C2413A' } : undefined}>
+                    {R(cur)} → {R(after)}
+                    {target > 0 && <em> / {R(target)} {unit}</em>}
+                </b>
+            </div>
+            <div className="t-delta-bar">
+                <i style={{ width: `${(cur / max) * 100}%` }}></i>
+                <i className="add" style={{ left: `${(cur / max) * 100}%`, width: `${(add / max) * 100}%`, background: over ? '#C2413A' : 'var(--accent)' }}></i>
+                {target > 0 && <u style={{ left: `${(target / max) * 100}%` }}></u>}
+            </div>
+        </div>
+    );
+};
+
+// Anteprima di un pasto salvato: cos'è, che macro ha, come si integra nel giorno.
+const MealPreview = ({ meal, day, tdee, gT, onBack, onConfirm, onClose }) => {
+    const t = dayTotals({ meals: [meal] });
+    const d = dayTotals(day);
+    const kc = { c: t.c * 4, p: t.p * 4, f: t.f * 9 };
+    const ksum = kc.c + kc.p + kc.f || 1;
+    const share = { c: (kc.c / ksum) * 100, p: (kc.p / ksum) * 100, f: (kc.f / ksum) * 100 };
+    const verdict = (() => {
+        if (!tdee) return null;
+        const after = d.kcal + t.kcal;
+        if (after > tdee * 1.08) return { ok: false, text: `Supera l’obiettivo del giorno di ${R(after - tdee)} kcal.` };
+        if (after < tdee * 0.92) return { ok: true, text: `Dopo l’aggiunta mancano ancora ${R(tdee - after)} kcal all’obiettivo.` };
+        return { ok: true, text: 'Dopo l’aggiunta il giorno resta in linea con l’obiettivo.' };
+    })();
+    return (
+        <div className="t-prev">
+            <div className="t-cell-head">
+                <button type="button" className="dg-ghost" onClick={onBack} aria-label="Torna all’elenco">
+                    <i className="ph-bold ph-arrow-left"></i>
+                </button>
+                <div className="min-w-0 flex-1">
+                    <p>{meal.title || 'Pasto'}</p>
+                    <span>{meal.items.length} {meal.items.length === 1 ? 'alimento' : 'alimenti'}{meal.savedAt ? ` · salvato il ${meal.savedAt}` : ''}</span>
+                </div>
+                <button type="button" className="dg-ghost" onClick={onClose} aria-label="Chiudi">
+                    <i className="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <div className="t-prev-body">
+                <div className="t-prev-kcal">
+                    <b>{R(t.kcal)}</b> <span>kcal</span>
+                </div>
+                <div className="t-prev-stack" role="img" aria-label="Ripartizione delle kcal tra carboidrati, proteine e grassi">
+                    <i style={{ width: `${share.c}%`, background: '#121317' }}></i>
+                    <i style={{ width: `${share.p}%`, background: '#1F8A5B' }}></i>
+                    <i style={{ width: `${share.f}%`, background: '#8A8780' }}></i>
+                </div>
+                <div className="t-prev-legend">
+                    <span><i style={{ background: '#121317' }}></i>Carboidrati <b>{R(t.c)} g</b> · {R(share.c)}%</span>
+                    <span><i style={{ background: '#1F8A5B' }}></i>Proteine <b>{R(t.p)} g</b> · {R(share.p)}%</span>
+                    <span><i style={{ background: '#8A8780' }}></i>Grassi <b>{R(t.f)} g</b> · {R(share.f)}%</span>
+                </div>
+
+                <p className="t-prev-h">Alimenti</p>
+                <div className="t-prev-items">
+                    {meal.items.map((it) => {
+                        const w = (parseFloat(it.weight) || 0) / 100;
+                        return (
+                            <div key={it.id || it.name}>
+                                <span className="min-w-0">{it.name || 'Alimento'}</span>
+                                <small>{R(parseFloat(it.weight) || 0)} g</small>
+                                <b>{R((parseFloat(it.kcal) || 0) * w)} kcal</b>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                <p className="t-prev-h">Nel giorno “{day.title}”</p>
+                <DeltaBar label="Calorie" cur={d.kcal} add={t.kcal} target={tdee} unit="kcal" />
+                <DeltaBar label="Carboidrati" cur={d.c} add={t.c} target={gT.c} unit="g" />
+                <DeltaBar label="Proteine" cur={d.p} add={t.p} target={gT.p} unit="g" />
+                <DeltaBar label="Grassi" cur={d.f} add={t.f} target={gT.f} unit="g" />
+                <p className="t-prev-key"><i></i> già nel giorno <i className="add"></i> aggiunto da questo pasto <u></u> obiettivo</p>
+                {verdict && <p className={`t-prev-verdict ${verdict.ok ? 'ok' : 'bad'}`}>{verdict.text}</p>}
+            </div>
+
+            <div className="t-prev-foot">
+                <button type="button" className="vw-back" style={{ height: 52, borderRadius: 16, padding: '0 20px', flex: 'none', width: 'auto', whiteSpace: 'nowrap' }} onClick={onBack}>Indietro</button>
+                <button type="button" className="vw-next" style={{ height: 52, borderRadius: 16, flex: 1 }} onClick={onConfirm}>
+                    Aggiungi al giorno
+                </button>
+            </div>
+        </div>
+    );
+};
+
+export const AddMealSheet = ({ library, day, tdee, gT, onAdd, onClose }) => {
     const [name, setName] = useState('');
+    const [pick, setPick] = useState(null);
     const [q, setQ] = useState('');
     const saved = (library || []).filter((m) => !isRecipe(m) && (m.items || []).length > 0);
     const shown = saved.filter((m) => !q.trim() || String(m.title).toLowerCase().includes(q.trim().toLowerCase()));
+    if (pick)
+        return createPortal(
+            <div className="sheet-back" onClick={onClose}>
+                <div className="sheet t-cellsheet t-prevsheet" onClick={(e) => e.stopPropagation()}>
+                    <MealPreview
+                        meal={pick}
+                        day={day}
+                        tdee={tdee}
+                        gT={gT}
+                        onBack={() => setPick(null)}
+                        onClose={onClose}
+                        onConfirm={() => {
+                            onAdd(pick.title, mealItemsCopy(pick));
+                            onClose();
+                        }}
+                    />
+                </div>
+            </div>,
+            document.body
+        );
     return createPortal(
         <div className="sheet-back" onClick={onClose}>
             <div className="sheet t-cellsheet" onClick={(e) => e.stopPropagation()}>
@@ -80,16 +203,13 @@ export const AddMealSheet = ({ library, onAdd, onClose }) => {
                                     <button
                                         key={m.id}
                                         className="t-addmeal-row"
-                                        onClick={() => {
-                                            onAdd(m.title, mealItemsCopy(m));
-                                            onClose();
-                                        }}
+                                        onClick={() => setPick(m)}
                                     >
                                         <span className="min-w-0">
                                             <b>{m.title || 'Pasto'}</b>
                                             <small>{m.items.length} {m.items.length === 1 ? 'alimento' : 'alimenti'} · {Math.round(t.kcal)} kcal</small>
                                         </span>
-                                        <i className="ph ph-plus"></i>
+                                        <i className="ph ph-caret-right"></i>
                                     </button>
                                 );
                             })}

@@ -425,7 +425,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mea
                 }[mealSheet.kind];
                 return createPortal(<ActionSheet key={mealSheet.kind} {...cfg} onClose={() => setMealSheet(null)} />, document.body);
             })()}
-            {addingMeal && <AddMealSheet library={mealLibrary} onAdd={(title, items) => update((d) => addMeal(d, day.id, title, items))} onClose={() => setAddingMeal(false)} />}
+            {addingMeal && <AddMealSheet library={mealLibrary} day={day} tdee={tdee} gT={gT} onAdd={(title, items) => update((d) => addMeal(d, day.id, title, items))} onClose={() => setAddingMeal(false)} />}
 
             {sheet && createPortal(
                 <ActionSheet
