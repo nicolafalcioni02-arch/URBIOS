@@ -46,7 +46,7 @@ export const SetRow = ({ set, index, cardio, oneRm, onChange, onRemove }) => {
 
 // La stessa serie su telefono: in alto i numeri che si toccano di più (reps, kg, %1RM, RPE),
 // sotto tempo, recupero e nota con la loro etichetta. Niente tabella da scorrere di lato.
-export const SetRowCompact = ({ set, index, cardio, oneRm, onChange, onRemove, detail = false }) => {
+export const SetRowCompact = ({ set, index, cardio, oneRm, onChange, onRemove, detail = false, noRec = false, recLabel = 'Rec.' }) => {
     const tipo = set.tipo || '';
     const b = BADGE[tipo] || BADGE[''];
     const nextTipo = () => TIPI[(TIPI.findIndex(([t]) => t === tipo) + 1) % TIPI.length][0];
@@ -83,7 +83,7 @@ export const SetRowCompact = ({ set, index, cardio, oneRm, onChange, onRemove, d
             {detail && <div className="t-setc-more">
                 {!cardio && extra('pct', '%1RM', derivedPct !== null ? String(Math.round(derivedPct)) : '%')}
                 {!cardio && extra('tempo', 'Tempo', '3-1-1-0')}
-                {extra('rec', 'Rec.', "90''")}
+                {!noRec && extra('rec', recLabel, "90''")}
                 {extra('note', 'Nota', cardio ? 'zona FC...' : '')}
             </div>}
         </div>

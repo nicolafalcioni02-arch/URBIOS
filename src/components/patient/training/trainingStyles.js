@@ -291,6 +291,9 @@ export const trainingCss = `
                 .t-grid thead th button.t-grid-wk { display: flex; flex-direction: column; align-items: center; gap: 1px; width: 100%; min-height: 44px; padding: 4px 6px; border-radius: 10px; font-size: 12.5px; font-weight: 600; color: var(--muted); white-space: nowrap; }
                 .t-grid thead th button.t-grid-wk:active { background: var(--soft); }
                 .t-grid thead th button.t-grid-wk i { font-size: 12px; opacity: .7; }
+                .t-ss-link { display: flex; align-items: center; justify-content: center; gap: 6px; margin: -6px auto 10px; min-height: 38px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--muted); }
+                .t-ss-link.on { background: var(--ink); color: #fff; margin-top: -14px; position: relative; z-index: 2; }
+                .t-ss-link:active { transform: scale(.97); }
                 .t-hint { font-size: 12.5px; color: var(--muted); margin: 8px 2px 0; line-height: 1.35; }
                 .t-wk-field { margin-bottom: 12px; }
                 .t-wk-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; min-height: 56px; border-radius: 16px; background: #fff; border: 1px solid var(--line); cursor: pointer; }

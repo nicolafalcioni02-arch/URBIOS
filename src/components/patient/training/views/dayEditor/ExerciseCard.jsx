@@ -22,7 +22,9 @@ const chip = {
 };
 
 // Una scheda-esercizio: nome (con suggerimenti), figure, superserie, serie con carico/%/RPE/tempo, riscaldamento, 1RM.
-export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions, oneRm, ops, compact = false }) => {
+export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions, oneRm, ops, compact = false, ssRole = '' }) => {
+    // in superserie il recupero si scrive solo sull'ultimo esercizio del blocco
+    const noRec = ssRole === 'first' || ssRole === 'mid';
     const imgs = getExerciseImages(ex.name, exerciseDB);
     const cardio = isCardio(ex);
     const workWithLoad = ex.sets.filter((s) => s.tipo !== 'riscaldamento' && numOrNull(s.load) && numOrNull(s.reps) && numOrNull(s.reps) <= 10);
@@ -88,27 +90,15 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                         style={{ flex: 1, minWidth: 0, color: '#6E6D69', fontSize: 14, fontWeight: 500 }}
                         placeholder="Gruppo muscolare"
                     />
-                    <select
-                        title="Superserie: gli esercizi consecutivi con la stessa lettera si eseguono uno dopo l'altro, senza recupero in mezzo"
-                        value={ex.ss || ''}
-                        onChange={(e) => ops.updateExValue(weekId, dayId, ex.id, 'ss', e.target.value)}
-                        style={{ ...chip, padding: '9px 10px', flex: 'none' }}
-                    >
-                        {SS.map((l) => (
-                            <option key={l} value={l}>
-                                {l ? (compact ? `Super ${l}` : `Superserie ${l}`) : 'Singolo'}
-                            </option>
-                        ))}
-                    </select>
                     <button className="t-icon-btn danger" style={{ marginLeft: 0, flex: 'none' }} onClick={() => ops.removeExercise(weekId, dayId, ex.id)} aria-label="Elimina l'esercizio">
                         <i className="ph ph-trash"></i>
                     </button>
                 </div>
             </div>
 
-            {ex.ss && (
+            {ssRole && (
                 <p className="t-hint" style={{ margin: '-6px 2px 12px' }}>
-                    Superserie {ex.ss}: gli esercizi di fila con la stessa lettera si fanno uno dopo l’altro. Scrivi il recupero solo sull’ultimo del gruppo.
+                    {noRec ? 'In superserie: nessun recupero tra gli esercizi. Il recupero si scrive sull’ultimo del blocco.' : 'Ultimo della superserie: qui scrivi il recupero dopo ogni giro.'}
                 </p>
             )}
 
@@ -147,6 +137,8 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                             cardio={cardio}
                             oneRm={oneRm}
                             detail={detail}
+                            noRec={noRec}
+                            recLabel={ssRole === 'last' ? 'Rec. giro' : 'Rec.'}
                             onChange={set(s.id)}
                             onRemove={() => ops.removeSet(weekId, dayId, ex.id, s.id)}
                         />

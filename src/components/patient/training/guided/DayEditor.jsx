@@ -13,6 +13,10 @@ const Stat = ({ k, v, hint }) => (
 );
 const fmtKg = (x) => (x >= 1000 ? `${(x / 1000).toFixed(2).replace('.', ',')} t` : `${Math.round(x)} kg`);
 
+const LETTERS = 'ABCDEF';
+// una superserie è una fila di esercizi consecutivi con la stessa sigla: un blocco da uno non esiste
+const clean = (arr) => arr.map((x, i) => (x && (arr[i - 1] === x || arr[i + 1] === x) ? x : ''));
+
 export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analysisCtx, ops, compact = false }) => {
     const [more, setMore] = useState(false); // su telefono nome, durata, RPE e note della seduta stanno dietro "Dettagli"
     const A = useMemo(() => analyzeDay(day, analysisCtx), [day, analysisCtx]);
@@ -79,9 +83,37 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
             {week.kind === 'deload' && <p className="dg-warn">Settimana di scarico: gli avvisi sul volume non vengono applicati.</p>}
 
             <div className="mt-4">
-                {day.exercises.map((ex) => (
-                    <ExerciseCard key={ex.id} ex={ex} label={labels[ex.id]} weekId={week.id} dayId={day.id} exerciseDB={exerciseDB} suggestions={suggestions} oneRm={oneRmFor(massimali, ex.name)} ops={ops} compact={compact} />
-                ))}
+                {day.exercises.map((ex, i) => {
+                    const next = day.exercises[i + 1];
+                    const prev = day.exercises[i - 1];
+                    const linked = !!(next && ex.ss && ex.ss === next.ss);
+                    const role = ex.ss ? (prev && prev.ss === ex.ss ? (next && next.ss === ex.ss ? 'mid' : 'last') : 'first') : '';
+                    const toggle = () => {
+                        const cur = day.exercises.map((e) => e.ss || '');
+                        if (linked) cur[i + 1] = '';
+                        else {
+                            const free = LETTERS.split('').find((l) => !cur.includes(l)) || 'F';
+                            const L = cur[i] || free;
+                            cur[i] = L;
+                            cur[i + 1] = L;
+                        }
+                        const out = clean(cur);
+                        out.forEach((v, k) => v !== (day.exercises[k].ss || '') && ops.updateExValue(week.id, day.id, day.exercises[k].id, 'ss', v));
+                    };
+                    return (
+                        <React.Fragment key={ex.id}>
+                            <div className={ex.ss ? 't-ss-wrap' : ''}>
+                                <ExerciseCard ex={ex} label={labels[ex.id]} weekId={week.id} dayId={day.id} exerciseDB={exerciseDB} suggestions={suggestions} oneRm={oneRmFor(massimali, ex.name)} ops={ops} compact={compact} ssRole={role} />
+                            </div>
+                            {next && (
+                                <button className={`t-ss-link ${linked ? 'on' : ''}`} onClick={toggle} aria-pressed={linked}>
+                                    <i className={`ph ${linked ? 'ph-link-break' : 'ph-link'}`}></i>
+                                    {linked ? 'Superserie · tocca per separare' : 'Collega in superserie'}
+                                </button>
+                            )}
+                        </React.Fragment>
+                    );
+                })}
             </div>
             <button className="dg-add" onClick={() => ops.addExercise(week.id, day.id)}>
                 <i className="ph ph-plus-circle"></i> Aggiungi esercizio
