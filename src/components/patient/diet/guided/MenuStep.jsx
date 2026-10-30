@@ -448,7 +448,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mea
                     targets={targets}
                     onLaf={onLaf}
                     onApply={(patch) => update((d) => d.map((x) => (x.id === day.id ? { ...x, ...patch } : x)))}
-                    onClear={() => update((d) => d.map((x) => (x.id === day.id ? { ...x, type: undefined, lafType: undefined, targets: undefined } : x)))}
+                    onClear={() => update((d) => d.map((x) => (x.id === day.id ? { ...x, type: undefined, typeLabel: undefined, lafType: undefined, targets: undefined } : x)))}
                     onClose={() => setTyping(false)}
                 />
             )}

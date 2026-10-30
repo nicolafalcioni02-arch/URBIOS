@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ACTIVITY, DAY_TYPES, GOALS, MACRO_PRESETS, MEAL_PRESETS, TYPE_IDS, applyGoals, computeRmr, computeTdee, distFor, macroGrams, prefillCalc, sumDist, sumPct, typeLaf, typeTargetKcal } from './guidedLogic';
+import { ACTIVITY, BASE_TYPE, GOALS, MACRO_PRESETS, MEAL_PRESETS, applyGoals, getTypes, typeIcon, typeName, computeRmr, computeTdee, distFor, macroGrams, prefillCalc, sumDist, sumPct, typeLaf, typeTargetKcal } from './guidedLogic';
 import { dietContext } from '../../../../ai/dietSection';
 import { CountUp } from '../../shared/fx';
 
@@ -56,8 +56,19 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
     const [editP, setEditP] = useState(false);
     const diff = g.dayMode === 'diff';
     const perType = diff && !!g.distByType; // ripartizione dei pasti diversa per tipo di giornata
-    const cols = perType ? TYPE_IDS : [null];
-    const typeOf = (id) => DAY_TYPES.find((t) => t.id === id);
+    const types = getTypes(calcData);
+    const cols = perType ? types.map((t) => t.id) : [null];
+    const setTypes = (list, extra = {}) => setG({ dayTypes: list, ...extra });
+    const patchType = (id, patch) => setTypes(types.map((t) => (t.id === id ? { ...t, ...patch } : t)));
+    const addType = () => {
+        const id = 't' + Date.now();
+        setTypes([...types, { id, name: 'Nuova giornata' }], g.distByType ? { distByType: { ...g.distByType, [id]: calcData.distribution.map((m) => ({ ...m })) } } : {});
+    };
+    const removeType = (id) => {
+        const rest = { ...(g.distByType || {}) };
+        delete rest[id];
+        setTypes(types.filter((t) => t.id !== id), g.distByType ? { distByType: rest } : {});
+    };
 
     // se il LAF cambia per altra via (calcolatore 24 ore), l'attività diventa "personalizzata"
     useEffect(() => {
@@ -138,9 +149,9 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
                     <button role="tab" aria-selected={diff} className={diff ? 'on' : ''} onClick={() => setG({ dayMode: 'diff' })}>Differenziate</button>
                 </div>
                 <p className="dg-hint" style={{ marginTop: 10 }}>
-                    {diff ? 'Riposo, lavoro e lavoro + allenamento: ognuno con le sue kcal. Parti da una giornata di lavoro e regola le altre.' : 'Un solo obiettivo di kcal per tutti i giorni.'}
+                    {diff ? 'Parti dalla giornata media e aggiungi le altre (riposo, allenamento, turno di notte…) con il nome che preferisci: ognuna ha le sue kcal.' : 'Un solo obiettivo di kcal per tutti i giorni.'}
                 </p>
-                <p className="fld-label" style={{ marginTop: 12 }}>{diff ? 'Una giornata di lavoro com’è?' : 'Quanto è attivo nella giornata?'}</p>
+                <p className="fld-label" style={{ marginTop: 12 }}>{diff ? 'Com’è una giornata media?' : 'Quanto è attivo nella giornata?'}</p>
                 <div className="flex flex-wrap gap-2">
                     {ACTIVITY.map((a) => (
                         <Chip key={a.id} on={activityId === a.id} sub={a.hint} onClick={() => setG({ activity: a.id }, { laf: a.laf })}>
@@ -155,29 +166,54 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
                 </div>
                 {diff && activityId && (
                     <div className="gm-types">
-                        <p className="gm-types-h"><span>Giornata</span><span>LAF</span><span>kcal</span></p>
-                        {TYPE_IDS.map((id) => (
-                            <div className="gm-type" key={id}>
-                                <span className="gm-tn"><i className={`ph ${typeOf(id).icon}`}></i> {typeOf(id).label}</span>
-                                {id === 'work' ? (
-                                    <b className="gm-laf ro">{Number(calcData.laf).toFixed(2).replace('.', ',')}</b>
-                                ) : (
-                                    <input
-                                        className="gm-laf"
-                                        inputMode="decimal"
-                                        value={g.lafByType?.[id] ?? typeLaf(calcData, id).toFixed(2).replace('.', ',')}
-                                        onChange={(e) => setG({ lafByType: { ...(g.lafByType || {}), [id]: e.target.value } })}
-                                        aria-label={`LAF ${typeOf(id).label}`}
-                                    />
-                                )}
-                                <b className="gm-k">{typeTargetKcal(calcData, id) || '–'}</b>
-                                {onLaf && id !== 'work' && (
-                                    <button className="gm-calc" onClick={() => onLaf((v) => setG({ lafByType: { ...(g.lafByType || {}), [id]: String(v) } }))} aria-label={`Calcola il LAF: ${typeOf(id).label}`}>
-                                        <i className="ph ph-clock"></i>
-                                    </button>
-                                )}
-                            </div>
-                        ))}
+                        <p className="gm-types-h"><span>Giornata</span><span>LAF</span><span>kcal</span><span></span></p>
+                        {types.map((t) => {
+                            const id = t.id;
+                            const base = id === BASE_TYPE;
+                            return (
+                                <div className="gm-type" key={id}>
+                                    {base ? (
+                                        <span className="gm-tn"><i className="ph ph-sun"></i> Giornata media</span>
+                                    ) : (
+                                        <span className="gm-tn gm-edit">
+                                            <i className={`ph ${typeIcon(id)}`}></i>
+                                            <input value={t.name} onChange={(e) => patchType(id, { name: e.target.value })} onBlur={(e) => !e.target.value.trim() && patchType(id, { name: 'Giornata' })} aria-label="Nome della giornata" placeholder="Nome" />
+                                        </span>
+                                    )}
+                                    {base ? (
+                                        <b className="gm-laf ro">{Number(calcData.laf).toFixed(2).replace('.', ',')}</b>
+                                    ) : (
+                                        <input
+                                            className="gm-laf"
+                                            inputMode="decimal"
+                                            value={t.laf ?? typeLaf(calcData, id).toFixed(2).replace('.', ',')}
+                                            onChange={(e) => patchType(id, { laf: e.target.value })}
+                                            aria-label={`LAF ${t.name}`}
+                                        />
+                                    )}
+                                    <b className="gm-k">{typeTargetKcal(calcData, id) || '–'}</b>
+                                    {base ? (
+                                        <span></span>
+                                    ) : (
+                                        <span className="gm-act">
+                                            {onLaf && (
+                                                <button className="gm-calc" onClick={() => onLaf((v) => patchType(id, { laf: String(v) }))} aria-label={`Calcola il LAF: ${t.name}`}>
+                                                    <i className="ph ph-clock"></i>
+                                                </button>
+                                            )}
+                                            <button className="gm-calc gm-del" onClick={() => removeType(id)} aria-label={`Elimina ${t.name}`}>
+                                                <i className="ph ph-trash"></i>
+                                            </button>
+                                        </span>
+                                    )}
+                                </div>
+                            );
+                        })}
+                        {types.length < 6 && (
+                            <button className="gm-addtype" onClick={addType}>
+                                <i className="ph ph-plus-circle"></i> Aggiungi giornata
+                            </button>
+                        )}
                     </div>
                 )}
             </section>
@@ -230,7 +266,7 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
                         <input
                             type="checkbox"
                             checked={perType}
-                            onChange={(e) => setG({ distByType: e.target.checked ? Object.fromEntries(TYPE_IDS.map((id) => [id, calcData.distribution.map((m) => ({ ...m }))])) : undefined })}
+                            onChange={(e) => setG({ distByType: e.target.checked ? Object.fromEntries(types.map((t) => [t.id, calcData.distribution.map((m) => ({ ...m }))])) : undefined })}
                         />
                         <span>
                             <b>Ripartizione diversa per tipo di giornata</b>
@@ -245,7 +281,7 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
                                 <tr>
                                     <th>Pasto</th>
                                     {cols.map((c) => (
-                                        <th key={c || 'all'}>{c ? { rest: 'Riposo', work: 'Lavoro', train: 'Allen.' }[c] : '% kcal'}</th>
+                                        <th key={c || 'all'}>{c ? typeName(calcData, c) : '% kcal'}</th>
                                     ))}
                                 </tr>
                             </thead>
@@ -262,7 +298,7 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
                                                     <input
                                                         inputMode="numeric"
                                                         value={v}
-                                                        aria-label={`${m.name}${c ? ` · ${typeOf(c).label}` : ''}`}
+                                                        aria-label={`${m.name}${c ? ` · ${typeName(calcData, c)}` : ''}`}
                                                         onChange={(e) => {
                                                             const nv = Number(e.target.value.replace(/[^\d]/g, '')) || 0;
                                                             if (!c) set({ distribution: calcData.distribution.map((x, j) => (j === i ? { ...x, value: nv } : x)) });
@@ -335,7 +371,7 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
             <section className="dg-result">
                 {tdee && activityId ? (
                     <>
-                        <p className="text-[12px] uppercase tracking-wider opacity-70 font-semibold">{diff ? 'Fabbisogno stimato · giornata di lavoro' : 'Fabbisogno stimato'}</p>
+                        <p className="text-[12px] uppercase tracking-wider opacity-70 font-semibold">{diff ? 'Fabbisogno stimato · giornata media' : 'Fabbisogno stimato'}</p>
                         <p className="text-[34px] font-semibold leading-tight">
                             <CountUp value={tdee} /> <span className="text-[16px] font-medium opacity-80">kcal al giorno</span>
                         </p>
@@ -346,12 +382,12 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
                         )}
                         {diff && (
                             <div className="gm-res">
-                                {TYPE_IDS.map((id) => {
+                                {types.map(({ id }) => {
                                     const k = typeTargetKcal(calcData, id);
                                     const gm = macroGrams(k, calcData.macroTargets);
                                     return (
                                         <p key={id}>
-                                            <b>{typeOf(id).label}</b>
+                                            <b>{typeName(calcData, id)}</b>
                                             <span>{k} kcal</span>
                                             <small>C {gm.c} · P {gm.p} · G {gm.f}</small>
                                         </p>

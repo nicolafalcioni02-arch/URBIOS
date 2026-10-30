@@ -54,11 +54,16 @@ export const computeTdee = (calc) => {
 // dLaf = scostamento di partenza dal LAF del piano (si può cambiare a mano o con il calcolatore LAF)
 export const DAY_TYPES = [
     { id: 'rest', label: 'Riposo', icon: 'ph-bed', dLaf: -0.15 },
-    { id: 'work', label: 'Lavoro', icon: 'ph-briefcase', dLaf: 0 },
-    { id: 'train', label: 'Lavoro + allenamento', short: 'Allenamento', icon: 'ph-barbell', dLaf: 0.2 },
+    { id: 'work', label: 'Giornata media', short: 'Media', icon: 'ph-sun', dLaf: 0 },
+    { id: 'train', label: 'Allenamento', short: 'Allenamento', icon: 'ph-barbell', dLaf: 0.2 },
     { id: 'custom', label: 'Personalizzata', short: 'Su misura', icon: 'ph-sliders-horizontal', dLaf: 0 },
 ];
-export const dayTypeOf = (day) => DAY_TYPES.find((t) => t.id === day?.type) || null;
+// nome scelto dall'utente (salvato anche sul giorno) oppure quello di base
+export const dayTypeOf = (day) => {
+    if (!day?.type) return null;
+    const base = DAY_TYPES.find((t) => t.id === day.type);
+    return { id: day.type, label: day.typeLabel || base?.label || 'Giornata', short: day.typeLabel || base?.short || base?.label || 'Giornata', icon: base?.icon || 'ph-calendar' };
+};
 // kcal di una giornata con un dato LAF: in proporzione all'obiettivo del piano (quindi con lo stesso deficit/surplus);
 // se il piano non ha un LAF o un obiettivo, si ricalcola dal metabolismo basale
 export const typeKcal = (calc, laf, planKcal) => {
@@ -75,11 +80,23 @@ export const dayTarget = (day, plan) => {
 };
 
 // ---- giornate differenziate negli Obiettivi ----
-export const TYPE_IDS = ['rest', 'work', 'train'];
+// Tipi di giornata del piano: la "Giornata media" (id 'work') è la base; gli altri hanno il nome che sceglie l'utente.
+export const BASE_TYPE = 'work';
+export const DEFAULT_TYPES = [
+    { id: 'work', name: 'Giornata media' },
+    { id: 'rest', name: 'Riposo' },
+    { id: 'train', name: 'Allenamento' },
+];
+export const getTypes = (calc) => {
+    const t = calc?.guided?.dayTypes;
+    return Array.isArray(t) && t.some((x) => x.id === BASE_TYPE) ? t : DEFAULT_TYPES;
+};
+export const typeName = (calc, id) => getTypes(calc).find((t) => t.id === id)?.name || DAY_TYPES.find((t) => t.id === id)?.label || 'Giornata';
+export const typeIcon = (id) => DAY_TYPES.find((t) => t.id === id)?.icon || 'ph-calendar';
 // LAF di un tipo: il "lavoro" è il LAF scelto per il piano; gli altri hanno un valore proprio (o di partenza)
 export const typeLaf = (calc, id) => {
-    if (id === 'work') return Number(calc.laf) || 0;
-    const v = parseFloat(String(calc.guided?.lafByType?.[id] ?? '').replace(',', '.'));
+    if (id === BASE_TYPE) return Number(calc.laf) || 0;
+    const v = parseFloat(String(getTypes(calc).find((t) => t.id === id)?.laf ?? '').replace(',', '.'));
     return v > 0 ? v : typeLafDefault(calc, id);
 };
 export const typeTargetKcal = (calc, id) => computeTdee({ ...calc, laf: typeLaf(calc, id) });
@@ -142,7 +159,8 @@ export const applyGoals = ({ calcData, setCalcData, setTargets, setDietDays }) =
     setTargets({ kcal: tdee, c: macro.c, p: macro.p, f: macro.f, isConfigured: true });
     const diff = calc.guided?.dayMode === 'diff';
     const plan = { kcal: tdee, ...macro };
-    const typed = (id) => ({ type: id, lafType: typeLaf(calc, id), targets: { kcal: typeTargetKcal(calc, id), ...macro } });
+    const types = getTypes(calc);
+    const typed = (id) => ({ type: id, typeLabel: typeName(calc, id), lafType: typeLaf(calc, id), targets: { kcal: typeTargetKcal(calc, id), ...macro } });
 
     setDietDays((days) => {
         let list = days.map((d) => ({ ...d }));
@@ -152,12 +170,12 @@ export const applyGoals = ({ calcData, setCalcData, setTargets, setDietDays }) =
                 const i = list.findIndex((d) => !d.type);
                 if (i >= 0) list[i] = { ...list[i], type: 'work' };
             }
-            TYPE_IDS.forEach((id) => {
-                if (!list.some((d) => d.type === id)) list.push({ id: genId(), title: DAY_TYPES.find((t) => t.id === id).label, meals: [], type: id });
+            types.forEach((t) => {
+                if (!list.some((d) => d.type === t.id)) list.push({ id: genId(), title: t.name, meals: [], type: t.id });
             });
         }
         return list.map((day) => {
-            const isTyped = diff && TYPE_IDS.includes(day.type);
+            const isTyped = diff && types.some((t) => t.id === day.type);
             const base = { ...day };
             if (isTyped) Object.assign(base, typed(day.type));
             else if (day.type !== 'custom' || !diff) {

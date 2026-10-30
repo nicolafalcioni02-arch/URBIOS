@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { DAY_TYPES, macroGrams, typeKcal, typeLaf, typeLafDefault } from './guidedLogic';
+import { getTypes, macroGrams, typeIcon, typeKcal, typeLaf, typeLafDefault } from './guidedLogic';
 
 const num = (v) => {
     const x = parseFloat(String(v).replace(',', '.'));
@@ -21,7 +21,7 @@ export const DayTypeSheet = ({ day, calcData, targets, onApply, onClear, onLaf, 
         setType(id);
         setManual(id === 'custom');
         if (id !== 'custom') {
-            const l = id === 'rest' || id === 'work' || id === 'train' ? typeLaf(calcData, id) : typeLafDefault(calcData, id);
+            const l = typeLaf(calcData, id) || typeLafDefault(calcData, id);
             setLaf(l);
             setKcal(String(typeKcal(calcData, l, targets.kcal)));
         } else if (!kcal) setKcal(String(Math.round(targets.kcal)));
@@ -50,7 +50,7 @@ export const DayTypeSheet = ({ day, calcData, targets, onApply, onClear, onLaf, 
                 </div>
 
                 <div className="t-daytypes">
-                    {DAY_TYPES.map((t) => (
+                    {[...getTypes(calcData).map((t) => ({ id: t.id, label: t.name, icon: typeIcon(t.id) })), { id: 'custom', label: 'Personalizzata', icon: 'ph-sliders-horizontal' }].map((t) => (
                         <button key={t.id} className={type === t.id ? 'on' : ''} onClick={() => pick(t.id)} aria-pressed={type === t.id}>
                             <i className={`ph ${t.icon}`}></i>
                             <span>{t.label}</span>
@@ -118,7 +118,7 @@ export const DayTypeSheet = ({ day, calcData, targets, onApply, onClear, onLaf, 
                         style={{ height: 52, borderRadius: 16, flex: 1 }}
                         disabled={!ok}
                         onClick={() => {
-                            onApply({ type, lafType: type === 'custom' ? undefined : num(laf) || undefined, targets: { kcal: num(kcal), c: num(mac.c), p: num(mac.p), f: num(mac.f) } });
+                            onApply({ type, typeLabel: type === 'custom' ? 'Personalizzata' : getTypes(calcData).find((t) => t.id === type)?.name, lafType: type === 'custom' ? undefined : num(laf) || undefined, targets: { kcal: num(kcal), c: num(mac.c), p: num(mac.p), f: num(mac.f) } });
                             onClose();
                         }}
                     >
