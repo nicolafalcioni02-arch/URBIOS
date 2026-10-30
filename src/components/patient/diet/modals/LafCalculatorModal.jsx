@@ -1,172 +1,129 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 
-export const LafCalculatorModal = ({
-    applyLafTemplate,
-    calcData,
-    calculatedLAF,
-    isLafModalOpen,
-    lafActivities,
-    setCalcData,
-    setIsLafModalOpen,
-    setLafActivities,
-    totalLafHours,
-}) => {
-    return (
-        isLafModalOpen && (
-            <div className="modal-backdrop" style={{ zIndex: 10000 }}>
-                <div className="modal-window" style={{ width: '650px', maxWidth: '95%', padding: '0', background: '#FAFAFC' }}>
-                    <div
-                        style={{
-                            padding: '20px',
-                            borderBottom: '1px solid #E6E4DE',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            background: 'white',
+// Calcolatore LAF (metodo delle 24 ore): ogni attività ha un coefficiente (PAL) e le ore che occupa.
+// LAF = Σ(PAL × ore) / 24, valido solo quando le ore sommano 24.
+const level = (laf) => {
+    const x = parseFloat(laf);
+    if (!Number.isFinite(x)) return '';
+    if (x < 1.5) return 'Sedentario';
+    if (x < 1.7) return 'Leggermente attivo';
+    if (x < 2.0) return 'Moderatamente attivo';
+    return 'Molto attivo';
+};
+const fmt = (n) => String(Math.round(n * 100) / 100).replace('.', ',');
+// più alto il coefficiente, più scuro il segmento
+const shade = (pal) => `rgba(18,19,23,${Math.min(1, 0.14 + (Number(pal) || 0) * 0.14)})`;
+
+export const LafCalculatorModal = ({ applyLafTemplate, calcData, calculatedLAF, isLafModalOpen, lafActivities, setCalcData, setIsLafModalOpen, setLafActivities, totalLafHours }) => {
+    if (!isLafModalOpen) return null;
+    const total = Math.round(totalLafHours * 100) / 100;
+    const ok = total === 24;
+    const diff = Math.round((24 - total) * 100) / 100;
+    const close = () => setIsLafModalOpen(false);
+    const patch = (id, fields) => setLafActivities(lafActivities.map((a) => (a.id === id ? { ...a, ...fields } : a)));
+    const addHours = (a, d) => patch(a.id, { hours: Math.min(24, Math.max(0, Math.round(((Number(a.hours) || 0) + d) * 2) / 2)) });
+    const num = (v) => {
+        const x = parseFloat(String(v).replace(',', '.'));
+        return Number.isFinite(x) ? x : 0;
+    };
+
+    return createPortal(
+        <div className="lafm-back" onClick={close}>
+            <div className="lafm" role="dialog" aria-label="Calcolatore LAF" onClick={(e) => e.stopPropagation()}>
+                <div className="lafm-head">
+                    <div>
+                        <h3>Calcolatore LAF</h3>
+                        <span>Come passa le 24 ore: attività, coefficiente e ore</span>
+                    </div>
+                    <button className="lafm-x" onClick={close} aria-label="Chiudi">
+                        <i className="ph-bold ph-x"></i>
+                    </button>
+                </div>
+
+                <div className="lafm-body">
+                    <p className="lafm-lab">Parti da una giornata tipo</p>
+                    <div className="lafm-tpl">
+                        {[
+                            ['sedentario', 'Sedentario'],
+                            ['leggero', 'Leggero'],
+                            ['attivo', 'Attivo'],
+                        ].map(([id, label]) => (
+                            <button key={id} onClick={() => applyLafTemplate(id)}>
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="lafm-day" role="img" aria-label="Le 24 ore divise per attività">
+                        {lafActivities.map((a) => (
+                            <i key={a.id} title={`${a.name}: ${a.hours} h`} style={{ flex: `${Math.max(0, Number(a.hours) || 0)} 0 0`, background: shade(a.pal) }}></i>
+                        ))}
+                    </div>
+                    <div className="lafm-scale">
+                        <span>0</span>
+                        <span>12</span>
+                        <span>24 h</span>
+                    </div>
+
+                    <p className="lafm-lab">Attività</p>
+                    <div className="lafm-list">
+                        {lafActivities.map((a) => (
+                            <div className="lafm-card" key={a.id}>
+                                <div className="lafm-top">
+                                    <span className="lafm-dot" style={{ background: shade(a.pal) }}></span>
+                                    <input className="lafm-name" value={a.name} onChange={(e) => patch(a.id, { name: e.target.value })} aria-label="Nome dell’attività" placeholder="Nome dell’attività" />
+                                    <button className="lafm-del" onClick={() => setLafActivities(lafActivities.filter((x) => x.id !== a.id))} aria-label={`Elimina ${a.name}`}>
+                                        <i className="ph ph-trash"></i>
+                                    </button>
+                                </div>
+                                <div className="lafm-row">
+                                    <label className="lafm-pal">
+                                        <small>Coefficiente (PAL)</small>
+                                        <input inputMode="decimal" value={a.pal} onChange={(e) => patch(a.id, { pal: e.target.value })} onBlur={(e) => patch(a.id, { pal: num(e.target.value) })} aria-label="Coefficiente PAL" />
+                                    </label>
+                                    <div className="lafm-step">
+                                        <small>Ore</small>
+                                        <div>
+                                            <button onClick={() => addHours(a, -0.5)} aria-label="Meno mezz’ora"><i className="ph ph-minus"></i></button>
+                                            <input inputMode="decimal" value={a.hours} onChange={(e) => patch(a.id, { hours: e.target.value })} onBlur={(e) => patch(a.id, { hours: Math.min(24, Math.max(0, num(e.target.value))) })} aria-label="Ore" />
+                                            <button onClick={() => addHours(a, 0.5)} aria-label="Più mezz’ora"><i className="ph ph-plus"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        <button className="lafm-add" onClick={() => setLafActivities([...lafActivities, { id: Date.now(), name: 'Nuova attività', pal: 1.5, hours: 0 }])}>
+                            <i className="ph ph-plus-circle"></i> Aggiungi attività
+                        </button>
+                    </div>
+                    <p className="lafm-hint">Riferimenti: sonno 0,95 · seduto 1,2–1,5 · cammino lento 2,5 · cammino veloce 3,5 · sport intenso 5–6.</p>
+                </div>
+
+                <div className="lafm-foot">
+                    <div className={`lafm-res ${ok ? 'ok' : 'no'}`}>
+                        <div>
+                            <small>{ok ? 'Ore' : diff > 0 ? `Mancano ${fmt(diff)} h` : `Eccedono ${fmt(-diff)} h`}</small>
+                            <b>{fmt(total)} / 24</b>
+                        </div>
+                        <div>
+                            <small>LAF{ok ? ` · ${level(calculatedLAF)}` : ''}</small>
+                            <b className="big">{ok ? calculatedLAF : '—'}</b>
+                        </div>
+                    </div>
+                    <button
+                        className="lafm-go"
+                        disabled={!ok}
+                        onClick={() => {
+                            setCalcData({ ...calcData, laf: parseFloat(calculatedLAF) });
+                            close();
                         }}
                     >
-                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 900 }}>Calcolatore LAF (Metodo 24h)</h3>
-                        <button
-                            onClick={() => setIsLafModalOpen(false)}
-                            style={{ border: 'none', background: 'transparent', fontSize: '20px', cursor: 'pointer', fontWeight: 900 }}
-                        >
-                            ✕
-                        </button>
-                    </div>
-
-                    <div style={{ padding: '20px' }}>
-                        {/* Pre-caricamento Giornata Tipo */}
-                        <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-                            <span style={{ fontSize: '11px', fontWeight: 800, color: '#6E6D69' }}>CARICA GIORNATA TIPO:</span>
-                            <button
-                                onClick={() => applyLafTemplate('sedentario')}
-                                className="setup-tab-btn"
-                                style={{ background: 'white', border: '1px solid #E6E4DE' }}
-                            >
-                                Sedentario
-                            </button>
-                            <button
-                                onClick={() => applyLafTemplate('leggero')}
-                                className="setup-tab-btn"
-                                style={{ background: 'white', border: '1px solid #E6E4DE' }}
-                            >
-                                Leggero
-                            </button>
-                            <button
-                                onClick={() => applyLafTemplate('attivo')}
-                                className="setup-tab-btn"
-                                style={{ background: 'white', border: '1px solid #E6E4DE' }}
-                            >
-                                Attivo
-                            </button>
-                        </div>
-
-                        {/* Tabella 24 Ore */}
-                        <table
-                            className="matrix-table"
-                            style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}
-                        >
-                            <thead style={{ background: '#F6F5F2' }}>
-                                <tr>
-                                    <th>Attività</th>
-                                    <th style={{ textAlign: 'center' }}>Coeff. (PAL)</th>
-                                    <th style={{ textAlign: 'center' }}>Ore</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {lafActivities.map((act, index) => (
-                                    <tr key={act.id} className="laf-row">
-                                        <td>
-                                            <input
-                                                type="text"
-                                                className="laf-input"
-                                                value={act.name}
-                                                onChange={(e) => {
-                                                    const newActs = [...lafActivities];
-                                                    newActs[index].name = e.target.value;
-                                                    setLafActivities(newActs);
-                                                }}
-                                            />
-                                        </td>
-                                        <td style={{ textAlign: 'center', padding: '5px' }}>
-                                            <input
-                                                type="number"
-                                                step="0.1"
-                                                className="laf-input number"
-                                                value={act.pal}
-                                                onChange={(e) => {
-                                                    const newActs = [...lafActivities];
-                                                    newActs[index].pal = parseFloat(e.target.value) || 0;
-                                                    setLafActivities(newActs);
-                                                }}
-                                            />
-                                        </td>
-                                        <td style={{ textAlign: 'center', padding: '5px' }}>
-                                            <input
-                                                type="number"
-                                                step="0.5"
-                                                className="laf-input number"
-                                                value={act.hours}
-                                                onChange={(e) => {
-                                                    const newActs = [...lafActivities];
-                                                    newActs[index].hours = parseFloat(e.target.value) || 0;
-                                                    setLafActivities(newActs);
-                                                }}
-                                            />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-
-                        {/* Controlli Totali */}
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                marginTop: '20px',
-                                padding: '15px',
-                                background: totalLafHours === 24 ? '#F1F8F4' : '#FFF0F0',
-                                borderRadius: '12px',
-                                border: `1px solid ${totalLafHours === 24 ? '#1F8A5B' : '#C2413A'}`,
-                            }}
-                        >
-                            <div>
-                                <span style={{ fontSize: '11px', fontWeight: 800, color: totalLafHours === 24 ? '#1F8A5B' : '#C2413A', display: 'block' }}>
-                                    SOMMA ORE
-                                </span>
-                                <span style={{ fontSize: '20px', fontWeight: 900 }}>{totalLafHours} / 24</span>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <span style={{ fontSize: '11px', fontWeight: 800, color: '#6E6D69', display: 'block' }}>LAF FINALE</span>
-                                <span style={{ fontSize: '24px', fontWeight: 900, color: '#121317' }}>{totalLafHours === 24 ? calculatedLAF : '---'}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style={{ padding: '20px', background: 'white', borderTop: '1px solid #E6E4DE', display: 'flex', justifyContent: 'flex-end' }}>
-                        <button
-                            disabled={totalLafHours !== 24}
-                            onClick={() => {
-                                setCalcData({ ...calcData, laf: parseFloat(calculatedLAF) });
-                                setIsLafModalOpen(false);
-                            }}
-                            style={{
-                                background: totalLafHours === 24 ? '#1F8A5B' : '#E6E4DE',
-                                color: totalLafHours === 24 ? 'white' : '#6E6D69',
-                                padding: '12px 30px',
-                                borderRadius: '10px',
-                                border: 'none',
-                                fontWeight: 900,
-                                cursor: totalLafHours === 24 ? 'pointer' : 'not-allowed',
-                            }}
-                        >
-                            TRASFERISCI AL PIANO
-                        </button>
-                    </div>
+                        Usa nel piano <i className="ph ph-arrow-right"></i>
+                    </button>
                 </div>
             </div>
-        )
+        </div>,
+        document.body
     );
 };

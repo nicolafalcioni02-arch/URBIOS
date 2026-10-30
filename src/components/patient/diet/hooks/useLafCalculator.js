@@ -11,7 +11,7 @@ export const useLafCalculator = () => {
     ]);
 
     // --- CALCOLI DERIVATI LAF ---
-    const totalLafHours = lafActivities.reduce((acc, a) => acc + (Number(a.hours) || 0), 0);
+    const totalLafHours = Math.round(lafActivities.reduce((acc, a) => acc + (Number(a.hours) || 0), 0) * 100) / 100;
 
     const calculatedLAF =
         totalLafHours === 24 ? (lafActivities.reduce((acc, a) => acc + (Number(a.pal) || 0) * (Number(a.hours) || 0), 0) / 24).toFixed(2) : '---';
