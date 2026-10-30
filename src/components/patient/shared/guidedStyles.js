@@ -238,6 +238,22 @@ export const guidedCss = `
 .t-prev-verdict.bad { background: #FDECEA; color: #A8362F; }
 .t-prev-foot { display: flex; gap: 8px; padding: 10px 0 calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--paper); }
 
+/* tipo di giornata */
+.t-daytypes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.t-daytypes button { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 8px 12px; border-radius: 14px; background: #fff; border: 1px solid var(--line); text-align: left; font-size: 14.5px; font-weight: 600; line-height: 1.2; }
+.t-daytypes button i { font-size: 20px; flex: none; }
+.t-daytypes button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.t-dt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.t-dt-grid label { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.t-dt-grid small { font-size: 12px; font-weight: 500; color: var(--muted); }
+.t-dt-grid input { height: 48px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: #fff; font-size: 18px; font-weight: 600; text-align: center; width: 100%; }
+.t-dt-grid input:disabled { background: var(--soft); color: var(--muted); }
+.t-dt-grid em { font-style: normal; font-size: 12.5px; color: var(--muted); text-align: center; }
+.t-dt-mac { grid-template-columns: repeat(3, 1fr); margin-top: 0; }
+.t-dt-note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+.dg-badge-type { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 99px; font-size: 10.5px; font-weight: 700; background: var(--soft); color: var(--ink); }
+.dg-chip.on .dg-badge-type { background: rgba(255,255,255,.22); color: #fff; }
+
 /* coriandoli della consegna */
 .dg-confetti { position: fixed; z-index: 99999; width: 8px; height: 8px; border-radius: 2px; pointer-events: none; animation: dgConf .95s cubic-bezier(.2,.8,.3,1) forwards; }
 @keyframes dgConf { 0% { transform: translate(0,0) rotate(0); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }

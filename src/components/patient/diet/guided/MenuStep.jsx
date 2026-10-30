@@ -5,7 +5,8 @@ import { createPortal } from 'react-dom';
 import { useCompact } from '../../../../hooks/useCompact';
 import { ActionSheet } from '../../../mobile/MobileChrome';
 import { NameSheet, AddMealSheet } from './MealSheets';
-import { addFood, addMeal, renameMeal, removeMeal, moveMeal, addSub, removeSub, setSubMode, suggestSubs, swapSub, SUB_MODES, dayStatus, dayTotals, duplicateDay, macroGrams, mealKcal, newDay, removeItem, scaleDayTo, setGrams } from './guidedLogic';
+import { DayTypeSheet } from './DayTypeSheet';
+import { dayTarget, dayTypeOf, addFood, addMeal, renameMeal, removeMeal, moveMeal, addSub, removeSub, setSubMode, suggestSubs, swapSub, SUB_MODES, dayStatus, dayTotals, duplicateDay, macroGrams, mealKcal, newDay, removeItem, scaleDayTo, setGrams } from './guidedLogic';
 
 // Passo 2 — Menù: giorni, pasti e alimenti si modificano sul posto. In alto, sempre visibile, l'andamento rispetto all'obiettivo.
 
@@ -118,7 +119,7 @@ const SubsPanel = ({ item, day, meal, foodDB, index, update }) => {
     );
 };
 
-export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mealLibrary, setMealLibrary, onFoods, onAnalysis, onActiveDay, onRecipe, onGoals, onNext }) => {
+export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mealLibrary, setMealLibrary, onLaf, onFoods, onAnalysis, onActiveDay, onRecipe, onGoals, onNext }) => {
     const index = useMemo(() => buildIndex(foodDB), [foodDB]);
     const [dayIdx, setDayIdx] = useState(0);
     const [searching, setSearching] = useState(null); // id del pasto con la ricerca aperta
@@ -131,10 +132,16 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mea
     const [sheet, setSheet] = useState(null); // 'day' | 'delDay' (telefono)
     const [mealSheet, setMealSheet] = useState(null); // { id, kind: 'menu' | 'del' | 'rename' } per un pasto
     const [addingMeal, setAddingMeal] = useState(false);
+    const [typing, setTyping] = useState(false); // pannello 'tipo di giornata'
 
-    const tdee = targets?.isConfigured ? targets.kcal : 0;
-    const gT = tdee ? macroGrams(tdee, { c: targets.c, p: targets.p, f: targets.f }) : { c: 0, p: 0, f: 0 };
     const day = dietDays[Math.min(dayIdx, dietDays.length - 1)];
+    // ogni giorno ha il suo obiettivo se gli è stato dato un tipo (riposo, lavoro...), altrimenti vale quello del piano
+    const targetOf = (d) => dayTarget(d, targets);
+    const tdeeOf = (d) => (targetOf(d)?.isConfigured ? targetOf(d).kcal : 0);
+    const tdee = tdeeOf(day);
+    const tg = targetOf(day) || {};
+    const gT = tdee ? macroGrams(tdee, { c: tg.c, p: tg.p, f: tg.f }) : { c: 0, p: 0, f: 0 };
+    const dType = dayTypeOf(day) && day.targets ? dayTypeOf(day) : null;
 
     // il grafico "Smart" lavora sul giorno aperto
     useEffect(() => {
@@ -205,7 +212,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mea
             <div className="flex items-center gap-2 mt-4">
                 <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 flex-1 min-w-0 t-fade">
                     {dietDays.map((d, i) => {
-                        const sd = dayStatus(d, tdee);
+                        const sd = dayStatus(d, tdeeOf(d));
                         return (
                             <button
                                 key={d.id}
@@ -231,6 +238,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mea
                             >
                                 <span className="inline-block w-2 h-2 rounded-full mr-2" style={{ background: i === dayIdx ? '#fff' : sd.color }}></span>
                                 {d.title}
+                                {dayTypeOf(d) && d.targets && <em className="dg-badge-type">{dayTypeOf(d).short || dayTypeOf(d).label}</em>}
                             </button>
                         );
                     })}
@@ -258,8 +266,13 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mea
             <div className="dg-sticky">
                 <div className="flex items-baseline justify-between gap-3 flex-wrap">
                     <p className="text-[26px] font-semibold leading-none">
-                        <CountUp value={tot.kcal} duration={450} /> <span className="text-[14px] font-medium text-[color:var(--muted)]">{tdee ? `/ ${tdee} kcal` : 'kcal'}</span>
+                        <CountUp value={tot.kcal} duration={450} /> <span className="text-[14px] font-medium text-[color:var(--muted)]">{tdee ? `/ ${Math.round(tdee)} kcal` : 'kcal'}</span>
                     </p>
+                    {dType && (
+                        <button className="text-[12.5px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'var(--ink)', color: '#fff' }} onClick={() => setTyping(true)} aria-label="Cambia il tipo di giornata">
+                            <i className={`ph ${dType.icon}`}></i> {dType.label}
+                        </button>
+                    )}
                     {st.label && (
                         <span className="text-[12.5px] font-semibold px-2.5 py-1 rounded-full" style={{ background: st.id === 'ok' ? '#DCE9E1' : st.id === 'off' ? '#FDECEA' : 'var(--soft)', color: st.color }}>
                             {st.label}
@@ -367,6 +380,9 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mea
             {/* Azioni del giorno */}
             {!compact && <div className="flex flex-wrap items-center gap-2 mt-4">
                 <input className="fld !w-auto min-w-[180px]" value={day.title} onChange={(e) => update((d) => d.map((x) => (x.id === day.id ? { ...x, title: e.target.value } : x)))} aria-label="Nome del giorno" />
+                <button className="dg-chip row" onClick={() => setTyping(true)}>
+                    <i className="ph ph-calendar-check"></i> Tipo di giornata
+                </button>
                 <button className="dg-chip row" onClick={() => { update((d) => [...d, duplicateDay(day)]); setDayIdx(dietDays.length); }}>
                     <i className="ph ph-copy"></i> Duplica giorno
                 </button>
@@ -425,6 +441,17 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mea
                 }[mealSheet.kind];
                 return createPortal(<ActionSheet key={mealSheet.kind} {...cfg} onClose={() => setMealSheet(null)} />, document.body);
             })()}
+            {typing && (
+                <DayTypeSheet
+                    day={day}
+                    calcData={calcData}
+                    targets={targets}
+                    onLaf={onLaf}
+                    onApply={(patch) => update((d) => d.map((x) => (x.id === day.id ? { ...x, ...patch } : x)))}
+                    onClear={() => update((d) => d.map((x) => (x.id === day.id ? { ...x, type: undefined, lafType: undefined, targets: undefined } : x)))}
+                    onClose={() => setTyping(false)}
+                />
+            )}
             {addingMeal && <AddMealSheet library={mealLibrary} day={day} tdee={tdee} gT={gT} onAdd={(title, items) => update((d) => addMeal(d, day.id, title, items))} onClose={() => setAddingMeal(false)} />}
 
             {sheet && createPortal(
@@ -436,6 +463,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mea
                             title: day.title || 'Giorno',
                             subtitle: `${day.meals.length} pasti · ${Math.round(tot.kcal)} kcal`,
                             groups: [
+                                [{ label: 'Tipo di giornata', icon: 'ph-calendar-check', note: dType ? dType.label : 'come il piano', onClick: () => setTimeout(() => setTyping(true), 280) }],
                                 [
                                     { label: 'Rinomina', icon: 'ph-pencil-simple', note: day.title, onClick: () => setTimeout(() => { const v = window.prompt('Nome del giorno', day.title || ''); if (v !== null) update((d) => d.map((x) => (x.id === day.id ? { ...x, title: v } : x))); }, 280) },
                                     { label: 'Sposta prima', icon: 'ph-arrow-left', disabled: dayIdx <= 0, onClick: () => moveDay(dayIdx, dayIdx - 1) },

@@ -50,6 +50,7 @@ export const DietPlan = ({ patient, onUpdateDb, db, initialVisitId = null }) => 
     const [isSmartOpen, setIsSmartOpen] = useState(false);
     const [isDrvEditorOpen, setIsDrvEditorOpen] = useState(false);
     const [isLafModalOpen, setIsLafModalOpen] = useState(false);
+    const [lafCb, setLafCb] = useState(null); // se presente, il LAF calcolato va a questa funzione (giornata) invece che al piano
 
     // database alimenti
     const [dbSearch, setDbSearch] = useState('');
@@ -129,7 +130,10 @@ export const DietPlan = ({ patient, onUpdateDb, db, initialVisitId = null }) => 
                 onAnalysis={() => setIsAnalysisOpen(true)}
                 onChart={() => setIsSmartOpen(true)}
                 onPrint={printCenter ? () => printCenter.open([{ type: 'dieta', visitId: selectedVisitaId }]) : undefined}
-                onLaf={() => setIsLafModalOpen(true)}
+                onLaf={(cb) => {
+                    setLafCb(typeof cb === 'function' ? () => cb : null);
+                    setIsLafModalOpen(true);
+                }}
                 onActiveDay={setActiveDayId}
             />
 
@@ -186,6 +190,7 @@ export const DietPlan = ({ patient, onUpdateDb, db, initialVisitId = null }) => 
             />
 
             <LafCalculatorModal
+                onUseLaf={lafCb}
                 applyLafTemplate={applyLafTemplate}
                 calcData={calcData}
                 calculatedLAF={calculatedLAF}

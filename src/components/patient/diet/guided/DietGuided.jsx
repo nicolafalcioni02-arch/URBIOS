@@ -231,6 +231,7 @@ export const DietGuided = ({
                                 foodDB={foodDB}
                                 mealLibrary={mealLibrary || []}
                                 setMealLibrary={setMealLibrary}
+                                onLaf={onLaf}
                                 onFoods={onFoods}
                                 onAnalysis={onAnalysis}
                                 onActiveDay={onActiveDay}

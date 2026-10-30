@@ -50,6 +50,30 @@ export const computeTdee = (calc) => {
     return Math.round(rmr * (Number(calc.laf) || 1.2) * (1 + adj / 100));
 };
 
+// ---- giornate differenziate: riposo / lavoro / lavoro + allenamento ----
+// dLaf = scostamento di partenza dal LAF del piano (si può cambiare a mano o con il calcolatore LAF)
+export const DAY_TYPES = [
+    { id: 'rest', label: 'Riposo', icon: 'ph-bed', dLaf: -0.15 },
+    { id: 'work', label: 'Lavoro', icon: 'ph-briefcase', dLaf: 0 },
+    { id: 'train', label: 'Lavoro + allenamento', short: 'Allenamento', icon: 'ph-barbell', dLaf: 0.2 },
+    { id: 'custom', label: 'Personalizzata', short: 'Su misura', icon: 'ph-sliders-horizontal', dLaf: 0 },
+];
+export const dayTypeOf = (day) => DAY_TYPES.find((t) => t.id === day?.type) || null;
+// kcal di una giornata con un dato LAF: in proporzione all'obiettivo del piano (quindi con lo stesso deficit/surplus);
+// se il piano non ha un LAF o un obiettivo, si ricalcola dal metabolismo basale
+export const typeKcal = (calc, laf, planKcal) => {
+    const planLaf = Number(calc.laf) || 0;
+    if (planKcal > 0 && planLaf > 0) return Math.round((planKcal * laf) / planLaf);
+    return computeTdee({ ...calc, laf });
+};
+export const typeLafDefault = (calc, type) => Math.min(2.4, Math.max(1.2, Math.round(((Number(calc.laf) || 1.5) + (DAY_TYPES.find((t) => t.id === type)?.dLaf || 0)) * 100) / 100));
+// obiettivo di un giorno: il suo (se ha un tipo) oppure quello del piano
+export const dayTarget = (day, plan) => {
+    const t = day?.targets;
+    if (day?.type && t && Number(t.kcal) > 0) return { kcal: Number(t.kcal), c: Number(t.c), p: Number(t.p), f: Number(t.f), isConfigured: true, typed: true };
+    return plan;
+};
+
 export const macroGrams = (kcal, pct) => ({
     c: Math.round((kcal * pct.c) / 100 / 4),
     p: Math.round((kcal * pct.p) / 100 / 4),

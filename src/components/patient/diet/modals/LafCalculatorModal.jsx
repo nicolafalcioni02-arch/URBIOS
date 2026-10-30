@@ -45,7 +45,7 @@ const coverage = (blocks) => {
 
 export const LafCalculatorModal = (props) => (props.isLafModalOpen ? <LafBody {...props} /> : null);
 
-const LafBody = ({ applyLafTemplate, calcData, calculatedLAF, lafActivities, setCalcData, setIsLafModalOpen, setLafActivities, totalLafHours }) => {
+const LafBody = ({ onUseLaf, applyLafTemplate, calcData, calculatedLAF, lafActivities, setCalcData, setIsLafModalOpen, setLafActivities, totalLafHours }) => {
     const [mode, setMode] = useState('ore'); // 'ore' | 'orario'
     const [info, setInfo] = useState(false);
     const [blocks, setBlocks] = useState([]);
@@ -268,11 +268,12 @@ const LafBody = ({ applyLafTemplate, calcData, calculatedLAF, lafActivities, set
                         className="lafm-go"
                         disabled={!ok}
                         onClick={() => {
-                            setCalcData({ ...calcData, laf: parseFloat(lafValue), guided: { ...(calcData.guided || {}), activity: 'custom' } });
+                            if (onUseLaf) onUseLaf(parseFloat(lafValue));
+                            else setCalcData({ ...calcData, laf: parseFloat(lafValue), guided: { ...(calcData.guided || {}), activity: 'custom' } });
                             close();
                         }}
                     >
-                        Usa nel piano <i className="ph ph-arrow-right"></i>
+                        {onUseLaf ? 'Usa per questa giornata' : 'Usa nel piano'} <i className="ph ph-arrow-right"></i>
                     </button>
                 </div>
             </div>

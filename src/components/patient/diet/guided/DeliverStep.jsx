@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { ActionSheet } from '../../../mobile/MobileChrome';
 import { SupplementSheet } from './MealSheets';
 import { confetti } from '../../shared/fx';
-import { STATUSES, dayStatus, dayTotals, patchVisit, setPlanStatus, statusOf } from './guidedLogic';
+import { STATUSES, dayTarget, dayTypeOf, dayStatus, dayTotals, patchVisit, setPlanStatus, statusOf } from './guidedLogic';
 
 // Passo 3 — Consegna: controllo finale, poi stampa, analisi e stato del piano.
 
@@ -20,7 +20,8 @@ const Action = ({ icon, title, sub, onClick, primary }) => (
 
 export const DeliverStep = ({ patient, targets, dietDays, visitaAttiva, onUpdateDb, onPrint, onAnalysis, onChart, onMenu }) => {
     const tdee = targets?.isConfigured ? targets.kcal : 0;
-    const rows = dietDays.map((d) => ({ d, st: dayStatus(d, tdee), tot: dayTotals(d), emptyMeals: d.meals.filter((m) => m.items.length === 0).length }));
+    const tdeeOf = (d) => (dayTarget(d, targets)?.isConfigured ? dayTarget(d, targets).kcal : 0);
+    const rows = dietDays.map((d) => ({ d, st: dayStatus(d, tdeeOf(d)), tot: dayTotals(d), emptyMeals: d.meals.filter((m) => m.items.length === 0).length }));
     const problems = rows.filter((r) => r.st.id === 'off' || r.st.id === 'empty' || r.emptyMeals > 0).length;
     const det = visitaAttiva?.dettagli || {};
     const supplements = Array.isArray(det.diet_supplements) ? det.diet_supplements : [];
@@ -39,9 +40,12 @@ export const DeliverStep = ({ patient, targets, dietDays, visitaAttiva, onUpdate
                     <div key={d.id} className="dg-row">
                         <i className={`ph ${st.id === 'ok' ? 'ph-check-circle' : st.id === 'empty' ? 'ph-circle-dashed' : 'ph-warning'} text-xl`} style={{ color: st.color }}></i>
                         <div className="flex-1 min-w-0">
-                            <p className="text-[14.5px] font-medium">{d.title}</p>
+                            <p className="text-[14.5px] font-medium">
+                                {d.title}
+                                {dayTypeOf(d) && d.targets && <em className="dg-badge-type">{dayTypeOf(d).short || dayTypeOf(d).label}</em>}
+                            </p>
                             <p className="text-[12.5px] text-[color:var(--muted)]">
-                                {Math.round(tot.kcal)} kcal · C {Math.round(tot.c)} g · P {Math.round(tot.p)} g · G {Math.round(tot.f)} g
+                                {Math.round(tot.kcal)}{tdeeOf(d) ? ` / ${Math.round(tdeeOf(d))}` : ''} kcal · C {Math.round(tot.c)} g · P {Math.round(tot.p)} g · G {Math.round(tot.f)} g
                                 {emptyMeals > 0 && st.id !== 'empty' ? ` · ${emptyMeals} ${emptyMeals === 1 ? 'pasto vuoto' : 'pasti vuoti'}` : ''}
                             </p>
                         </div>
@@ -52,6 +56,15 @@ export const DeliverStep = ({ patient, targets, dietDays, visitaAttiva, onUpdate
                         )}
                     </div>
                 ))}
+                {rows.length > 1 && rows.some((r) => r.d.type && r.d.targets) && tdee > 0 && (() => {
+                    const avgGoal = rows.reduce((a, r) => a + tdeeOf(r.d), 0) / rows.length;
+                    const avgPlan = rows.reduce((a, r) => a + r.tot.kcal, 0) / rows.length;
+                    return (
+                        <p className="dg-hint mt-3">
+                            Media dei giorni: <b>{Math.round(avgPlan)}</b> kcal nel menù, <b>{Math.round(avgGoal)}</b> kcal di obiettivo (piano: {Math.round(tdee)}).
+                        </p>
+                    );
+                })()}
                 {problems > 0 && (
                     <button className="dg-link mt-3" onClick={onMenu}>
                         <i className="ph ph-pencil-simple"></i> Torna al menù
