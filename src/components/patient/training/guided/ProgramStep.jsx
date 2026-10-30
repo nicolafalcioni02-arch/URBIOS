@@ -5,7 +5,7 @@ import { GridView } from './GridView';
 import { CellPanel } from './CellPanel';
 import { WeekPanel } from './WeekPanel';
 import { blankExercise, cloneWeeks, genId } from '../logic/trainingModel';
-import { move } from './trainingGuidedLogic';
+import { move, ssClean, ssCanon, ssToggle } from './trainingGuidedLogic';
 import { useCompact } from '../../../../hooks/useCompact';
 import { ActionSheet } from '../../../mobile/MobileChrome';
 
@@ -140,6 +140,18 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
             {mode === 'grid' ? (
                 <GridView weeks={weeks} di={di} onDay={setDi} onOpen={(weekId, dayIndex, exKey) => setCell({ weekId, dayIndex, exKey })}
                     onWeek={setWeekPanel}
+                    onLinkRows={(dayIndex, keyA, keyB, link) => {
+                        const nm = (e) => String(e.name || '').trim().toLowerCase();
+                        setWeeks((prev) => prev.map((w) => {
+                            const day = w.days[dayIndex];
+                            if (!day) return w;
+                            const ia = day.exercises.findIndex((e) => nm(e) === keyA);
+                            // vale nelle settimane in cui i due esercizi sono davvero uno sotto l'altro
+                            if (ia < 0 || !day.exercises[ia + 1] || nm(day.exercises[ia + 1]) !== keyB) return w;
+                            const sig = ssToggle(day.exercises.map((e) => e.ss || ''), ia, link);
+                            return { ...w, days: w.days.map((dd, i) => (i === dayIndex ? { ...dd, exercises: dd.exercises.map((e, k) => ({ ...e, ss: sig[k] })) } : dd)) };
+                        }));
+                    }}
                     onAddWeek={() => setWeeks((prev) => (prev.length ? [...prev, { ...cloneWeeks([prev[prev.length - 1]])[0], title: `Settimana ${prev.length + 1}`, kind: '' }] : prev))}
                     onAddExercise={(dayIndex, name) => setWeeks((prev) => prev.map((w) => (w.days[dayIndex] ? { ...w, days: w.days.map((d, i) => (i === dayIndex ? { ...d, exercises: [...d.exercises, { ...blankExercise(), id: genId(), name }] } : d)) } : w)))} />
             ) : (<>

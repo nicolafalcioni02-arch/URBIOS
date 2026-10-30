@@ -5,7 +5,7 @@ import { summarizeSets } from '../logic/trainingModel';
 // Serve a leggere la progressione (serie, carico, RPE) a colpo d'occhio; un tocco su una cella apre quella settimana per modificarla.
 const norm = (s) => String(s || '').trim().toLowerCase();
 
-export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, onWeek }) => {
+export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, onWeek, onLinkRows }) => {
     const [name, setName] = useState('');
     const maxDays = Math.max(...weeks.map((w) => w.days.length), 0);
     const d = Math.min(di, Math.max(0, maxDays - 1));
@@ -19,6 +19,21 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
             if (k && !rows.some((r) => r.k === k)) rows.push({ k, name: e.name });
         });
     });
+    // sigla di una riga (A1, B2...) dalla prima settimana in cui l'esercizio è in una superserie
+    const ssInfo = (k) => {
+        for (const w of weeks) {
+            const day = w.days[d];
+            if (!day) continue;
+            const i = day.exercises.findIndex((e) => norm(e.name) === rows[k].k);
+            if (i < 0 || !day.exercises[i].ss) continue;
+            let n = 1;
+            for (let j = i - 1; j >= 0 && day.exercises[j].ss === day.exercises[i].ss; j--) n++;
+            return `${day.exercises[i].ss}${n}`;
+        }
+        return '';
+    };
+    const sigs = rows.map((r, k) => ssInfo(k));
+    const linkedNext = (k) => !!sigs[k] && !!sigs[k + 1] && sigs[k][0] === sigs[k + 1][0];
     const titleOf = (i) => {
         const w = weeks.find((x) => x.days[i]);
         return (w && w.days[i].title) || `Seduta ${i + 1}`;
@@ -57,9 +72,10 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
                             </tr>
                         </thead>
                         <tbody>
-                            {rows.map((r) => (
-                                <tr key={r.k}>
-                                    <th scope="row">{r.name}</th>
+                            {rows.map((r, k) => (
+                                <React.Fragment key={r.k}>
+                                <tr className={sigs[k] ? 't-grid-ssrow' : ''}>
+                                    <th scope="row">{sigs[k] && <b className="t-grid-sig">{sigs[k]}</b>}{r.name}</th>
                                     {weeks.map((w, wi) => {
                                         const ex = w.days[d] && w.days[d].exercises.find((e) => norm(e.name) === r.k);
                                         const S = ex && summarizeSets(ex.sets);
@@ -79,6 +95,17 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
                                     })}
                                     <td></td>
                                 </tr>
+                                {k < rows.length - 1 && (
+                                    <tr className={`t-grid-link ${linkedNext(k) ? 'on' : ''}`}>
+                                        <td colSpan={weeks.length + 2}>
+                                            <button onClick={() => onLinkRows(d, r.k, rows[k + 1].k, !linkedNext(k))} aria-pressed={linkedNext(k)}>
+                                                <i className={`ph-bold ${linkedNext(k) ? 'ph-link-simple' : 'ph-link-simple-break'}`}></i>
+                                                {linkedNext(k) ? 'Superserie · separa' : 'Collega'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )}
+                                </React.Fragment>
                             ))}
                         </tbody>
                     </table>
@@ -98,7 +125,7 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
                     <i className="ph ph-plus"></i> Esercizio
                 </button>
             </form>
-            <p className="dg-hint mt-3">Tocca una cella per modificare l’esercizio, il nome di una settimana per rinominarla, duplicarla o eliminarla.</p>
+            <p className="dg-hint mt-3">Tocca una cella per modificare l’esercizio, il nome di una settimana per rinominarla, duplicarla o eliminarla. Tra due esercizi, “Collega” li unisce in superserie in tutte le settimane.</p>
         </div>
     );
 };

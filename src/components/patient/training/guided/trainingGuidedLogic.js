@@ -87,3 +87,26 @@ export const schedaFromBook = (entry, patient) => ({
 });
 
 export { GOALS, LEVELS, getSchede };
+
+
+// ---- superserie: una fila di esercizi consecutivi con la stessa sigla; le sigle seguono la posizione (A, B, C dall'alto) ----
+const SS_LETTERS = 'ABCDEF';
+// un blocco da un solo esercizio non esiste
+export const ssClean = (arr) => arr.map((x, i) => (x && (arr[i - 1] === x || arr[i + 1] === x) ? x : ''));
+export const ssCanon = (arr) => {
+    let n = 0;
+    const out = [];
+    arr.forEach((x, i) => out.push(!x ? '' : i > 0 && arr[i - 1] === x ? out[i - 1] : SS_LETTERS[Math.min(n++, SS_LETTERS.length - 1)]));
+    return out;
+};
+// collega (link=true) o separa l'esercizio i con il successivo, in un elenco di sigle
+export const ssToggle = (cur, i, link) => {
+    const next = [...cur];
+    if (!link) next[i + 1] = '';
+    else {
+        const L = next[i] || SS_LETTERS.split('').find((l) => !next.includes(l)) || 'F';
+        next[i] = L;
+        next[i + 1] = L;
+    }
+    return ssCanon(ssClean(next));
+};
