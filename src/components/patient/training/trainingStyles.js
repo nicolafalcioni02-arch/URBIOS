@@ -336,6 +336,39 @@ export const trainingCss = `
                 .t-grid td small { font-size: 12px; color: var(--muted); }
                 .t-grid td button.empty { color: var(--muted); }
 
+
+                /* ---- database esercizi su telefono: schermata intera a schede ---- */
+                .t-dbm { position: fixed; inset: 0; z-index: 10002; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); animation: sheet-up .35s var(--ease) both; }
+                .t-dbm-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: max(14px, env(safe-area-inset-top)) 16px 10px; }
+                .t-dbm-head h3 { font-size: 22px; font-weight: 700; line-height: 1.15; }
+                .t-dbm-head span { font-size: 13px; color: var(--muted); }
+                .t-dbm-x { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1px solid var(--line); display: grid; place-items: center; flex: none; }
+                .t-dbm-tools { padding: 0 16px 10px; display: flex; flex-direction: column; gap: 8px; }
+                .t-dbm-search { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+                .t-dbm-search i { color: var(--muted); font-size: 18px; }
+                .t-dbm-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; }
+                .t-dbm-new { display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border-radius: 14px; background: var(--ink); color: #fff; font-weight: 600; font-size: 15px; }
+                .t-dbm-form { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 16px; background: #fff; border: 1px solid var(--line); }
+                .t-dbm-form div { display: flex; gap: 8px; }
+                .t-dbm-form input { flex: 1; min-width: 0; height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); }
+                .t-dbm-form button { height: 46px; border-radius: 12px; background: var(--soft); font-weight: 600; }
+                .t-dbm-form button:disabled { opacity: .4; }
+                .t-dbm-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 16px 12px; display: flex; flex-direction: column; gap: 8px; }
+                .t-dbm-empty { text-align: center; color: var(--muted); padding: 30px 0; }
+                .t-dbm-card { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 16px; background: #fff; border: 1px solid var(--line); }
+                .t-dbm-thumb { flex: none; width: 56px; height: 56px; border-radius: 12px; overflow: hidden; background: var(--soft); display: grid; place-items: center; color: var(--muted); font-size: 20px; }
+                .t-dbm-thumb img { width: 100%; height: 100%; object-fit: cover; }
+                .t-dbm-fields { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+                .t-dbm-fields div { display: flex; gap: 6px; }
+                .t-dbm-fields input { flex: 1; min-width: 0; height: 36px; padding: 0 8px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--ink); }
+                .t-dbm-fields input:focus { border-color: var(--ink); background: var(--paper); outline: 0; }
+                .t-dbm-fields input.n { font-weight: 600; height: 40px; }
+                .t-dbm-fields div input { color: var(--muted); font-size: 14px; }
+                .t-dbm-del { flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: #C2413A; border-radius: 12px; }
+                .t-dbm-foot { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 16px max(12px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--paper); }
+                .t-dbm-foot button { flex: 1 1 28%; display: flex; align-items: center; justify-content: center; gap: 6px; height: 44px; border-radius: 12px; background: #fff; border: 1px solid var(--line); font-size: 14px; font-weight: 600; }
+                .t-dbm-foot button.reset { flex-basis: 100%; height: 36px; border: 0; background: transparent; color: #C2413A; font-weight: 500; font-size: 13px; }
+
                 /* ==================== ADATTAMENTO A TABLET E TELEFONO ==================== */
                 @media (max-width: 1100px) {
                     .t-client-header-card { grid-template-columns: repeat(2, minmax(0, 1fr)); }

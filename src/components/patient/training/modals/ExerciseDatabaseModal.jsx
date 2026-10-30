@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useCompact } from '../../../../hooks/useCompact';
 import { getExerciseImages } from '../logic/exerciseMedia';
 
 export const ExerciseDatabaseModal = ({
@@ -19,6 +21,83 @@ export const ExerciseDatabaseModal = ({
     setNewEx,
     updateDbEx,
 }) => {
+    const compact = useCompact(639);
+    const [adding, setAdding] = useState(false);
+    if (isSettingsOpen && compact) {
+        const q = dbSearch.toLowerCase();
+        const list = exerciseDB.map((ex, index) => ({ ex, index })).filter(({ ex }) => !q || ex.name.toLowerCase().includes(q) || ex.group.toLowerCase().includes(q));
+        return createPortal(
+            <div className="t-dbm" role="dialog" aria-label="Database esercizi">
+                <div className="t-dbm-head">
+                    <div>
+                        <h3>Database esercizi</h3>
+                        <span>{exerciseDB.length} esercizi · modifica diretta</span>
+                    </div>
+                    <button className="t-dbm-x" onClick={() => setIsSettingsOpen(false)} aria-label="Chiudi">
+                        <i className="ph-bold ph-x"></i>
+                    </button>
+                </div>
+                <div className="t-dbm-tools">
+                    <div className="t-dbm-search">
+                        <i className="ph ph-magnifying-glass"></i>
+                        <input type="search" placeholder="Cerca esercizio o gruppo" value={dbSearch} onChange={(e) => setDbSearch(e.target.value)} />
+                    </div>
+                    <button className="t-dbm-new" onClick={() => setAdding(!adding)} aria-expanded={adding}>
+                        <i className={`ph-bold ${adding ? 'ph-x' : 'ph-plus'}`}></i> {adding ? 'Annulla' : 'Nuovo esercizio'}
+                    </button>
+                    {adding && (
+                        <form
+                            className="t-dbm-form"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                if (!newEx.name.trim()) return;
+                                addExerciseToDB();
+                                setAdding(false);
+                            }}
+                        >
+                            <input autoFocus placeholder="Nome (es. Squat)" value={newEx.name} onChange={(e) => setNewEx({ ...newEx, name: e.target.value })} />
+                            <div>
+                                <input placeholder="Gruppo (es. Gambe)" value={newEx.group} onChange={(e) => setNewEx({ ...newEx, group: e.target.value })} />
+                                <input placeholder="Tipo (es. Forza)" value={newEx.type} onChange={(e) => setNewEx({ ...newEx, type: e.target.value })} />
+                            </div>
+                            <button type="submit" disabled={!newEx.name.trim()}>Aggiungi al database</button>
+                        </form>
+                    )}
+                </div>
+                <div className="t-dbm-list">
+                    {list.length === 0 && <p className="t-dbm-empty">Nessun esercizio trovato.</p>}
+                    {list.map(({ ex, index }) => {
+                        const thumb = getExerciseImages(ex.name, exerciseDB)[0];
+                        return (
+                            <div className="t-dbm-card" key={index}>
+                                <button className="t-dbm-thumb" onClick={() => openPhotos({ name: ex.name, group: ex.group })} aria-label="Foto dell'esercizio">
+                                    {thumb ? <img src={thumb} alt="" /> : <i className="ph ph-camera-plus"></i>}
+                                </button>
+                                <div className="t-dbm-fields">
+                                    <input className="n" value={ex.name} onChange={(e) => updateDbEx(index, 'name', e.target.value)} aria-label="Nome" />
+                                    <div>
+                                        <input value={ex.group} placeholder="Gruppo" onChange={(e) => updateDbEx(index, 'group', e.target.value)} aria-label="Gruppo" />
+                                        <input value={ex.type} placeholder="Tipo" onChange={(e) => updateDbEx(index, 'type', e.target.value)} aria-label="Tipo" />
+                                    </div>
+                                </div>
+                                <button className="t-dbm-del" onClick={() => deleteExDB(index)} aria-label="Elimina">
+                                    <i className="ph ph-trash"></i>
+                                </button>
+                            </div>
+                        );
+                    })}
+                </div>
+                <div className="t-dbm-foot">
+                    <button onClick={addCatalog}><i className="ph ph-images"></i> Catalogo</button>
+                    <button onClick={exportJSON}><i className="ph ph-download-simple"></i> Esporta</button>
+                    <button onClick={() => fileInputRef.current.click()}><i className="ph ph-upload-simple"></i> Importa</button>
+                    <input type="file" ref={fileInputRef} accept=".json" style={{ display: 'none' }} onChange={importJSON} />
+                    <button className="reset" onClick={resetDatabase}>Reset</button>
+                </div>
+            </div>,
+            document.body
+        );
+    }
     return (
         isSettingsOpen && (
             <div className="t-modal-overlay" style={{ display: 'flex' }}>
