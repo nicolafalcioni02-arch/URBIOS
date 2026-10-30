@@ -83,13 +83,17 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
             {week.kind === 'deload' && <p className="dg-warn">Settimana di scarico: gli avvisi sul volume non vengono applicati.</p>}
 
             <div className="mt-4">
-                {day.exercises.map((ex, i) => {
-                    const next = day.exercises[i + 1];
-                    const prev = day.exercises[i - 1];
-                    const linked = !!(next && ex.ss && ex.ss === next.ss);
-                    const role = ex.ss ? (prev && prev.ss === ex.ss ? (next && next.ss === ex.ss ? 'mid' : 'last') : 'first') : '';
-                    const toggle = () => {
-                        const cur = day.exercises.map((e) => e.ss || '');
+                {(() => {
+                    const exs = day.exercises;
+                    // blocchi: una superserie (esercizi di fila con la stessa sigla) o un esercizio singolo
+                    const blocks = [];
+                    exs.forEach((e, i) => {
+                        const last = blocks[blocks.length - 1];
+                        if (e.ss && last && exs[last[last.length - 1]].ss === e.ss) last.push(i);
+                        else blocks.push([i]);
+                    });
+                    const toggle = (i, linked) => {
+                        const cur = exs.map((e) => e.ss || '');
                         if (linked) cur[i + 1] = '';
                         else {
                             const free = LETTERS.split('').find((l) => !cur.includes(l)) || 'F';
@@ -98,22 +102,43 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
                             cur[i + 1] = L;
                         }
                         const out = clean(cur);
-                        out.forEach((v, k) => v !== (day.exercises[k].ss || '') && ops.updateExValue(week.id, day.id, day.exercises[k].id, 'ss', v));
+                        out.forEach((v, k) => v !== (exs[k].ss || '') && ops.updateExValue(week.id, day.id, exs[k].id, 'ss', v));
                     };
-                    return (
-                        <React.Fragment key={ex.id}>
-                            <div className={ex.ss ? `t-ss-wrap t-ss-${role}` : ''}>
-                                <ExerciseCard ex={ex} label={labels[ex.id]} weekId={week.id} dayId={day.id} exerciseDB={exerciseDB} suggestions={suggestions} oneRm={oneRmFor(massimali, ex.name)} ops={ops} compact={compact} ssRole={role} />
-                            </div>
-                            {next && (
-                                <button className={`t-ss-link ${linked ? 'on' : ''}`} onClick={toggle} aria-pressed={linked}>
-                                    <i className={`ph-bold ${linked ? 'ph-link-simple' : 'ph-link-simple-break'}`}></i>
-                                    <span>{linked ? 'Superserie · separa' : 'Collega in superserie'}</span>
-                                </button>
-                            )}
-                        </React.Fragment>
+                    const linkBtn = (i, linked) => (
+                        <button key={`l${i}`} className={`t-ss-link ${linked ? 'on' : ''}`} onClick={() => toggle(i, linked)} aria-pressed={linked}>
+                            <i className={`ph-bold ${linked ? 'ph-link-simple' : 'ph-link-simple-break'}`}></i>
+                            <span>{linked ? 'Superserie · separa' : 'Collega in superserie'}</span>
+                        </button>
                     );
-                })}
+                    const card = (i, role) => (
+                        <ExerciseCard key={exs[i].id} ex={exs[i]} label={labels[exs[i].id]} weekId={week.id} dayId={day.id} exerciseDB={exerciseDB} suggestions={suggestions} oneRm={oneRmFor(massimali, exs[i].name)} ops={ops} compact={compact} ssRole={role} />
+                    );
+                    return blocks.map((blk) => {
+                        const lastIdx = blk[blk.length - 1];
+                        const after = exs[lastIdx + 1] ? linkBtn(lastIdx, false) : null;
+                        if (blk.length === 1) {
+                            return (
+                                <React.Fragment key={exs[blk[0]].id}>
+                                    {card(blk[0], '')}
+                                    {after}
+                                </React.Fragment>
+                            );
+                        }
+                        return (
+                            <React.Fragment key={exs[blk[0]].id}>
+                                <div className="t-ss-box">
+                                    {blk.map((i, k) => (
+                                        <React.Fragment key={exs[i].id}>
+                                            {card(i, k === 0 ? 'first' : k === blk.length - 1 ? 'last' : 'mid')}
+                                            {k < blk.length - 1 && linkBtn(i, true)}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                                {after}
+                            </React.Fragment>
+                        );
+                    });
+                })()}
             </div>
             <button className="dg-add" onClick={() => ops.addExercise(week.id, day.id)}>
                 <i className="ph ph-plus-circle"></i> Aggiungi esercizio
