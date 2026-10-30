@@ -463,7 +463,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mea
                             title: day.title || 'Giorno',
                             subtitle: `${day.meals.length} pasti · ${Math.round(tot.kcal)} kcal`,
                             groups: [
-                                [{ label: 'Tipo di giornata', icon: 'ph-calendar-check', note: dType ? dType.label : 'come il piano', onClick: () => setTimeout(() => setTyping(true), 280) }],
+                                [{ label: 'Tipo di giornata', icon: 'ph-calendar-check', note: dType ? dType.label : 'nessuno', onClick: () => setTimeout(() => setTyping(true), 280) }],
                                 [
                                     { label: 'Rinomina', icon: 'ph-pencil-simple', note: day.title, onClick: () => setTimeout(() => { const v = window.prompt('Nome del giorno', day.title || ''); if (v !== null) update((d) => d.map((x) => (x.id === day.id ? { ...x, title: v } : x))); }, 280) },
                                     { label: 'Sposta prima', icon: 'ph-arrow-left', disabled: dayIdx <= 0, onClick: () => moveDay(dayIdx, dayIdx - 1) },

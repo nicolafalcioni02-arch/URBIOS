@@ -85,7 +85,7 @@ export const DayTypeSheet = ({ day, calcData, targets, onApply, onClear, onLaf, 
                         )}
                         <p className="t-dt-note">
                             {manual && type !== 'custom' ? 'Kcal modificate a mano. ' : ''}
-                            {kcal && Math.abs(diff) >= 1 ? `${diff > 0 ? '+' : '−'}${Math.abs(Math.round(diff))} kcal rispetto al piano.` : 'Come il piano.'}
+                            {kcal && Math.abs(diff) >= 1 ? `${diff > 0 ? '+' : '−'}${Math.abs(Math.round(diff))} kcal rispetto all’obiettivo del piano.` : 'Uguale all’obiettivo del piano.'}
                         </p>
 
                         <p className="t-prev-h" style={{ marginTop: 14 }}>Macro (% delle kcal)</p>
@@ -109,7 +109,7 @@ export const DayTypeSheet = ({ day, calcData, targets, onApply, onClear, onLaf, 
                 <div className="t-prev-foot" style={{ marginTop: 12 }}>
                     {day.type && (
                         <button type="button" className="vw-back" style={{ height: 52, borderRadius: 16, padding: '0 16px', flex: 'none', width: 'auto', whiteSpace: 'nowrap' }} onClick={() => { onClear(); onClose(); }}>
-                            Come il piano
+                            Togli il tipo
                         </button>
                     )}
                     <button
