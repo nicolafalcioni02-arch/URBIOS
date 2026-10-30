@@ -115,7 +115,7 @@ export const LafCalculatorModal = ({ applyLafTemplate, calcData, calculatedLAF, 
                         className="lafm-go"
                         disabled={!ok}
                         onClick={() => {
-                            setCalcData({ ...calcData, laf: parseFloat(calculatedLAF) });
+                            setCalcData({ ...calcData, laf: parseFloat(calculatedLAF), guided: { ...(calcData.guided || {}), activity: 'custom' } });
                             close();
                         }}
                     >
