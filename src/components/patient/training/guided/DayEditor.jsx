@@ -102,13 +102,13 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
                     };
                     return (
                         <React.Fragment key={ex.id}>
-                            <div className={ex.ss ? 't-ss-wrap' : ''}>
+                            <div className={ex.ss ? `t-ss-wrap t-ss-${role}` : ''}>
                                 <ExerciseCard ex={ex} label={labels[ex.id]} weekId={week.id} dayId={day.id} exerciseDB={exerciseDB} suggestions={suggestions} oneRm={oneRmFor(massimali, ex.name)} ops={ops} compact={compact} ssRole={role} />
                             </div>
                             {next && (
                                 <button className={`t-ss-link ${linked ? 'on' : ''}`} onClick={toggle} aria-pressed={linked}>
-                                    <i className={`ph ${linked ? 'ph-link-break' : 'ph-link'}`}></i>
-                                    {linked ? 'Superserie · tocca per separare' : 'Collega in superserie'}
+                                    <i className={`ph-bold ${linked ? 'ph-link-simple' : 'ph-link-simple-break'}`}></i>
+                                    <span>{linked ? 'Superserie · separa' : 'Collega in superserie'}</span>
                                 </button>
                             )}
                         </React.Fragment>
