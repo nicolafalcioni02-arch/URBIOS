@@ -61,7 +61,6 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
                 <button className="t-det" onClick={() => setMore(!more)} aria-expanded={more}>
                     <span>
                         <b>{A.trains ? `${A.workSets} serie · ${Math.round(A.minutes)} min${A.volumeLoad ? ` · ${fmtKg(A.volumeLoad)}` : ''}` : 'Seduta vuota'}</b>
-                        <small>Nome, durata, note</small>
                     </span>
                     <i className={`ph ph-caret-down ${more ? 'open' : ''}`}></i>
                 </button>

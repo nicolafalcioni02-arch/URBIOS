@@ -152,7 +152,8 @@ export const guidedCss = `
   .dg-step b { font-size: 15px; text-align: center; }
   .dg-body[data-step="menu"] .dg-title, .dg-body[data-step="menu"] .dg-hint2 { display: none; }
   .dg-title { font-size: 26px; }
-  .dg-hint2 { font-size: 13.5px; margin: 4px 0 12px; }
+  .dg-hint2 { display: none; }
+  .dg-title { margin-bottom: 12px; }
   .dg-chip.row { min-height: 46px; padding: 0 18px; font-size: 15px; }
   .dg-add { height: 48px; }
   .dg-more { width: 46px; height: 46px; border-radius: 14px; background: #fff; border: 1px solid var(--line); color: var(--ink); }

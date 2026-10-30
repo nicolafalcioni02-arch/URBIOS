@@ -489,7 +489,7 @@ export const trainingCss = `
                     .t-root .dg-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
                     .t-root .dg-tools .dg-tool { min-width: 0; padding: 0 6px; gap: 5px; height: 40px; overflow: hidden; }
                     .t-root .dg-title { font-size: 26px; }
-                    .t-root .dg-hint2 { font-size: 13.5px; margin: 4px 0 14px; }
+                    .t-root .dg-hint2 { display: none; }
 
                     /* strumenti del passo: una sola riga che scorre */
                     .t-root .t-toolrow { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 0 16px 2px; }
@@ -541,7 +541,6 @@ export const trainingCss = `
                     .t-sumline b { color: var(--ink); font-weight: 600; }
                     .t-root .dg-step { padding: 8px 10px; border-radius: 14px; }
                     .t-root .dg-body[data-step="program"] .dg-title, .t-root .dg-body[data-step="program"] .dg-hint2 { display: none; }
-                    .t-root .dg-body .dg-hint2 { margin-bottom: 10px; }
                     .t-root .t-lab { display: none; }
                     .t-root .dg-chip.row { min-height: 46px; padding: 0 18px; font-size: 15px; }
                     .t-root .t-more { width: 46px; height: 46px; border-radius: 14px; }

@@ -35,8 +35,6 @@ export const responsiveStyles = `
                     .fab-container .t-fab-print { width: 52px; height: 52px; }
                     .modal-backdrop { padding: 0 !important; height: 100dvh; }
                     .modal-window { height: 100dvh !important; max-width: none !important; width: 100% !important; border-radius: 0 !important; }
-                    .sc-body { grid-template-columns: 1fr; overflow-y: auto; }
-                    .sc-panel { border-right: none; border-bottom: 1px solid #F0F0F2; overflow: visible; }
                     .day-title-input { width: 100%; }
                     .day-summary-header { flex-wrap: wrap; gap: 10px; }
                 }
@@ -126,26 +124,6 @@ export const responsiveStyles = `
                     .dm-sub .dm-sbtn { width: 40px !important; height: 40px !important; }
                     .dm-sub .t-ex-input { font-size: 16px !important; }
                     .t-suggestions-list { max-height: 40vh; }
-                }
-
-                /* ===== SMART REPORT MAKER su schermo piccolo ===== */
-                @media (max-width: 900px) {
-                    .sc-modal-overlay { padding: 0 !important; }
-                    .sc-modal { height: 100dvh !important; max-width: none !important; border-radius: 0 !important; }
-                    .sc-header { padding: 14px 16px !important; }
-                    .sc-body { display: block !important; overflow-y: auto !important; }
-                    .sc-panel { padding: 16px !important; gap: 18px !important; }
-                    .sc-chart-area { padding: 16px !important; overflow: visible !important; }
-                    .sc-chart-container { min-height: 340px; }
-                    .sc-type-btn, .sc-scope-btn { min-height: 44px; font-size: 13px !important; }
-                    .sc-select { min-height: 46px; }
-                    .sc-section-label { font-size: 12px !important; }
-                    .sc-footer { padding: 10px 14px max(12px, env(safe-area-inset-bottom)) !important; gap: 10px; }
-                    .sc-footer > div { flex: 1; }
-                    .sc-footer > div > span { display: none; }
-                    .sc-btn-save { flex: 1; justify-content: center; height: 48px; font-size: 14px !important; border-radius: 14px !important; }
-                    .sc-btn-reset { height: 48px; padding: 0 16px !important; font-size: 13px !important; border-radius: 14px !important; }
-                    .sc-close-btn { width: 40px !important; height: 40px !important; }
                 }
 
                 /* ===== SETUP OBIETTIVI su schermo piccolo ===== */

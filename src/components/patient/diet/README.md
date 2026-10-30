@@ -15,13 +15,14 @@ diet/
 │   ├── useFoodDatabase.js    database alimenti (import/export)
 │   ├── useLafCalculator.js   calcolatore LAF 24h
 │   ├── useDietPlanData.js    dati del piano (paziente/visita, calcData, targets, giorni, report, DB) + autosave
-│   ├── useDietAnalysis.js    report salvati, analisi bioprofilo/DRV, compone analysis/useSmartChartPlot (Plotly, con un builder per tipo di grafico in analysis/plotBuilders/)
+│   ├── useDietAnalysis.js    target EFSA del paziente, report salvati, analisi bioprofilo/DRV
 ├── views/                    DietMenuView, DietSidebar, FloatingActions, dietMain/ (dashboard centrale + parts/)
+├── smartReport/              Report grafico: metrics (catalogo), reportModel (dati → serie, dato mancante ≠ zero), figure (Plotly), ReportChart, SmartReportModal
 ├── modals/                   MealEditor, MealLibrary, SaveMealToLibrary, SaveStatus, ChangeVisit,
-│                             nutritionSetup/ (3 tab), LafCalculator, FoodDatabase, SmartChart,
+│                             nutritionSetup/ (3 tab), LafCalculator, FoodDatabase,
 │                             clinicalAnalysis/, DrvEditor
 ├── printReport/              dietDocument (DietDocBody) + sheets/ (copertina, impostazioni, giorni, spesa, finale) + logic/printLayout
 ├── ui/                       icons, MacroProgressBar, MiniReportChart
 ├── logic/                    clinicalFormulas (RMR, BMI, WHR...), dietTotals
-└── data/                     defaultFoodDB, nutrientMapping, metricCatalog
+└── data/                     defaultFoodDB, nutrientMapping
 ```

@@ -1,10 +1,7 @@
 import { useEffect } from 'react';
-import { METRIC_CATALOG } from '../data/metricCatalog';
 import { legacyTargets } from '../analysis/drvEngine';
-import { calculateTotals } from '../logic/dietTotals';
-import { useSmartChartPlot } from './analysis/useSmartChartPlot';
 
-// Grafico Smart (Plotly), report salvati, analisi bioprofilo/DRV
+// Target EFSA del paziente, report salvati, analisi bioprofilo/DRV
 export const useDietAnalysis = ({
     activeDay,
     dietDays,
@@ -12,7 +9,6 @@ export const useDietAnalysis = ({
     emptyFoodTemplate,
     foodDB,
     genId,
-    isSmartOpen,
     patientProfile,
     savedReports,
     setIsSmartOpen,
@@ -73,15 +69,14 @@ export const useDietAnalysis = ({
         return { label: 'Altri Micronutrienti', icon: 'ph-dots-three-circle', color: 'text-gray-400' };
     };
 
-    // --- MOTORE DI CALCOLO MICRONUTRIENTI ---
-
     // --- GESTIONE SALVATAGGIO REPORT ---
     const saveSmartReport = () => {
+        const day = dietDays.find((d) => d.id === smartConfig.dayId) || activeDay;
         const newReport = {
             id: genId(),
             date: new Date().toLocaleDateString('it-IT'),
-            dayId: activeDay ? activeDay.id : null,
-            dayTitle: smartConfig.scope === 'activeDay' ? activeDay?.title || 'Giorno' : 'Panoramica Settimanale',
+            dayId: day ? day.id : null,
+            dayTitle: smartConfig.scope === 'activeDay' ? day?.title || 'Giorno' : 'Panoramica Settimanale',
             config: { ...smartConfig },
         };
         setSavedReports((prev) => [newReport, ...prev]); // Aggiunge in cima alla lista
@@ -127,27 +122,5 @@ export const useDietAnalysis = ({
         return { data: analysis, avgMealsPerDay: totalMeals / dayCount };
     };
 
-    // Funzione helper: somma un campo dal foodDB per una lista di items
-    const sumFieldFromDB = (items, fieldKeys) => {
-        return items.reduce((acc, item) => {
-            const food = foodDB.find((f) => f.name === item.name);
-            if (!food) return acc;
-            const factor = (Number(item.weight) || 0) / 100;
-            const val = fieldKeys.reduce((sum, k) => sum + (Number(food[k]) || 0), 0);
-            return acc + val * factor;
-        }, 0);
-    };
-
-    // Funzione di aggregazione dati per tipo metrica
-    const buildMetricData = (items, metricKey) => {
-        const m = METRIC_CATALOG[metricKey];
-        if (!m) return 0;
-        if (m.keys) return sumFieldFromDB(items, m.keys);
-        if (m.aggregation === 'kcal') return calculateTotals(items).kcal;
-        return 0;
-    };
-
-    const { plotRef } = useSmartChartPlot({ activeDay, dietDays, drvDB, getPatientTargets, isSmartOpen, smartConfig, sumFieldFromDB, targets });
-
-    return { plotRef, getPatientTargets, saveSmartReport, deleteReport, analyzeCompleteBioProfile };
+    return { getPatientTargets, saveSmartReport, deleteReport, analyzeCompleteBioProfile };
 };

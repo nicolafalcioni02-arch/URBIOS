@@ -11,8 +11,7 @@ export const PlansWorkspace = ({ patient, active, setActive, onDone, children })
         <div className="vw-steps sticky top-0 z-30 px-4 md:px-8 py-3">
             <div className="max-w-5xl mx-auto flex items-center gap-3">
                 <div className="min-w-0 flex-1">
-                    <p className="text-[12px] text-[color:var(--muted)] leading-tight">Visita salvata · {patient.nome} {patient.cognome}</p>
-                    <div className="vw-seg mt-1.5" role="tablist">
+                    <div className="vw-seg" role="tablist" aria-label={`Piani di ${patient.nome} ${patient.cognome}`}>
                         {TABS.map((t) => (
                             <button key={t.id} role="tab" aria-selected={active === t.id} onClick={() => setActive(t.id)} className={active === t.id ? 'is-on' : ''}>
                                 <i className={`ph ${t.icon}`}></i>

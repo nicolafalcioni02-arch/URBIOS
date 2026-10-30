@@ -5,7 +5,7 @@ import { AnalysisModal } from './analysis/AnalysisModal';
 import { DrvEditorModal } from './modals/DrvEditorModal';
 import { FoodDatabaseModal } from './modals/FoodDatabaseModal';
 import { LafCalculatorModal } from './modals/LafCalculatorModal';
-import { SmartChartModal } from './modals/SmartChartModal';
+import { DEFAULT_REPORT_CONFIG, SmartReportModal } from './smartReport/SmartReportModal';
 import { DietGuided } from './guided/DietGuided';
 import { fmtLong, genId, planDateInfo } from './guided/guidedLogic';
 import { emptyFoodTemplate } from './data/emptyFoodTemplate';
@@ -79,15 +79,14 @@ export const DietPlan = ({ patient, onUpdateDb, db, initialVisitId = null }) => 
     // grafici: il giorno "attivo" è quello aperto nel menù
     const [activeDayId, setActiveDayId] = useState(null);
     const activeDay = dietDays.find((d) => d.id === activeDayId) || dietDays[0];
-    const [smartConfig, setSmartConfig] = useState({ type: 'bar', metric: 'kcal', scope: 'activeDay', comment: '', showTarget: true });
-    const { plotRef, saveSmartReport } = useDietAnalysis({
+    const [smartConfig, setSmartConfig] = useState(DEFAULT_REPORT_CONFIG);
+    const { getPatientTargets, saveSmartReport } = useDietAnalysis({
         activeDay,
         dietDays,
         drvDB,
         emptyFoodTemplate,
         foodDB,
         genId,
-        isSmartOpen,
         patientProfile,
         savedReports,
         setIsSmartOpen,
@@ -152,14 +151,16 @@ export const DietPlan = ({ patient, onUpdateDb, db, initialVisitId = null }) => 
                 setIsDbOpen={setIsDbOpen}
             />
 
-            <SmartChartModal
-                activeDay={activeDay}
-                isSmartOpen={isSmartOpen}
-                plotRef={plotRef}
-                saveSmartReport={saveSmartReport}
-                setIsSmartOpen={setIsSmartOpen}
-                setSmartConfig={setSmartConfig}
-                smartConfig={smartConfig}
+            <SmartReportModal
+                config={smartConfig}
+                dietDays={dietDays}
+                foodDB={foodDB}
+                isOpen={isSmartOpen}
+                kcalTarget={targets?.kcal}
+                onClose={() => setIsSmartOpen(false)}
+                onSave={saveSmartReport}
+                patientTargets={isSmartOpen ? getPatientTargets() : {}}
+                setConfig={setSmartConfig}
             />
 
             <AnalysisModal
