@@ -106,6 +106,12 @@ export const ExerciseCard = ({ ex, label, weekId, dayId, exerciseDB, suggestions
                 </div>
             </div>
 
+            {ex.ss && (
+                <p className="t-hint" style={{ margin: '-6px 2px 12px' }}>
+                    Superserie {ex.ss}: gli esercizi di fila con la stessa lettera si fanno uno dopo l’altro. Scrivi il recupero solo sull’ultimo del gruppo.
+                </p>
+            )}
+
             {cardio && (
                 <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#555' }}>
                     <i className="ph ph-heartbeat"></i> Intensità (per il dispendio):

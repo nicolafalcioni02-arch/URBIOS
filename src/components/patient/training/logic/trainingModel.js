@@ -100,7 +100,9 @@ const join = (vals) => {
 };
 export const summarizeSets = (allSets) => {
     const warm = allSets.filter((s) => s.tipo === 'riscaldamento');
-    const sets = allSets.filter((s) => s.tipo !== 'riscaldamento');
+    const drops = allSets.filter((s) => s.tipo === 'drop');
+    // le serie "drop" si indicano a parte (+ N drop): le serie principali restano leggibili
+    const sets = allSets.filter((s) => s.tipo !== 'riscaldamento' && (s.tipo !== 'drop' || allSets.every((x) => x.tipo === 'drop' || x.tipo === 'riscaldamento')));
     const reps = sets.map((s) => String(s.reps || '').trim());
     const filled = reps.filter(Boolean);
     const rec = uniq(sets.map((s) => String(s.rec || '').trim()).filter(Boolean));
@@ -111,6 +113,7 @@ export const summarizeSets = (allSets) => {
         else if (uniq(reps).length === 1) serie = `${sets.length} × ${reps[0]}`;
         else serie = `${sets.length} serie: ${reps.map((r) => r || '–').join(' / ')}`;
     }
+    if (drops.length && sets.length && !sets.includes(drops[0])) serie += ` + ${drops.length} drop`;
     if (warm.length) serie += `${serie ? ' ' : ''}(+${warm.length} risc.)`;
     return {
         serie,

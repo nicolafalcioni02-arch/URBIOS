@@ -27,7 +27,8 @@ export const TrainingDocBody = ({ header, weeks, exerciseDB, massimali, profile,
     const usesSS = allRows.some((r) => r.ss),
         usesRpe = allRows.some((r) => r.rpe),
         usesTempo = allRows.some((r) => r.tempo),
-        usesWarm = allRows.some((r) => /risc\./.test(r.serie));
+        usesWarm = allRows.some((r) => /risc\./.test(r.serie)),
+        usesDrop = allRows.some((r) => /drop/.test(r.serie));
     const profName = [prof.nome, prof.cognome].filter(Boolean).join(' ');
     const hasProfile = profName && !(prof.nome === 'Dottore' && !prof.cognome); // 'Dottore' è il valore predefinito: non va stampato
     const goal = goalById(header.tipo);
@@ -154,13 +155,14 @@ export const TrainingDocBody = ({ header, weeks, exerciseDB, massimali, profile,
             </section>
         ))}
 
-        {opts.legend && (usesSS || usesRpe || usesTempo || usesWarm) && (
+        {opts.legend && (usesSS || usesRpe || usesTempo || usesWarm || usesDrop) && (
             <div className="tp-legend">
                 <b>Legenda.</b>
                 {usesRpe && <> RPE = sforzo percepito da 1 a 10 (10 = massimo, nessuna ripetizione di riserva; 8 = 2 ripetizioni di riserva).</>}
                 {usesTempo && <> Tempo = secondi di discesa – pausa in basso – salita – pausa in alto (X = salita esplosiva).</>}
                 {usesSS && <> A1/A2 = superserie: esegui gli esercizi uno dopo l'altro senza recupero, poi recupera.</>}
                 {usesWarm && <> risc. = serie di riscaldamento prima delle serie di lavoro.</>}
+                {usesDrop && <> drop = serie a carico ridotto, eseguita subito dopo l'ultima serie senza recupero.</>}
             </div>
         )}
 

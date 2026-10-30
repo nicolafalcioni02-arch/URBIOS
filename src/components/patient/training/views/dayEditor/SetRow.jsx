@@ -19,7 +19,7 @@ export const SetRow = ({ set, index, cardio, oneRm, onChange, onRemove }) => {
         <input type="text" value={set[field] ?? ''} placeholder={placeholder} onChange={(e) => onChange(field, e.target.value)} {...extra} />
     );
     return (
-        <tr style={tipo === 'riscaldamento' ? { background: '#FFFBF2' } : undefined}>
+        <tr style={tipo === 'riscaldamento' ? { background: '#FFFBF2' } : tipo === 'drop' ? { background: '#F7F2FF' } : undefined}>
             <td>
                 <div
                     className="t-set-badge"
@@ -62,7 +62,7 @@ export const SetRowCompact = ({ set, index, cardio, oneRm, onChange, onRemove, d
         </label>
     );
     return (
-        <div className={`t-setc ${tipo === 'riscaldamento' ? 'warm' : ''}`}>
+        <div className={`t-setc ${tipo === 'riscaldamento' ? 'warm' : tipo === 'drop' ? 'drop' : ''}`}>
             <div className={`t-setc-row ${cardio ? 'cardio' : ''}`}>
                 <button
                     type="button"

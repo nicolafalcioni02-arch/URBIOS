@@ -411,6 +411,7 @@ export const trainingCss = `
                 .t-setc { padding: 6px 0 8px; border-bottom: 1px solid #EFEDE8; }
                 .t-setc:last-child { border-bottom: 0; }
                 .t-setc.warm { background: #FFFBF2; border-radius: 12px; }
+                .t-setc.drop { background: #F7F2FF; border-radius: 12px; }
                 .t-setc-row input { width: 100%; min-width: 0; height: 46px; padding: 0 4px; border: 1px solid #E6E4DE; border-radius: 12px; background: #fff; text-align: center; font-weight: 600; font-size: 17px; color: var(--ink); outline: none; }
                 .t-setc-row input::placeholder { color: #B5B3AE; font-weight: 400; }
                 .t-setc input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(18,19,23,.08); }
