@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ExerciseCard } from '../views/dayEditor/ExerciseCard';
 import { analyzeDay, oneRmFor } from '../logic/analysis';
 
@@ -16,8 +16,21 @@ const fmtKg = (x) => (x >= 1000 ? `${(x / 1000).toFixed(2).replace('.', ',')} t`
 const LETTERS = 'ABCDEF';
 // una superserie è una fila di esercizi consecutivi con la stessa sigla: un blocco da uno non esiste
 const clean = (arr) => arr.map((x, i) => (x && (arr[i - 1] === x || arr[i + 1] === x) ? x : ''));
+// le sigle seguono la posizione, dall'alto: la prima superserie è A, la seconda B... (non l'ordine in cui le hai create)
+const canon = (arr) => {
+    let n = 0;
+    return arr.map((x, i) => (!x ? '' : i > 0 && arr[i - 1] === x ? null : LETTERS[Math.min(n++, LETTERS.length - 1)])).reduce((out, v, i) => [...out, v === null ? out[i - 1] : v], []);
+};
 
 export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analysisCtx, ops, compact = false }) => {
+    // sigle sempre in ordine di posizione (anche dopo aver riordinato o eliminato esercizi)
+    const ssSig = day.exercises.map((e) => e.ss || '').join('|');
+    useEffect(() => {
+        const cur = day.exercises.map((e) => e.ss || '');
+        const want = canon(clean(cur));
+        want.forEach((v, k) => v !== cur[k] && ops.updateExValue(week.id, day.id, day.exercises[k].id, 'ss', v));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ssSig]);
     const [more, setMore] = useState(false); // su telefono nome, durata, RPE e note della seduta stanno dietro "Dettagli"
     const A = useMemo(() => analyzeDay(day, analysisCtx), [day, analysisCtx]);
     // sigla delle superserie: A1, A2, B1…
@@ -101,7 +114,7 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
                             cur[i] = L;
                             cur[i + 1] = L;
                         }
-                        const out = clean(cur);
+                        const out = canon(clean(cur));
                         out.forEach((v, k) => v !== (exs[k].ss || '') && ops.updateExValue(week.id, day.id, exs[k].id, 'ss', v));
                     };
                     const linkBtn = (i, linked) => (

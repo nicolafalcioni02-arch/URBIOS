@@ -295,9 +295,9 @@ export const trainingCss = `
                 .t-ss-link { display: flex; width: max-content; max-width: 100%; align-items: center; justify-content: center; gap: 6px; margin: -6px auto 10px; min-height: 38px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--muted); border: 1.5px dashed #CFCCC3; background: transparent; }
                 .t-ss-link:active { transform: scale(.96); }
                 /* superserie: un box arancione attorno al blocco, stessa sporgenza (12px) su tutti i lati; dentro, le schede restano normali */
-                .t-ss-box { padding: 12px; margin: 0 0 16px; border-radius: 26px; background: color-mix(in srgb, var(--warn) 10%, #fff); border: 1.5px solid color-mix(in srgb, var(--warn) 45%, transparent); }
+                .t-ss-box { --ss: #E8730C; padding: 12px; margin: 0 0 16px; border-radius: 26px; background: color-mix(in srgb, var(--ss) 9%, #fff); border: 1.5px solid var(--ss); }
                 .t-ss-box .t-exercise-item, .t-root .t-ss-box .t-exercise-item { margin-bottom: 0 !important; }
-                .t-ss-box .t-ss-link { margin: 10px auto; color: #fff; background: var(--warn); border: 0; animation: ssPop .4s var(--ease) both; }
+                .t-ss-box .t-ss-link { margin: 10px auto; color: #fff; background: var(--ss); border: 0; animation: ssPop .4s var(--ease) both; }
                 .t-ss-box .t-ss-link i { font-size: 17px; }
                 @keyframes ssPop { from { transform: scale(.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
                 .t-hint { font-size: 12.5px; color: var(--muted); margin: 8px 2px 0; line-height: 1.35; }
