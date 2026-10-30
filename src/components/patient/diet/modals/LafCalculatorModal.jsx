@@ -241,7 +241,6 @@ const LafBody = ({ onUseLaf, applyLafTemplate, calcData, calculatedLAF, lafActiv
                             <i className="ph ph-plus-circle"></i> Aggiungi attività
                         </button>
                     </div>
-                    <p className="lafm-hint">Riferimenti: sonno 0,95 · seduto 1,2–1,5 · cammino lento 2,5 · cammino veloce 3,5 · sport intenso 5–6.</p>
                   </>
                   )}
                 </div>
