@@ -129,6 +129,22 @@ export const setGrams = (days, dayId, mealId, itemId, grams) =>
     mapMeal(days, dayId, mealId, (m) => ({ ...m, items: m.items.map((i) => (i.id === itemId ? { ...i, weight: grams } : i)) }));
 export const removeItem = (days, dayId, mealId, itemId) => mapMeal(days, dayId, mealId, (m) => ({ ...m, items: m.items.filter((i) => i.id !== itemId) }));
 
+// ---- pasti di un giorno: aggiungere, rinominare, spostare, eliminare ----
+export const addMeal = (days, dayId, title, items = []) => days.map((d) => (d.id !== dayId ? d : { ...d, meals: [...d.meals, { id: genId(), title: title || 'Pasto', items }] }));
+export const renameMeal = (days, dayId, mealId, title) => mapMeal(days, dayId, mealId, (m) => ({ ...m, title }));
+export const removeMeal = (days, dayId, mealId) => days.map((d) => (d.id !== dayId ? d : { ...d, meals: d.meals.filter((m) => m.id !== mealId) }));
+export const moveMeal = (days, dayId, mealId, delta) =>
+    days.map((d) => {
+        if (d.id !== dayId) return d;
+        const from = d.meals.findIndex((m) => m.id === mealId);
+        const to = from + delta;
+        if (from < 0 || to < 0 || to >= d.meals.length) return d;
+        const meals = [...d.meals];
+        const [m] = meals.splice(from, 1);
+        meals.splice(to, 0, m);
+        return { ...d, meals };
+    });
+
 export const newDay = (calcData, n) => ({
     id: genId(),
     title: `Giorno ${n}`,

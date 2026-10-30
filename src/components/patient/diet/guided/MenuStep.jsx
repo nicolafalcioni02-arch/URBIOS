@@ -4,7 +4,8 @@ import { CountUp } from '../../shared/fx';
 import { createPortal } from 'react-dom';
 import { useCompact } from '../../../../hooks/useCompact';
 import { ActionSheet } from '../../../mobile/MobileChrome';
-import { addFood, addSub, removeSub, setSubMode, suggestSubs, swapSub, SUB_MODES, dayStatus, dayTotals, duplicateDay, macroGrams, mealKcal, newDay, removeItem, scaleDayTo, setGrams } from './guidedLogic';
+import { NameSheet, AddMealSheet } from './MealSheets';
+import { addFood, addMeal, renameMeal, removeMeal, moveMeal, addSub, removeSub, setSubMode, suggestSubs, swapSub, SUB_MODES, dayStatus, dayTotals, duplicateDay, macroGrams, mealKcal, newDay, removeItem, scaleDayTo, setGrams } from './guidedLogic';
 
 // Passo 2 — Menù: giorni, pasti e alimenti si modificano sul posto. In alto, sempre visibile, l'andamento rispetto all'obiettivo.
 
@@ -117,7 +118,7 @@ const SubsPanel = ({ item, day, meal, foodDB, index, update }) => {
     );
 };
 
-export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, setMealLibrary, onFoods, onAnalysis, onActiveDay, onRecipe, onGoals, onNext }) => {
+export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mealLibrary, setMealLibrary, onFoods, onAnalysis, onActiveDay, onRecipe, onGoals, onNext }) => {
     const index = useMemo(() => buildIndex(foodDB), [foodDB]);
     const [dayIdx, setDayIdx] = useState(0);
     const [searching, setSearching] = useState(null); // id del pasto con la ricerca aperta
@@ -128,6 +129,8 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
     const [savedMeal, setSavedMeal] = useState(null);
     const compact = useCompact(639);
     const [sheet, setSheet] = useState(null); // 'day' | 'delDay' (telefono)
+    const [mealSheet, setMealSheet] = useState(null); // { id, kind: 'menu' | 'del' | 'rename' } per un pasto
+    const [addingMeal, setAddingMeal] = useState(false);
 
     const tdee = targets?.isConfigured ? targets.kcal : 0;
     const gT = tdee ? macroGrams(tdee, { c: targets.c, p: targets.p, f: targets.f }) : { c: 0, p: 0, f: 0 };
@@ -286,11 +289,10 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
                             <span className="text-[13px] text-[color:var(--muted)]">
                                 {Math.round(mk)} kcal{budget ? ` · obiettivo ${budget}` : ''}
                             </span>
-                            {meal.items.length > 0 && (
-                                <button className="dg-ghost !w-8 !h-8" title="Salva questo pasto nella libreria (si ritrova da “Ricetta”)" aria-label="Salva il pasto" onClick={() => saveMeal(meal)}>
-                                    <i className={`ph ${savedMeal === meal.id ? 'ph-check' : 'ph-bookmark-simple'}`} style={savedMeal === meal.id ? { color: 'var(--ok)' } : undefined}></i>
-                                </button>
-                            )}
+                            {savedMeal === meal.id && <span className="text-[12px] font-semibold" style={{ color: 'var(--ok)' }}>Salvato</span>}
+                            <button className="dg-ghost" aria-label={`Opzioni di ${meal.title}`} onClick={() => setMealSheet({ id: meal.id, kind: 'menu' })}>
+                                <i className="ph-bold ph-dots-three"></i>
+                            </button>
                         </div>
                         {budget > 0 && (
                             <div className="dg-bar mt-2">
@@ -358,6 +360,10 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
                 );
             })}
 
+            <button className="dg-add" style={{ marginTop: 14 }} onClick={() => setAddingMeal(true)}>
+                <i className="ph ph-plus-circle"></i> Pasto
+            </button>
+
             {/* Azioni del giorno */}
             {!compact && <div className="flex flex-wrap items-center gap-2 mt-4">
                 <input className="fld !w-auto min-w-[180px]" value={day.title} onChange={(e) => update((d) => d.map((x) => (x.id === day.id ? { ...x, title: e.target.value } : x)))} aria-label="Nome del giorno" />
@@ -388,6 +394,38 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
                     {compact ? 'Consegna' : 'Verifica e consegna'} <i className="ph ph-arrow-right"></i>
                 </button>
             </div>
+
+            {(() => {
+                const m = mealSheet && day.meals.find((x) => x.id === mealSheet.id);
+                if (!m) return null;
+                const idxM = day.meals.indexOf(m);
+                if (mealSheet.kind === 'rename') return <NameSheet title="Rinomina il pasto" initial={m.title} placeholder="Nome del pasto" onSubmit={(v) => update((d) => renameMeal(d, day.id, m.id, v))} onClose={() => setMealSheet(null)} />;
+                const cfg = {
+                    menu: {
+                        title: m.title || 'Pasto',
+                        subtitle: `${m.items.length} ${m.items.length === 1 ? 'alimento' : 'alimenti'} · ${Math.round(mealKcal(m))} kcal`,
+                        groups: [
+                            [
+                                { label: 'Rinomina', icon: 'ph-pencil-simple', note: m.title, onClick: () => setTimeout(() => setMealSheet({ id: m.id, kind: 'rename' }), 280) },
+                                { label: 'Sposta su', icon: 'ph-arrow-up', disabled: idxM <= 0, onClick: () => update((d) => moveMeal(d, day.id, m.id, -1)) },
+                                { label: 'Sposta giù', icon: 'ph-arrow-down', disabled: idxM >= day.meals.length - 1, onClick: () => update((d) => moveMeal(d, day.id, m.id, 1)) },
+                            ],
+                            [{ label: 'Salva nei pasti salvati', icon: 'ph-bookmark-simple', disabled: !m.items.length, onClick: () => saveMeal(m) }],
+                            [{ label: 'Elimina il pasto', icon: 'ph-trash', tone: 'danger', onClick: () => setTimeout(() => setMealSheet({ id: m.id, kind: 'del' }), 280) }],
+                        ],
+                    },
+                    del: {
+                        title: `Eliminare ${m.title || 'il pasto'}?`,
+                        subtitle: m.items.length ? 'Gli alimenti del pasto andranno persi.' : 'Il pasto è vuoto.',
+                        groups: [
+                            [{ label: 'Elimina il pasto', icon: 'ph-trash', tone: 'danger', onClick: () => update((d) => removeMeal(d, day.id, m.id)) }],
+                            [{ label: 'Annulla', icon: 'ph-x', onClick: () => {} }],
+                        ],
+                    },
+                }[mealSheet.kind];
+                return createPortal(<ActionSheet key={mealSheet.kind} {...cfg} onClose={() => setMealSheet(null)} />, document.body);
+            })()}
+            {addingMeal && <AddMealSheet library={mealLibrary} onAdd={(title, items) => update((d) => addMeal(d, day.id, title, items))} onClose={() => setAddingMeal(false)} />}
 
             {sheet && createPortal(
                 <ActionSheet

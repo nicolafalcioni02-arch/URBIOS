@@ -229,6 +229,7 @@ export const DietGuided = ({
                                 dietDays={dietDays}
                                 setDietDays={setDietDays}
                                 foodDB={foodDB}
+                                mealLibrary={mealLibrary || []}
                                 setMealLibrary={setMealLibrary}
                                 onFoods={onFoods}
                                 onAnalysis={onAnalysis}

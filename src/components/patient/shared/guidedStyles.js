@@ -187,6 +187,20 @@ export const guidedCss = `
   .dg-card .dg-ghost { width: 40px !important; height: 40px !important; }
 }
 
+/* pannelli dal basso (nome, aggiungi pasto...) condivisi da Dieta e Training */
+.t-cellsheet { max-width: 520px; padding: 14px 14px calc(16px + env(safe-area-inset-bottom)); max-height: 88dvh; overflow-y: auto; }
+.t-cell-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 2px 4px 12px; }
+.t-cell-head p { font-size: 17px; font-weight: 700; line-height: 1.2; }
+.t-cell-head span { font-size: 13px; color: var(--muted); }
+.t-cell-done { width: 100%; height: 52px; border-radius: 16px; }
+.t-cell-done:disabled { opacity: .4; }
+.t-addmeal-list { display: flex; flex-direction: column; gap: 8px; max-height: 42dvh; overflow-y: auto; padding-bottom: 4px; }
+.t-addmeal-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left; padding: 12px 14px; min-height: 56px; border-radius: 16px; background: #fff; border: 1px solid var(--line); }
+.t-addmeal-row b { display: block; font-size: 15px; font-weight: 600; }
+.t-addmeal-row small { display: block; font-size: 12.5px; color: var(--muted); }
+.t-addmeal-row i { color: var(--muted); font-size: 18px; flex: none; }
+.t-addmeal-row:active { background: var(--soft); }
+
 /* coriandoli della consegna */
 .dg-confetti { position: fixed; z-index: 99999; width: 8px; height: 8px; border-radius: 2px; pointer-events: none; animation: dgConf .95s cubic-bezier(.2,.8,.3,1) forwards; }
 @keyframes dgConf { 0% { transform: translate(0,0) rotate(0); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }

@@ -60,4 +60,5 @@ export const lafStyles = `
                     align-items: center;
                     justify-content: center;
                     margin: 0 auto 20px;
+                }
 `;
