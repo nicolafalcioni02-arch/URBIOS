@@ -161,4 +161,11 @@ select.lafm-name { appearance: none; -webkit-appearance: none; background: var(-
 .lafi-row b { text-align: center; font-size: 14.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .lafi-row button { width: 40px; height: 40px; border-radius: 50%; background: var(--soft); display: grid; place-items: center; justify-self: end; }
 .lafi-row button:disabled { background: transparent; color: var(--ok); }
+
+.lafi-sexnote { font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.4; }
+.lafi-sexnote b { color: var(--ink); }
+.lafi-cols .me { color: var(--ink); }
+.lafi-row b.me { background: var(--soft); border-radius: 8px; padding: 4px 0; }
+.lafi-only { display: block; font-size: 11.5px; font-weight: 600; color: #9A5B00; margin-top: 1px; }
+.lafm-warn { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; color: #9A5B00; background: #FFF6E5; border-radius: 10px; padding: 6px 10px; margin-top: 8px; line-height: 1.3; }
 `;

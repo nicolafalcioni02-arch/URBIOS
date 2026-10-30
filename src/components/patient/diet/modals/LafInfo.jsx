@@ -5,7 +5,10 @@ import { LAF_ACTIVITIES, LAF_LEVELS } from './lafData';
 const f2 = (x) => (x === undefined ? '–' : String(x).replace('.', ','));
 
 // Tabelle di riferimento del calcolatore LAF: livelli di attività (LARN, FAO/WHO/UNU, EFSA) e coefficienti per attività.
-export const LafInfo = ({ onClose, onAdd, activities }) => {
+export const LafInfo = ({ onClose, onAdd, activities, sex = 'M' }) => {
+    const mine = sex === 'F' ? 'f' : 'm'; // colonna del paziente
+    const other = sex === 'F' ? 'm' : 'f';
+    const sexLabel = sex === 'F' ? 'donna' : 'uomo';
     const [tab, setTab] = useState('livelli');
     const [q, setQ] = useState('');
     const [group, setGroup] = useState('tutte');
@@ -85,27 +88,36 @@ export const LafInfo = ({ onClose, onAdd, activities }) => {
                                 </button>
                             ))}
                         </div>
+                        <p className="lafi-sexnote">
+                            Paziente: <b>{sexLabel}</b>. Per l’aggiunta uso il valore del suo sesso; dove la FAO riporta solo l’altro, uso quello e lo segnalo.
+                        </p>
                         <p className="lafi-cols">
                             <span>Attività</span>
-                            <span>Uomo</span>
-                            <span>Donna</span>
+                            <span className={mine === 'm' ? 'me' : ''}>Uomo</span>
+                            <span className={mine === 'f' ? 'me' : ''}>Donna</span>
                             <span></span>
                         </p>
                         {groups.map((g) => (
                             <section className="lafi-card" key={g.group}>
                                 <p className="lafi-gh">{g.group}</p>
                                 {g.rows.map((r) => {
-                                    const avg = r.m !== undefined && r.f !== undefined ? (r.m + r.f) / 2 : r.m ?? r.f;
+                                    // valore del sesso del paziente; se manca, quello dell'altro sesso (segnalato)
+                                    const own = r[mine];
+                                    const val = own !== undefined ? own : r[other];
+                                    const onlyOther = own === undefined && r[other] !== undefined;
                                     const done = added[r.n] || has(r.n);
                                     return (
                                         <div className="lafi-row" key={r.n}>
-                                            <span className="lafi-n">{r.n}</span>
-                                            <b>{f2(r.m)}</b>
-                                            <b>{f2(r.f)}</b>
+                                            <span className="lafi-n">
+                                                {r.n}
+                                                {onlyOther && <small className="lafi-only">solo {other === 'm' ? 'uomini' : 'donne'}</small>}
+                                            </span>
+                                            <b className={mine === 'm' ? 'me' : ''}>{f2(r.m)}</b>
+                                            <b className={mine === 'f' ? 'me' : ''}>{f2(r.f)}</b>
                                             <button
                                                 disabled={done}
                                                 onClick={() => {
-                                                    onAdd(r.n, Math.round(avg * 100) / 100);
+                                                    onAdd(r.n, Math.round(val * 100) / 100, onlyOther ? `Valore FAO riportato solo per ${other === 'm' ? 'gli uomini' : 'le donne'}: controlla` : '');
                                                     setAdded({ ...added, [r.n]: true });
                                                 }}
                                                 aria-label={done ? `${r.n}: già nel calcolatore` : `Aggiungi ${r.n} al calcolatore`}
@@ -119,7 +131,7 @@ export const LafInfo = ({ onClose, onAdd, activities }) => {
                         ))}
                         {groups.length === 0 && <p className="lafm-hint">Nessuna attività trovata.</p>}
                         <p className="lafm-hint">
-                            Valori PAR (multipli del metabolismo basale), FAO/WHO/UNU 2001, Annex 5. “–” = non riportato per quel sesso. Il tasto + aggiunge l’attività al calcolatore con la media dei due valori (o quello disponibile): poi scegli le ore. Nel calcolatore il sonno vale 0,95 (valore usato in alcune tabelle italiane); la FAO riporta 1,0.
+                            Valori PAR (multipli del metabolismo basale), FAO/WHO/UNU 2001, Annex 5. “–” = non riportato per quel sesso. Il tasto + aggiunge l’attività al calcolatore con il valore del sesso del paziente: poi scegli le ore. Nel calcolatore il sonno vale 0,95 (valore usato in alcune tabelle italiane); la FAO riporta 1,0.
                         </p>
                         <p className="lafm-hint">
                             <a href="https://www.fao.org/4/y5686e/y5686e0e.htm" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>

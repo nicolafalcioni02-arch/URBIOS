@@ -220,10 +220,11 @@ const LafBody = ({ onUseLaf, applyLafTemplate, calcData, calculatedLAF, lafActiv
                                         <i className="ph ph-trash"></i>
                                     </button>
                                 </div>
+                                {a.note && <p className="lafm-warn"><i className="ph ph-warning"></i> {a.note}</p>}
                                 <div className="lafm-row">
                                     <label className="lafm-pal">
                                         <small>Coefficiente (PAL)</small>
-                                        <input inputMode="decimal" value={a.pal} onChange={(e) => patch(a.id, { pal: e.target.value })} onBlur={(e) => patch(a.id, { pal: num(e.target.value) })} aria-label="Coefficiente PAL" />
+                                        <input inputMode="decimal" value={a.pal} onChange={(e) => patch(a.id, { pal: e.target.value, note: undefined })} onBlur={(e) => patch(a.id, { pal: num(e.target.value) })} aria-label="Coefficiente PAL" />
                                     </label>
                                     <div className="lafm-step">
                                         <small>Ore</small>
@@ -280,7 +281,8 @@ const LafBody = ({ onUseLaf, applyLafTemplate, calcData, calculatedLAF, lafActiv
             {info && (
                 <LafInfo
                     onClose={() => setInfo(false)}
-                    onAdd={(name, pal) => setLafActivities([...lafActivities, { id: Date.now() + Math.random(), name, pal, hours: 0 }])}
+                    sex={calcData.sex}
+                    onAdd={(name, pal, note) => setLafActivities([...lafActivities, { id: Date.now() + Math.random(), name, pal, hours: 0, ...(note ? { note } : {}) }])}
                     activities={lafActivities}
                 />
             )}
