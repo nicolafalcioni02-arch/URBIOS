@@ -272,9 +272,11 @@ export const trainingCss = `
                 .t-cell-empty { padding: 18px 4px 22px; color: var(--muted); font-size: 14.5px; }
                 .t-cell-empty .dg-sm { margin-top: 12px; }
                 .t-grid-sig { display: inline-block; margin-right: 6px; padding: 1px 6px; border-radius: 6px; background: #E8730C; color: #fff; font-size: 11.5px; }
-                .t-grid-tools { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-                .t-grid-tools span { font-size: 12.5px; color: var(--muted); line-height: 1.3; }
-                .t-grid-tools .dg-sm.t-on { background: var(--ink); color: #fff; }
+                .t-grid-actions { display: flex; gap: 8px; margin-top: 14px; }
+                .t-grid-actions .dg-sm { flex: 1; justify-content: center; height: 46px; border-radius: 14px; background: #fff; border-color: var(--line); }
+                .t-grid-actions .dg-sm.t-on { background: var(--ink); color: #fff; border-color: var(--ink); }
+                .t-grid-tools2 { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
+                .t-grid-tools2 .dg-sm { flex: 1 1 calc(50% - 6px); justify-content: center; height: 42px; }
                 .t-grid tbody th.pickable { cursor: pointer; }
                 .t-grid-check { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 8px; vertical-align: -4px; border-radius: 50%; border: 1.5px solid #B5B3AE; background: #fff; color: #fff; font-size: 11px; font-style: normal; }
                 .t-grid-check.on { background: var(--ink); border-color: var(--ink); }

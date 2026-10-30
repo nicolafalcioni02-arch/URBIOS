@@ -4,7 +4,7 @@ import { DayEditor } from './DayEditor';
 import { GridView } from './GridView';
 import { CellPanel } from './CellPanel';
 import { WeekPanel } from './WeekPanel';
-import { blankExercise, cloneWeeks, genId } from '../logic/trainingModel';
+import { blankDay, blankExercise, cloneWeeks, genId } from '../logic/trainingModel';
 import { move, ssClean, ssCanon } from './trainingGuidedLogic';
 import { useCompact } from '../../../../hooks/useCompact';
 import { ActionSheet } from '../../../mobile/MobileChrome';
@@ -140,6 +140,8 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
             {mode === 'grid' ? (
                 <GridView weeks={weeks} di={di} onDay={setDi} onOpen={(weekId, dayIndex, exKey) => setCell({ weekId, dayIndex, exKey })}
                     onWeek={setWeekPanel}
+                    onTools={{ progression: onProgression, analysis: onAnalysis, massimali: onTools, exercises: onExercises }}
+                    onAddDay={(name) => setWeeks((prev) => prev.map((w) => ({ ...w, days: [...w.days, { ...blankDay(), title: name || `Giorno ${'ABCDEFG'[w.days.length] || w.days.length + 1}`, exercises: [] }] })))}
                     onSuperset={(dayIndex, keys, link) => {
                         const nm = (e) => String(e.name || '').trim().toLowerCase();
                         setWeeks((prev) => prev.map((w) => {

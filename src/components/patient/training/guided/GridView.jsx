@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { summarizeSets } from '../logic/trainingModel';
 
 // Vista a griglia: gli esercizi di una seduta (A, B, C…) in righe, le settimane in colonne.
 // Serve a leggere la progressione (serie, carico, RPE) a colpo d'occhio; un tocco su una cella apre quella settimana per modificarla.
 const norm = (s) => String(s || '').trim().toLowerCase();
 
-export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, onWeek, onSuperset }) => {
+export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, onWeek, onSuperset, onAddDay, onTools }) => {
+    const [ask, setAsk] = useState(null); // 'ex' | 'day': pannello per il nome
     const [name, setName] = useState('');
     const [ssMode, setSsMode] = useState(false);
     const [sel, setSel] = useState([]); // chiavi delle righe scelte
@@ -59,14 +61,6 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
                     </button>
                 ))}
             </div>
-            {rows.length > 1 && (
-                <div className="t-grid-tools">
-                    <button className={`dg-sm ${ssMode ? 't-on' : ''}`} onClick={() => { setSsMode(!ssMode); setSel([]); }} aria-pressed={ssMode}>
-                        <i className="ph ph-link-simple"></i> {ssMode ? 'Fine' : 'Superserie'}
-                    </button>
-                    {ssMode && <span>Tocca gli esercizi da unire (uno sotto l’altro)</span>}
-                </div>
-            )}
             {rows.length === 0 ? (
                 <p className="dg-sub mt-4">Questa seduta non ha ancora esercizi con un nome.</p>
             ) : (
@@ -139,20 +133,61 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
                     )}
                 </div>
             )}
-            <form
-                className="t-grid-new"
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    if (!name.trim()) return;
-                    onAddExercise(d, name.trim());
-                    setName('');
-                }}
-            >
-                <input className="fld" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nuovo esercizio (es. Squat)" aria-label="Nome del nuovo esercizio" />
-                <button type="submit" className="dg-sm" disabled={!name.trim()}>
+            <div className="t-grid-actions">
+                <button className="dg-sm" onClick={() => { setName(''); setAsk('ex'); }}>
                     <i className="ph ph-plus"></i> Esercizio
                 </button>
-            </form>
+                <button className="dg-sm" onClick={() => { setName(''); setAsk('day'); }}>
+                    <i className="ph ph-plus"></i> Seduta
+                </button>
+                {rows.length > 1 && (
+                    <button className={`dg-sm ${ssMode ? 't-on' : ''}`} onClick={() => { setSsMode(!ssMode); setSel([]); }} aria-pressed={ssMode}>
+                        <i className="ph ph-link-simple"></i> {ssMode ? 'Fine' : 'Superserie'}
+                    </button>
+                )}
+            </div>
+            {ssMode && sel.length === 0 && <p className="t-hint">Tocca gli esercizi da unire (uno sotto l’altro).</p>}
+            <div className="t-grid-tools2 no-scrollbar">
+                <button className="dg-sm" onClick={onTools.progression}><i className="ph ph-trend-up"></i> Progressione</button>
+                <button className="dg-sm" onClick={onTools.analysis}><i className="ph ph-chart-bar"></i> Analisi</button>
+                <button className="dg-sm" onClick={onTools.massimali}><i className="ph ph-calculator"></i> Massimali</button>
+                <button className="dg-sm" onClick={onTools.exercises}><i className="ph ph-list-magnifying-glass"></i> Esercizi</button>
+            </div>
+            {ask && createPortal(
+                <div className="sheet-back" onClick={() => setAsk(null)}>
+                    <form
+                        className="sheet t-cellsheet"
+                        onClick={(e) => e.stopPropagation()}
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            const v = name.trim();
+                            if (ask === 'ex') {
+                                if (!v) return;
+                                onAddExercise(d, v);
+                            } else {
+                                onAddDay(v);
+                                onDay(maxDays);
+                            }
+                            setAsk(null);
+                        }}
+                    >
+                        <div className="t-cell-head">
+                            <div className="min-w-0">
+                                <p>{ask === 'ex' ? 'Nuovo esercizio' : 'Nuova seduta'}</p>
+                                <span>{ask === 'ex' ? `Si aggiunge a ${titleOf(d)} in tutte le settimane` : 'Si aggiunge a tutte le settimane'}</span>
+                            </div>
+                            <button type="button" className="dg-ghost" onClick={() => setAsk(null)} aria-label="Chiudi">
+                                <i className="ph-bold ph-x"></i>
+                            </button>
+                        </div>
+                        <input className="fld" autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={ask === 'ex' ? 'Nome (es. Squat)' : 'Nome (es. Gambe) — facoltativo'} aria-label="Nome" />
+                        <button type="submit" className="vw-next t-cell-done" style={{ marginTop: 12 }} disabled={ask === 'ex' && !name.trim()}>
+                            Aggiungi
+                        </button>
+                    </form>
+                </div>,
+                document.body
+            )}
             <p className="dg-hint mt-3">Tocca una cella per modificare l’esercizio, il nome di una settimana per rinominarla, duplicarla o eliminarla. Il tasto “Superserie” unisce più esercizi di fila, in tutte le settimane.</p>
         </div>
     );
