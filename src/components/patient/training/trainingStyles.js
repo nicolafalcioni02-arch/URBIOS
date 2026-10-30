@@ -474,12 +474,12 @@ export const trainingCss = `
                 .t-setc .t-set-badge { width: 28px !important; height: 28px !important; min-width: 0; min-height: 0; padding: 0; margin: 0 auto; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
                 .t-setc-del { width: 36px; height: 46px; display: grid; place-items: center; color: #C2413A; border-radius: 10px; }
                 .t-setc-del:active { background: var(--soft); }
-                .t-setc-more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin-top: 5px; }
-                .t-setc-f { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px; border-radius: 10px; background: #fff; border: 1px solid #EFEDE8; }
+                .t-setc-more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin: 5px 41px 0 37px; }
+                .t-setc-f { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 0; height: 54px; padding: 0 12px; border-radius: 12px; background: #fff; border: 1px solid #E6E4DE; }
                 .t-setc-f.wide { flex: 1 1 0; }
                 .t-setc-f.rec { flex: 1 1 0; }
                 .t-setc-f span { flex: none; font-size: 10.5px; font-weight: 600; color: var(--muted); }
-                .t-setc-f input { flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; outline: none; font-weight: 500; color: var(--ink); padding: 0; }
+                .t-setc-f input { flex: none; width: 100%; min-width: 0; height: 26px; border: 0; background: transparent; outline: none; font-weight: 500; color: var(--ink); padding: 0; }
                 .t-setc-f:focus-within { border-color: var(--ink); }
 
                 @media (max-width: 639px) {
@@ -534,7 +534,7 @@ export const trainingCss = `
                     .t-root .t-tier-week .dg-chip.row.on { background: var(--soft); color: var(--ink); border-color: transparent; }
                     .t-root .t-tier-week .t-more { width: 34px; height: 34px; min-height: 0; border: 0; background: transparent; }
                     .t-root .t-tier-day { margin-top: 4px; }
-                    .t-weekpill { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 4px; font-size: 15px; font-weight: 600; color: var(--ink); }
+                    .t-weekpill { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0; font-size: 15px; font-weight: 600; color: var(--ink); }
                     .t-weekpill small { color: var(--muted); font-weight: 500; font-size: 13px; }
                     .t-weekpill i { color: var(--muted); }
                     .t-sumline { font-size: 14px; color: var(--muted); padding: 2px 4px; }
@@ -551,7 +551,7 @@ export const trainingCss = `
                     .t-det small { display: block; font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 62vw; }
                     .t-det i { color: var(--muted); transition: transform .3s var(--ease); }
                     .t-det i.open { transform: rotate(180deg); }
-                    .t-root .t-exercise-item .t-ex-input { font-size: 18px; min-height: 44px; }
+                    .t-root .t-exercise-item .t-ex-input { font-size: 18px; min-height: 44px; padding-left: 0; padding-right: 0; }
                     /* il tasto Consegna resta sempre in fondo allo schermo, anche con poco contenuto */
                     .t-root .dg-foot { position: fixed; left: 0; right: 0; bottom: 0; margin: 0; gap: 8px; padding: 10px 16px max(12px, env(safe-area-inset-bottom)); }
                     .t-root .dg-body { padding-bottom: 96px; }

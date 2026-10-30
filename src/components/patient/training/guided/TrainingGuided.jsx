@@ -106,7 +106,7 @@ export const TrainingGuided = ({
             <GuidedHead
                 progress={progress}
                 kicker="Scheda di allenamento"
-                plan={{ label: schedaLabel(header), status: st, onClick: () => setPlanOpen(true), title: 'Nome, data e stato della scheda; altre schede del paziente', icon: 'ph-barbell' }}
+                plan={{ label: compact ? schedaLabel(header).split(' · ')[0] : schedaLabel(header), status: st, onClick: () => setPlanOpen(true), title: 'Nome, data e stato della scheda; altre schede del paziente', icon: 'ph-barbell' }}
                 tools={compact ? [
                     { label: 'Altro', icon: 'ph-dots-three-outline', onClick: () => setMenuOpen(true), title: 'Strumenti, libro schede, misure' },
                 ] : [

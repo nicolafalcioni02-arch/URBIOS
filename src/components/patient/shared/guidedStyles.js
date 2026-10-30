@@ -142,6 +142,8 @@ export const guidedCss = `
   .dg-headmain { min-width: 0; }
   .dg-planbtn { width: 100%; min-height: 44px; padding: 0 12px; gap: 7px; }
   .dg-planbtn .dg-edit { display: none; }
+  .dg-planbtn span { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.2; font-size: 14.5px; }
+  .dg-planbtn { min-height: 48px; padding-top: 4px; padding-bottom: 4px; }
   .dg-planbtn .dg-stat { font-size: 11px; padding: 2px 8px; }
   .dg-tools { display: flex; gap: 6px; flex: none; width: auto; }
   .dg-tools .dg-tool { width: 44px; height: 44px; padding: 0; justify-content: center; border-radius: 14px; flex: none; }
@@ -156,6 +158,12 @@ export const guidedCss = `
   .dg-title { margin-bottom: 12px; }
   .dg-chip.row { min-height: 46px; padding: 0 18px; font-size: 15px; }
   .dg-add { height: 48px; }
+  /* scelte a due righe (obiettivo, livello...): una sotto l'altra, tutte della stessa larghezza */
+  .dg-chip:has(small):not(.row) { flex: 1 1 100%; width: 100%; }
+  /* righe che scorrono di lato: si tagliano al bordo dello schermo, non a 16 px */
+  .t-fade { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+  .dg-chip.row { max-width: 62vw; overflow: hidden; text-overflow: ellipsis; }
+  .t-bleed { margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; }
   .dg-more { width: 46px; height: 46px; border-radius: 14px; background: #fff; border: 1px solid var(--line); color: var(--ink); }
   /* barra in fondo allo schermo, sempre */
   .dg-foot { position: fixed; left: 0; right: 0; bottom: 0; margin: 0; gap: 8px; padding: 10px 16px max(12px, env(safe-area-inset-bottom)); }
@@ -176,6 +184,7 @@ export const guidedCss = `
   .dg-row .dg-stepper button { width: 40px; height: 40px; }
   .dg-row .dg-stepper input { width: 56px; font-size: 17px; }
   .dg-row .dg-ghost { width: 44px; height: 44px; }
+  .dg-card .dg-ghost { width: 40px !important; height: 40px !important; }
 }
 
 /* coriandoli della consegna */

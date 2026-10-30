@@ -7,17 +7,28 @@ const num = (v) => {
     const x = parseFloat(String(v ?? '').replace(',', '.'));
     return Number.isFinite(x) ? x : 0; // "tr" (tracce) → 0
 };
-const has = (food, k) => food[k] !== undefined && food[k] !== null && food[k] !== '';
+
+// Il database usa 0 anche per "dato assente". Un valore > 0 è sempre un dato; uno 0 vale come dato
+// solo se quel campo è popolato in una parte sensibile del database (altrimenti è un buco, non uno zero vero).
+const MIN_FILLED = 0.25;
+const filledCache = new WeakMap();
+const isFilled = (foodDB, k) => {
+    let m = filledCache.get(foodDB);
+    if (!m) filledCache.set(foodDB, (m = new Map()));
+    if (!m.has(k)) m.set(k, foodDB.filter((f) => num(f[k]) > 0).length / (foodDB.length || 1) >= MIN_FILLED);
+    return m.get(k);
+};
+const has = (food, k, foodDB) => food[k] !== undefined && food[k] !== null && food[k] !== '' && (num(food[k]) > 0 || isFilled(foodDB, k));
 
 // valore per 100 g di un alimento, oppure null se il database non ha il dato
-const readFood = (food, def) => {
-    let ks = def.keys.filter((k) => has(food, k));
-    if (!ks.length && def.fallback) ks = def.fallback.filter((k) => has(food, k));
+const readFood = (food, def, foodDB) => {
+    let ks = def.keys.filter((k) => has(food, k, foodDB));
+    if (!ks.length && def.fallback) ks = def.fallback.filter((k) => has(food, k, foodDB));
     return ks.length ? ks.reduce((s, k) => s + num(food[k]), 0) : null;
 };
 
 // totale di una metrica su un gruppo di righe del piano
-const measure = (def, items, foodByName) => {
+const measure = (def, items, foodByName, foodDB) => {
     let value = 0;
     let total = 0;
     let known = 0;
@@ -30,7 +41,7 @@ const measure = (def, items, foodByName) => {
             return;
         }
         const food = foodByName.get(it.name);
-        const per100 = food ? readFood(food, def) : null;
+        const per100 = food ? readFood(food, def, foodDB) : null;
         if (per100 === null) return;
         known += w;
         value += (per100 * w) / 100;
@@ -76,7 +87,7 @@ export const buildReport = ({ config, dietDays, foodDB, patientTargets, kcalTarg
         let totW = 0;
         let knownW = 0;
         const values = groups.map((g) => {
-            const r = measure(def, g.items, foodByName);
+            const r = measure(def, g.items, foodByName, foodDB);
             totW += r.total;
             knownW += r.known;
             return metric.percent ? (r.value / target) * 100 : r.value;

@@ -54,7 +54,7 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
 
     return (
         <div className="max-w-3xl mx-auto dg-in">
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 t-bleed t-fade">
                 {Array.from({ length: maxDays }, (_, i) => (
                     <button key={i} className={`dg-chip row ${i === d ? 'on' : ''}`} onClick={() => onDay(i)}>
                         {titleOf(i)}

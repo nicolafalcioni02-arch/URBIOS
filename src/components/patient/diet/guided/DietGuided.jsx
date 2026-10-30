@@ -156,7 +156,7 @@ export const DietGuided = ({
             <GuidedHead
                 progress={progress}
                 kicker="Piano alimentare"
-                plan={visitaAttiva ? { label: planLabel(visitaAttiva), status: st, onClick: () => setPlanOpen(true), title: 'Nome, data, stato e collegamento del piano' } : null}
+                plan={visitaAttiva ? { label: compact ? planLabel(visitaAttiva).split(' · ')[0] : planLabel(visitaAttiva), status: st, onClick: () => setPlanOpen(true), title: 'Nome, data, stato e collegamento del piano' } : null}
                 tools={compact ? [
                     { label: 'Altro', icon: 'ph-dots-three-outline', onClick: () => setMenuOpen(true), title: 'Strumenti, libro diete, misure, Aiuto AI' },
                 ] : [

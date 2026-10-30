@@ -200,7 +200,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
 
             {/* Giorni (si riordinano trascinando o con le frecce) */}
             <div className="flex items-center gap-2 mt-4">
-                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 flex-1 min-w-0">
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 flex-1 min-w-0 t-fade">
                     {dietDays.map((d, i) => {
                         const sd = dayStatus(d, tdee);
                         return (

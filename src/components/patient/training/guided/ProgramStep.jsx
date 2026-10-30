@@ -19,7 +19,7 @@ const Tabs = ({ items, current, onSelect, onMove, onAdd, addLabel, badge, onMore
     const idx = Math.min(current, items.length - 1);
     return (
         <div className={`flex items-center gap-2 ${cls}`}>
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 flex-1 min-w-0">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 flex-1 min-w-0 t-fade">
                 {items.map((it, i) => (
                     <button
                         key={it.id}
