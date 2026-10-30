@@ -117,7 +117,7 @@ export const LafInfo = ({ onClose, onAdd, activities, sex = 'M' }) => {
                                             <button
                                                 disabled={done}
                                                 onClick={() => {
-                                                    onAdd(r.n, Math.round(val * 100) / 100, onlyOther ? `Fonte: FAO/WHO/UNU 2001, Annex 5 (valore riportato solo per ${other === 'm' ? 'gli uomini' : 'le donne'})` : '');
+                                                    onAdd(r.n, Math.round(val * 100) / 100, onlyOther ? `Valore FAO riportato solo per ${other === 'm' ? 'gli uomini' : 'le donne'}` : '');
                                                     setAdded({ ...added, [r.n]: true });
                                                 }}
                                                 aria-label={done ? `${r.n}: già nel calcolatore` : `Aggiungi ${r.n} al calcolatore`}

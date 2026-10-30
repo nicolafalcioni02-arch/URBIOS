@@ -107,7 +107,7 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
                 <p className="dg-q">1 · Paziente</p>
                 {sexMissing && (
                     <div className="dg-warn" style={{ marginTop: 0, marginBottom: 12 }} role="alert">
-                        <b>Il sesso non è indicato nella scheda del paziente.</b> È impostato <b>{calcData.sex === 'F' ? 'Donna' : 'Uomo'}</b>. Nel metabolismo basale vale +5 kcal per gli uomini e −161 per le donne (Mifflin–St Jeor, 1990).
+                        <b>Sesso biologico mancante</b>
                         <div className="flex gap-2 mt-2">
                             {['M', 'F'].map((sx) => (
                                 <button key={sx} type="button" className={`dg-chip row ${calcData.sex === sx ? 'on' : ''}`} onClick={() => setG({ sexChecked: true }, { sex: sx })}>
