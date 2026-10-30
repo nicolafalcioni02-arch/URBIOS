@@ -47,7 +47,7 @@ export const LafCalculatorModal = (props) => (props.isLafModalOpen ? <LafBody {.
 
 const LafBody = ({ onUseLaf, applyLafTemplate, calcData, calculatedLAF, lafActivities, setCalcData, setIsLafModalOpen, setLafActivities, totalLafHours }) => {
     const [mode, setMode] = useState('ore'); // 'ore' | 'orario'
-    const [info, setInfo] = useState(false);
+    const [info, setInfo] = useState(false); // false | 'info' | 'pick' (scelta di un'attività)
     const [blocks, setBlocks] = useState([]);
     const palOf = (id) => Number((lafActivities.find((a) => String(a.id) === String(id)) || {}).pal) || 0;
     const palB = (b) => (b.pal !== undefined && b.pal !== '' && Number.isFinite(parseFloat(String(b.pal).replace(',', '.'))) ? parseFloat(String(b.pal).replace(',', '.')) : palOf(b.actId));
@@ -106,7 +106,7 @@ const LafBody = ({ onUseLaf, applyLafTemplate, calcData, calculatedLAF, lafActiv
                         <span>Come passa le 24 ore: attività, coefficiente e ore</span>
                     </div>
                     <div className="lafm-btns">
-                    <button className="lafm-x" onClick={() => setInfo(true)} aria-label="Informazioni e tabelle di riferimento">
+                    <button className="lafm-x" onClick={() => setInfo('info')} aria-label="Informazioni e tabelle di riferimento">
                         <i className="ph ph-info"></i>
                     </button>
                     <button className="lafm-x" onClick={close} aria-label="Chiudi">
@@ -237,7 +237,7 @@ const LafBody = ({ onUseLaf, applyLafTemplate, calcData, calculatedLAF, lafActiv
                                 </div>
                             </div>
                         ))}
-                        <button className="lafm-add" onClick={() => setLafActivities([...lafActivities, { id: Date.now(), name: 'Nuova attività', pal: 1.5, hours: 0 }])}>
+                        <button className="lafm-add" onClick={() => setInfo('pick')}>
                             <i className="ph ph-plus-circle"></i> Aggiungi attività
                         </button>
                     </div>
@@ -279,6 +279,7 @@ const LafBody = ({ onUseLaf, applyLafTemplate, calcData, calculatedLAF, lafActiv
             </div>
             {info && (
                 <LafInfo
+                    pick={info === 'pick'}
                     onClose={() => setInfo(false)}
                     sex={calcData.sex}
                     onAdd={(name, pal, note) => setLafActivities([...lafActivities, { id: Date.now() + Math.random(), name, pal, hours: 0, ...(note ? { note } : {}) }])}

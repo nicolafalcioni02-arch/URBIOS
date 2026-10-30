@@ -169,4 +169,7 @@ select.lafm-name { appearance: none; -webkit-appearance: none; background: var(-
 .lafi-only { display: block; font-size: 11.5px; font-weight: 500; color: var(--muted); margin-top: 1px; }
 .lafm-warn { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; color: var(--muted); background: var(--soft); border-radius: 10px; padding: 6px 10px; margin-top: 8px; line-height: 1.3; }
 .lafm-warn i { margin-top: 1px; flex: none; }
+
+.lafi-custom { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; margin-top: 8px; padding: 12px 14px; min-height: 52px; border-radius: 14px; border: 1.5px dashed #CFCCC3; font-size: 15px; font-weight: 600; text-align: left; }
+.lafi-custom small { flex-basis: 100%; font-size: 12.5px; font-weight: 400; color: var(--muted); margin-left: 28px; margin-top: -4px; }
 `;

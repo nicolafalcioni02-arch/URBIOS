@@ -5,11 +5,11 @@ import { LAF_ACTIVITIES, LAF_LEVELS } from './lafData';
 const f2 = (x) => (x === undefined ? '–' : String(x).replace('.', ','));
 
 // Tabelle di riferimento del calcolatore LAF: livelli di attività (LARN, FAO/WHO/UNU, EFSA) e coefficienti per attività.
-export const LafInfo = ({ onClose, onAdd, activities, sex = 'M' }) => {
+export const LafInfo = ({ onClose, onAdd, activities, sex = 'M', pick = false }) => {
     const mine = sex === 'F' ? 'f' : 'm'; // colonna del paziente
     const other = sex === 'F' ? 'm' : 'f';
     const sexLabel = sex === 'F' ? 'donna' : 'uomo';
-    const [tab, setTab] = useState('livelli');
+    const [tab, setTab] = useState(pick ? 'attivita' : 'livelli');
     const [q, setQ] = useState('');
     const [group, setGroup] = useState('tutte');
     const [added, setAdded] = useState({});
@@ -24,21 +24,21 @@ export const LafInfo = ({ onClose, onAdd, activities, sex = 'M' }) => {
         <div className="lafi" role="dialog" aria-label="Informazioni sul LAF" onClick={(e) => e.stopPropagation()}>
             <div className="lafm-head">
                 <div>
-                    <h3>Riferimenti LAF</h3>
-                    <span>Livelli di attività e coefficienti per attività</span>
+                    <h3>{pick ? 'Scegli un’attività' : 'Riferimenti LAF'}</h3>
+                    <span>{pick ? 'Tocca + per aggiungerla al calcolatore' : 'Livelli di attività e coefficienti per attività'}</span>
                 </div>
                 <button className="lafm-x" onClick={onClose} aria-label="Chiudi">
                     <i className="ph-bold ph-x"></i>
                 </button>
             </div>
-            <div className="lafm-modes" role="tablist">
+            {!pick && <div className="lafm-modes" role="tablist">
                 <button role="tab" aria-selected={tab === 'livelli'} className={tab === 'livelli' ? 'on' : ''} onClick={() => setTab('livelli')}>
                     <i className="ph ph-gauge"></i> Livelli
                 </button>
                 <button role="tab" aria-selected={tab === 'attivita'} className={tab === 'attivita' ? 'on' : ''} onClick={() => setTab('attivita')}>
                     <i className="ph ph-person-simple-walk"></i> Attività
                 </button>
-            </div>
+            </div>}
 
             <div className="lafm-body">
                 {tab === 'livelli' ? (
@@ -77,6 +77,12 @@ export const LafInfo = ({ onClose, onAdd, activities, sex = 'M' }) => {
                     </>
                 ) : (
                     <>
+                        {pick && (
+                            <button className="lafi-custom" onClick={() => { onAdd('Nuova attività', 1.5, ''); onClose(); }}>
+                                <i className="ph ph-plus-circle"></i> Attività personalizzata
+                                <small>nome e coefficiente a tua scelta</small>
+                            </button>
+                        )}
                         <div className="lafi-search">
                             <i className="ph ph-magnifying-glass"></i>
                             <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca un’attività" aria-label="Cerca" />
@@ -119,6 +125,7 @@ export const LafInfo = ({ onClose, onAdd, activities, sex = 'M' }) => {
                                                 onClick={() => {
                                                     onAdd(r.n, Math.round(val * 100) / 100, onlyOther ? `Valore FAO riportato solo per ${other === 'm' ? 'gli uomini' : 'le donne'}` : '');
                                                     setAdded({ ...added, [r.n]: true });
+                                                    if (pick) onClose();
                                                 }}
                                                 aria-label={done ? `${r.n}: già nel calcolatore` : `Aggiungi ${r.n} al calcolatore`}
                                             >
