@@ -254,6 +254,46 @@ export const guidedCss = `
 .dg-badge-type { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 99px; font-size: 10.5px; font-weight: 700; background: var(--soft); color: var(--ink); }
 .dg-chip.on .dg-badge-type { background: rgba(255,255,255,.22); color: #fff; }
 
+/* obiettivi: giornate e matrice dei pasti */
+.dg-seg { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--soft); }
+.dg-seg button { flex: 1; height: 42px; border-radius: 999px; font-size: 14.5px; font-weight: 600; color: var(--muted); }
+.dg-seg button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(18,19,23,.12); }
+.gm-sum { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 15px; }
+.gm-types { margin-top: 16px; padding: 4px 12px; border-radius: 16px; background: var(--paper); border: 1px solid var(--line); }
+.gm-types-h, .gm-type { display: grid; grid-template-columns: minmax(0, 1fr) 72px 64px 40px; gap: 8px; align-items: center; }
+.gm-types-h { font-size: 11.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); padding: 8px 0 2px; }
+.gm-types-h span:nth-child(n+2) { text-align: center; }
+.gm-type { padding: 8px 0; border-top: 1px solid var(--line); min-height: 56px; }
+.gm-tn { display: flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 600; line-height: 1.2; }
+.gm-tn i { font-size: 18px; flex: none; }
+.gm-laf { height: 44px; width: 100%; border-radius: 12px; border: 1px solid var(--line); background: #fff; text-align: center; font-weight: 600; font-size: 16px; display: grid; place-items: center; }
+.gm-laf.ro { background: var(--soft); color: var(--muted); }
+.gm-k { text-align: center; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.gm-calc { width: 40px; height: 40px; border-radius: 12px; background: #fff; border: 1px solid var(--line); display: grid; place-items: center; }
+.gm-check { display: flex; align-items: flex-start; gap: 12px; margin-top: 14px; padding: 12px 14px; border-radius: 16px; background: var(--paper); border: 1px solid var(--line); cursor: pointer; }
+.gm-check input { width: 22px; height: 22px; margin-top: 2px; flex: none; }
+.gm-check b { display: block; font-size: 14.5px; font-weight: 600; }
+.gm-check small { display: block; font-size: 12.5px; color: var(--muted); }
+.gm-wrap { margin: 14px -4px 0; overflow-x: auto; }
+.gm-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.gm-table th, .gm-table td { padding: 6px 4px; text-align: center; vertical-align: middle; }
+.gm-table thead th { font-size: 11.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.gm-table tbody th, .gm-table thead th:first-child, .gm-table tfoot th { width: 34%; text-align: left; font-size: 14.5px; font-weight: 600; line-height: 1.2; }
+.gm-table thead th:first-child { font-size: 11.5px; }
+.gm-table tbody tr { border-top: 1px solid var(--line); }
+.gm-table input { width: 100%; max-width: 72px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: #fff; text-align: center; font-weight: 600; font-size: 16px; }
+.gm-table em { display: block; font-style: normal; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.gm-table tfoot tr { border-top: 2px solid var(--line); }
+.gm-table tfoot th { text-align: left; font-size: 14px; }
+.gm-table tfoot td { font-weight: 700; font-size: 15px; }
+.gm-table tfoot td.ok { color: var(--ok); }
+.gm-table tfoot td.no { color: var(--bad); }
+.gm-res { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.gm-res p { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; align-items: baseline; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.18); }
+.gm-res b { font-size: 14.5px; font-weight: 600; }
+.gm-res span { font-size: 17px; font-weight: 700; }
+.gm-res small { grid-column: 1 / -1; font-size: 12.5px; opacity: .75; }
+
 /* coriandoli della consegna */
 .dg-confetti { position: fixed; z-index: 99999; width: 8px; height: 8px; border-radius: 2px; pointer-events: none; animation: dgConf .95s cubic-bezier(.2,.8,.3,1) forwards; }
 @keyframes dgConf { 0% { transform: translate(0,0) rotate(0); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }

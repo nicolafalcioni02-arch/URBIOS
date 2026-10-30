@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ACTIVITY, GOALS, MACRO_PRESETS, MEAL_PRESETS, applyGoals, computeRmr, computeTdee, macroGrams, prefillCalc, sumDist, sumPct } from './guidedLogic';
+import { ACTIVITY, DAY_TYPES, GOALS, MACRO_PRESETS, MEAL_PRESETS, TYPE_IDS, applyGoals, computeRmr, computeTdee, distFor, macroGrams, prefillCalc, sumDist, sumPct, typeLaf, typeTargetKcal } from './guidedLogic';
 import { dietContext } from '../../../../ai/dietSection';
 import { CountUp } from '../../shared/fx';
 
@@ -53,6 +53,11 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
     const macroId = g.macro || (MACRO_PRESETS.find((m) => m.c === calcData.macroTargets?.c && m.p === calcData.macroTargets?.p && m.f === calcData.macroTargets?.f) || {}).id || 'custom';
     const mealsN = g.meals || (MEAL_PRESETS[calcData.distribution?.length] ? calcData.distribution.length : 0);
     const [customMacro, setCustomMacro] = useState(macroId === 'custom');
+    const [editP, setEditP] = useState(false);
+    const diff = g.dayMode === 'diff';
+    const perType = diff && !!g.distByType; // ripartizione dei pasti diversa per tipo di giornata
+    const cols = perType ? TYPE_IDS : [null];
+    const typeOf = (id) => DAY_TYPES.find((t) => t.id === id);
 
     // se il LAF cambia per altra via (calcolatore 24 ore), l'attività diventa "personalizzata"
     useEffect(() => {
@@ -72,7 +77,7 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
     if (!(n(calcData.weight) > 0)) missing.push('peso');
     if (!(n(calcData.height) > 0)) missing.push('altezza');
     const macroOk = sumPct(calcData.macroTargets) === 100;
-    const distOk = sumDist(calcData.distribution) === 100;
+    const distOk = cols.every((c) => sumDist(c ? distFor(calcData, c) : calcData.distribution) === 100);
     const ready = tdee > 0 && macroOk && distOk && !!activityId;
 
     const grams = useMemo(() => (tdee ? macroGrams(tdee, calcData.macroTargets) : null), [tdee, calcData.macroTargets]);
@@ -86,32 +91,37 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
     return (
         <div className="max-w-3xl mx-auto dg-in">
             <section className="dg-card">
-                <p className="dg-q">1 · Chi è il paziente?</p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <Field label="Sesso">
-                        <div className="flex gap-2">
-                            {['M', 'F'].map((s) => (
-                                <Chip key={s} on={calcData.sex === s} onClick={() => set({ sex: s })}>
-                                    {s === 'M' ? 'Uomo' : 'Donna'}
-                                </Chip>
-                            ))}
-                        </div>
-                    </Field>
-                    <Field label="Età" unit="anni" value={calcData.age} onChange={(v) => set({ age: v })} />
-                    <Field label="Peso" unit="kg" value={calcData.weight} onChange={(v) => set({ weight: v })} />
-                    <Field label="Altezza" unit="cm" value={calcData.height} onChange={(v) => set({ height: v })} />
-                </div>
-                {missing.length > 0 ? (
-                    <p className="dg-warn">Mancano: {missing.join(', ')}. Li trovi in anagrafica e nelle visite, oppure scrivili qui.</p>
+                <p className="dg-q">1 · Paziente</p>
+                {!editP && missing.length === 0 ? (
+                    <div className="gm-sum">
+                        <span>
+                            {calcData.sex === 'F' ? 'Donna' : 'Uomo'} · {calcData.age} anni · {calcData.weight} kg · {calcData.height} cm{bmi ? ` · BMI ${bmi.toFixed(1)}` : ''}
+                        </span>
+                        <button className="dg-link" onClick={() => setEditP(true)}>Modifica</button>
+                    </div>
                 ) : (
-                    <p className="dg-hint">
-                        Dati presi dalla scheda del paziente{bmi ? ` · BMI ${bmi.toFixed(1)}` : ''}.
-                    </p>
+                    <>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <Field label="Sesso">
+                                <div className="flex gap-2">
+                                    {['M', 'F'].map((sx) => (
+                                        <Chip key={sx} on={calcData.sex === sx} onClick={() => set({ sex: sx })}>
+                                            {sx === 'M' ? 'Uomo' : 'Donna'}
+                                        </Chip>
+                                    ))}
+                                </div>
+                            </Field>
+                            <Field label="Età" unit="anni" value={calcData.age} onChange={(v) => set({ age: v })} />
+                            <Field label="Peso" unit="kg" value={calcData.weight} onChange={(v) => set({ weight: v })} />
+                            <Field label="Altezza" unit="cm" value={calcData.height} onChange={(v) => set({ height: v })} />
+                        </div>
+                        {missing.length > 0 ? <p className="dg-warn">Mancano: {missing.join(', ')}. Li trovi in anagrafica e nelle visite, oppure scrivili qui.</p> : <button className="dg-link mt-3" onClick={() => setEditP(false)}>Fatto</button>}
+                    </>
                 )}
             </section>
 
             <section className="dg-card">
-                <p className="dg-q">2 · Cosa vuole ottenere?</p>
+                <p className="dg-q">2 · Obiettivo</p>
                 <div className="flex flex-wrap gap-2">
                     {GOALS.map((x) => (
                         <Chip key={x.id} on={goalId === x.id} sub={x.hint} onClick={() => setG({ goal: x.id }, { kcalAdjustPct: x.adj })}>
@@ -122,7 +132,15 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
             </section>
 
             <section className="dg-card">
-                <p className="dg-q">3 · Quanto è attivo nella giornata?</p>
+                <p className="dg-q">3 · Come sono le giornate?</p>
+                <div className="dg-seg" role="tablist" aria-label="Giornate">
+                    <button role="tab" aria-selected={!diff} className={!diff ? 'on' : ''} onClick={() => setG({ dayMode: 'same' })}>Tutte uguali</button>
+                    <button role="tab" aria-selected={diff} className={diff ? 'on' : ''} onClick={() => setG({ dayMode: 'diff' })}>Differenziate</button>
+                </div>
+                <p className="dg-hint" style={{ marginTop: 10 }}>
+                    {diff ? 'Riposo, lavoro e lavoro + allenamento: ognuno con le sue kcal. Parti da una giornata di lavoro e regola le altre.' : 'Un solo obiettivo di kcal per tutti i giorni.'}
+                </p>
+                <p className="fld-label" style={{ marginTop: 12 }}>{diff ? 'Una giornata di lavoro com’è?' : 'Quanto è attivo nella giornata?'}</p>
                 <div className="flex flex-wrap gap-2">
                     {ACTIVITY.map((a) => (
                         <Chip key={a.id} on={activityId === a.id} sub={a.hint} onClick={() => setG({ activity: a.id }, { laf: a.laf })}>
@@ -130,15 +148,42 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
                         </Chip>
                     ))}
                     {onLaf && (
-                        <Chip on={activityId === 'custom'} sub={activityId === 'custom' ? `LAF ${Number(calcData.laf).toFixed(2)}` : 'ora per ora, più preciso'} onClick={onLaf}>
+                        <Chip on={activityId === 'custom'} sub={activityId === 'custom' ? `LAF ${Number(calcData.laf).toFixed(2)}` : 'ora per ora, più preciso'} onClick={() => onLaf()}>
                             <i className="ph ph-clock"></i> Calcolo in 24 ore
                         </Chip>
                     )}
                 </div>
+                {diff && activityId && (
+                    <div className="gm-types">
+                        <p className="gm-types-h"><span>Giornata</span><span>LAF</span><span>kcal</span></p>
+                        {TYPE_IDS.map((id) => (
+                            <div className="gm-type" key={id}>
+                                <span className="gm-tn"><i className={`ph ${typeOf(id).icon}`}></i> {typeOf(id).label}</span>
+                                {id === 'work' ? (
+                                    <b className="gm-laf ro">{Number(calcData.laf).toFixed(2).replace('.', ',')}</b>
+                                ) : (
+                                    <input
+                                        className="gm-laf"
+                                        inputMode="decimal"
+                                        value={g.lafByType?.[id] ?? typeLaf(calcData, id).toFixed(2).replace('.', ',')}
+                                        onChange={(e) => setG({ lafByType: { ...(g.lafByType || {}), [id]: e.target.value } })}
+                                        aria-label={`LAF ${typeOf(id).label}`}
+                                    />
+                                )}
+                                <b className="gm-k">{typeTargetKcal(calcData, id) || '–'}</b>
+                                {onLaf && id !== 'work' && (
+                                    <button className="gm-calc" onClick={() => onLaf((v) => setG({ lafByType: { ...(g.lafByType || {}), [id]: String(v) } }))} aria-label={`Calcola il LAF: ${typeOf(id).label}`}>
+                                        <i className="ph ph-clock"></i>
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </section>
 
             <section className="dg-card">
-                <p className="dg-q">4 · Come ripartire i nutrienti?</p>
+                <p className="dg-q">4 · Nutrienti</p>
                 <div className="flex flex-wrap gap-2">
                     {MACRO_PRESETS.map((m) => (
                         <Chip
@@ -172,30 +217,82 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
             </section>
 
             <section className="dg-card">
-                <p className="dg-q">5 · Quanti pasti al giorno?</p>
+                <p className="dg-q">5 · Pasti</p>
                 <div className="flex flex-wrap gap-2">
                     {[3, 4, 5, 6].map((k) => (
-                        <Chip key={k} on={mealsN === k} onClick={() => setG({ meals: k }, { distribution: MEAL_PRESETS[k].map((m) => ({ ...m })) })}>
+                        <Chip key={k} on={mealsN === k} onClick={() => setG({ meals: k, distByType: undefined }, { distribution: MEAL_PRESETS[k].map((m) => ({ ...m })) })}>
                             {k} pasti
                         </Chip>
                     ))}
                 </div>
+                {diff && calcData.distribution?.length > 0 && (
+                    <label className="gm-check">
+                        <input
+                            type="checkbox"
+                            checked={perType}
+                            onChange={(e) => setG({ distByType: e.target.checked ? Object.fromEntries(TYPE_IDS.map((id) => [id, calcData.distribution.map((m) => ({ ...m }))])) : undefined })}
+                        />
+                        <span>
+                            <b>Ripartizione diversa per tipo di giornata</b>
+                            <small>Es. più carboidrati prima dell’allenamento</small>
+                        </span>
+                    </label>
+                )}
                 {calcData.distribution?.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
-                        {calcData.distribution.map((d, i) => (
-                            <div key={d.id}>
-                                <label className="fld-label">{d.name} (%)</label>
-                                <input
-                                    className="fld"
-                                    inputMode="numeric"
-                                    value={d.value}
-                                    onChange={(e) => set({ distribution: calcData.distribution.map((x, j) => (j === i ? { ...x, value: Number(e.target.value) || 0 } : x)) })}
-                                />
-                            </div>
-                        ))}
+                    <div className="gm-wrap">
+                        <table className="gm-table">
+                            <thead>
+                                <tr>
+                                    <th>Pasto</th>
+                                    {cols.map((c) => (
+                                        <th key={c || 'all'}>{c ? { rest: 'Riposo', work: 'Lavoro', train: 'Allen.' }[c] : '% kcal'}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {calcData.distribution.map((m, i) => (
+                                    <tr key={m.id}>
+                                        <th scope="row">{m.name}</th>
+                                        {cols.map((c) => {
+                                            const list = c ? distFor(calcData, c) : calcData.distribution;
+                                            const v = list[i] ? list[i].value : 0;
+                                            const kc = c ? typeTargetKcal(calcData, c) : tdee;
+                                            return (
+                                                <td key={c || 'all'}>
+                                                    <input
+                                                        inputMode="numeric"
+                                                        value={v}
+                                                        aria-label={`${m.name}${c ? ` · ${typeOf(c).label}` : ''}`}
+                                                        onChange={(e) => {
+                                                            const nv = Number(e.target.value.replace(/[^\d]/g, '')) || 0;
+                                                            if (!c) set({ distribution: calcData.distribution.map((x, j) => (j === i ? { ...x, value: nv } : x)) });
+                                                            else setG({ distByType: { ...g.distByType, [c]: list.map((x, j) => (j === i ? { ...x, value: nv } : x)) } });
+                                                        }}
+                                                    />
+                                                    {kc > 0 && <em>{Math.round((kc * v) / 100)} kcal</em>}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Totale</th>
+                                    {cols.map((c) => {
+                                        const t = sumDist(c ? distFor(calcData, c) : calcData.distribution);
+                                        return (
+                                            <td key={c || 'all'} className={t === 100 ? 'ok' : 'no'}>
+                                                {t}%
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
                 )}
-                {!distOk && calcData.distribution?.length > 0 && <p className="dg-warn">Le percentuali dei pasti sommano {sumDist(calcData.distribution)}: devono fare 100.</p>}
+                {!distOk && calcData.distribution?.length > 0 && <p className="dg-warn">Ogni colonna deve sommare 100%.</p>}
             </section>
 
             <details className="dg-card dg-adv">
@@ -238,14 +335,29 @@ export const GoalsStep = ({ patient, calcData, setCalcData, setTargets, setDietD
             <section className="dg-result">
                 {tdee && activityId ? (
                     <>
-                        <p className="text-[12px] uppercase tracking-wider opacity-70 font-semibold">Fabbisogno stimato</p>
+                        <p className="text-[12px] uppercase tracking-wider opacity-70 font-semibold">{diff ? 'Fabbisogno stimato · giornata di lavoro' : 'Fabbisogno stimato'}</p>
                         <p className="text-[34px] font-semibold leading-tight">
                             <CountUp value={tdee} /> <span className="text-[16px] font-medium opacity-80">kcal al giorno</span>
                         </p>
-                        {grams && (
+                        {grams && !diff && (
                             <p className="text-[14px] opacity-85 mt-1">
                                 Carboidrati {grams.c} g · Proteine {grams.p} g · Grassi {grams.f} g
                             </p>
+                        )}
+                        {diff && (
+                            <div className="gm-res">
+                                {TYPE_IDS.map((id) => {
+                                    const k = typeTargetKcal(calcData, id);
+                                    const gm = macroGrams(k, calcData.macroTargets);
+                                    return (
+                                        <p key={id}>
+                                            <b>{typeOf(id).label}</b>
+                                            <span>{k} kcal</span>
+                                            <small>C {gm.c} · P {gm.p} · G {gm.f}</small>
+                                        </p>
+                                    );
+                                })}
+                            </div>
                         )}
                         <p className="text-[12px] opacity-60 mt-2">Metabolismo basale {rmr} kcal × attività {Number(calcData.laf).toFixed(2)}{Number(calcData.kcalAdjustPct) ? ` ${calcData.kcalAdjustPct > 0 ? '+' : '−'}${Math.abs(calcData.kcalAdjustPct)}%` : ''}</p>
                     </>

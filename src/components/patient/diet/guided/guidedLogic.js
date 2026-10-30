@@ -74,6 +74,18 @@ export const dayTarget = (day, plan) => {
     return plan;
 };
 
+// ---- giornate differenziate negli Obiettivi ----
+export const TYPE_IDS = ['rest', 'work', 'train'];
+// LAF di un tipo: il "lavoro" è il LAF scelto per il piano; gli altri hanno un valore proprio (o di partenza)
+export const typeLaf = (calc, id) => {
+    if (id === 'work') return Number(calc.laf) || 0;
+    const v = parseFloat(String(calc.guided?.lafByType?.[id] ?? '').replace(',', '.'));
+    return v > 0 ? v : typeLafDefault(calc, id);
+};
+export const typeTargetKcal = (calc, id) => computeTdee({ ...calc, laf: typeLaf(calc, id) });
+// ripartizione dei pasti: quella del tipo di giornata (se diversa) oppure quella comune
+export const distFor = (calc, type) => (type && calc.guided?.distByType?.[type]) || calc.distribution || [];
+
 export const macroGrams = (kcal, pct) => ({
     c: Math.round((kcal * pct.c) / 100 / 4),
     p: Math.round((kcal * pct.p) / 100 / 4),
@@ -93,39 +105,70 @@ export const goalsReady = (calc) => computeTdee(calc) > 0 && sumPct(calc.macroTa
 export const sumPct = (m) => (Number(m?.c) || 0) + (Number(m?.p) || 0) + (Number(m?.f) || 0);
 export const sumDist = (d) => (d || []).reduce((a, x) => a + (Number(x.value) || 0), 0);
 
-// Scrive gli obiettivi e allinea i pasti dei giorni già presenti, senza perdere alimenti.
+// Allinea i pasti di un giorno a una ripartizione, senza perdere alimenti.
+const syncMeals = (day, distribution) => {
+    const old = day.meals || [];
+    const used = new Set();
+    const norm = (x) => String(x || '').toLowerCase().trim();
+    // 1) stesso nome  2) i pasti rimasti, in ordine (rinominati)  3) i pasti con alimenti non assegnati restano in coda
+    const slots = distribution.map((d) => {
+        const hit = old.find((m) => !used.has(m.id) && norm(m.title) === norm(d.name));
+        if (hit) used.add(hit.id);
+        return hit || null;
+    });
+    const leftovers = old.filter((m) => !used.has(m.id));
+    const synced = distribution.map((d, i) => {
+        let m = slots[i];
+        if (!m) {
+            const free = leftovers.find((x) => !used.has(x.id));
+            if (free) {
+                used.add(free.id);
+                m = free;
+            }
+        }
+        return { id: m ? m.id : genId(), title: d.name, items: m ? m.items : [] };
+    });
+    const keep = leftovers.filter((x) => !used.has(x.id) && x.items.length > 0);
+    return [...synced, ...keep];
+};
+
+// Scrive gli obiettivi e allinea i giorni. "Tutte uguali": un solo obiettivo. "Differenziate": un giorno per tipo
+// (riposo, lavoro, lavoro + allenamento) con le sue kcal e la sua ripartizione dei pasti.
 export const applyGoals = ({ calcData, setCalcData, setTargets, setDietDays }) => {
     const tdee = computeTdee(calcData);
     const calc = { ...calcData, matrixMode: 'global', activeMatrixDayId: null, dailyConfigs: {} };
     setCalcData(calc);
-    setTargets({ kcal: tdee, c: calc.macroTargets.c, p: calc.macroTargets.p, f: calc.macroTargets.f, isConfigured: true });
-    setDietDays((days) =>
-        days.map((day) => {
-            const old = day.meals || [];
-            const used = new Set();
-            const norm = (s) => String(s || '').toLowerCase().trim();
-            // 1) stesso nome  2) i pasti rimasti, in ordine (rinominati)  3) i pasti con alimenti non assegnati restano in coda
-            const slots = calc.distribution.map((d) => {
-                const hit = old.find((m) => !used.has(m.id) && norm(m.title) === norm(d.name));
-                if (hit) used.add(hit.id);
-                return hit || null;
+    const macro = calc.macroTargets;
+    setTargets({ kcal: tdee, c: macro.c, p: macro.p, f: macro.f, isConfigured: true });
+    const diff = calc.guided?.dayMode === 'diff';
+    const plan = { kcal: tdee, ...macro };
+    const typed = (id) => ({ type: id, lafType: typeLaf(calc, id), targets: { kcal: typeTargetKcal(calc, id), ...macro } });
+
+    setDietDays((days) => {
+        let list = days.map((d) => ({ ...d }));
+        if (diff) {
+            // un giorno senza tipo diventa il giorno di lavoro; poi si creano i tipi che mancano
+            if (!list.some((d) => d.type === 'work')) {
+                const i = list.findIndex((d) => !d.type);
+                if (i >= 0) list[i] = { ...list[i], type: 'work' };
+            }
+            TYPE_IDS.forEach((id) => {
+                if (!list.some((d) => d.type === id)) list.push({ id: genId(), title: DAY_TYPES.find((t) => t.id === id).label, meals: [], type: id });
             });
-            const leftovers = old.filter((m) => !used.has(m.id));
-            const synced = calc.distribution.map((d, i) => {
-                let m = slots[i];
-                if (!m) {
-                    const free = leftovers.find((x) => !used.has(x.id));
-                    if (free) {
-                        used.add(free.id);
-                        m = free;
-                    }
-                }
-                return { id: m ? m.id : genId(), title: d.name, items: m ? m.items : [] };
-            });
-            const keep = leftovers.filter((x) => !used.has(x.id) && x.items.length > 0);
-            return { ...day, meals: [...synced, ...keep], targets: { kcal: tdee, ...calc.macroTargets } };
-        })
-    );
+        }
+        return list.map((day) => {
+            const isTyped = diff && TYPE_IDS.includes(day.type);
+            const base = { ...day };
+            if (isTyped) Object.assign(base, typed(day.type));
+            else if (day.type !== 'custom' || !diff) {
+                // giorno "personalizzato" in modalità differenziata: resta com'è; altrimenti torna all'obiettivo del piano
+                base.type = diff ? day.type : undefined;
+                base.lafType = undefined;
+                base.targets = plan;
+            }
+            return { ...base, meals: syncMeals(day, distFor(calc, isTyped ? day.type : undefined)) };
+        });
+    });
 };
 
 // ---- totali di piano ----

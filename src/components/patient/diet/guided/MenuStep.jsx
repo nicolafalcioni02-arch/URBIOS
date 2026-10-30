@@ -6,7 +6,7 @@ import { useCompact } from '../../../../hooks/useCompact';
 import { ActionSheet } from '../../../mobile/MobileChrome';
 import { NameSheet, AddMealSheet } from './MealSheets';
 import { DayTypeSheet } from './DayTypeSheet';
-import { dayTarget, dayTypeOf, addFood, addMeal, renameMeal, removeMeal, moveMeal, addSub, removeSub, setSubMode, suggestSubs, swapSub, SUB_MODES, dayStatus, dayTotals, duplicateDay, macroGrams, mealKcal, newDay, removeItem, scaleDayTo, setGrams } from './guidedLogic';
+import { dayTarget, dayTypeOf, distFor, addFood, addMeal, renameMeal, removeMeal, moveMeal, addSub, removeSub, setSubMode, suggestSubs, swapSub, SUB_MODES, dayStatus, dayTotals, duplicateDay, macroGrams, mealKcal, newDay, removeItem, scaleDayTo, setGrams } from './guidedLogic';
 
 // Passo 2 — Menù: giorni, pasti e alimenti si modificano sul posto. In alto, sempre visibile, l'andamento rispetto all'obiettivo.
 
@@ -191,7 +191,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, mea
     const tot = dayTotals(day);
     const st = dayStatus(day, tdee);
     const budgetFor = (meal) => {
-        const d = calcData.distribution?.find((x) => String(x.name).toLowerCase() === String(meal.title).toLowerCase());
+        const d = distFor(calcData, day.type && day.targets ? day.type : undefined).find((x) => String(x.name).toLowerCase() === String(meal.title).toLowerCase());
         return d && tdee ? Math.round((tdee * (Number(d.value) || 0)) / 100) : 0;
     };
     const update = (fn) => setDietDays((days) => fn(days));

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { DAY_TYPES, macroGrams, typeKcal, typeLafDefault } from './guidedLogic';
+import { DAY_TYPES, macroGrams, typeKcal, typeLaf, typeLafDefault } from './guidedLogic';
 
 const num = (v) => {
     const x = parseFloat(String(v).replace(',', '.'));
@@ -21,7 +21,7 @@ export const DayTypeSheet = ({ day, calcData, targets, onApply, onClear, onLaf, 
         setType(id);
         setManual(id === 'custom');
         if (id !== 'custom') {
-            const l = typeLafDefault(calcData, id);
+            const l = id === 'rest' || id === 'work' || id === 'train' ? typeLaf(calcData, id) : typeLafDefault(calcData, id);
             setLaf(l);
             setKcal(String(typeKcal(calcData, l, targets.kcal)));
         } else if (!kcal) setKcal(String(Math.round(targets.kcal)));
