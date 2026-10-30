@@ -5,7 +5,7 @@ import { GridView } from './GridView';
 import { CellPanel } from './CellPanel';
 import { WeekPanel } from './WeekPanel';
 import { blankExercise, cloneWeeks, genId } from '../logic/trainingModel';
-import { move, ssClean, ssCanon, ssToggle } from './trainingGuidedLogic';
+import { move, ssClean, ssCanon } from './trainingGuidedLogic';
 import { useCompact } from '../../../../hooks/useCompact';
 import { ActionSheet } from '../../../mobile/MobileChrome';
 
@@ -140,15 +140,20 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
             {mode === 'grid' ? (
                 <GridView weeks={weeks} di={di} onDay={setDi} onOpen={(weekId, dayIndex, exKey) => setCell({ weekId, dayIndex, exKey })}
                     onWeek={setWeekPanel}
-                    onLinkRows={(dayIndex, keyA, keyB, link) => {
+                    onSuperset={(dayIndex, keys, link) => {
                         const nm = (e) => String(e.name || '').trim().toLowerCase();
                         setWeeks((prev) => prev.map((w) => {
                             const day = w.days[dayIndex];
                             if (!day) return w;
-                            const ia = day.exercises.findIndex((e) => nm(e) === keyA);
-                            // vale nelle settimane in cui i due esercizi sono davvero uno sotto l'altro
-                            if (ia < 0 || !day.exercises[ia + 1] || nm(day.exercises[ia + 1]) !== keyB) return w;
-                            const sig = ssToggle(day.exercises.map((e) => e.ss || ''), ia, link);
+                            const pos = keys.map((k) => day.exercises.findIndex((e) => nm(e) === k));
+                            // vale nelle settimane in cui gli esercizi sono davvero uno sotto l'altro, in quest'ordine
+                            if (pos.some((p) => p < 0) || pos.some((p, i) => i > 0 && p !== pos[i - 1] + 1)) return w;
+                            const cur = day.exercises.map((e) => e.ss || '');
+                            if (link) {
+                                const L = cur[pos[0]] || 'ABCDEF'.split('').find((l) => !cur.includes(l)) || 'F';
+                                pos.forEach((p) => { cur[p] = L; });
+                            } else pos.forEach((p) => { cur[p] = ''; });
+                            const sig = ssCanon(ssClean(cur));
                             return { ...w, days: w.days.map((dd, i) => (i === dayIndex ? { ...dd, exercises: dd.exercises.map((e, k) => ({ ...e, ss: sig[k] })) } : dd)) };
                         }));
                     }}

@@ -5,8 +5,10 @@ import { summarizeSets } from '../logic/trainingModel';
 // Serve a leggere la progressione (serie, carico, RPE) a colpo d'occhio; un tocco su una cella apre quella settimana per modificarla.
 const norm = (s) => String(s || '').trim().toLowerCase();
 
-export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, onWeek, onLinkRows }) => {
+export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, onWeek, onSuperset }) => {
     const [name, setName] = useState('');
+    const [ssMode, setSsMode] = useState(false);
+    const [sel, setSel] = useState([]); // chiavi delle righe scelte
     const maxDays = Math.max(...weeks.map((w) => w.days.length), 0);
     const d = Math.min(di, Math.max(0, maxDays - 1));
     // esercizi in ordine di comparsa, uniti per nome
@@ -34,6 +36,15 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
     };
     const sigs = rows.map((r, k) => ssInfo(k));
     const linkedNext = (k) => !!sigs[k] && !!sigs[k + 1] && sigs[k][0] === sigs[k + 1][0];
+    const pick = (key) => setSel((c) => (c.includes(key) ? c.filter((x) => x !== key) : [...c, key]));
+    const idx = sel.map((k) => rows.findIndex((r) => r.k === k)).filter((i) => i >= 0).sort((a, b) => a - b);
+    const consecutive = idx.length >= 2 && idx.every((v, i) => i === 0 || v === idx[i - 1] + 1);
+    const anyLinked = idx.some((i) => !!sigs[i]);
+    const apply = (link) => {
+        onSuperset(d, idx.map((i) => rows[i].k), link);
+        setSel([]);
+        setSsMode(false);
+    };
     const titleOf = (i) => {
         const w = weeks.find((x) => x.days[i]);
         return (w && w.days[i].title) || `Seduta ${i + 1}`;
@@ -48,6 +59,14 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
                     </button>
                 ))}
             </div>
+            {rows.length > 1 && (
+                <div className="t-grid-tools">
+                    <button className={`dg-sm ${ssMode ? 't-on' : ''}`} onClick={() => { setSsMode(!ssMode); setSel([]); }} aria-pressed={ssMode}>
+                        <i className="ph ph-link-simple"></i> {ssMode ? 'Fine' : 'Superserie'}
+                    </button>
+                    {ssMode && <span>Tocca gli esercizi da unire (uno sotto l’altro)</span>}
+                </div>
+            )}
             {rows.length === 0 ? (
                 <p className="dg-sub mt-4">Questa seduta non ha ancora esercizi con un nome.</p>
             ) : (
@@ -74,41 +93,50 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
                         <tbody>
                             {rows.map((r, k) => (
                                 <React.Fragment key={r.k}>
-                                <tr className={sigs[k] ? 't-grid-ssrow' : ''}>
-                                    <th scope="row">{sigs[k] && <b className="t-grid-sig">{sigs[k]}</b>}{r.name}</th>
+                                <tr>
+                                    <th scope="row" onClick={ssMode ? () => pick(r.k) : undefined} className={ssMode ? 'pickable' : ''}>
+                                        {ssMode && <i className={`t-grid-check ${sel.includes(r.k) ? 'on' : ''}`}>{sel.includes(r.k) && <i className="ph-bold ph-check"></i>}</i>}
+                                        {sigs[k] && <b className="t-grid-sig">{sigs[k]}</b>}{r.name}
+                                    </th>
                                     {weeks.map((w, wi) => {
                                         const ex = w.days[d] && w.days[d].exercises.find((e) => norm(e.name) === r.k);
                                         const S = ex && summarizeSets(ex.sets);
                                         return (
                                             <td key={w.id}>
                                                 {S && S.serie ? (
-                                                    <button onClick={() => onOpen(w.id, d, r.k)} aria-label={`Modifica ${r.name}, ${w.title}`}>
+                                                    <button onClick={() => (ssMode ? pick(r.k) : onOpen(w.id, d, r.k))} aria-label={`Modifica ${r.name}, ${w.title}`}>
                                                         <b>{S.serie}</b>
                                                         {S.load && <span>{S.load} kg</span>}
                                                         {S.rpe && <small>RPE {S.rpe}</small>}
                                                     </button>
                                                 ) : (
-                                                    <span className="empty">–</span>
+                                                    <span className="empty" onClick={ssMode ? () => pick(r.k) : undefined}>–</span>
                                                 )}
                                             </td>
                                         );
                                     })}
                                     <td></td>
                                 </tr>
-                                {k < rows.length - 1 && (
-                                    <tr className={`t-grid-link ${linkedNext(k) ? 'on' : ''}`}>
-                                        <td colSpan={weeks.length + 2}>
-                                            <button onClick={() => onLinkRows(d, r.k, rows[k + 1].k, !linkedNext(k))} aria-pressed={linkedNext(k)}>
-                                                <i className={`ph-bold ${linkedNext(k) ? 'ph-link-simple' : 'ph-link-simple-break'}`}></i>
-                                                {linkedNext(k) ? 'Superserie · separa' : 'Collega'}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                )}
                                 </React.Fragment>
                             ))}
                         </tbody>
                     </table>
+                </div>
+            )}
+            {ssMode && sel.length > 0 && (
+                <div className="t-grid-bar">
+                    {consecutive ? (
+                        <button className="t-grid-bar-go" onClick={() => apply(true)}>
+                            <i className="ph-bold ph-link-simple"></i> Unisci {idx.length} in superserie
+                        </button>
+                    ) : (
+                        <p>{idx.length < 2 ? 'Scegli almeno un altro esercizio' : 'Scegli esercizi uno sotto l’altro'}</p>
+                    )}
+                    {anyLinked && (
+                        <button className="t-grid-bar-sep" onClick={() => apply(false)}>
+                            Separa
+                        </button>
+                    )}
                 </div>
             )}
             <form
@@ -125,7 +153,7 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
                     <i className="ph ph-plus"></i> Esercizio
                 </button>
             </form>
-            <p className="dg-hint mt-3">Tocca una cella per modificare l’esercizio, il nome di una settimana per rinominarla, duplicarla o eliminarla. Tra due esercizi, “Collega” li unisce in superserie in tutte le settimane.</p>
+            <p className="dg-hint mt-3">Tocca una cella per modificare l’esercizio, il nome di una settimana per rinominarla, duplicarla o eliminarla. Il tasto “Superserie” unisce più esercizi di fila, in tutte le settimane.</p>
         </div>
     );
 };
