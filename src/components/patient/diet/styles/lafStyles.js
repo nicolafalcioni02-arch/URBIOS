@@ -107,4 +107,58 @@ export const lafStyles = `
 .lafm-res b.big { font-size: 28px; }
 .lafm-go { height: 52px; border-radius: 16px; background: var(--ink); color: #fff; font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .lafm-go:disabled { background: var(--soft); color: var(--muted); }
+
+.lafm-modes { display: flex; gap: 2px; margin: 4px 18px 0; padding: 3px; border-radius: 999px; background: var(--soft); }
+.lafm-modes button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; height: 40px; border-radius: 999px; font-size: 14.5px; font-weight: 600; color: var(--muted); }
+.lafm-modes button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(18,19,23,.12); }
+.lafm-clock { display: flex; gap: 1px; height: 22px; margin-top: 16px; border-radius: 8px; overflow: hidden; background: var(--soft); }
+.lafm-clock i { flex: 1; height: 100%; min-width: 0; }
+.lafm-clock i.gap { background: repeating-linear-gradient(45deg, #E6E4DE, #E6E4DE 3px, #F6F5F2 3px, #F6F5F2 6px); }
+.lafm-clock i.over { background: #C2413A; }
+.lafm-scale4 span { width: 0; display: flex; justify-content: center; }
+.lafm-scale4 span:first-child { justify-content: flex-start; } .lafm-scale4 span:last-child { justify-content: flex-end; }
+select.lafm-name { appearance: none; -webkit-appearance: none; background: var(--paper); border: 1px solid var(--line); padding: 0 12px; }
+.lafm-pal input[type="time"] { padding: 0 8px; min-width: 0; }
+.lafm-dur { display: flex; flex-direction: column; gap: 4px; min-width: 64px; text-align: center; }
+.lafm-dur small { font-size: 11.5px; font-weight: 500; color: var(--muted); }
+.lafm-dur b { font-size: 17px; font-weight: 700; height: 46px; display: grid; place-items: center; }
+.lafm-palnote { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+.lafm-palrow { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.lafm-palrow small { font-size: 12px; font-weight: 500; color: var(--muted); flex: none; }
+.lafm-palrow input { width: 84px; height: 40px; padding: 0 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); text-align: center; font-weight: 600; font-size: 16px; }
+.lafm-reset { font-size: 12.5px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; color: var(--muted); margin-left: auto; }
+
+.lafm-btns { display: flex; gap: 8px; flex: none; }
+.lafi { position: fixed; inset: 0; z-index: 10001; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); animation: sheet-up .3s var(--ease) both; max-width: 640px; margin: 0 auto; }
+@media (min-width: 640px) { .lafi { inset: 24px auto 24px 50%; width: 640px; margin-left: -320px; height: auto; border-radius: 28px; box-shadow: 0 30px 80px rgba(0,0,0,.35); overflow: hidden; } }
+.lafi-how { padding: 12px 14px; border-radius: 16px; background: #fff; border: 1px solid var(--line); font-size: 14px; line-height: 1.45; margin-top: 8px; }
+.lafi-how p { color: var(--muted); margin-top: 2px; }
+.lafi-how p b { color: var(--ink); }
+.lafi-card { margin-top: 12px; padding: 4px 14px 6px; border-radius: 18px; background: #fff; border: 1px solid var(--line); }
+.lafi-src { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0 8px; border-bottom: 1px solid var(--line); }
+.lafi-src b { display: block; font-size: 15px; }
+.lafi-src small { display: block; font-size: 12.5px; color: var(--muted); }
+.lafi-src a { font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; flex: none; }
+.lafi-lvl { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.lafi-lvl:last-child { border-bottom: 0; }
+.lafi-v { flex: none; min-width: 78px; padding: 4px 8px; border-radius: 10px; background: var(--ink); color: #fff; font-weight: 700; font-size: 14px; text-align: center; }
+.lafi-lvl b { display: block; font-size: 14.5px; font-weight: 600; }
+.lafi-lvl small { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.35; margin-top: 1px; }
+.lafi-search { display: flex; align-items: center; gap: 8px; height: 46px; padding: 0 14px; margin-top: 8px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+.lafi-search i { color: var(--muted); }
+.lafi-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; }
+.lafi-groups { display: flex; gap: 6px; overflow-x: auto; margin: 10px -18px 0; padding: 0 18px; }
+.lafi-groups button { flex: none; height: 38px; padding: 0 14px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-size: 14px; font-weight: 600; }
+.lafi-groups button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.lafi-cols, .lafi-row { display: grid; grid-template-columns: minmax(0, 1fr) 46px 46px 44px; gap: 6px; align-items: center; }
+.lafi-cols { font-size: 11.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin: 14px 14px 0; }
+.lafi-cols span:nth-child(2), .lafi-cols span:nth-child(3) { text-align: center; }
+.lafi-gh { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 12px 0 4px; }
+.lafi-row { padding: 6px 0; border-bottom: 1px solid var(--line); min-height: 48px; }
+.lafi-row:last-child { border-bottom: 0; }
+.lafi-n { font-size: 14.5px; line-height: 1.25; }
+.lafi-row b { text-align: center; font-size: 14.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.lafi-row button { width: 40px; height: 40px; border-radius: 50%; background: var(--soft); display: grid; place-items: center; justify-self: end; }
+.lafi-row button:disabled { background: transparent; color: var(--ok); }
 `;
