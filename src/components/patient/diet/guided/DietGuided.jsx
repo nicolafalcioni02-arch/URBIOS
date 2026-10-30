@@ -10,6 +10,9 @@ import { MeasuresModal } from '../../MeasuresModal';
 import { addItems, makeIndependentVisit, planLabel, statusOf, todayIso } from './guidedLogic';
 import { guidedCss } from './guidedStyles';
 import { GuidedHead, GuidedSteps, StepTitle, stepDir } from '../../shared/GuidedParts';
+import { createPortal } from 'react-dom';
+import { useCompact } from '../../../../hooks/useCompact';
+import { ActionSheet } from '../../../mobile/MobileChrome';
 
 // Dieta — un'unica schermata guidata. Gerarchia (dall'alto):
 //  1. testata: il piano (nome, data, stato) + gli strumenti globali (Libro diete, Aiuto AI)
@@ -64,6 +67,8 @@ export const DietGuided = ({
     const [planOpen, setPlanOpen] = useState(false);
     const [bookOpen, setBookOpen] = useState(false);
     const [measuresOpen, setMeasuresOpen] = useState(false);
+    const compact = useCompact(639);
+    const [menuOpen, setMenuOpen] = useState(false);
     const [newDate, setNewDate] = useState(todayIso());
     const [newNoDate, setNewNoDate] = useState(false);
 
@@ -152,7 +157,9 @@ export const DietGuided = ({
                 progress={progress}
                 kicker="Piano alimentare"
                 plan={visitaAttiva ? { label: planLabel(visitaAttiva), status: st, onClick: () => setPlanOpen(true), title: 'Nome, data, stato e collegamento del piano' } : null}
-                tools={[
+                tools={compact ? [
+                    { label: 'Altro', icon: 'ph-dots-three-outline', onClick: () => setMenuOpen(true), title: 'Strumenti, libro diete, misure, Aiuto AI' },
+                ] : [
                     { label: 'Misure', icon: 'ph-ruler', onClick: () => setMeasuresOpen(true), title: 'Le misure del paziente registrate in archivio' },
                     { label: 'Libro diete', icon: 'ph-books', onClick: () => setBookOpen(true), title: 'Le diete già fatte, da riusare' },
                     { label: 'Aiuto AI', icon: 'ph-sparkle', onClick: () => setHelpOpen(true), primary: true, title: "Fatti aiutare dall'intelligenza artificiale" },
@@ -173,7 +180,7 @@ export const DietGuided = ({
             )}
 
             {/* 3 · Il passo */}
-            <div className="dg-body">
+            <div className="dg-body" data-step={step}>
                 {hint && <p className="dg-warn max-w-3xl mx-auto mb-3">{hint}</p>}
 
                 {!visitaAttiva ? (
@@ -248,6 +255,26 @@ export const DietGuided = ({
                 )}
             </div>
 
+            {menuOpen && createPortal(
+                <ActionSheet
+                    title="Altro"
+                    subtitle="Strumenti e archivio"
+                    onClose={() => setMenuOpen(false)}
+                    groups={[
+                        [{ label: 'Aiuto AI', icon: 'ph-sparkle', note: 'crea o rivedi la dieta', onClick: () => setHelpOpen(true) }],
+                        [
+                            { label: 'Database alimenti', icon: 'ph-database', onClick: onFoods },
+                            { label: 'Analisi nutrienti', icon: 'ph-stethoscope', onClick: onAnalysis },
+                            { label: 'Calcolatore LAF', icon: 'ph-calculator', onClick: onLaf },
+                        ],
+                        [
+                            { label: 'Libro diete', icon: 'ph-books', note: 'da riusare', onClick: () => setBookOpen(true) },
+                            { label: 'Misure del paziente', icon: 'ph-ruler', onClick: () => setMeasuresOpen(true) },
+                        ],
+                    ]}
+                />,
+                document.body
+            )}
             {recipeFor && (
                 <RecipeModal
                     patient={patient}

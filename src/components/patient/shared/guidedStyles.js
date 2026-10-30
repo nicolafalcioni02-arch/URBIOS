@@ -134,6 +134,49 @@ export const guidedCss = `
 .dg-foot { position: sticky; bottom: 0; z-index: 25; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 28px -16px 0; padding: 12px 16px max(12px, env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 @media (min-width: 768px) { .dg-foot { margin: 28px -32px 0; padding: 12px 32px; } }
 .dg-foot .vw-next { margin-left: auto; }
+/* ---- telefono: prima ciò che serve con una mano, il resto dietro un tocco (Dieta e Training) ---- */
+@media (max-width: 639px) {
+  .dg-root { padding-top: 6px; }
+  .dg-head { flex-wrap: nowrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .dg-orb, .dg-kicker { display: none; }
+  .dg-headmain { min-width: 0; }
+  .dg-planbtn { width: 100%; min-height: 44px; padding: 0 12px; gap: 7px; }
+  .dg-planbtn .dg-edit { display: none; }
+  .dg-planbtn .dg-stat { font-size: 11px; padding: 2px 8px; }
+  .dg-tools { display: flex; gap: 6px; flex: none; width: auto; }
+  .dg-tools .dg-tool { width: 44px; height: 44px; padding: 0; justify-content: center; border-radius: 14px; flex: none; }
+  .dg-tool-l { display: none; }
+  .dg-tools .dg-tool i { font-size: 20px; }
+  .dg-step .dg-dot, .dg-step small { display: none; }
+  .dg-step { padding: 8px 10px; border-radius: 14px; justify-content: center; min-height: 44px; }
+  .dg-step b { font-size: 15px; text-align: center; }
+  .dg-body[data-step="menu"] .dg-title, .dg-body[data-step="menu"] .dg-hint2 { display: none; }
+  .dg-title { font-size: 26px; }
+  .dg-hint2 { font-size: 13.5px; margin: 4px 0 12px; }
+  .dg-chip.row { min-height: 46px; padding: 0 18px; font-size: 15px; }
+  .dg-add { height: 48px; }
+  .dg-more { width: 46px; height: 46px; border-radius: 14px; background: #fff; border: 1px solid var(--line); color: var(--ink); }
+  /* barra in fondo allo schermo, sempre */
+  .dg-foot { position: fixed; left: 0; right: 0; bottom: 0; margin: 0; gap: 8px; padding: 10px 16px max(12px, env(safe-area-inset-bottom)); }
+  .dg-body { padding-bottom: 96px; }
+  .dg-in { animation-fill-mode: backwards; }
+  .dg-foot .vw-back { width: 46px; height: 52px; padding: 0; flex: none; border-radius: 16px; }
+  .dg-foot .vw-back span { display: none; }
+  .dg-foot .vw-next { flex: 1; min-width: 0; height: 52px; border-radius: 16px; font-size: 16px; }
+  /* riepilogo dei macro: tre colonne compatte */
+  .dg-sticky { padding: 12px 14px; border-radius: 18px; }
+  .dg-sticky .gap-4 { gap: 10px !important; flex-wrap: nowrap; }
+  .dg-sticky .gap-4 > div { min-width: 0 !important; flex: 1 1 0; }
+  .dg-sticky .gap-4 > div > div:first-child { flex-direction: column; gap: 0; }
+  /* alimento: nome in alto, sotto grammi e azioni */
+  .dg-row { flex-wrap: wrap; row-gap: 6px; }
+  .dg-row > div:first-child { flex: 1 1 100%; }
+  .dg-row .dg-stepper { margin-right: auto; padding: 4px; }
+  .dg-row .dg-stepper button { width: 40px; height: 40px; }
+  .dg-row .dg-stepper input { width: 56px; font-size: 17px; }
+  .dg-row .dg-ghost { width: 44px; height: 44px; }
+}
+
 /* coriandoli della consegna */
 .dg-confetti { position: fixed; z-index: 99999; width: 8px; height: 8px; border-radius: 2px; pointer-events: none; animation: dgConf .95s cubic-bezier(.2,.8,.3,1) forwards; }
 @keyframes dgConf { 0% { transform: translate(0,0) rotate(0); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }

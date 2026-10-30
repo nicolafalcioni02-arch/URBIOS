@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { buildIndex, foodValues, searchFoods } from '../../../../ai/foodMatcher';
 import { CountUp } from '../../shared/fx';
+import { createPortal } from 'react-dom';
+import { useCompact } from '../../../../hooks/useCompact';
+import { ActionSheet } from '../../../mobile/MobileChrome';
 import { addFood, addSub, removeSub, setSubMode, suggestSubs, swapSub, SUB_MODES, dayStatus, dayTotals, duplicateDay, macroGrams, mealKcal, newDay, removeItem, scaleDayTo, setGrams } from './guidedLogic';
 
 // Passo 2 — Menù: giorni, pasti e alimenti si modificano sul posto. In alto, sempre visibile, l'andamento rispetto all'obiettivo.
@@ -123,6 +126,8 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
     const [dragId, setDragId] = useState(null); // giorno trascinato
     const [overId, setOverId] = useState(null);
     const [savedMeal, setSavedMeal] = useState(null);
+    const compact = useCompact(639);
+    const [sheet, setSheet] = useState(null); // 'day' | 'delDay' (telefono)
 
     const tdee = targets?.isConfigured ? targets.kcal : 0;
     const gT = tdee ? macroGrams(tdee, { c: targets.c, p: targets.p, f: targets.f }) : { c: 0, p: 0, f: 0 };
@@ -184,14 +189,14 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
     return (
         <div className="max-w-3xl mx-auto dg-in">
             {/* Strumenti del passo */}
-            <div className="dg-toolbar" style={{ marginTop: 0 }}>
+            {!compact && <div className="dg-toolbar" style={{ marginTop: 0 }}>
                 <button className="dg-sm" onClick={onFoods}>
                     <i className="ph ph-database"></i> Database alimenti
                 </button>
                 <button className="dg-sm" onClick={onAnalysis}>
                     <i className="ph ph-stethoscope"></i> Analisi nutrienti
                 </button>
-            </div>
+            </div>}
 
             {/* Giorni (si riordinano trascinando o con le frecce) */}
             <div className="flex items-center gap-2 mt-4">
@@ -230,7 +235,11 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
                         <i className="ph ph-plus"></i> Giorno
                     </button>
                 </div>
-                {dietDays.length > 1 && (
+                {compact ? (
+                    <button className="dg-ghost dg-more" aria-label="Opzioni del giorno" onClick={() => setSheet('day')}>
+                        <i className="ph-bold ph-dots-three"></i>
+                    </button>
+                ) : dietDays.length > 1 && (
                     <div className="flex gap-1 flex-none">
                         <button className="dg-ghost" title="Sposta il giorno prima" aria-label="Sposta il giorno prima" disabled={dayIdx === 0} style={dayIdx === 0 ? { opacity: 0.3 } : undefined} onClick={() => moveDay(dayIdx, dayIdx - 1)}>
                             <i className="ph ph-arrow-left"></i>
@@ -338,7 +347,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
                         ) : (
                             <div className="flex gap-2">
                                 <button className="dg-add" onClick={() => setSearching(meal.id)}>
-                                    <i className="ph ph-plus-circle"></i> Aggiungi alimento
+                                    <i className="ph ph-plus-circle"></i> {compact ? 'Alimento' : 'Aggiungi alimento'}
                                 </button>
                                 <button className="dg-add" onClick={() => onRecipe(day.id, meal.id)}>
                                     <i className="ph ph-cooking-pot"></i> Ricetta
@@ -350,7 +359,7 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
             })}
 
             {/* Azioni del giorno */}
-            <div className="flex flex-wrap items-center gap-2 mt-4">
+            {!compact && <div className="flex flex-wrap items-center gap-2 mt-4">
                 <input className="fld !w-auto min-w-[180px]" value={day.title} onChange={(e) => update((d) => d.map((x) => (x.id === day.id ? { ...x, title: e.target.value } : x)))} aria-label="Nome del giorno" />
                 <button className="dg-chip row" onClick={() => { update((d) => [...d, duplicateDay(day)]); setDayIdx(dietDays.length); }}>
                     <i className="ph ph-copy"></i> Duplica giorno
@@ -369,16 +378,47 @@ export const MenuStep = ({ calcData, targets, dietDays, setDietDays, foodDB, set
                         <i className="ph ph-trash"></i> Elimina giorno
                     </button>
                 )}
-            </div>
+            </div>}
 
             <div className="dg-foot">
                 <button className="vw-back" onClick={onGoals}>
-                    <i className="ph ph-arrow-left"></i> Obiettivi
+                    <i className="ph ph-arrow-left"></i> <span>Obiettivi</span>
                 </button>
                 <button className="vw-next" onClick={onNext}>
-                    Verifica e consegna <i className="ph ph-arrow-right"></i>
+                    {compact ? 'Consegna' : 'Verifica e consegna'} <i className="ph ph-arrow-right"></i>
                 </button>
             </div>
+
+            {sheet && createPortal(
+                <ActionSheet
+                    key={sheet}
+                    onClose={() => setSheet(null)}
+                    {...({
+                        day: {
+                            title: day.title || 'Giorno',
+                            subtitle: `${day.meals.length} pasti · ${Math.round(tot.kcal)} kcal`,
+                            groups: [
+                                [
+                                    { label: 'Rinomina', icon: 'ph-pencil-simple', note: day.title, onClick: () => setTimeout(() => { const v = window.prompt('Nome del giorno', day.title || ''); if (v !== null) update((d) => d.map((x) => (x.id === day.id ? { ...x, title: v } : x))); }, 280) },
+                                    { label: 'Sposta prima', icon: 'ph-arrow-left', disabled: dayIdx <= 0, onClick: () => moveDay(dayIdx, dayIdx - 1) },
+                                    { label: 'Sposta dopo', icon: 'ph-arrow-right', disabled: dayIdx >= dietDays.length - 1, onClick: () => moveDay(dayIdx, dayIdx + 1) },
+                                ],
+                                [{ label: 'Duplica il giorno', icon: 'ph-copy', onClick: () => { update((d) => [...d, duplicateDay(day)]); setDayIdx(dietDays.length); } }],
+                                [{ label: 'Elimina il giorno', icon: 'ph-trash', tone: 'danger', disabled: dietDays.length < 2, onClick: () => setTimeout(() => setSheet('delDay'), 280) }],
+                            ],
+                        },
+                        delDay: {
+                            title: `Eliminare ${day.title || 'il giorno'}?`,
+                            subtitle: 'Pasti e alimenti del giorno andranno persi.',
+                            groups: [
+                                [{ label: 'Elimina il giorno', icon: 'ph-trash', tone: 'danger', onClick: () => { update((d) => d.filter((x) => x.id !== day.id)); setDayIdx(0); } }],
+                                [{ label: 'Annulla', icon: 'ph-x', onClick: () => {} }],
+                            ],
+                        },
+                    }[sheet])}
+                />,
+                document.body
+            )}
         </div>
     );
 };
