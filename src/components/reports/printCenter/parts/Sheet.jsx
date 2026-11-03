@@ -14,7 +14,7 @@ const BrandMark = ({ style }) => (
 );
 
 // Foglio A4 con intestazione e piè di pagina; il contenuto sta in .pc-body, nell'area utile calcolata dal tema
-export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true, page, total, patientName, prof, title, children, bare = false, noBrand = false }) => {
+export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true, lab = false, page, total, patientName, prof, title, children, bare = false, noBrand = false }) => {
     const m = g.m;
     const top = m.t + (withHead ? g.head : 0);
     const studio = [prof.nome, prof.cognome].filter(Boolean).join(' ');
@@ -46,11 +46,11 @@ export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true
             )}
             {!bare && withFoot && theme.footer && (
                 <div className="pc-foot" style={{ bottom: `${m.b}mm`, left: `${m.s}mm`, right: `${m.s}mm` }}>
-                    <span>Documento personale e riservato · {fmtDate(new Date())}</span>
+                    <span>{lab ? '' : 'Documento personale e riservato · '}{fmtDate(new Date())}</span>
                     <BrandMark />
                     {theme.numbers && (
                         <span className="num">
-                            Pagina {page} di {total}
+                            {lab ? `Pagina ${page}` : `Pagina ${page} di ${total}`}
                         </span>
                     )}
                 </div>
@@ -58,7 +58,7 @@ export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true
             {/* senza piè di pagina (copertina o piè disattivato) il marchio resta in fondo da solo */}
             {!bare && withFoot && !theme.footer && theme.numbers && (
                 <span className="pc-bm pc-bm-num" style={{ position: 'absolute', right: `${m.s}mm`, bottom: `${Math.max(4, m.b - 4)}mm` }}>
-                    Pagina {page} di {total}
+                    {lab ? `Pagina ${page}` : `Pagina ${page} di ${total}`}
                 </span>
             )}
             {!noBrand && (bare || !withFoot || !theme.footer) && <BrandMark style={{ position: 'absolute', left: '50%', bottom: `${Math.max(4, m.b - 4)}mm`, transform: 'translateX(-50%)' }} />}

@@ -422,26 +422,29 @@ const rigore = `
 .pc-l-rigore.pc-l-rigore, .pc-l-rigore.pc-l-rigore *:not(i) { font-family: var(--pc-font, 'Inter', system-ui, sans-serif) !important; font-style: normal !important; }
 .pc-sheet.pc-l-rigore { background: #fff; color: #000; }
 .pc-l-rigore .pc-flow { font-size: 10.5pt; line-height: 1.5; color: #000; }
-.pc-l-rigore .d-rb-recipe { margin: 0 0 7mm; }
-.pc-l-rigore .d-rb-head { display: block; padding: 0 0 2.5mm; margin-bottom: 4mm; border-radius: 0; background: none; border-bottom: .45mm solid #000; }
-.pc-l-rigore .d-kicker { color: #000; font-size: 8pt; font-weight: 700; letter-spacing: .12em; margin-bottom: 1.5mm; }
-.pc-theme.pc-l-rigore .d-rb .d-rb-title, .pc-l-rigore .d-rb-title { font-size: 18pt; font-weight: 700; letter-spacing: -.005em; line-height: 1.2; }
-.pc-l-rigore .d-rb-meta { border-top: .25mm solid #000; border-bottom: .25mm solid #000; margin-bottom: 4mm; }
-.pc-l-rigore .d-rb-meta > div + div { border-left: .2mm solid #000; }
-.pc-l-rigore .d-rb-meta span { color: #000; font-size: 7.5pt; font-weight: 700; letter-spacing: .1em; }
-.pc-l-rigore .d-rb-meta b { font-size: 10.5pt; font-weight: 600; }
-.pc-l-rigore .d-rb-h { color: #000; font-size: 9pt; font-weight: 700; letter-spacing: .1em; margin: 5mm 0 2mm; padding-bottom: 1mm; border-bottom: .2mm solid #000; }
-.pc-l-rigore .d-prose p { text-align: justify; hyphens: auto; margin: 0 0 2mm; }
-.pc-l-rigore .d-table { font-size: 9.5pt; border-top: .35mm solid #000; border-bottom: .35mm solid #000; }
-.pc-l-rigore .d-table th { color: #000; font-size: 8pt; font-weight: 700; letter-spacing: .06em; border-bottom: .25mm solid #000; background: none; }
-.pc-l-rigore .d-table td { border-bottom: .15mm solid #9a9a9a; }
+.pc-l-rigore .d-rb-recipe { margin: 0 0 9mm; }
+.pc-l-rigore .d-rb-head { display: block; padding: 0; margin-bottom: 2.5mm; border: 0; background: none; border-radius: 0; }
+.pc-l-rigore .d-kicker { color: #444; font-size: 8pt; font-weight: 500; letter-spacing: 0; text-transform: none; margin-bottom: 0; }
+.pc-theme.pc-l-rigore .d-rb .d-rb-title, .pc-l-rigore .d-rb-title { font-size: 15pt; font-weight: 700; line-height: 1.2; margin: 0; }
+.pc-l-rigore .d-meta { width: 100%; border-collapse: collapse; margin: 0 0 3mm; }
+.pc-l-rigore .d-meta th { text-align: left; font-size: 7.5pt; font-weight: 500; color: #555; padding: 0 4mm 0 0; border: 0; }
+.pc-l-rigore .d-meta td { font-size: 10pt; font-weight: 600; padding: 0 4mm 0 0; border: 0; }
+.pc-l-rigore .d-form { width: 100%; border-collapse: collapse; margin: 0 0 3mm; border-top: .3mm solid #000; }
+.pc-l-rigore .d-form th { width: 27mm; text-align: left; vertical-align: top; font-size: 8.5pt; font-weight: 700; color: #000; padding: 1.5mm 3mm 1.5mm 0; border-bottom: .1mm solid #ccc; }
+.pc-l-rigore .d-form td { vertical-align: top; padding: 1.5mm 0; font-size: 10pt; border-bottom: .1mm solid #ccc; }
+.pc-l-rigore .d-form td .d-table { margin: 0; } .pc-l-rigore .d-form td p { margin: 0 0 1mm; }
+.pc-l-rigore .d-form td .d-table tr:last-child td { border-bottom: 0; }
+.pc-l-rigore .d-fig { margin: 2mm 0 3mm; } .pc-l-rigore .d-fig p { margin: 0; font-size: 9.5pt; }
+.pc-l-rigore .d-sign td { height: 9mm; border-bottom: .2mm solid #000; }
+.pc-l-rigore .d-rb-h { color: #000; font-size: 10pt; font-weight: 700; letter-spacing: 0; text-transform: none; margin: 3.5mm 0 1mm; padding: 0; border: 0; }
+.pc-l-rigore .d-prose p { text-align: left; hyphens: auto; margin: 0 0 1.5mm; }
+.pc-l-rigore .d-table { font-size: 9.5pt; border: 0; margin: 1mm 0 2mm; }
+.pc-l-rigore .d-table th { color: #000; font-size: 8pt; font-weight: 700; letter-spacing: 0; text-transform: none; border-bottom: .25mm solid #000; background: none; padding: 1mm 2mm; }
+.pc-l-rigore .d-table td { border-bottom: .1mm solid #ccc; padding: 1mm 2mm; }
 .pc-l-rigore .d-table small, .pc-l-rigore small { color: #444; }
+.pc-l-rigore .d-rb-steps { margin: 0 0 2mm; } .pc-l-rigore .d-rb-steps li { margin-bottom: 1mm; }
 .pc-l-rigore .d-rb-steps li::marker { color: #000; font-weight: 700; font-size: 9pt; }
 .pc-l-rigore .d-placeholder { color: #333; font-size: 9.5pt; }
-.pc-l-rigore .nb-cover { padding-top: 62mm; }
-.pc-l-rigore .nb-cover .d-rb-head { border-bottom: .8mm solid #000; padding-bottom: 5mm; margin-bottom: 8mm; }
-.pc-l-rigore .nb-cover .d-rb-title { font-size: 30pt; font-weight: 700; }
-.pc-l-rigore .nb-cover .d-rb-meta { border-top: 0; }
 .pc-l-rigore .pc-foot, .pc-l-rigore .pc-foot * , .pc-l-rigore .pc-bm, .pc-l-rigore .pc-bm * { color: #000 !important; }
 `;
 

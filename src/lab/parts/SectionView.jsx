@@ -8,6 +8,7 @@ import { NotebookPreview } from './NotebookPreview';
 export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, onDelete, onPrint, onBlank, onExcel, db, vol, setVol }) => {
     const [q, setQ] = useState('');
     const [group, setGroup] = useState('');
+    const [fopen, setFopen] = useState(false);
     const [picked, setPicked] = useState([]);
     const all = lab[section.key];
 
@@ -36,21 +37,33 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
                         <div>
                             <h1 className="lab-title">{section.label}</h1>
                         </div>
-                        <button className="lab-btn is-primary is-sm" onClick={onNew}><Icon name="plus" size={14} />Nuovo</button>
-                    </header>
-                    <input className="fld" value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Cerca in ${section.label.toLowerCase()}`} aria-label="Cerca" />
-                    {groups.length > 1 && (
-                        <div className="seg lab-seg" role="group" aria-label="Filtra">
-                            <button className={!group ? 'on' : ''} onClick={() => setGroup('')}>Tutti</button>
-                            {groups.map(([g, n]) => <button key={g} className={group === g ? 'on' : ''} onClick={() => setGroup(group === g ? '' : g)}>{g} {n}</button>)}
+                        <div className="lab-head-btns">
+                            <button className="lab-btn is-secondary is-sm is-ico" disabled={!list.length} onClick={onExcel} aria-label="Esporta in Excel" title="Esporta in Excel"><Icon name="table" size={17} /></button>
+                            <button className="lab-btn is-primary is-sm is-ico" onClick={onNew} aria-label={`Nuovo ${section.single}`} title={`Nuovo ${section.single}`}><Icon name="plus" size={17} /></button>
                         </div>
-                    )}
-                    <div className="lab-tools">
+                    </header>
+                    <div className="lab-searchrow">
+                        <input className="fld" value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Cerca in ${section.label.toLowerCase()}`} aria-label="Cerca" />
+                        {groups.length > 1 && (
+                            <div className="lab-filterwrap">
+                                <button type="button" className={`lab-btn is-secondary is-sm is-ico lab-filterbtn${group ? ' on' : ''}`} aria-expanded={fopen} aria-label="Filtro" title={group ? `Filtro: ${group}` : 'Filtro'} onClick={() => setFopen((o) => !o)}><Icon name="filter" size={17} />{group && <i className="lab-filter-dot" />}</button>
+                                {fopen && (
+                                    <>
+                                        <div className="lab-pop-back" onClick={() => setFopen(false)} />
+                                        <div className="lab-pop" role="menu">
+                                            <button role="menuitem" className={!group ? 'on' : ''} onClick={() => { setGroup(''); setFopen(false); }}>Tutti<em>{all.length}</em></button>
+                                            {groups.map(([g, n]) => <button role="menuitem" key={g} className={group === g ? 'on' : ''} onClick={() => { setGroup(g); setFopen(false); }}>{g}<em>{n}</em></button>)}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    <div className="lab-listtools">
                         {section.key === 'reagenti' && <input className="fld" style={{ height: 38, flex: '1 1 130px' }} value={vol} onChange={(e) => setVol(e.target.value)} placeholder="Volume da preparare" aria-label="Volume da preparare in stampa" title="Se compilato, le quantità in stampa si scalano su questo volume finale" />}
-                        <button className="lab-btn is-secondary is-sm" disabled={!list.length} onClick={onExcel}><Icon name="table" size={16} />Excel</button>
-                        {!page && <button className="lab-btn is-secondary is-sm" disabled={!list.length} onClick={() => onPrint(ids)}><Icon name="printer" size={16} />{picked.length ? `Stampa ${picked.length}` : 'Stampa'}</button>}
-                        {onBlank && !page && <button className="lab-btn is-secondary is-sm" onClick={onBlank} title="Pagine a quadretti numerate, da compilare a mano"><Icon name="notebook" size={16} />Pagine vuote</button>}
-                        {picked.length > 0 && <button className="lab-btn is-ghost is-sm" onClick={() => setPicked([])}>Deseleziona</button>}
+                        {!page && <button className="lab-btn is-secondary is-sm is-ico" disabled={!list.length} onClick={() => onPrint(ids)} aria-label="Stampa" title={picked.length ? `Stampa ${picked.length} selezionate` : 'Stampa'}><Icon name="printer" size={17} />{picked.length > 0 && picked.length}</button>}
+                        {onBlank && !page && <button className="lab-btn is-secondary is-sm is-ico" onClick={onBlank} aria-label="Pagine vuote" title="Pagine vuote: a quadretti, numerate, da compilare a mano"><Icon name="notebook" size={17} /></button>}
+                        {picked.length > 0 && <button className="lab-btn is-ghost is-sm is-ico" onClick={() => setPicked([])} aria-label="Deseleziona" title="Deseleziona"><Icon name="x" size={17} /></button>}
                     </div>
                 </div>
                 <div className="lab-listscroll">
@@ -64,9 +77,8 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
                                 return (
                                     <div key={r.id} className={`lab-item${activeId === r.id ? ' sel' : ''}`}>
                                         <button type="button" className="lab-item-main" onClick={() => onSelect(r)} aria-current={activeId === r.id ? 'true' : undefined}>
-                                            <b>{section.title(r)}</b>
+                                            <span className="lab-item-top"><b>{section.title(r)}</b>{b && <span className={`lab-pill ${b.tone}`} title={b.label}>{b.label}</span>}</span>
                                             {section.sub(r) && <small>{section.sub(r)}</small>}
-                                            {b && <span className={`lab-pill ${b.tone}`}>{b.label}</span>}
                                         </button>
                                         <button type="button" className={`lab-check${on ? ' on' : ''}`} aria-label={on ? 'Togli dalla selezione' : 'Seleziona per stampare'} aria-pressed={on} onClick={() => toggle(r.id)}>{on && <Icon name="check" size={13} stroke={2.4} />}</button>
                                     </div>

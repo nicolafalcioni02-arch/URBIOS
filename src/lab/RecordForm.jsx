@@ -13,7 +13,7 @@ const Steps = ({ value, onChange }) => {
             {list.map((s, i) => (
                 <div className="lab-step" key={i}>
                     <span>{i + 1}</span>
-                    <textarea className="fld" rows={1} value={s.testo || ''} placeholder="Descrivi il passaggio" onChange={(e) => set(i, { testo: e.target.value })} />
+                    <textarea className="fld" rows={1} value={s.testo || ''} placeholder="Descrivi il passaggio" onChange={(e) => set(i, { testo: e.target.value })} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && (s.testo || '').trim()) { e.preventDefault(); onChange([...list.slice(0, i + 1), { testo: '', durata: '' }, ...list.slice(i + 1)]); setTimeout(() => e.target.closest('.lab-rows')?.querySelectorAll('textarea')[i + 1]?.focus(), 0); } }} />
                     <input className="fld" style={{ height: 40 }} value={s.durata || ''} placeholder="Tempo" onChange={(e) => set(i, { durata: e.target.value })} />
                     <button type="button" className="lab-x" aria-label="Togli passaggio" onClick={() => onChange(list.filter((_, k) => k !== i))}><Icon name="x" size={16} /></button>
                 </div>
@@ -99,22 +99,33 @@ export const RecordForm = ({ section, record, lab, isNew, inline, onSave, onDele
 
     const suggestions = (f) => [...new Set(lab[section.key].map((r) => String(r[f.key] || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'it'));
 
+    // scelto il protocollo nel quaderno, i suoi passaggi e materiali si copiano nell'esperimento (se ancora vuoti), da modificare liberamente
+    const pickRef = (f, v) => {
+        set(f.key, v);
+        const p = section.key === 'quaderno' && f.key === 'protocolloId' ? lab.protocolli.find((x) => x.id === v) : null;
+        if (!p) return;
+        if (!(d.passaggi || []).length && (p.passaggi || []).length) set('passaggi', p.passaggi.map((s) => ({ ...s })));
+        if (!(d.materiali || []).length && (p.materiali || []).length) set('materiali', p.materiali.map((m) => ({ ...m })));
+    };
+
     const input = (f) => {
-        if (f.type === 'area') return <textarea className="fld" rows={3} style={{ height: 'auto', paddingTop: 10 }} value={d[f.key] || ''} onChange={(e) => set(f.key, e.target.value)} />;
+        if (f.type === 'area') return <textarea className="fld" rows={3} style={{ height: 'auto', paddingTop: 10 }} placeholder={f.ph} value={d[f.key] || ''} onChange={(e) => set(f.key, e.target.value)} />;
+        if (f.type === 'select' && f.options.length <= 5) return <div className="lab-opts" role="group" aria-label={f.label}>{f.options.map((o) => <button type="button" key={o} className={`lab-chip${(d[f.key] || '') === o ? ' on' : ''}`} aria-pressed={(d[f.key] || '') === o} onClick={() => set(f.key, o)}>{o}</button>)}</div>;
         if (f.type === 'select') return <select className="fld" value={d[f.key] || ''} onChange={(e) => set(f.key, e.target.value)}>{f.options.map((o) => <option key={o}>{o}</option>)}</select>;
-        if (f.type === 'ref') return <select className="fld" value={d[f.key] || ''} onChange={(e) => set(f.key, e.target.value)}><option value="">—</option>{lab[f.from].map((r) => <option key={r.id} value={r.id}>{[r.codice, r.titolo].filter(Boolean).join(' · ')}</option>)}</select>;
+        if (f.type === 'ref') return <select className="fld" value={d[f.key] || ''} onChange={(e) => pickRef(f, e.target.value)}><option value="">—</option>{lab[f.from].map((r) => <option key={r.id} value={r.id}>{[r.codice, r.titolo].filter(Boolean).join(' · ')}</option>)}</select>;
         if (f.type === 'steps') return <Steps value={d[f.key]} onChange={(v) => set(f.key, v)} />;
         if (f.type === 'figures') return <FiguresEditor value={d[f.key]} onChange={(v) => set(f.key, v)} />;
         if (f.type === 'rows') return <Rows cols={f.cols} value={d[f.key]} onChange={(v) => set(f.key, v)} />;
         const listId = f.list ? `lab-dl-${section.key}-${f.key}` : undefined;
         return (
             <>
-                <input className="fld" type={f.type === 'date' ? 'date' : 'text'} inputMode={f.type === 'number' ? 'decimal' : undefined} list={listId} value={d[f.key] ?? ''} onChange={(e) => set(f.key, e.target.value)} />
+                <input className="fld" type={f.type === 'date' ? 'date' : 'text'} inputMode={f.type === 'number' ? 'decimal' : undefined} list={listId} placeholder={f.ph} value={d[f.key] ?? ''} onChange={(e) => set(f.key, e.target.value)} />
                 {listId && <datalist id={listId}>{suggestions(f).map((s) => <option key={s} value={s} />)}</datalist>}
             </>
         );
     };
 
+    const groups = (section.groups || [{ title: 'Dati', keys: section.fields.map((f) => f.key) }]).map((g) => ({ ...g, fields: g.keys.map((k) => section.fields.find((f) => f.key === k)).filter(Boolean) }));
     const body = (
         <>
             <div className="lab-pane-head">
@@ -128,14 +139,19 @@ export const RecordForm = ({ section, record, lab, isNew, inline, onSave, onDele
                     {!inline && <button className="lab-btn is-primary" onClick={() => { flush(); onClose(); }}>Fatto</button>}
                 </div>
             </div>
-            <div className="lab-form">
-                {section.fields.map((f) => (
-                    <div key={f.key} className={f.full ? 'full' : ''}>
-                        <label className="fld-label">{f.label}</label>
-                        {input(f)}
+            {groups.map((g, i) => (
+                <section className="lab-card" key={g.title}>
+                    <h3 className="lab-card-h"><span className="lab-card-n">{i + 1}</span>{g.title}</h3>
+                    <div className="lab-form">
+                        {g.fields.map((f) => (
+                            <div key={f.key} className={f.full || ['steps', 'rows', 'figures', 'area'].includes(f.type) ? 'full' : ''}>
+                                <label className="fld-label">{f.label}{f === section.fields[0] && <span className="lab-req" title="Obbligatorio per salvare"> *</span>}</label>
+                                {input(f)}
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
+                </section>
+            ))}
         </>
     );
 

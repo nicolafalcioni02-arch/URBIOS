@@ -13,7 +13,7 @@ import { CoverPage, FitBox, Sheet } from './parts/Sheet';
 import { Sidebar } from './parts/Sidebar';
 import { TextTools } from './parts/TextTools';
 import { printCenterCss } from './printCenterStyles';
-import { wordFile } from './docs/lab';
+import { wordMime } from './docs/lab';
 import { professionalFor } from '../../../storage/example/example';
 
 // Safari (e ogni browser su iPhone/iPad) salva i PDF con il motore WebKit: alcuni effetti vanno semplificati in stampa
@@ -348,9 +348,9 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     // Word: il testo com'è sui fogli (con le modifiche a mano), come file .doc
     const exportWord = () => {
         commitAll();
-        setTimeout(() => {
+        setTimeout(async () => {
             const html = itemsRef.current.filter((it) => it.on && it.html).map((it) => it.html).join('');
-            const blob = new Blob(['\ufeff', wordFile(html, undefined, theme.font)], { type: 'application/msword' });
+            const blob = new Blob([await wordMime(html, 'Quaderno di laboratorio', theme.font)], { type: 'application/msword' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = `quaderno-di-laboratorio-${new Date().toISOString().slice(0, 10)}.doc`;
@@ -489,7 +489,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
             const d = chartData(it);
             const withHead = headOn(it, p.i);
             sheet = (
-                <Sheet g={g} theme={theme} layoutClass={layoutClass} accent={theme.accent} withHead={withHead} page={num} total={total} patientName={patientName} prof={prof} title={label}>
+                <Sheet g={g} theme={theme} layoutClass={layoutClass} accent={theme.accent} withHead={withHead} lab={scope === 'lab'} page={num} total={total} patientName={patientName} prof={prof} title={label}>
                     {d ? (
                         <FitBox key={`${tKey}|${withHead}|${it.opts.visitId}`}>
                             <ChartsPage page={p.n} patient={patient} {...d} />
@@ -501,7 +501,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
             const withHead = headOn(it, p.i);
             const k = `${it.id}:${p.i}`;
             sheet = (
-                <Sheet g={g} theme={theme} layoutClass={`${layoutClass} ${overflow[k] ? 'overflow' : ''}`} accent={theme.accent} withHead={withHead} page={num} total={total} patientName={patientName} prof={prof} title={label}>
+                <Sheet g={g} theme={theme} layoutClass={`${layoutClass} ${overflow[k] ? 'overflow' : ''}`} accent={theme.accent} withHead={withHead} lab={scope === 'lab'} page={num} total={total} patientName={patientName} prof={prof} title={label}>
                     {p.html === null ? (
                         <div className="pc-skeleton">Impagino…</div>
                     ) : (
