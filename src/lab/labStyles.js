@@ -161,7 +161,7 @@ html[data-look='vetro'] .lab-side{--lab-side-bg:radial-gradient(52vmax 44vmax at
 .lab-chip{height:32px;padding:0 12px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:500;color:var(--muted)}
 .lab-chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
 .lab-chart-hint{font-size:12.5px;color:var(--muted);margin:0}
-.lab-grid{display:grid;gap:6px;padding:10px;background:var(--soft);border-radius:12px;overflow-x:auto}
+.lab-grid{display:grid;gap:6px;padding:10px;background:var(--soft);border-radius:12px}
 .lab-grid-row{display:grid;grid-template-columns:var(--tpl);gap:6px;align-items:center}
 .lab-grid-h{font-size:12px;font-weight:600;color:var(--muted);padding-left:2px}
 .lab-pane .lab-grid .fld{height:36px;border-radius:8px;padding:0 10px;background:var(--surface);border:1px solid var(--line);box-shadow:none;min-width:0}

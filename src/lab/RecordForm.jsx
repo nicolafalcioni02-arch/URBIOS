@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Icon } from './ui/icons';
 import { FiguresEditor } from './FiguresEditor';
 
@@ -64,7 +64,28 @@ export const RecordForm = ({ section, record, lab, isNew, inline, onSave, onDele
             setSaved(true);
         }
     };
-    const set = (k, v) => { dirty.current = true; setSaved(false); setD((x) => ({ ...x, [k]: v })); };
+    // mentre si scrive il modulo non deve spostarsi: se il browser (Safari) lo fa scorrere da solo, lo si rimette dov'era
+    const scroller = useRef(null);
+    const hold = useRef({ top: null, until: 0, user: 0 });
+    const set = (k, v) => {
+        const el = scroller.current;
+        if (el) hold.current = { ...hold.current, top: el.scrollTop, until: Date.now() + 2500 };
+        dirty.current = true; setSaved(false); setD((x) => ({ ...x, [k]: v }));
+    };
+    const restore = () => {
+        const el = scroller.current;
+        const h = hold.current;
+        if (el && h.top !== null && Date.now() < h.until && Date.now() - h.user > 400 && Math.abs(el.scrollTop - h.top) > 1) el.scrollTop = h.top;
+    };
+    useLayoutEffect(restore);
+    useEffect(() => {
+        const el = scroller.current;
+        if (!el) return undefined;
+        const mark = () => { hold.current = { ...hold.current, top: null, user: Date.now() }; };
+        el.addEventListener('scroll', restore);
+        ['wheel', 'touchstart', 'pointerdown'].forEach((ev) => el.addEventListener(ev, mark, { passive: true }));
+        return () => { el.removeEventListener('scroll', restore); ['wheel', 'touchstart', 'pointerdown'].forEach((ev) => el.removeEventListener(ev, mark)); };
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (!dirty.current) return undefined;
@@ -115,10 +136,10 @@ export const RecordForm = ({ section, record, lab, isNew, inline, onSave, onDele
         </>
     );
 
-    if (inline) return <div className="lab-pane">{body}</div>;
+    if (inline) return <div className="lab-pane" ref={scroller}>{body}</div>;
     return (
         <div className="sheet-back" onClick={() => { flush(); onClose(); }}>
-            <div className="lab-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={isNew ? `Nuovo ${section.single}` : `Modifica ${section.single}`}>{body}</div>
+            <div className="lab-modal" ref={scroller} onClick={(e) => e.stopPropagation()} role="dialog" aria-label={isNew ? `Nuovo ${section.single}` : `Modifica ${section.single}`}>{body}</div>
         </div>
     );
 };
