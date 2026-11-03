@@ -82,7 +82,8 @@ html[data-look='vetro'] .lab-side{--lab-side-bg:radial-gradient(52vmax 44vmax at
 
 /* elenco + editor */
 .lab-split{display:grid;grid-template-columns:minmax(300px,390px) minmax(0,1fr);height:100%;min-height:0}
-.lab-split.with-page{min-width:1220px;grid-template-columns:240px minmax(240px,1fr) 740px}
+.lab-split.with-page{min-width:1220px;grid-template-columns:240px minmax(240px,1fr) 704px}
+.with-page .lab-pane{padding-right:16px}
 .with-page .lab-listhead{padding:22px 16px 10px;gap:10px}
 .with-page .lab-listhead .lab-intro{display:none}
 .with-page .lab-listscroll{padding:0 16px 24px}
