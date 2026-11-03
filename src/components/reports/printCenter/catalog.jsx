@@ -89,7 +89,7 @@ export const defaultOptions = (type, ctx, hint = {}) => {
     if (type === 'copertina') return { title: 'Il tuo percorso', subtitle: 'Report personale', index: true, contacts: true };
     if (type === 'nota') return { title: 'Note per te' };
     if (type === 'quaderno') return { view: hint.view || 'compilato', ids: hint.ids || null, book: '', startPage: '1', count: '10' };
-    if (type === 'lab') return { ...LAB_DEFAULT_OPTS, kind: hint.kind || 'protocolli', ids: hint.ids || null, volume: hint.volume || '' };
+    if (type === 'lab') return { ...LAB_DEFAULT_OPTS, kind: hint.kind || 'protocolli', ids: hint.ids || null, volume: hint.volume || '', completo: !!hint.completo };
     return {};
 };
 

@@ -2,6 +2,12 @@
 // Solo token di index.css, così anche l'aspetto Vetro funziona. Classi lab-*.
 export const labStyles = `
 .lab-svg{flex:none}
+.lab-ws .fld,.lab-modal .fld{border:1.5px solid #B9B9C0;background:#fff}
+.lab-ws .fld:hover,.lab-modal .fld:hover{border-color:#8E8E96}
+.lab-ws .fld:focus,.lab-modal .fld:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,84,235,.15)}
+.lab-ws .fld:not(:placeholder-shown):not(:focus),.lab-modal .fld:not(:placeholder-shown):not(:focus){background:#fff}
+.lab-form .fld-label,.lab-modal .fld-label{font-size:13px;font-weight:600;color:var(--ink);margin:0 0 6px}
+.lab-ws,.lab-ws *{--paper:#F7F7F8;--soft:#F1F1F3;--line:#E4E4E7;--muted:#6B6B72}
 .lab-ws{display:grid;grid-template-columns:240px minmax(0,1fr);height:100%;width:100%;background:var(--surface);color:var(--ink);overflow:hidden}
 .lab-ws.narrow{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);background:var(--paper)}
 .lab-main{min-width:0;min-height:0;height:100%;overflow:hidden;background:var(--surface)}
@@ -73,8 +79,9 @@ export const labStyles = `
 
 /* elenco + editor */
 .lab-split{display:grid;grid-template-columns:minmax(300px,390px) minmax(0,1fr);height:100%;min-height:0}
-.lab-split.with-page{grid-template-columns:minmax(240px,300px) minmax(340px,430px) minmax(0,1fr)}
+.lab-split.with-page{grid-template-columns:minmax(220px,260px) minmax(320px,400px) minmax(0,1fr)}
 .lab-pagescol{min-width:0;min-height:0;height:100%;display:flex;flex-direction:column;border-left:1px solid var(--line)}
+.lab-pagesbody{flex:1;min-height:0}
 .lab-pageshead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--surface)}
 .lab-pages{flex:1;min-width:0;min-height:0;overflow:auto;background:var(--soft);padding:20px;display:flex;flex-direction:column;align-items:center;gap:18px}
 .lab-zoom{position:sticky;top:0;z-index:5;align-self:flex-end;display:flex;border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden;box-shadow:0 2px 8px rgba(30,25,15,.12)}

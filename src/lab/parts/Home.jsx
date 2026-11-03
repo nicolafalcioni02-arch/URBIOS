@@ -24,13 +24,11 @@ export const Home = ({ ov, onOpen, onNew }) => {
         ...ov.inCorso.map((r) => ({ id: r.id, key: 'quaderno', icon: q.icon, tone: r.stato === 'Da ripetere' ? 'bad' : 'warn', title: q.title(r), sub: r.stato === 'Da ripetere' ? 'Da ripetere' : 'Esperimento in corso' })),
         ...ov.campioniAperti.map((r) => ({ id: r.id, key: 'campioni', icon: camp.icon, tone: '', title: camp.title(r), sub: `Campione ${String(r.stato).toLowerCase()}` })),
     ];
-    const summary = todo.length ? `${plural(ov.inCorso.length, 'esperimento in corso', 'esperimenti in corso')}, ${plural(ov.scaduti.length + ov.scorta.length + ov.scadenza.length, 'avviso di magazzino', 'avvisi di magazzino')}.` : 'Tutto in ordine: niente in sospeso.';
     return (
         <div className="lab-page">
             <header className="lab-page-head">
                 <div>
                     <h1 className="lab-title">Panoramica</h1>
-                    <p className="lab-intro">{summary}</p>
                 </div>
                 <button className="lab-btn is-primary" onClick={() => onNew('quaderno')}><Icon name="plus" size={16} />Nuovo esperimento</button>
             </header>

@@ -46,12 +46,13 @@ const LabInner = ({ db, onUpdateDb, onBack }) => {
 
     let main;
     if (view === 'home') main = <Home ov={ov} onOpen={open} onNew={create} />;
-    else if (view === 'calcoli') main = <div className="lab-page"><header className="lab-page-head"><div><h1 className="lab-title">Calcoli</h1><p className="lab-intro">Diluizioni e soluzioni molari.</p></div></header><Calc /></div>;
+    else if (view === 'calcoli') main = <div className="lab-page"><header className="lab-page-head"><div><h1 className="lab-title">Calcoli</h1></div></header><Calc /></div>;
     else main = (
         <SectionView
             key={view}
             section={section}
             lab={lab}
+            db={db}
             wide={wide}
             sel={sel && sel.record ? sel : null}
             onSelect={(r) => setSel(r ? { record: r, isNew: false } : null)}

@@ -19,7 +19,6 @@ export const Calc = () => {
         <div className="lab-calc">
             <section>
                 <h3>Diluizione</h3>
-                <p>C₁ · V₁ = C₂ · V₂. Compila tre valori (stessa unità per le concentrazioni, stessa per i volumi) e lascia vuoto quello da trovare.</p>
                 <div className="grid grid-cols-2 gap-3">
                     <F label="C₁ iniziale" value={d.c1} onChange={(v) => setD({ ...d, c1: v })} />
                     <F label="V₁ da prelevare" value={d.v1} onChange={(v) => setD({ ...d, v1: v })} />
@@ -30,7 +29,6 @@ export const Calc = () => {
             </section>
             <section>
                 <h3>Soluzione molare</h3>
-                <p>Massa da pesare = molarità × volume × peso molecolare.</p>
                 <div className="grid grid-cols-3 gap-3">
                     <F label="Molarità (mol/L)" value={m.molarita} onChange={(v) => setM({ ...m, molarita: v })} />
                     <F label="Volume (L)" value={m.volume} onChange={(v) => setM({ ...m, volume: v })} />

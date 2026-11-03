@@ -5,7 +5,7 @@ import { NotebookPreview } from './NotebookPreview';
 
 // Una sezione: elenco (ricerca, filtri, selezione per stampare) e, accanto, l'editor (schermi larghi) o a finestra (telefono/tablet).
 // Il record aperto è `sel = { record, isNew }`.
-export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, onDelete, onPrint, onBlank, onExcel, vol, setVol }) => {
+export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, onDelete, onPrint, onBlank, onExcel, db, vol, setVol }) => {
     const [q, setQ] = useState('');
     const [group, setGroup] = useState('');
     const [picked, setPicked] = useState([]);
@@ -35,7 +35,6 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
                     <header className="lab-page-head" style={{ marginBottom: 0 }}>
                         <div>
                             <h1 className="lab-title">{section.label}</h1>
-                            <p className="lab-intro">{section.hint}</p>
                         </div>
                         <button className="lab-btn is-primary" onClick={onNew}><Icon name="plus" size={16} />Nuovo</button>
                     </header>
@@ -84,7 +83,7 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
                     )}
                 </div>
             )}
-            {page && <NotebookPreview lab={lab} activeId={activeId} onPrintAll={() => onPrint(null, { completo: true })} />}
+            {page && <NotebookPreview db={db} activeId={activeId} />}
         </div>
     );
 };

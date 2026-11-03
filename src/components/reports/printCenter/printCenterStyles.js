@@ -7,6 +7,15 @@ const uiCss = `
 .pc-overlay { position: fixed; inset: 0; z-index: 100000; display: flex; flex-direction: column; background: #E7E5E0; color: var(--ink, #121317);
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; }
 .pc-overlay button { font-family: inherit; color: inherit; }
+.pc-overlay.pc-embedded { position: relative; inset: auto; z-index: auto; height: 100%; min-height: 0; border-left: 1px solid var(--line, #E6E4DE); }
+.pc-embedded .pc-pages { padding: 20px 12px 40px; }
+/* incorporato: pannelli a scomparsa e barra compatta, come sugli schermi stretti */
+.pc-embedded .pc-brand, .pc-embedded .pc-bar { display: none !important; }
+.pc-embedded .pc-side { position: absolute; z-index: 5; top: 0; bottom: 0; left: 0; transform: translateX(-102%); transition: transform .3s var(--ease, ease); width: min(340px, 90%); box-shadow: 10px 0 40px rgba(0,0,0,.18); }
+.pc-embedded .pc-side.open { transform: none; }
+.pc-embedded .pc-scrim { display: block; position: absolute; inset: 0; background: rgba(0,0,0,.25); z-index: 4; opacity: 0; pointer-events: none; transition: opacity .3s; }
+.pc-embedded .pc-scrim.open { opacity: 1; pointer-events: auto; }
+.pc-embedded .pc-side-toggle { display: inline-grid !important; }
 .pc-top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface, #fff); border-bottom: 1px solid var(--line, #E6E4DE); flex: none; min-width: 0; }
 .pc-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .pc-brand h1 { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 600; font-size: 22px; line-height: 1; margin: 0; white-space: nowrap; }
@@ -618,6 +627,7 @@ const printCss = `
   html, body { background: #fff !important; overflow: visible !important; height: auto !important; margin: 0 !important; padding: 0 !important; }
   body > *:not(.pc-overlay), body > #root { display: none !important; height: 0 !important; overflow: hidden !important; }
   .pc-overlay, .pc-overlay * { visibility: visible !important; }
+  .pc-embedded { height: auto !important; border: 0 !important; }
   .pc-overlay { position: static !important; display: block !important; background: #fff !important; overflow: visible !important; }
   .pc-top, .pc-tools, .pc-side, .pc-scrim, .pc-toast, .pc-pagelabel, .pc-measure, .pc-overlay .pc-flow .pc-pb { display: none !important; }
   .pc-main, .pc-desk { display: block !important; overflow: visible !important; position: static !important; }
@@ -634,4 +644,9 @@ const printCss = `
 }
 `;
 
-export const printCenterCss = uiCss + sheetCss + chartsCss + trainingDocCss + layoutCss + printCss;
+// Laboratorio: un solo carattere (Inter), niente corsivi né serif
+const labFontCss = `
+.pc-lab, .pc-lab *:not(i), .d-rb, .d-rb *:not(i) { font-family: 'Inter', system-ui, sans-serif !important; font-style: normal !important; }
+`;
+
+export const printCenterCss = uiCss + sheetCss + chartsCss + trainingDocCss + layoutCss + printCss + labFontCss;

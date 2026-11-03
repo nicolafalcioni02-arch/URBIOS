@@ -26,7 +26,7 @@ const newId = () => `d${Date.now().toString(36)}${seq++}`;
 // chiave delle modifiche a mano salvate: stesso documento con le stesse opzioni
 const editKey = (it) => `${it.type}:${JSON.stringify(it.opts || {})}`;
 
-export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = false, scope = null, draft = null, initial = null, onClose }) => {
+export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = false, scope = null, draft = null, initial = null, embedded = false, onClose }) => {
     const patient = useMemo(() => freshPatient(db, patient0), [db, patient0]);
     const prof = professionalFor(patient, db);
     const ctx = useMemo(() => ({ patient, db, prof, draft, scope }), [patient, db, prof, draft, scope]);
@@ -42,7 +42,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
             const s = typeof spec === 'string' ? { type: spec } : spec;
             const item = { id: newId(), type: s.type, on: true, edited: false, opts: defaultOptions(s.type, ctx, s) };
             if (DOC_TYPES[s.type].kind === 'flow') {
-                const saved = ctx.patient.stampaModifiche?.[editKey(item)];
+                const saved = s.html || ctx.patient.stampaModifiche?.[editKey(item)];
                 if (saved) Object.assign(item, { html: saved, edited: true });
                 else item.html = cleanHtml(buildHtml(item, ctx));
             }
@@ -59,6 +59,22 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
         const p = presets.find((x) => x.id === (stored.ultimoPacchetto || 'consegna')) || PRESETS[0];
         return fromTypes(p.types);
     });
+
+    // incorporato (anteprima del Laboratorio): se i dati cambiano, i documenti si rigenerano tenendo gli stessi id (niente sfarfallio)
+    const firstRun = useRef(true);
+    const initialKey = JSON.stringify(initial);
+    useEffect(() => {
+        if (!embedded) return;
+        if (firstRun.current) { firstRun.current = false; return; }
+        // con modifiche fatte a mano l'anteprima non si rigenera (le perderebbe): si ripristina dal tasto
+        setItems((old) => (old.some((it) => it.edited) || dirty.current.size ? old : regen(old)));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [db, initialKey]);
+    const regen = (old) => fromTypes(initial || []).map((it, i) => (old[i] ? { ...it, id: old[i].id } : it));
+    const rootRef = useRef(null);
+    const itemsRef = useRef(items);
+    itemsRef.current = items;
+    const handEdited = embedded && items.some((it) => it.edited);
 
     const [frags, setFrags] = useState({});
     const fragCache = useRef({});
@@ -336,6 +352,17 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
         };
         window.addEventListener('afterprint', restore);
         if (pdf) flash('Nella finestra di stampa scegli «Salva come PDF»: il nome del file è già pronto.', 'ph-file-pdf');
+        // incorporato: per stampare va portato fuori dalla pagina (la stampa nasconde tutto tranne il Centro stampa)
+        const el = rootRef.current;
+        const home = embedded && el ? { parent: el.parentNode, next: el.nextSibling } : null;
+        if (home) {
+            document.body.appendChild(el);
+            const back = () => {
+                home.parent.insertBefore(el, home.next);
+                window.removeEventListener('afterprint', back);
+            };
+            window.addEventListener('afterprint', back);
+        }
         setTimeout(() => {
             window.print();
             setTimeout(restore, 1500);
@@ -524,7 +551,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     };
 
     return ReactDOM.createPortal(
-        <div className={`pc-overlay${IS_SAFARI ? ' pc-safari' : ''}`} style={{ '--accent-ui': theme.accent }}>
+        <div className={`pc-overlay${IS_SAFARI ? ' pc-safari' : ''}${scope === 'lab' ? ' pc-lab' : ''}`} style={{ '--accent-ui': theme.accent }}>
             <style>{printCenterCss}</style>
 
             <div className="pc-top">
@@ -542,6 +569,12 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                     {busy && <span className="pc-busy" aria-hidden="true" />}
                     {busy ? 'Impagino…' : `${total} ${total === 1 ? 'foglio' : 'fogli'} A4`}
                 </span>
+                {handEdited && (
+                    <button className="pc-btn" onClick={() => { dirty.current.clear(); setItems(regen); }} title="Scarta le modifiche a mano e riparti dai dati">
+                        <i className="ph ph-arrow-counter-clockwise"></i>
+                        <span className="lbl">Ripristina dai dati</span>
+                    </button>
+                )}
                 <div className="pc-zoom">
                     <button onClick={() => setGrid((v) => !v)} aria-label="Vista d'insieme" title={grid ? 'Torna alla lettura' : "Vista d'insieme: tutti i fogli affiancati"} style={grid ? { background: '#fff' } : null}>
                         <i className={`ph ${grid ? 'ph-rows' : 'ph-squares-four'}`}></i>
@@ -567,9 +600,11 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                     <i className="ph ph-printer"></i>
                     <span className="lbl">Stampa</span>
                 </button>
-                <button className="pc-ic" onClick={close} aria-label="Chiudi il Centro stampa" title="Chiudi">
-                    <i className="ph ph-x"></i>
-                </button>
+                {!embedded && (
+                    <button className="pc-ic" onClick={close} aria-label="Chiudi il Centro stampa" title="Chiudi">
+                        <i className="ph ph-x"></i>
+                    </button>
+                )}
             </div>
 
             {menu && total > 0 && (
@@ -670,7 +705,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                     <div className="pc-flow" ref={measureFlow} />
                 </div>
             </div>
-        </div>,
-        document.body
+        </div>
     );
+    return embedded ? ui : ReactDOM.createPortal(ui, document.body);
 };

@@ -93,11 +93,10 @@ export const RecordForm = ({ section, record, lab, isNew, inline, onSave, onDele
         <>
             <div className="lab-pane-head">
                 <div className="min-w-0">
-                    <span className="lab-kicker">{isNew && !saved ? `Nuovo ${section.single}` : section.label}</span>
                     <h2 className="lab-title lab-pane-title">{section.title(d)}</h2>
                 </div>
                 <div className="lab-pane-actions">
-                    <span className="lab-saved" aria-live="polite">{!ok ? 'Compila il primo campo per salvare' : saved ? 'Salvato' : 'Salvataggio…'}</span>
+                    <span className="lab-saved" aria-live="polite">{!ok ? '' : saved ? 'Salvato' : 'Salvataggio…'}</span>
                     {ok && onPrint && <button className="lab-btn is-secondary" onClick={() => { flush(); onPrint(d); }} aria-label="Stampa"><Icon name="printer" size={16} /><span className="lab-hide-s">Stampa</span></button>}
                     {ok && <button className="lab-btn is-danger" aria-label="Elimina" onClick={() => { if (window.confirm(`Eliminare questo ${section.single}?`)) { dead.current = true; onDelete(); } }}><Icon name="trash" size={16} /><span className="lab-hide-s">Elimina</span></button>}
                     {!inline && <button className="lab-btn is-primary" onClick={() => { flush(); onClose(); }}>Fatto</button>}
