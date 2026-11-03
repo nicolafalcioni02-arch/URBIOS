@@ -82,9 +82,12 @@ export const RecordForm = ({ section, record, lab, isNew, inline, onSave, onDele
         const el = scroller.current;
         if (!el) return undefined;
         const mark = () => { hold.current = { ...hold.current, top: null, user: Date.now() }; };
+        // clic su un campo: Safari lo porta al centro anche se è già visibile, quindi si tiene ferma la posizione; clic sulla barra di scorrimento = scorre l'utente
+        const press = (e) => { if (e.target === el) mark(); else hold.current = { ...hold.current, top: el.scrollTop, until: Date.now() + 600 }; };
         el.addEventListener('scroll', restore);
-        ['wheel', 'touchstart', 'pointerdown'].forEach((ev) => el.addEventListener(ev, mark, { passive: true }));
-        return () => { el.removeEventListener('scroll', restore); ['wheel', 'touchstart', 'pointerdown'].forEach((ev) => el.removeEventListener(ev, mark)); };
+        el.addEventListener('pointerdown', press, { passive: true });
+        ['wheel', 'touchstart'].forEach((ev) => el.addEventListener(ev, mark, { passive: true }));
+        return () => { el.removeEventListener('scroll', restore); el.removeEventListener('pointerdown', press); ['wheel', 'touchstart'].forEach((ev) => el.removeEventListener(ev, mark)); };
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
