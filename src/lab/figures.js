@@ -204,7 +204,7 @@ export const chartSvg = (c) => {
 // cuts: [{ dir: 'v'|'h', pos }] (taglia la foto in parti), hide: { v: [n parte], h: [n parte] }, gap (px tra le parti),
 // proc: { l, t, r, b (% ritaglio), rot (0|90|180|270), deg (raddrizza, gradi), gray, invert, bright, contr (-100..100), tint },
 // style: { title, lanes, ladder, marks (colori), size (corsie), size2 (marcatori e bande) } }
-export const defaultProc = () => ({ l: 0, t: 0, r: 0, b: 0, rot: 0, deg: 0, gray: false, invert: false, bright: 0, contr: 0, tint: '' });
+export const defaultProc = () => ({ l: 0, t: 0, r: 0, b: 0, rot: 0, deg: 0, gray: false, invert: false, bright: 0, contr: 0, tint: '', flat: 0, denoise: 0, local: 0, lo: 0, hi: 255, zones: [], curve: null });
 export const gelStyle = (g) => ({ title: '#121317', lanes: '#121317', ladder: '#121317', marks: '#121317', size: 11.5, size2: 11, ...(g.style || {}) });
 export const emptyGel = () => ({ img: '', src: '', w: 0, h: 0, title: '', lanes: ['M', '1', '2', '3'], x0: 8, x1: 92, laneDx: [], tilt: 0, angle: 45, ladder: [], marks: [], cuts: [], hide: {}, gap: 8, proc: defaultProc(), style: {} });
 export const hasGel = (g) => Boolean(g && g.img);
@@ -215,14 +215,80 @@ export const LADDERS = [
 ];
 
 // lavora la foto: raddrizza/ruota, ritaglia, grigi, inverti, luminosità, contrasto, colore (pixel a mano: Safari non supporta ctx.filter)
-export const processGel = (src, p, noCrop) => new Promise((resolve) => {
-    const im = new Image();
-    im.onerror = () => resolve({ img: src, w: 4, h: 3 });
-    im.onload = () => {
+// sfocatura a scatola (finestra mobile, separabile) su un canale: serve a ridurre il rumore, stimare il fondo e il contrasto locale
+const boxBlur = (src, w, h, r) => {
+    const tmp = new Float32Array(src.length); const out = new Float32Array(src.length);
+    const run = (a, b, len, step, n2, outer) => {
+        for (let o = 0; o < outer; o++) {
+            let sum = 0; const base = o * (step === 1 ? len : 1);
+            const at = (i) => a[base + Math.min(len - 1, Math.max(0, i)) * step];
+            for (let i = -r; i <= r; i++) sum += at(i);
+            for (let i = 0; i < len; i++) { b[base + i * step] = sum / (2 * r + 1); sum += at(i + r + 1) - at(i - r); }
+        }
+    };
+    run(src, tmp, w, 1, 0, h); run(tmp, out, h, w, 0, w);
+    return out;
+};
+const channels = (px, n3) => [0, 1, 2].map((k) => { const a = new Float32Array(n3); for (let i = 0; i < n3; i++) a[i] = px[i * 4 + k]; return a; });
+const clamp255 = (v) => (v < 0 ? 0 : v > 255 ? 255 : v);
+
+// curva dei toni: punti [ingresso, uscita] 0-255 uniti da una curva morbida (monotona); restituisce la tabella di 256 valori
+export const curveLut = (pts) => {
+    const lut = new Float32Array(256);
+    const p = [...(pts || [])].sort((a, b) => a[0] - b[0]);
+    if (!p.length) { for (let i = 0; i < 256; i++) lut[i] = i; return lut; }
+    if (p[0][0] > 0) p.unshift([0, p[0][1]]);
+    if (p[p.length - 1][0] < 255) p.push([255, p[p.length - 1][1]]);
+    const n2 = p.length; const dx = []; const m = []; const t = new Array(n2).fill(0);
+    for (let i = 0; i < n2 - 1; i++) { dx[i] = Math.max(0.0001, p[i + 1][0] - p[i][0]); m[i] = (p[i + 1][1] - p[i][1]) / dx[i]; }
+    t[0] = m[0]; t[n2 - 1] = m[n2 - 2];
+    for (let i = 1; i < n2 - 1; i++) t[i] = m[i - 1] * m[i] <= 0 ? 0 : (m[i - 1] + m[i]) / 2;
+    for (let i = 0; i < n2 - 1; i++) {
+        if (m[i] === 0) { t[i] = 0; t[i + 1] = 0; continue; }
+        const a = t[i] / m[i]; const b = t[i + 1] / m[i]; const h = Math.hypot(a, b);
+        if (h > 3) { t[i] = (3 * a * m[i]) / h; t[i + 1] = (3 * b * m[i]) / h; }
+    }
+    let seg = 0;
+    for (let x = 0; x < 256; x++) {
+        while (seg < n2 - 2 && x > p[seg + 1][0]) seg++;
+        const h = dx[seg]; const u = (x - p[seg][0]) / h;
+        const h00 = 2 * u ** 3 - 3 * u ** 2 + 1; const h10 = u ** 3 - 2 * u ** 2 + u; const h01 = -2 * u ** 3 + 3 * u ** 2; const h11 = u ** 3 - u ** 2;
+        lut[x] = Math.max(0, Math.min(255, h00 * p[seg][1] + h10 * h * t[seg] + h01 * p[seg + 1][1] + h11 * h * t[seg + 1]));
+    }
+    return lut;
+};
+
+// maschera a due zone: ogni zona ha le sue regolazioni di colore
+export const zoneDef = () => ({ bright: 0, contr: 0, sat: 0, gray: false, invert: false, tint: '' });
+const zoneFn = (Z) => {
+    const cf = (259 * (Z.contr * 2.55 + 255)) / (255 * (259 - Z.contr * 2.55));
+    const t = Z.tint ? [parseInt(Z.tint.slice(1, 3), 16), parseInt(Z.tint.slice(3, 5), 16), parseInt(Z.tint.slice(5, 7), 16)] : null;
+    const sk = 1 + (Z.sat || 0) / 100; const bo = Z.bright * 2.55;
+    return (r, g, b, o) => {
+        const y = 0.299 * r + 0.587 * g + 0.114 * b;
+        if (Z.gray || t) { r = y; g = y; b = y; } else if (sk !== 1) { r = y + (r - y) * sk; g = y + (g - y) * sk; b = y + (b - y) * sk; }
+        r = cf * (r - 128) + 128 + bo; g = cf * (g - 128) + 128 + bo; b = cf * (b - 128) + 128 + bo;
+        if (Z.invert) { r = 255 - r; g = 255 - g; b = 255 - b; }
+        if (t) { const k = clamp255(r) / 255; r = t[0] * k; g = t[1] * k; b = t[2] * k; }
+        o[0] = r; o[1] = g; o[2] = b;
+    };
+};
+
+// l'ultima foto decodificata resta in memoria: i cursori non la rileggono a ogni passo
+let imgCache = { src: '', im: null };
+const loadImg = (src) => new Promise((res, rej) => {
+    if (imgCache.src === src && imgCache.im) { res(imgCache.im); return; }
+    const im = new Image(); im.onload = () => { imgCache = { src, im }; res(im); }; im.onerror = rej; im.src = src;
+});
+
+export const processGel = (src, p, noCrop, maxDim) => new Promise((resolve) => {
+    loadImg(src).catch(() => null).then((im) => {
+        if (!im) { resolve({ img: src, w: 4, h: 3 }); return; }
         const P = { ...defaultProc(), ...(p || {}) };
         if (noCrop) { P.l = 0; P.t = 0; P.r = 0; P.b = 0; }
-        const sw = im.width; const sh = im.height;
-        if (!P.l && !P.t && !P.r && !P.b && !P.rot && !P.deg && !P.gray && !P.invert && !P.bright && !P.contr && !P.tint) { resolve({ img: src, w: sw, h: sh }); return; }
+        const sc = maxDim ? Math.min(1, maxDim / Math.max(im.width, im.height)) : 1;
+        const sw = Math.max(1, Math.round(im.width * sc)); const sh = Math.max(1, Math.round(im.height * sc));
+        if (!P.l && !P.t && !P.r && !P.b && !P.rot && !P.deg && !P.gray && !P.invert && !P.bright && !P.contr && !P.tint && !P.flat && !P.denoise && !P.local && !P.lo && P.hi >= 255 && !(P.zones && P.zones.length) && !(P.curve && P.curve.length)) { resolve({ img: src, w: sw, h: sh }); return; }
         const rad = (((P.rot + Number(P.deg || 0)) % 360) * Math.PI) / 180;
         const co = Math.abs(Math.cos(rad)); const si = Math.abs(Math.sin(rad));
         const bw = Math.ceil(sw * co + sh * si); const bh = Math.ceil(sw * si + sh * co);
@@ -230,7 +296,7 @@ export const processGel = (src, p, noCrop) => new Promise((resolve) => {
         c1.width = bw; c1.height = bh;
         const g1 = c1.getContext('2d');
         g1.fillStyle = '#fff'; g1.fillRect(0, 0, bw, bh);
-        g1.translate(bw / 2, bh / 2); g1.rotate(rad); g1.drawImage(im, -sw / 2, -sh / 2);
+        g1.translate(bw / 2, bh / 2); g1.rotate(rad); g1.drawImage(im, -sw / 2, -sh / 2, sw, sh);
         const cx = Math.round((bw * P.l) / 100); const cy = Math.round((bh * P.t) / 100);
         const cw = Math.max(8, Math.round(bw * (1 - (P.l + P.r) / 100))); const ch = Math.max(8, Math.round(bh * (1 - (P.t + P.b) / 100)));
         const c = document.createElement('canvas');
@@ -239,6 +305,26 @@ export const processGel = (src, p, noCrop) => new Promise((resolve) => {
         g.drawImage(c1, cx, cy, cw, ch, 0, 0, cw, ch);
         const d = g.getImageData(0, 0, cw, ch);
         const px = d.data;
+        // filtri spaziali (prima di luminosità e contrasto): riduzione del rumore, fondo piatto, contrasto locale
+        const n3 = cw * ch; const big = Math.max(8, Math.round(Math.max(cw, ch) / 12)); const mid = Math.max(4, Math.round(Math.max(cw, ch) / 40));
+        if (P.denoise || P.flat || P.local) {
+            let ch3 = channels(px, n3);
+            if (P.denoise) ch3 = ch3.map((a) => boxBlur(a, cw, ch, Math.round(P.denoise)));
+            const bg = P.flat ? ch3.map((a) => boxBlur(a, cw, ch, big)) : null;
+            const lo = P.local ? ch3.map((a) => boxBlur(a, cw, ch, mid)) : null;
+            const mean = bg ? bg.map((a) => a.reduce((x, y) => x + y, 0) / n3) : null;
+            for (let k = 0; k < 3; k++) {
+                for (let i = 0; i < n3; i++) {
+                    let v = ch3[k][i];
+                    if (bg) v += (mean[k] - bg[k][i]) * (P.flat / 100);
+                    if (lo) v += (ch3[k][i] - lo[k][i]) * (P.local / 25);
+                    px[i * 4 + k] = clamp255(v);
+                }
+            }
+        }
+        // livelli: il nero sta a «lo», il bianco a «hi»
+        if (P.lo > 0 || P.hi < 255) { const k = 255 / Math.max(10, P.hi - P.lo); for (let i = 0; i < px.length; i += 4) { px[i] = clamp255((px[i] - P.lo) * k); px[i + 1] = clamp255((px[i + 1] - P.lo) * k); px[i + 2] = clamp255((px[i + 2] - P.lo) * k); } }
+        if (P.curve && P.curve.length) { const lut = curveLut(P.curve); for (let i = 0; i < px.length; i += 4) { px[i] = lut[Math.round(clamp255(px[i]))]; px[i + 1] = lut[Math.round(clamp255(px[i + 1]))]; px[i + 2] = lut[Math.round(clamp255(px[i + 2]))]; } }
         const cf = (259 * (P.contr * 2.55 + 255)) / (255 * (259 - P.contr * 2.55));
         const t = P.tint ? [parseInt(P.tint.slice(1, 3), 16), parseInt(P.tint.slice(3, 5), 16), parseInt(P.tint.slice(5, 7), 16)] : null;
         for (let i = 0; i < px.length; i += 4) {
@@ -249,10 +335,30 @@ export const processGel = (src, p, noCrop) => new Promise((resolve) => {
             if (t) { const k = Math.max(0, Math.min(255, r)) / 255; r = t[0] * k; gg = t[1] * k; b = t[2] * k; }
             px[i] = r; px[i + 1] = gg; px[i + 2] = b;
         }
+        // zone a mano libera (rettangolo, ellisse, poligono): ognuna con le sue regolazioni, bordo sfumabile
+        (P.zones || []).forEach((Z) => {
+            const mc = document.createElement('canvas'); mc.width = cw; mc.height = ch;
+            const m = mc.getContext('2d'); m.fillStyle = '#000'; m.fillRect(0, 0, cw, ch); m.fillStyle = '#fff'; m.beginPath();
+            const X = (v) => (v / 100) * cw; const Y = (v) => (v / 100) * ch;
+            if (Z.type === 'poly') (Z.pts || []).forEach((q, i) => (i ? m.lineTo(X(q[0]), Y(q[1])) : m.moveTo(X(q[0]), Y(q[1]))));
+            else if (Z.type === 'ell') m.ellipse(X((Z.x0 + Z.x1) / 2), Y((Z.y0 + Z.y1) / 2), Math.max(1, Math.abs(X(Z.x1) - X(Z.x0)) / 2), Math.max(1, Math.abs(Y(Z.y1) - Y(Z.y0)) / 2), 0, 0, Math.PI * 2);
+            else m.rect(X(Math.min(Z.x0, Z.x1)), Y(Math.min(Z.y0, Z.y1)), Math.abs(X(Z.x1) - X(Z.x0)), Math.abs(Y(Z.y1) - Y(Z.y0)));
+            m.closePath(); m.fill();
+            const md = m.getImageData(0, 0, cw, ch).data; let a = new Float32Array(cw * ch);
+            for (let i = 0; i < a.length; i++) a[i] = md[i * 4];
+            const fr = Math.round(((Z.feather || 0) / 100) * Math.max(cw, ch) / 2);
+            if (fr > 0) { a = boxBlur(a, cw, ch, fr); a = boxBlur(a, cw, ch, Math.max(1, Math.round(fr / 2))); }
+            const fz = zoneFn({ ...zoneDef(), ...Z.adj }); const o = [0, 0, 0];
+            for (let i = 0; i < a.length; i++) {
+                let w = a[i] / 255; if (Z.inv) w = 1 - w;
+                if (w <= 0.002) continue;
+                const j = i * 4; fz(px[j], px[j + 1], px[j + 2], o);
+                for (let k = 0; k < 3; k++) px[j + k] = clamp255(px[j + k] + (o[k] - px[j + k]) * w);
+            }
+        });
         g.putImageData(d, 0, 0);
-        resolve({ img: c.toDataURL('image/jpeg', 0.9), w: cw, h: ch });
-    };
-    im.src = src;
+        resolve({ img: c.toDataURL('image/jpeg', maxDim ? 0.7 : 0.9), w: cw, h: ch });
+    });
 });
 
 // un asse (larghezza o altezza) diviso dai tagli in parti; f: % della foto -> pixel del disegno, inv: il contrario
@@ -285,6 +391,14 @@ const axis = (g, dir, len) => {
     return { segs, total, f, inv };
 };
 
+// didascalia sotto il gel: a capo in righe di larghezza proporzionata al disegno
+const capLines = (g, tw) => {
+    const t = String(g.caption || '').trim(); if (!t) return [];
+    const max = Math.max(20, Math.floor(tw / 5.6)); const out = [];
+    t.split('\n').forEach((par) => { let line = ''; par.split(/\s+/).forEach((w) => { if ((line + ' ' + w).trim().length > max) { out.push(line); line = w; } else line = (line + ' ' + w).trim(); }); out.push(line); });
+    return out;
+};
+
 // misure del disegno (servono anche all'editor per tradurre un clic in posizione sul gel)
 export const gelLayout = (g) => {
     const Wb = 420;
@@ -292,11 +406,13 @@ export const gelLayout = (g) => {
     const ax = axis(g, 'v', Wb); const ay = axis(g, 'h', Hb);
     const st = gelStyle(g);
     const ang = Number(g.angle) || 0;
-    const mt = (g.title ? 24 : 8) + (ang === 0 ? st.size + 10 : ang === 45 ? st.size * 4.4 + 6 : st.size * 5.4 + 6);
+    const rad = (ang * Math.PI) / 180; const longest = Math.max(1, ...(g.lanes || []).map((l) => String(l).length));
+    const labH = Math.ceil(st.size * Math.cos(rad) + longest * st.size * 0.58 * Math.sin(rad)) + 6; // altezza reale delle etichette corsia
+    const mt = (g.title ? 22 : 6) + labH;
     const ml = (g.ladder || []).length ? 62 : 14;
     const mr = (g.marks || []).length ? 120 : 14;
     const shift = (Math.tan(((Number(g.tilt) || 0) * Math.PI) / 180) * Hb) / Wb * 100; // spostamento (% larghezza) della corsia dall'alto al basso
-    return { Wb, Hb, ax, ay, W: ax.total, H: ay.total, mt, ml, mr, shift, tw: ml + ax.total + mr, th: mt + ay.total + 8 };
+    return { Wb, Hb, ax, ay, W: ax.total, H: ay.total, mt, ml, mr, shift, tw: ml + ax.total + mr, th: mt + ay.total + 8 + capLines(g, ml + ax.total + mr).length * 13 };
 };
 export const laneTop = (g, i) => n(g.x0) + ((n(g.x1) - n(g.x0)) * (i + 0.5)) / Math.max(1, (g.lanes || []).length) + n((g.laneDx || [])[i]);
 
@@ -315,7 +431,7 @@ export const gelSvg = (g, opt = {}) => {
     }));
     if (opt.guides) {
         (g.cuts || []).forEach((c) => { b += c.dir === 'v' ? `<line x1="${X(n(c.pos))}" x2="${X(n(c.pos))}" y1="${mt - 4}" y2="${mt + H + 4}" stroke="#C2413A" stroke-dasharray="4 3"/>` : `<line y1="${Y(n(c.pos))}" y2="${Y(n(c.pos))}" x1="${ml - 4}" x2="${ml + W + 4}" stroke="#C2413A" stroke-dasharray="4 3"/>`; });
-        lanes.forEach((_, i) => { const p = laneTop(g, i); b += `<line x1="${X(p)}" x2="${X(p + L.shift)}" y1="${mt}" y2="${mt + H}" stroke="#2F54EB" stroke-width="1" stroke-dasharray="3 3" opacity=".75"/>`; });
+        lanes.forEach((_, i) => { const p = laneTop(g, i); b += `<line x1="${X(p)}" x2="${X(p + L.shift)}" y1="${mt}" y2="${mt + H}" stroke="#121317" stroke-width="1" stroke-dasharray="3 3" opacity=".75"/>`; });
     }
     if (g.title) b += `<text x="${ml + W / 2}" y="16" text-anchor="middle" font-size="13" font-weight="600" fill="${st.title}" ${fs}>${esc(g.title)}</text>`;
     lanes.forEach((l, i) => {
@@ -332,7 +448,8 @@ export const gelSvg = (g, opt = {}) => {
         const y = Y(n(m.y)); const x = X(n(m.x)); const col = m.color || st.marks;
         b += `<line x1="${x}" x2="${ml + W + 8}" y1="${y}" y2="${y}" stroke="${col}" stroke-width="1"/><circle cx="${x}" cy="${y}" r="2.2" fill="${col}"/><text x="${ml + W + 12}" y="${y + st.size2 / 3}" font-size="${st.size2}" fill="${col}" ${fs}>${esc(m.text)}</text>`;
     });
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${tw} ${th}" width="100%" role="img">${b}</svg>`;
+    capLines(g, tw).forEach((ln, i) => { b += `<text x="${ml}" y="${mt + H + 20 + i * 13}" font-size="10.5" fill="${st.title}" ${fs}>${esc(ln)}</text>`; });
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${tw} ${th}" width="${opt.px || '100%'}"${opt.px ? ` height="${Math.round((opt.px * th) / tw)}"` : ''} role="img">${b}</svg>`;
 };
 
 // HTML della figura per anteprima e stampa
@@ -355,3 +472,15 @@ export const chartNotes = (c) => {
     }
     return h;
 };
+
+// PNG ad alta risoluzione: con etichette (gelSvg) o solo la foto lavorata
+export const gelPng = (g, withLabels, px = 2400) => new Promise((resolve) => {
+    const im = new Image();
+    im.onload = () => {
+        const c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
+        const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0);
+        c.toBlob(resolve, 'image/png');
+    };
+    im.onerror = () => resolve(null);
+    im.src = withLabels ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(gelSvg(g, { px }))}` : g.img;
+});

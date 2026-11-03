@@ -3,12 +3,56 @@ import { Icon } from '../ui/icons';
 import { RecordForm } from '../RecordForm';
 import { NotebookPreview } from './NotebookPreview';
 
+const MESI = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+const pad = (n) => String(n).padStart(2, '0');
+
+// Calendario in sola lettura: i giorni con almeno un esperimento sono segnati; toccando un giorno compaiono i titoli.
+const ExperimentCalendar = ({ items, onClose }) => {
+    const today = new Date();
+    const [y, setY] = useState(today.getFullYear());
+    const [m, setM] = useState(today.getMonth());
+    const [day, setDay] = useState('');
+    const byDay = useMemo(() => {
+        const o = {};
+        items.forEach((r) => { if (r.data) (o[r.data.slice(0, 10)] ||= []).push(r); });
+        return o;
+    }, [items]);
+    const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+    const n = new Date(y, m + 1, 0).getDate();
+    const go = (d) => { const t = new Date(y, m + d, 1); setY(t.getFullYear()); setM(t.getMonth()); setDay(''); };
+    const key = (d) => `${y}-${pad(m + 1)}-${pad(d)}`;
+    const shown = day ? byDay[day] || [] : [];
+    return (
+        <>
+            <div className="lab-pop-back" onClick={onClose} />
+            <div className="lab-pop lab-cal" role="dialog" aria-label="Calendario esperimenti">
+                <div className="lab-cal-head">
+                    <button type="button" onClick={() => go(-1)} aria-label="Mese precedente"><Icon name="chevron-left" size={16} /></button>
+                    <b>{MESI[m]} {y}</b>
+                    <button type="button" onClick={() => go(1)} aria-label="Mese successivo"><Icon name="chevron-right" size={16} /></button>
+                </div>
+                <div className="lab-cal-grid">
+                    {['L', 'M', 'M', 'G', 'V', 'S', 'D'].map((d, i) => <span key={i}>{d}</span>)}
+                    {Array.from({ length: lead }, (_, i) => <i key={`e${i}`} />)}
+                    {Array.from({ length: n }, (_, i) => {
+                        const k = key(i + 1);
+                        const has = !!byDay[k];
+                        return <button type="button" key={k} className={`lab-cal-d${has ? ' has' : ''}${day === k ? ' sel' : ''}`} onClick={() => has && setDay(day === k ? '' : k)} aria-label={has ? `${i + 1} ${MESI[m]}: ${byDay[k].length} esperimenti` : undefined}>{i + 1}</button>;
+                    })}
+                </div>
+                {shown.length > 0 && <div className="lab-cal-list">{shown.map((r) => <p key={r.id}>{r.titolo || 'Esperimento senza titolo'}{r.codice && <small> · {r.codice}</small>}</p>)}</div>}
+            </div>
+        </>
+    );
+};
+
 // Una sezione: elenco (ricerca, filtri, selezione per stampare) e, accanto, l'editor (schermi larghi) o a finestra (telefono/tablet).
 // Il record aperto è `sel = { record, isNew }`.
 export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, onDelete, onPrint, onBlank, onExcel, db, vol, setVol }) => {
     const [q, setQ] = useState('');
     const [group, setGroup] = useState('');
     const [fopen, setFopen] = useState(false);
+    const [calOpen, setCalOpen] = useState(false);
     const [picked, setPicked] = useState([]);
     const all = lab[section.key];
 
@@ -38,7 +82,13 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
                             <h1 className="lab-title">{section.label}</h1>
                         </div>
                         <div className="lab-head-btns">
-                            <button className="lab-btn is-secondary is-sm is-ico" disabled={!list.length} onClick={onExcel} aria-label="Esporta in Excel" title="Esporta in Excel"><Icon name="table" size={17} /></button>
+                            {section.key === 'quaderno' && (
+                                <div className="lab-filterwrap">
+                                    <button type="button" className="lab-btn is-secondary is-sm is-ico" aria-expanded={calOpen} aria-label="Calendario esperimenti" title="Calendario esperimenti" onClick={() => setCalOpen((o) => !o)}><Icon name="calendar" size={17} /></button>
+                                    {calOpen && <ExperimentCalendar items={all} onClose={() => setCalOpen(false)} />}
+                                </div>
+                            )}
+                            <button className="lab-btn is-ok is-sm is-ico" disabled={!list.length} onClick={onExcel} aria-label="Esporta in Excel" title="Esporta in Excel"><Icon name="table" size={17} /></button>
                             <button className="lab-btn is-primary is-sm is-ico" onClick={onNew} aria-label={`Nuovo ${section.single}`} title={`Nuovo ${section.single}`}><Icon name="plus" size={17} /></button>
                         </div>
                     </header>
