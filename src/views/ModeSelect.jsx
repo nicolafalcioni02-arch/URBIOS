@@ -13,13 +13,13 @@ export const ModeSelect = ({ data, onSelect, onExit }) => {
     const compact = useCompact(639);
     const nome = [data?.utente?.nome, data?.utente?.cognome].filter(Boolean).join(' ');
     return (
-        <div className="h-screen w-full bg-[var(--paper)] overflow-y-auto font-sans">
-            <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 flex flex-col" style={{ minHeight: '100%', paddingTop: compact ? 'calc(20px + env(safe-area-inset-top))' : 48, paddingBottom: compact ? 'calc(24px + env(safe-area-inset-bottom))' : 48 }}>
-                <div className="flex items-center justify-between rise">
+        <div className="h-screen w-full bg-[var(--paper)] overflow-y-auto font-sans relative">
+            <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 flex flex-col" style={{ minHeight: '100%', paddingTop: 0, paddingBottom: 0 }}>
+                <div className="flex items-center justify-between rise absolute left-0 right-0 top-0 px-4 sm:px-6 max-w-3xl mx-auto" style={{ paddingTop: compact ? 'calc(20px + env(safe-area-inset-top))' : 48 }}>
                     <span className="inline-flex items-center gap-2.5 text-[13px] font-semibold tracking-[0.32em] text-[color:var(--ink)]"><UrbiosLogo size={26} />URBIOS</span>
                     {onExit && <button onClick={onExit} className="home-quiet" aria-label="Esci"><i className="ph ph-sign-out"></i>{!compact && <span>Esci</span>}</button>}
                 </div>
-                <div className="flex-1 flex flex-col justify-center py-10">
+                <div className="flex-1 flex flex-col justify-center py-24">
                     <p className="text-sm text-[color:var(--muted)] mb-1 rise">{nome ? `Ciao ${nome}` : 'Ciao'}</p>
                     <h1 className="display text-[30px] sm:text-[40px] text-[color:var(--ink)] mb-8 rise">Dove vuoi lavorare?</h1>
                     <div className="home-list stagger flex flex-col gap-2">

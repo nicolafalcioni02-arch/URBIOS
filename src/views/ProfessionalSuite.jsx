@@ -320,8 +320,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb, onSwitchArea }) => {
                         <BarBtn icon="ph-dog" label="Pets" note="presto" onClick={() => setPetsOpen(true)} />
                         <BarBtn icon="ph-chef-hat" label="Chef" onClick={() => setChef(true)} />
                         <BarBtn icon="ph-chart-line" label="Ricerca" note="anteprima" onClick={() => setResearch(true)} />
-                        <BarBtn icon={<InvoiceIcon size="1.3em" />} label="Contabilità" onClick={() => setInvoices(true)} />
-                        {onSwitchArea && <BarBtn icon="ph-swap" label="Cambia area" onClick={onSwitchArea} />}
+                        <BarBtn icon={<InvoiceIcon size="22px" />} label="Contabilità" onClick={() => setInvoices(true)} />
                         <BarBtn icon="ph-calendar-dots" label="Agenda" badge={todayAppts || null} onClick={() => setAgenda({ date: dateKey(new Date()) })} />
                         <BarBtn icon={widgetsEditing ? 'ph-check' : 'ph-squares-four'} label={widgetsEditing ? 'Fine' : 'Widget'} onClick={() => setWidgetsEditing((v) => !v)} className="max-[1359px]:!hidden" />
                         <BarBtn icon="ph-gear" label="Impostazioni" onClick={() => setShowSettings(true)} />
@@ -331,6 +330,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb, onSwitchArea }) => {
                                 <span>Salva</span>
                             </button>
                         )}
+                        {onSwitchArea && <BarBtn icon="ph-swap" label="Cambia area" onClick={onSwitchArea} />}
                         <BarBtn icon="ph-sign-out" label="Esci" onClick={openExitDialog} />
                     </div>
                 </div>

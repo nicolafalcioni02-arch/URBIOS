@@ -79,3 +79,26 @@ export const massForMolar = ({ molarita, volume, pm }) => {
     const m = num(molarita), v = num(volume), p = num(pm);
     return m !== null && v !== null && p !== null ? m * v * p : null;
 };
+
+// Panoramica della home: tutto ciò che richiede attenzione, calcolato dai dati
+export const overview = (lab) => {
+    const st = lab.magazzino.map((r) => ({ r, s: stockState(r) }));
+    const pick = (id) => st.filter((x) => x.s.id === id).map((x) => x.r);
+    return {
+        scaduti: pick('scaduto'),
+        scorta: pick('scorta'),
+        scadenza: pick('scadenza'),
+        inCorso: lab.quaderno.filter((r) => r.stato === 'In corso' || r.stato === 'Da ripetere'),
+        campioniAperti: lab.campioni.filter((c) => c.stato === 'Ricevuto' || c.stato === 'In lavorazione'),
+        bozze: lab.protocolli.filter((p) => p.stato === 'Bozza'),
+        daLeggere: lab.articoli.filter((a) => a.lettura === 'Da leggere' || a.lettura === 'In lettura'),
+        recenti: [...lab.quaderno].sort((a, b) => String(b.data || '').localeCompare(String(a.data || ''))).slice(0, 5),
+    };
+};
+
+// ricerca su tutto il laboratorio: [{ key, rec }]
+export const searchAll = (lab, sections, q, max = 12) => {
+    const s = q.trim().toLowerCase();
+    if (s.length < 2) return [];
+    return sections.flatMap((sec) => lab[sec.key].filter((r) => sec.search(r).includes(s)).map((rec) => ({ key: sec.key, rec }))).slice(0, max);
+};
