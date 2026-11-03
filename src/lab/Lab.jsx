@@ -8,6 +8,7 @@ import { RecordForm } from './RecordForm';
 import { Calc } from './Calc';
 import { Icon } from './ui/icons';
 import { Home } from './parts/Home';
+import { labIsEmpty, loadExample } from './exampleData';
 import { Sidebar, NAV } from './parts/Sidebar';
 import { SectionView } from './parts/SectionView';
 import { labStyles } from './labStyles';
@@ -45,7 +46,7 @@ const LabInner = ({ db, onUpdateDb, onBack }) => {
     const excelAll = () => downloadXlsx(`laboratorio-${stamp()}.xlsx`, sheetsFor(lab));
 
     let main;
-    if (view === 'home') main = <Home ov={ov} onOpen={open} onNew={create} />;
+    if (view === 'home') main = <Home ov={ov} empty={labIsEmpty(lab)} onExample={() => loadExample(onUpdateDb)} onOpen={open} onNew={create} />;
     else if (view === 'calcoli') main = <div className="lab-page"><header className="lab-page-head"><div><h1 className="lab-title">Calcoli</h1></div></header><Calc /></div>;
     else main = (
         <SectionView
