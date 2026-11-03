@@ -13,7 +13,7 @@ const Chart = ({ chart, onChange }) => {
     const addSeries = () => set({ series: [...c.series, { name: `Serie ${c.series.length + 1}`, vals: c.cats.map(() => '') }] });
     const pie = c.type === 'pie';
     const cols = pie ? 1 : c.series.length;
-    const tpl = `minmax(0,1.3fr) ${Array(cols).fill('minmax(0,1fr)').join(' ')} 34px`;
+    const tpl = `minmax(40px,1.2fr) ${Array(cols).fill('minmax(52px,1fr)').join(' ')} 26px`;
     return (
         <div className="lab-chart">
             <div className="lab-chart-top">

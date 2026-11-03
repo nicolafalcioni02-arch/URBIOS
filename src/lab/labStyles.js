@@ -162,7 +162,9 @@ html[data-look='vetro'] .lab-side{--lab-side-bg:radial-gradient(52vmax 44vmax at
 .lab-sheet{display:grid;gap:4px}.lab-sheet-row{display:grid;grid-template-columns:var(--tpl);gap:4px;align-items:center}
 .lab-chart-hint{font-size:12.5px;color:var(--muted);margin:0}
 .lab-sheet{padding:8px;background:var(--soft);border-radius:10px}
-.lab-sheet .fld{background:var(--surface);border:1px solid var(--line);min-width:0}
+.lab-sheet .fld{background:var(--surface);border:1px solid var(--line);min-width:0;padding:0 6px}
+.lab-sheet .lab-x{width:26px}
+.lab-sheet{overflow-x:auto}
 .lab-sheet-h{font-size:12px;font-weight:600;color:var(--muted)}
 .lab-sheet-name{font-weight:600;text-align:center}
 .lab-sheet-row input:focus{border-color:var(--accent);outline:none}
