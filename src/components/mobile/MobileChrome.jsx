@@ -78,7 +78,7 @@ export const ActionSheet = ({ title, subtitle, groups, onClose }) => {
                     <div key={i} className="m-group m-sheet-group" style={{ '--i': i }}>
                         {g.map((it) => (
                             <button key={it.label} className={`m-sheet-row ${it.tone || ''}`} disabled={it.disabled} style={{ '--n': n++ }} onClick={() => close(it.onClick)}>
-                                <i className={`ph ${it.icon}`}></i>
+                                {typeof it.icon === 'string' ? <i className={`ph ${it.icon}`}></i> : it.icon}
                                 <span className="flex-1 text-left">{it.label}</span>
                                 {it.note && <span className="m-sheet-note">{it.note}</span>}
                             </button>

@@ -16,16 +16,9 @@ export default defineConfig({
         inlineDynamicImports: true, // IMPORTANTE: Impedisce a React di spezzettare il codice JS in più file
       },
     },
-    minify: 'terser', // Ottimizzazione massima
-    terserOptions: {
-      compress: {
-        // IMPORTANTE: Questo protegge le tue formule personalizzate
-        // Impedisce al computer di cambiare nome alle variabili 'peso', 'altezza' ecc.
-        keep_fnames: true, 
-      },
-      mangle: {
-        keep_fnames: true, // Protezione doppia per le tue formule matematiche
-      }
-    }
-  }
+    minify: 'esbuild', // Terser esauriva la memoria; esbuild è molto più leggero
+  },
+  esbuild: {
+    keepNames: true, // Mantiene i nomi di funzioni e variabili delle formule
+  },
 });

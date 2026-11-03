@@ -13,6 +13,9 @@ export const researchStyles = `
 .rs-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--ink); }
 .rs-table td.n, .rs-table th.n { text-align: right; }
 .rs-table tr:last-child td { border-bottom: 0; }
+.rs-table.rs-cat { table-layout: fixed; }
+.rs-table.rs-cat td:nth-child(2) { width: 56px; }
+.rs-table.rs-cat td:nth-child(3) { width: 84px; }
 .rs-scroll { overflow-x: auto; }
 .rs-h { font-weight: 600; font-size: 15px; color: var(--ink); margin: 0 0 10px; }
 .rs-muted { color: var(--muted); font-size: 13px; line-height: 1.5; }

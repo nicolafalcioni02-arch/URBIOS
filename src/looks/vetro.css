@@ -102,7 +102,6 @@ html[data-look='vetro'] .panel { border-radius: 28px; padding: 22px; }
 /* intestazione della scheda paziente e barre fisse (livello di navigazione):
    niente divisori netti, l'effetto bordo di scorrimento sfoca il contenuto che passa sotto */
 html[data-look='vetro'] .bg-\[var\(--paper\)\]\/90,
-html[data-look='vetro'] .vw-steps,
 html[data-look='vetro'] .visit-bar,
 html[data-look='vetro'] .m-nav {
     background: linear-gradient(180deg, rgba(247, 244, 236, 0.72), rgba(247, 244, 236, 0.5));
@@ -111,15 +110,85 @@ html[data-look='vetro'] .m-nav {
     border-color: transparent;
     box-shadow: 0 10px 18px -16px rgba(70, 60, 30, 0.35);
 }
+/* barra dei passi / Dieta-Training: nessun velo beige, solo sfocatura di ciò che scorre sotto */
+html[data-look='vetro'] .vw-steps {
+    background: transparent;
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(14px) saturate(1.4);
+    border-color: transparent;
+    box-shadow: none;
+}
+/* le barre del wizard stanno nella colonna centrale: i lati sfumano invece di finire a taglio netto */
+html[data-look='vetro'] :is(.vw-steps, .visit-bar) {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent);
+}
+
+/* --- AGENDA: fondo trasparente (si vede il fondo sfumato), pannelli e pillole di vetro --- */
+html[data-look='vetro'] .ag-wrap { background: transparent; }
+html[data-look='vetro'] body :is(.ag-card, .ag-main, .agm-cal, .agm-empty) {
+    background: var(--v-material);
+    -webkit-backdrop-filter: var(--v-blur);
+    backdrop-filter: var(--v-blur);
+    border-color: var(--v-edge);
+    box-shadow: var(--v-shadow);
+}
+html[data-look='vetro'] .ag-card { border-radius: 26px; padding: 18px; }
+html[data-look='vetro'] .ag-main { border-radius: 28px; padding: 20px; }
+html[data-look='vetro'] .ag-sheet { background: var(--v-material-thick); -webkit-backdrop-filter: var(--v-blur); backdrop-filter: var(--v-blur); border: 1px solid var(--v-edge); border-radius: 30px; }
+html[data-look='vetro'] .ag-work { background: rgba(255, 255, 255, 0.55); }
+html[data-look='vetro'] body :is(.ag-icon, .ag-places button, .ag-chips button, .ag-slotctl) { background: rgba(255, 255, 255, 0.7); border-color: var(--v-edge); }
+
+/* le finestre grandi (Smart Plot, ecc.) sono un solo vetro: le fasce bianche interne non ne aggiungono altro */
+html[data-look='vetro'] body .rounded-\[2rem\].bg-white > :is(.bg-white, .bg-gray-50\/50) {
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+}
+html[data-look='vetro'] body .rounded-\[2rem\].bg-white { background: var(--v-material-thick); }
+
+/* piani Dieta e Training: le card dei passi sono vetro, non bianco pieno */
+html[data-look='vetro'] body .dg-card {
+    background: var(--v-material);
+    -webkit-backdrop-filter: var(--v-blur);
+    backdrop-filter: var(--v-blur);
+    border-color: var(--v-edge);
+    box-shadow: var(--v-shadow);
+    border-radius: 26px;
+}
+
+/* .fld-label azzera il margine superiore e batte le utility mt-*: qui lo spazio tra un campo e l'etichetta successiva torna quello previsto */
+html[data-look='vetro'] .fld-label.mt-3 { margin-top: 12px; }
+html[data-look='vetro'] .fld-label.mt-4 { margin-top: 16px; }
+html[data-look='vetro'] .fld-label.mt-5 { margin-top: 20px; }
+
+/* sotto-finestre di Dieta e Training (Misure, Libro, Strumenti...): vetro smerigliato invece di carta beige piena */
+html[data-look='vetro'] body :is(.dg-modal, .t-modal-card, .modal-window, .sr-modal) {
+    background: rgba(255, 255, 255, 0.34);
+    -webkit-backdrop-filter: blur(40px) saturate(1.9);
+    backdrop-filter: blur(40px) saturate(1.9);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 30px 80px -20px rgba(70, 60, 30, 0.35);
+}
+html[data-look='vetro'] .t-modal-card h3 { font-weight: 600 !important; letter-spacing: -0.01em; }
+html[data-look='vetro'] body :is(.dg-overlay, .t-modal-overlay, .modal-backdrop) { background: rgba(255, 255, 255, 0.12); -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4); }
+/* fogli, menu a tendina, schede flottanti e vista Cucina di Chef: vetro colorato, non carta beige */
+html[data-look='vetro'] body :is(.sheet, .vd-sheet, .ch-pop, .ch-sc) { background: rgba(255, 255, 255, 0.55) !important; -webkit-backdrop-filter: blur(40px) saturate(1.9) !important; backdrop-filter: blur(40px) saturate(1.9) !important; border-color: rgba(255, 255, 255, 0.7); }
+html[data-look='vetro'] body .ch-cook { background: var(--v-bg) fixed; }
+html[data-look='vetro'] body .ch-ed .ch-top, html[data-look='vetro'] body .ch-mbox-foot { background: rgba(255, 255, 255, 0.4); -webkit-backdrop-filter: blur(22px) saturate(1.5); backdrop-filter: blur(22px) saturate(1.5); }
 
 /* --- Campi --- */
 html[data-look='vetro'] .fld {
     background: rgba(255, 255, 255, 0.55);
     border-color: rgba(255, 255, 255, 0.9);
     border-radius: 16px;
-    box-shadow: 0 1px 2px rgba(70, 60, 30, 0.05) inset;
+    box-shadow: 0 1px 2px rgba(70, 60, 30, 0.05) inset, 0 0 0 1px rgba(23, 24, 27, 0.06) inset;
     font-weight: 400;
 }
+/* su fogli e finestre bianche il campo si distingue con un velo caldo */
+html[data-look='vetro'] :is(.sheet, .ag-sheet, .bg-white, .panel) .fld:not(:focus) { background: rgba(23, 24, 27, 0.04); }
+html[data-look='vetro'] :is(.sheet, .ag-sheet, .bg-white, .panel) .fld:not(:placeholder-shown):not(:focus) { background: rgba(23, 24, 27, 0.055); }
 html[data-look='vetro'] .fld:not(:placeholder-shown):not(:focus) { background: rgba(255, 255, 255, 0.7); }
 html[data-look='vetro'] .fld:hover { border-color: #fff; }
 html[data-look='vetro'] .fld:focus {
@@ -199,18 +268,23 @@ html[data-look='vetro'] .ex-badge { background: rgba(201, 195, 242, 0.6); color:
 
 /* --- Fogli e finestre --- */
 html[data-look='vetro'] .sheet-back {
-    background: rgba(40, 36, 28, 0.22);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(10px) saturate(1.3);
+    backdrop-filter: blur(10px) saturate(1.3);
 }
-html[data-look='vetro'] .sheet {
-    background: var(--v-material-thick);
+/* `body` alza la specificità: senza, vince il materiale "regular" delle superfici e il foglio resta grigio sopra lo scrim */
+html[data-look='vetro'] body .sheet:not(.pc-main *) {
+    background: rgba(255, 255, 255, 0.5);
+    -webkit-backdrop-filter: blur(40px) saturate(1.9);
+    backdrop-filter: blur(40px) saturate(1.9);
     border: 1px solid var(--v-edge);
     border-radius: 34px 34px 0 0;
 }
 @media (min-width: 640px) {
     html[data-look='vetro'] .sheet { border-radius: 34px; }
 }
+/* finestre di dialogo sopra lo scrim scuro (Esci, Smart Plot…): materiale spesso, altrimenti il vetro leggero diventa grigio */
+html[data-look='vetro'] body .fixed .bg-white.shadow-2xl:not(.pc-main *) { background: rgba(255, 255, 255, 0.55); }
 html[data-look='vetro'] .bg-black\/50 { background: rgba(40, 36, 28, 0.25); }
 
 /* impostazioni */
@@ -255,4 +329,9 @@ html[data-look='vetro'] .text-gray-300 { color: #A6A299; }
 /* Riduci movimento: le card non si sollevano */
 @media (prefers-reduced-motion: reduce) {
     html[data-look='vetro'] .patient-row:hover { transform: none; }
+}
+
+/* tinta colorata (lilla, lime, pesca) sulle finestre di vetro: il colore c'è anche dove lo sfondo dietro è crema */
+html[data-look='vetro'] body :is(.dg-modal, .t-modal-card, .modal-window, .sr-modal, .sheet, .vd-sheet, .ch-pop, .ch-sc):not(.pc-main *) {
+    background-image: linear-gradient(160deg, rgba(201, 195, 242, 0.42) 0%, rgba(225, 234, 76, 0.16) 52%, rgba(246, 205, 180, 0.36) 100%);
 }

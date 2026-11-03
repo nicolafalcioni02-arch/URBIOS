@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ShaderCanvas } from '../../visuals/ShaderCanvas';
 
 // Pezzi comuni alle schermate guidate di Dieta e Training: stessa gerarchia, stesso aspetto, stessi effetti
@@ -6,6 +6,26 @@ import { ShaderCanvas } from '../../visuals/ShaderCanvas';
 //  1. GuidedHead: la sfera + il piano (nome · data · stato) a sinistra, gli strumenti globali a destra
 //  2. GuidedSteps: i passi del lavoro con riepilogo e barra di avanzamento
 //  3. StepTitle: titolo e indicazione del passo (scivola avanti/indietro con il passo)
+
+// Un tasto principale che, premuto, fa uscire gli altri con una piccola animazione (prima/dopo il tasto con side).
+export const ToolFan = ({ label, icon = 'ph-dots-three-outline', items, side = 'after', small = false }) => {
+    const [open, setOpen] = useState(false);
+    const main = (
+        <button key="main" className={`${small ? 'dg-sm' : 'dg-tool'} dg-fan-main ${open ? 'is-open' : ''}`} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={label} title={label}>
+            <i className={`ph ${open ? 'ph-x' : icon}`}></i> <span className="dg-tool-l">{label}</span>
+        </button>
+    );
+    const list = (
+        <div key="items" className="dg-fan-items" aria-hidden={!open}>
+            {items.map((t, i) => (
+                <button key={t.label} className={small ? 'dg-sm' : 'dg-tool'} style={{ '--i': i }} tabIndex={open ? 0 : -1} onClick={() => { setOpen(false); t.onClick(); }} title={t.title} aria-label={t.label}>
+                    <i className={`ph ${t.icon}`}></i> <span className="dg-tool-l">{t.label}</span>
+                </button>
+            ))}
+        </div>
+    );
+    return <div className={`dg-fan ${open ? 'open' : ''}`}>{side === 'before' ? [list, main] : [main, list]}</div>;
+};
 
 export const GuidedHead = ({ plan, tools, progress = 0, kicker }) => {
     const scale = 0.72 + 0.28 * progress; // la sfera cresce man mano che il lavoro avanza
@@ -34,11 +54,17 @@ export const GuidedHead = ({ plan, tools, progress = 0, kicker }) => {
                 </div>
             </div>
             <div className="dg-tools">
-                {tools.map((t) => (
-                    <button key={t.label} className={`dg-tool ${t.primary ? 'ai' : ''}`} onClick={t.onClick} title={t.title} aria-label={t.label}>
-                        <i className={`ph ${t.icon}`}></i> <span className="dg-tool-l">{t.label}</span>
-                    </button>
-                ))}
+                {(() => {
+                    const rest = tools.filter((t) => !t.primary);
+                    const main = tools.filter((t) => t.primary);
+                    const row = (t) => (
+                        <button key={t.label} className={`dg-tool ${t.primary ? 'ai' : ''}`} onClick={t.onClick} title={t.title} aria-label={t.label}>
+                            <i className={`ph ${t.icon}`}></i> <span className="dg-tool-l">{t.label}</span>
+                        </button>
+                    );
+                    if (rest.length < 2) return tools.map(row);
+                    return [<ToolFan key="fan" label="Strumenti" side="before" items={rest} />, ...main.map(row)];
+                })()}
             </div>
         </div>
     );

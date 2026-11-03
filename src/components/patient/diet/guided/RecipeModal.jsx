@@ -7,6 +7,7 @@ import { defaultChoice } from '../../../../ai/dietSection';
 import { FoodSearch } from './MenuStep';
 import { genId } from './guidedLogic';
 import { isRecipe, makeRecipe, mealItemsCopy, recipeStats, recipeToItem } from './recipeLogic';
+import { AiTextTools } from '../../../../ai/AiTextTools';
 
 // Ricette: libreria, editor e creazione con AI. Una ricetta si inserisce nel pasto come UN alimento (es. "Ciambellone", 80 g).
 
@@ -334,7 +335,8 @@ export const RecipeModal = ({ patient, db, foodDB, mealLibrary, setMealLibrary, 
                                 </div>
                             </div>
                             <label className="fld-label mt-3">Richieste particolari (facoltative)</label>
-                            <textarea className="fld" rows={3} style={{ height: 'auto', padding: 14 }} placeholder="Es. senza lattosio, poco zucchero, ricca di proteine, adatta a una colazione…" value={ai.notes} onChange={(e) => setAi({ ...ai, notes: e.target.value })} />
+                            <AiTextTools value={ai.notes} onChange={(v) => setAi({ ...ai, notes: v })} getEl={() => document.getElementById('ai-notes')} />
+                            <textarea id="ai-notes" className="fld" rows={3} style={{ height: 'auto', padding: 14 }} placeholder="Es. senza lattosio, poco zucchero, ricca di proteine, adatta a una colazione…" value={ai.notes} onChange={(e) => setAi({ ...ai, notes: e.target.value })} />
                             <p className="dg-hint" style={{ color: '#7A5B0B' }}><i className="ph ph-shield-warning"></i> Non scrivere nome, residenza, contatti o altri dati che identificano il paziente (GDPR e AI Act): solo dati clinici.</p>
                             <label className="flex items-start gap-2.5 mt-4 p-4 rounded-2xl border border-[color:var(--line)] bg-white cursor-pointer">
                                 <input type="checkbox" className="mt-1 w-4 h-4" checked={ai.includeFoodList} onChange={(e) => setAi({ ...ai, includeFoodList: e.target.checked })} />
@@ -354,9 +356,11 @@ export const RecipeModal = ({ patient, db, foodDB, mealLibrary, setMealLibrary, 
                     {view === 'paste' && (
                         <div className="dg-in">
                             <p className="dg-sub !mt-0">Incolla la risposta dell’AI. Anche con testo prima o dopo: ripulisco io.</p>
+                            <AiTextTools value={pasted} onChange={(v) => { setPasted(v); setErr(''); }} getEl={() => document.getElementById('ai-pasted')} />
                             <textarea
+                                id="ai-pasted"
                                 autoFocus
-                                className="fld mt-4"
+                                className="fld"
                                 rows={12}
                                 style={{ height: 'auto', padding: 14, fontFamily: 'ui-monospace, Menlo, monospace', fontSize: 12.5 }}
                                 placeholder={'```json\n{ "format": "URBIOS-AI", "ricetta": { ... } }\n```'}

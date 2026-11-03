@@ -206,7 +206,9 @@ export const DietGuided = ({
                     </div>
                 ) : (
                     <div key={step} className={dir}>
-                        <StepTitle id={step} dir="" title={TITLES[step][0]} hint={TITLES[step][1]} />
+                        <div className="max-w-3xl mx-auto">
+                            <StepTitle id={step} dir="" title={TITLES[step][0]} hint={TITLES[step][1]} />
+                        </div>
                         {step === 'goals' && (
                             <GoalsStep
                                 patient={patient}

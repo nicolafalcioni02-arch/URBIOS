@@ -206,6 +206,11 @@ export const agendaStyles = `
 .agm-cards[style*="--n: 3"] { grid-auto-flow: row; }
 
 .agm-slots.wide { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); margin-left: 58px; }
+/* telefono: senza appuntamenti la griglia occupa tutta la riga, e gli orari sono bersagli da pollice */
+@media (max-width: 639px) {
+    .agm-list > .agm-slots.wide:only-child { margin-left: 0; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .agm-list > .agm-slots.wide .agm-slot { height: 36px; font-size: 13px; border-radius: 12px; }
+}
 /* giornata su PC/tablet: due colonne (mattina | pomeriggio), cosi' una giornata piena sta in pagina */
 @media (min-width: 900px) {
     .ag-daywrap { max-width: none; }

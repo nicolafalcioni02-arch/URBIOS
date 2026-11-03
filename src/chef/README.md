@@ -1,0 +1,7 @@
+# Chef URBIOS (ricettario)
+- `Chef.jsx` contenitore: elenco ricette (ricerca + categorie), tab Menù, routing locale lista/ricetta/editor
+- `RecipeView.jsx` pagina ricetta (kcal e macro a porzione, stampa) · `RecipeEditor.jsx` modulo con ricerca ingredienti nel database alimenti
+- `ChefCharts.jsx` ciambella macro, barre ingredienti, statistiche, scheda 3D · `CookMode.jsx` modalità Cucina passo-passo
+- `MenuBoard.jsx` elenco menù a schede (+ box quantità) · `ChefPick.jsx` menù a tendina personalizzato (con ricerca) · `MenuSide.jsx` panoramica a sinistra del box · `MenuBox.jsx` box di un menù (schede Evento / Menù / Special / Lettera agli chef) · `MenuGuide.jsx` percorso guidato AI · `chefLogic.js` funzioni pure · `chefStyles.js` CSS
+- Dati: ricette in `db.diet_meal_library` (kind 'ricetta', le stesse della Dieta), menù in `db.chef_menus` (`{id,title,subtitle,patientId (paziente associato: nello storico compare come evento speciale, bordo scuro e data tratteggiata, `VisitList.jsx`),event:{name,location,guests,date},sections:[{id,name,dishes:[recipeId]}]}`; i vecchi `courses` si convertono con `normalizeMenu`). Stampa del menù: Centro stampa, tipo `menu` (`printCenter/docs/menu.js`)
+- `AiRecipe.jsx` crea la ricetta con URBIOS AI (prompt in `src/ai/recipeSection.js`, senza paziente) · stampa: Chef è avvolto in `PrintCenterProvider` con uno "studio" vuoto e apre il documento Ricettario (`opts.ids` = ricette scelte)

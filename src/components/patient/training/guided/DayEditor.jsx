@@ -140,8 +140,7 @@ export const DayEditor = ({ week, day, exerciseDB, suggestions, massimali, analy
                 <i className="ph ph-plus-circle"></i> Aggiungi esercizio
             </button>
 
-            <label className={`fld-label mt-5 ${compact && !more ? 'hidden' : ''}`}>Note della seduta (riscaldamento, mobilità, indicazioni)</label>
-            <textarea className={`fld ${compact && !more ? 'hidden' : ''}`} rows={2} style={{ height: 'auto', padding: 14 }} placeholder="Es. 10 min di riscaldamento generale + mobilità spalle. Defaticamento con stretching." value={day.note || ''} onChange={(e) => ops.updateDayField(week.id, day.id, 'note', e.target.value)} />
+            <textarea aria-label="Note della seduta" className={`fld mt-5 ${compact && !more ? 'hidden' : ''}`} rows={2} style={{ height: 'auto', padding: 14 }} placeholder="Es. 10 min di riscaldamento generale + mobilità spalle. Defaticamento con stretching." value={day.note || ''} onChange={(e) => ops.updateDayField(week.id, day.id, 'note', e.target.value)} />
         </div>
     );
 };

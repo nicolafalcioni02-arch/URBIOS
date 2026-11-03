@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { UrbiosLogo } from '../brand/UrbiosLogo';
 import { SettingsModal } from './settings/SettingsModal';
 import { PatientDetail } from './patientDetail/PatientDetail';
 import { StudentMode } from './StudentMode';
@@ -11,12 +12,17 @@ import { HomeMobile } from './home/HomeMobile';
 import { MobileTabBar, ActionSheet } from '../components/mobile/MobileChrome';
 import { isExample } from '../storage/example/example';
 import { Research } from '../research/Research';
+import { Chef } from '../chef/Chef';
+import { InvoiceIcon } from '../invoices/InvoiceIcon';
+import { InvoicesView } from '../invoices/InvoicesView';
+import { Lab } from '../lab/Lab';
+import { LabIcon } from '../lab/LabIcon';
 
 // Voce della barra alta (desktop): solo icona; al passaggio si ingrandisce come sotto una lente e mostra il nome (stile .hq in index.css)
 const BarBtn = ({ icon, label, note, badge, onClick, className = '' }) => (
     <button onClick={onClick} className={`home-quiet hq ${className}`} aria-label={note ? `${label} (${note})` : label}>
         <span className="hq-ico">
-            <i className={`ph ${icon}`}></i>
+            {typeof icon === 'string' ? <i className={`ph ${icon}`}></i> : icon}
             {badge && <span className="hq-badge">{badge}</span>}
         </span>
         <span className="hq-text">
@@ -33,13 +39,19 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const [showSettings, setShowSettings] = useState(false);
     const [studentMode, setStudentMode] = useState(false);
     const [adding, setAdding] = useState(false);
+    const [searching, setSearching] = useState(false);
+    const [sq, setSq] = useState('');
     const [petsOpen, setPetsOpen] = useState(false);
     const [studentSoonOpen, setStudentSoonOpen] = useState(false);
     const [widgetsEditing, setWidgetsEditing] = useState(false);
     const [agenda, setAgenda] = useState(null); // null = chiusa, altrimenti { date, open?, newAppt? }
     const [query, setQuery] = useState('');
     const [moreOpen, setMoreOpen] = useState(false);
+    const [chefMenu, setChefMenu] = useState(null); // menù da aprire entrando in Chef (dallo storico di un paziente)
+    const [chef, setChef] = useState(false); // Chef URBIOS (src/chef/)
+    const [invoices, setInvoices] = useState(false); // gestionale fatture (src/invoices/)
     const [research, setResearch] = useState(false); // unità Ricerca (src/research/)
+    const [lab, setLab] = useState(false); // gestionale di laboratorio (src/lab/)
     const compact = useCompact(639); // telefono: cornice da app nativa
     const [form, setForm] = useState({ nome: '', cognome: '', sesso: 'M' });
     const { dirty, ephemeral, saveFile, openExitDialog } = useArchive();
@@ -73,6 +85,8 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     };
 
     const selectedPatient = useMemo(() => data.pazienti.find((p) => p.id === selectedPatientId), [data.pazienti, selectedPatientId]);
+
+    const lastVisit = (p) => (p.visite.length ? new Date(p.visite[0].data).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Nessuna visita');
 
     const sheets = (
         <>
@@ -114,6 +128,40 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                     <button onClick={() => setStudentSoonOpen(false)} className="pets-close">
                         Ho capito
                     </button>
+                </div>
+            </div>
+        )}
+
+        {/* Cerca paziente */}
+        {searching && (
+            <div className="sheet-back" onClick={() => setSearching(false)}>
+                <div className="sheet" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="font-semibold text-[20px] text-[color:var(--ink)]">Cerca paziente</h2>
+                        <button type="button" onClick={() => setSearching(false)} className="vw-chip !px-0 w-9 !h-9 justify-center" aria-label="Chiudi">
+                            <i className="ph ph-x"></i>
+                        </button>
+                    </div>
+                    <div className="relative mb-3">
+                        <i className="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[color:var(--muted)] text-lg pointer-events-none"></i>
+                        <input autoFocus value={sq} onChange={(e) => setSq(e.target.value)} placeholder="Nome, cognome o numero" className="fld" style={{ paddingLeft: 40 }} />
+                    </div>
+                    <div className="flex flex-col gap-2" style={{ maxHeight: 320, overflowY: 'auto' }}>
+                        {sq.trim() && data.pazienti.filter((p) => `${p.nome} ${p.cognome} ${p.id}`.toLowerCase().includes(sq.trim().toLowerCase())).map((p) => (
+                            <button key={p.id} onClick={() => { setSelectedPatientId(p.id); setSearching(false); setSq(''); }} className="patient-row">
+                                <span className="patient-avatar">{p.nome.charAt(0)}{p.cognome.charAt(0)}</span>
+                                <span className="min-w-0 flex-1 text-left">
+                                    <span className="block font-semibold text-[16px] text-[color:var(--ink)] truncate">{p.nome} {p.cognome}</span>
+                                    <span className="block text-[13px] text-[color:var(--muted)] truncate">
+                                        {[p.dataNascita && `nato/a il ${new Date(p.dataNascita).toLocaleDateString('it-IT')}`, p.cf].filter(Boolean).join(' · ') || `N. ${p.id} · ${lastVisit(p)}`}
+                                    </span>
+                                </span>
+                            </button>
+                        ))}
+                        {sq.trim() && !data.pazienti.some((p) => `${p.nome} ${p.cognome} ${p.id}`.toLowerCase().includes(sq.trim().toLowerCase())) && (
+                            <p className="text-center text-[14px] text-[color:var(--muted)] py-6">Nessun risultato</p>
+                        )}
+                    </div>
                 </div>
             </div>
         )}
@@ -165,8 +213,17 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     if (studentMode) {
         return <StudentMode onExit={() => setStudentMode(false)} db={data} />;
     }
+    if (chef) {
+        return <Chef db={data} onUpdateDb={onUpdateDb} initialMenuId={chefMenu} onBack={() => { setChef(false); setChefMenu(null); }} />;
+    }
+    if (invoices) {
+        return <InvoicesView db={data} onUpdateDb={onUpdateDb} onBack={() => setInvoices(false)} onOpenPatient={(id) => { setInvoices(false); setSelectedPatientId(id); }} />;
+    }
     if (research) {
         return <Research db={data} onBack={() => setResearch(false)} />;
+    }
+    if (lab) {
+        return <Lab db={data} onUpdateDb={onUpdateDb} onBack={() => setLab(false)} />;
     }
 
     const agendaView = agenda && (
@@ -193,7 +250,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
         // la scheda resta montata sotto l'agenda: la visita in corso non si perde
         return (
             <>
-                <PatientDetail key={selectedPatient.id} patient={selectedPatient} onBack={() => setSelectedPatientId(null)} onUpdateDb={onUpdateDb} db={data} onOpenAgenda={(o) => setAgenda({ date: dateKey(new Date()), ...o })} />
+                <PatientDetail key={selectedPatient.id} patient={selectedPatient} onBack={() => setSelectedPatientId(null)} onUpdateDb={onUpdateDb} db={data} onOpenAgenda={(o) => setAgenda({ date: dateKey(new Date()), ...o })} onOpenChef={(id) => { setChefMenu(id); setChef(true); }} />
                 {agendaView}
             </>
         );
@@ -204,7 +261,6 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const q = query.trim().toLowerCase();
     const list = q ? data.pazienti.filter((p) => `${p.nome} ${p.cognome} ${p.id}`.toLowerCase().includes(q)) : data.pazienti;
     const todayAppts = (data.agenda || []).filter((a) => isActive(a) && sameDay(startOf(a), new Date())).length;
-    const lastVisit = (p) => (p.visite.length ? new Date(p.visite[0].data).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Nessuna visita');
 
     // --- TELEFONO: sezioni nella barra in basso, tutto il resto nel foglio "Altro" ---
     if (compact) {
@@ -236,6 +292,9 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                                 ...(showSave ? [{ label: 'Salva ora', icon: 'ph-floppy-disk', onClick: handleSave }] : []),
                                 { label: 'Impostazioni', icon: 'ph-gear', onClick: () => setShowSettings(true) },
                                 { label: 'Ricerca', icon: 'ph-chart-line', onClick: () => setResearch(true) },
+                                { label: 'Chef', icon: 'ph-chef-hat', onClick: () => setChef(true) },
+                                { label: 'Contabilità', icon: <InvoiceIcon />, onClick: () => setInvoices(true) },
+                                { label: 'Laboratorio', icon: <LabIcon />, onClick: () => setLab(true) },
                             ],
                             [
                                 { label: 'Student', icon: 'ph-student', note: 'presto', onClick: () => setStudentSoonOpen(true) },
@@ -260,14 +319,17 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
             <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-6 sm:pt-12 pb-24">
                 {/* Barra alta: marchio a sinistra, azioni secondarie a destra */}
                 <div className="home-bar flex items-center justify-between mb-8 sm:mb-12 rise">
-                    <span className="text-[13px] font-semibold tracking-[0.32em] text-[color:var(--ink)]">URBIOS</span>
+                    <span className="inline-flex items-center gap-2.5 text-[13px] font-semibold tracking-[0.32em] text-[color:var(--ink)]"><UrbiosLogo size={26} />URBIOS</span>
                     <div className="flex items-center gap-1">
                         {/* Student: bloccata per ora (codice intatto in StudentMode.jsx). Per riattivarla: setStudentMode(true) al posto di setStudentSoonOpen(true) */}
                         <BarBtn icon="ph-student" label="Student" note="presto" onClick={() => setStudentSoonOpen(true)} />
                         <BarBtn icon="ph-dog" label="Pets" note="presto" onClick={() => setPetsOpen(true)} />
-                        <BarBtn icon={widgetsEditing ? 'ph-check' : 'ph-squares-four'} label={widgetsEditing ? 'Fine' : 'Widget'} onClick={() => setWidgetsEditing((v) => !v)} className="max-[1359px]:!hidden" />
+                        <BarBtn icon="ph-chef-hat" label="Chef" onClick={() => setChef(true)} />
                         <BarBtn icon="ph-chart-line" label="Ricerca" note="anteprima" onClick={() => setResearch(true)} />
+                        <BarBtn icon={<InvoiceIcon size="1.3em" />} label="Contabilità" onClick={() => setInvoices(true)} />
+                        <BarBtn icon={<LabIcon size="1.3em" />} label="Laboratorio" onClick={() => setLab(true)} />
                         <BarBtn icon="ph-calendar-dots" label="Agenda" badge={todayAppts || null} onClick={() => setAgenda({ date: dateKey(new Date()) })} />
+                        <BarBtn icon={widgetsEditing ? 'ph-check' : 'ph-squares-four'} label={widgetsEditing ? 'Fine' : 'Widget'} onClick={() => setWidgetsEditing((v) => !v)} className="max-[1359px]:!hidden" />
                         <BarBtn icon="ph-gear" label="Impostazioni" onClick={() => setShowSettings(true)} />
                         {!ephemeral && dirty && (
                             <button onClick={handleSave} className="home-quiet" style={{ color: 'var(--bad)' }}>
@@ -290,10 +352,15 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                         </p>
                     </div>
                     {data.pazienti.length > 0 && (
-                        <button onClick={() => setAdding(true)} className="vw-next" style={{ height: 48, whiteSpace: 'nowrap' }}>
-                            <i className="ph-bold ph-plus"></i>
-                            <span>Nuovo paziente</span>
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button onClick={() => { setSq(''); setSearching(true); }} className="vw-chip !px-0 justify-center" style={{ width: 48, height: 48 }} aria-label="Cerca paziente" title="Cerca paziente">
+                                <i className="ph ph-magnifying-glass text-[20px]"></i>
+                            </button>
+                            <button onClick={() => setAdding(true)} className="vw-next" style={{ height: 48, whiteSpace: 'nowrap' }}>
+                                <i className="ph-bold ph-plus"></i>
+                                <span>Nuovo paziente</span>
+                            </button>
+                        </div>
                     )}
                 </div>
 

@@ -122,7 +122,7 @@ export const DescriptivePanel = ({ ds }) => {
                             return (
                                 <div key={v.key}>
                                     <p className="text-[13px] font-semibold mb-1">{v.label}</p>
-                                    <table className="rs-table">
+                                    <table className="rs-table rs-cat">
                                         <tbody>
                                             {f.rows.map((r) => (
                                                 <tr key={r.value}>

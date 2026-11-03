@@ -171,8 +171,9 @@ html[data-look='vetro'] .m-nav {
     -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent);
     mask-image: linear-gradient(180deg, #000 70%, transparent);
     border-bottom-color: transparent !important;
-    padding-bottom: 6px;
+    padding: calc(env(safe-area-inset-top) + 10px) 16px 6px;
 }
+html[data-look='vetro'] .m-brand { padding-left: 4px; }
 
 /* barra delle sezioni: capsula di vetro sospesa, etichette monocromatiche, la scheda scelta ha la sua lente */
 html[data-look='vetro'] .m-tabbar {
@@ -265,3 +266,259 @@ html[data-look='vetro'] .hq::before { background: var(--lg-fill-hover); box-shad
 html[data-look='vetro'] .hq-tip { background: rgba(255, 255, 255, 0.92); border: 0; box-shadow: var(--lg-rim), var(--lg-drop); font-weight: 400; }
 /* la pillola di vetro ha 8px di bordo attorno ai tasti: l'etichetta scende un po' di più per staccarsi */
 html[data-look='vetro'] .hq-text { top: calc(100% + 18px); }
+
+/* avanzamento della nuova visita: filo con l'accento, come il tasto Avanti */
+html[data-look='vetro'] .vw-progress { top: 0; height: 3px; }
+html[data-look='vetro'] .vw-progress span { background: var(--accent); }
+
+/* tasto di chiusura delle finestre grafiche (Smart Plot): lente di vetro invece del nero pieno */
+html[data-look='vetro'] body .sp-close {
+    background: var(--lg-fill);
+    color: var(--ink);
+    -webkit-backdrop-filter: var(--lg-filter);
+    backdrop-filter: var(--lg-filter);
+    box-shadow: var(--lg-rim), var(--lg-drop);
+}
+
+/* assistente AI: la barra dei tasti in basso lascia vedere lo sfondo, niente fascia con bordo netto */
+html[data-look='vetro'] body .uai-foot { background: transparent; border-top-color: transparent; }
+
+/* passi e piede dei piani (Obiettivo / Menù / Consegna, Scheda): niente fascia beige piatta, sfumano sullo sfondo come la barra in alto */
+html[data-look='vetro'] body .dg-stepbar {
+    background: transparent;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    -webkit-mask-image: linear-gradient(180deg, #000 86%, transparent);
+    mask-image: linear-gradient(180deg, #000 86%, transparent);
+}
+html[data-look='vetro'] body .dg-foot {
+    background: transparent;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    -webkit-mask-image: linear-gradient(0deg, #000 86%, transparent);
+    mask-image: linear-gradient(0deg, #000 86%, transparent);
+}
+
+/* griglia del training: una scheda di vetro con i margini della pagina (non più a filo dello schermo), colonna fissa chiara */
+html[data-look='vetro'] body .t-grid-wrap {
+    margin: 12px 0 0;
+    padding: 0;
+    border-radius: 24px;
+    background: var(--v-material);
+    border: 1px solid var(--v-edge);
+    box-shadow: var(--v-shadow);
+    -webkit-backdrop-filter: var(--v-blur);
+    backdrop-filter: var(--v-blur);
+}
+html[data-look='vetro'] body .t-grid tbody th,
+html[data-look='vetro'] body .t-grid thead th:first-child { background: rgba(251, 249, 244, 0.94); }
+html[data-look='vetro'] body .t-grid tbody th { box-shadow: 8px 0 10px -8px rgba(70, 60, 30, 0.22); }
+html[data-look='vetro'] body .t-grid tbody tr:last-child > * { border-bottom-color: transparent; }
+html[data-look='vetro'] body .t-grid th,
+html[data-look='vetro'] body .t-grid td { border-bottom-color: rgba(23, 24, 27, 0.06); }
+
+/* telefono: i fogli che salgono dal basso (menù «…», Altro, nuovo paziente) fluttuano staccati dai bordi, come in iOS */
+@media (max-width: 639px) {
+    html[data-look='vetro'] body .sheet:not(.pc-main *) {
+        width: calc(100% - 16px);
+        margin-bottom: max(8px, env(safe-area-inset-bottom));
+        padding-bottom: 20px;
+        border-radius: 36px;
+    }
+}
+
+/* ---------- CENTRO STAMPA: solo l'interfaccia (barre, pannelli, pulsanti); i fogli A4 restano carta bianca ---------- */
+html[data-look='vetro'] body .pc-overlay { background: var(--v-bg); background-attachment: fixed; }
+html[data-look='vetro'] body .pc-top { background: transparent; border-bottom: 0; }
+html[data-look='vetro'] body .pc-brand h1 { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Outfit, sans-serif; font-style: normal; font-weight: 600; font-size: 24px; letter-spacing: -0.03em; }
+html[data-look='vetro'] body :is(.pc-ic:not(.on), .pc-btn:not(.primary)) {
+    background: var(--lg-fill);
+    -webkit-backdrop-filter: var(--lg-filter);
+    backdrop-filter: var(--lg-filter);
+    border: 0;
+    box-shadow: var(--lg-rim), var(--lg-drop);
+}
+html[data-look='vetro'] body .pc-btn.primary,
+html[data-look='vetro'] body .pc-bar .pc-bar-print {
+    background: var(--lg-tint-fill);
+    border: 0;
+    color: #fff;
+    box-shadow: var(--lg-tint-rim), 0 8px 22px -8px rgba(var(--lg-tint), 0.6);
+}
+html[data-look='vetro'] body .pc-tools { background: var(--lg-fill); border-bottom: 0; -webkit-backdrop-filter: var(--lg-filter); backdrop-filter: var(--lg-filter); }
+html[data-look='vetro'] body .pc-menu { background: rgba(251, 249, 244, 0.86); -webkit-backdrop-filter: blur(32px) saturate(1.7); backdrop-filter: blur(32px) saturate(1.7); border: 0; border-radius: 24px; }
+html[data-look='vetro'] body :is(.pc-item, .pc-chip:not(.on)) { background: var(--v-material); border-color: var(--v-edge); }
+html[data-look='vetro'] body .pc-item { border-radius: 20px; }
+
+@media screen and (max-width: 640px) {
+    /* barra in basso: capsula sospesa come la barra delle sezioni */
+    html[data-look='vetro'] body .pc-bar {
+        margin: 0 16px max(10px, env(safe-area-inset-bottom));
+        padding: 5px;
+        border: 0;
+        border-radius: 999px;
+        background: var(--lg-fill);
+        -webkit-backdrop-filter: var(--lg-filter);
+        backdrop-filter: var(--lg-filter);
+        box-shadow: var(--lg-rim), var(--lg-drop-hi);
+    }
+    html[data-look='vetro'] body .pc-bar button { border-radius: 999px; }
+    html[data-look='vetro'] body .pc-bar button.on { background: var(--lg-vibrant); }
+    /* pannelli: foglio di vetro che galleggia sopra la barra */
+    html[data-look='vetro'] body .pc-side {
+        left: 8px;
+        right: 8px;
+        width: auto;
+        bottom: 8px;
+        border-radius: 36px;
+        border: 1px solid var(--v-edge);
+        background: rgba(251, 249, 244, 0.82);
+        -webkit-backdrop-filter: blur(32px) saturate(1.7);
+        backdrop-filter: blur(32px) saturate(1.7);
+        box-shadow: var(--lg-rim), var(--lg-drop-hi);
+    }
+    html[data-look='vetro'] body .pc-side::before { background: rgba(60, 60, 67, 0.3); }
+    html[data-look='vetro'] body .pc-scrim { background: rgba(40, 36, 28, 0.14); }
+}
+@media screen and (max-width: 640px) {
+    html[data-look='vetro'] body .pc-top { padding: calc(env(safe-area-inset-top) + 14px) 16px 8px; }
+}
+@media screen and (max-width: 640px) {
+    /* le pagine non finiscono più con un taglio netto sopra la barra: sfumano sullo sfondo */
+    html[data-look='vetro'] body .pc-desk {
+        -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 44px), transparent 100%);
+        mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 44px), transparent 100%);
+    }
+}
+
+/* ---------- WIDGET (browser largo): vetro come i widget di iOS ---------- */
+html[data-look='vetro'] body .wd-box {
+    background: color-mix(in srgb, var(--wd-bg) 58%, transparent);
+    -webkit-backdrop-filter: blur(28px) saturate(1.8);
+    backdrop-filter: blur(28px) saturate(1.8);
+    border: 0;
+    border-radius: 26px;
+    box-shadow:
+        inset 0 0 0 0.5px rgba(255, 255, 255, 0.7),
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.85),
+        0 0.5px 1px rgba(0, 0, 0, 0.08),
+        0 12px 30px -14px rgba(40, 30, 10, 0.3);
+}
+html[data-look='vetro'] body .wd-card { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Outfit, sans-serif; }
+html[data-look='vetro'] body .wd-title { font-weight: 600; letter-spacing: -0.015em; }
+/* al passaggio il widget si alza appena, senza alone colorato né riflesso */
+html[data-look='vetro'] body .wd-dock:not(.is-editing) .wd-item:hover .wd-box {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow:
+        inset 0 0 0 0.5px rgba(255, 255, 255, 0.8),
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+        0 1px 2px rgba(0, 0, 0, 0.1),
+        0 20px 36px -14px rgba(40, 30, 10, 0.34);
+}
+html[data-look='vetro'] body .wd-dock:not(.is-editing) .wd-item:hover .wd-box::after { opacity: 0; animation: none; }
+html[data-look='vetro'] body .wd-dock:not(.is-editing) .wd-rail:hover .wd-item:not(:hover) .wd-box { opacity: 1; filter: none; transform: none; }
+html[data-look='vetro'] body .wd-item.is-lifted .wd-box { transform: scale(1.05); box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.8), 0 28px 50px -16px rgba(40, 30, 10, 0.45); }
+/* modifica: il tasto per togliere è il tondo grigio con il meno, come in iOS */
+html[data-look='vetro'] body .wd-remove {
+    background: rgba(110, 110, 118, 0.78);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 0;
+    box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.5), 0 2px 6px rgba(0, 0, 0, 0.22);
+}
+html[data-look='vetro'] body :is(.wd-seg, .wd-dots, .wd-plus) {
+    background: var(--lg-fill);
+    -webkit-backdrop-filter: var(--lg-filter);
+    backdrop-filter: var(--lg-filter);
+    border: 0;
+    box-shadow: var(--lg-rim), var(--lg-drop);
+}
+html[data-look='vetro'] body .wd-tray,
+html[data-look='vetro'] body .wd-pick {
+    background: rgba(251, 249, 244, 0.78);
+    -webkit-backdrop-filter: blur(32px) saturate(1.7);
+    backdrop-filter: blur(32px) saturate(1.7);
+    border: 0;
+    box-shadow: var(--lg-rim), var(--lg-drop-hi);
+}
+html[data-look='vetro'] body .wd-tray { border-radius: 32px; }
+html[data-look='vetro'] body .wd-pick { border-radius: 26px; }
+html[data-look='vetro'] body .wd-tile { background: var(--lg-vibrant); border: 0; border-radius: 18px; }
+html[data-look='vetro'] body .wd-done { background: var(--lg-tint-fill); box-shadow: var(--lg-tint-rim); }
+html[data-look='vetro'] body .wd-fly { background: var(--lg-fill); -webkit-backdrop-filter: var(--lg-filter); backdrop-filter: var(--lg-filter); border: 0; box-shadow: var(--lg-rim), var(--lg-drop-hi); }
+html[data-look='vetro'] body .wd-ghost { border-radius: 26px; }
+
+/* ---------- WIDGET 2026: più grandi di carattere, molle, un po' pazzerelli ---------- */
+html[data-look='vetro'] body .wd-item { --spring: cubic-bezier(.34, 1.7, .5, 1); }
+html[data-look='vetro'] body .wd-box { transition: transform .45s var(--spring), box-shadow .3s, rotate .45s var(--spring); }
+html[data-look='vetro'] body .wd-dock:not(.is-editing) .wd-item:hover .wd-box { transform: translateY(-4px) scale(1.04); rotate: 0deg; }
+html[data-look='vetro'] body .wd-title { font-size: 15px; font-weight: 800; letter-spacing: -0.03em; }
+html[data-look='vetro'] body .wd-title i { font-size: 17px; }
+/* tocco di colore: un velo che sfuma dall'accento del tono */
+html[data-look='vetro'] body .wd-box::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none; z-index: -1; border-radius: inherit;
+    background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--wd-acc) 22%, transparent), transparent 60%);
+}
+html[data-look='vetro'] body .wd-box { isolation: isolate; }
+/* sticker leggermente storti */
+html[data-look='vetro'] body .wd-box:has(.wd-postit) { rotate: -2.5deg; }
+html[data-look='vetro'] body .wd-box:has(.wd-quote) { rotate: 1.8deg; }
+html[data-look='vetro'] body .wd-box:has(.wd-bday) { rotate: -1.5deg; }
+html[data-look='vetro'] body .wd-box:has(.wd-water-title) { rotate: 1.5deg; }
+/* appuntamenti: il riassunto è un pastiglione, le righe sono bolle */
+html[data-look='vetro'] body .wd-sum { display: inline-block; margin: 0 0 8px; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--wd-acc) 16%, transparent); color: var(--wd-acc); font-weight: 700; font-size: 11.5px; }
+html[data-look='vetro'] body .wd-agenda li { padding: 3px 0; border: 0; }
+html[data-look='vetro'] body .wd-agenda .wd-row { width: 100%; padding: 6px 8px; border-radius: 16px; background: color-mix(in srgb, var(--wd-fg) 5%, transparent); text-align: left; display: flex; align-items: center; gap: 8px; transition: transform .3s var(--spring), background .2s; }
+html[data-look='vetro'] body .wd-agenda .wd-row:hover { transform: scale(1.03); background: color-mix(in srgb, var(--wd-acc) 14%, transparent); }
+html[data-look='vetro'] body .wd-when b { font-weight: 800; }
+html[data-look='vetro'] body .wd-round { background: var(--wd-acc); color: #fff !important; box-shadow: 0 4px 10px -2px color-mix(in srgb, var(--wd-acc) 60%, transparent); }
+html[data-look='vetro'] body .wd-round:hover { transform: rotate(90deg) scale(1.12); }
+html[data-look='vetro'] body .wd-open { padding: 5px 10px; border-radius: 999px; background: color-mix(in srgb, var(--wd-acc) 14%, transparent); }
+/* compleanni: l'oggi è una pillola grande */
+html[data-look='vetro'] body .wd-bday-now { background: linear-gradient(135deg, color-mix(in srgb, var(--wd-acc) 30%, transparent), color-mix(in srgb, var(--wd-acc) 10%, transparent)); border-radius: 18px; }
+html[data-look='vetro'] body .wd-bday-now b { font-size: 17px; font-weight: 800; letter-spacing: -0.03em; }
+html[data-look='vetro'] body .wd-bday li { padding: 5px 10px; margin-top: 4px; border-radius: 999px; background: color-mix(in srgb, var(--wd-fg) 6%, transparent); }
+html[data-look='vetro'] body .wd-bday li em { font-weight: 700; color: var(--wd-acc); }
+/* foglietto: bigliettino con scotch */
+html[data-look='vetro'] body .wd-box:has(.wd-postit)::after { content: ''; position: absolute; top: 6px; left: 50%; width: 46px; height: 14px; margin-left: -23px; border-radius: 3px; background: rgba(255, 255, 255, 0.55); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); transform: rotate(-3deg); z-index: 2; }
+html[data-look='vetro'] body .wd-postit { padding-top: 30px; }
+html[data-look='vetro'] body .wd-postit textarea { font-size: 25px; }
+html[data-look='vetro'] body .wd-pin { display: none; }
+/* da fare: caselle tonde che saltano */
+html[data-look='vetro'] body .wd-todo li { border: 0; padding: 5px 0; font-weight: 600; }
+html[data-look='vetro'] body .wd-check { width: 20px; height: 20px; border-radius: 999px; border-width: 2px; font-size: 11px; transition: transform .35s var(--spring), background .2s; }
+html[data-look='vetro'] body .wd-todo li.done .wd-check { transform: scale(1.15); box-shadow: 0 3px 8px -2px color-mix(in srgb, var(--wd-acc) 70%, transparent); }
+html[data-look='vetro'] body .wd-todo form { margin-top: 4px; padding: 6px 10px; border-radius: 999px; background: color-mix(in srgb, var(--wd-fg) 6%, transparent); }
+/* calendario: oggi è una bolla piena */
+html[data-look='vetro'] body .wd-cal-head { font-weight: 800; letter-spacing: -0.03em; font-size: 16px; }
+html[data-look='vetro'] body .wd-cal-grid button.today, html[data-look='vetro'] body .wd-cal-grid .today { background: var(--wd-acc); color: #fff !important; box-shadow: 0 4px 10px -2px color-mix(in srgb, var(--wd-acc) 65%, transparent); }
+html[data-look='vetro'] body .wd-cal-grid button { transition: transform .25s var(--spring), background .15s; } html[data-look='vetro'] body .wd-cal-grid button:hover { transform: scale(1.25); }
+/* timer, luna, acqua, pensiero */
+html[data-look='vetro'] body .wd-timer-ring strong { font-size: 25px; font-weight: 800; letter-spacing: -0.04em; }
+html[data-look='vetro'] body .wd-timer-presets button { border: 0; background: color-mix(in srgb, var(--wd-fg) 10%, transparent); transition: transform .3s var(--spring); } html[data-look='vetro'] body .wd-timer-presets button:hover:not(:disabled) { transform: scale(1.12); }
+html[data-look='vetro'] body .wd-timer-presets button.on { background: var(--wd-acc); color: #fff !important; }
+html[data-look='vetro'] body .wd-timer-actions button { background: var(--wd-acc); color: #fff !important; box-shadow: 0 6px 14px -4px color-mix(in srgb, var(--wd-acc) 70%, transparent); transition: transform .3s var(--spring); } html[data-look='vetro'] body .wd-timer-actions button:hover { transform: scale(1.08); }
+html[data-look='vetro'] body .wd-timer-actions button:last-child { background: color-mix(in srgb, var(--wd-fg) 12%, transparent); color: var(--wd-fg) !important; box-shadow: none; }
+html[data-look='vetro'] body .wd-moon svg { filter: drop-shadow(0 0 14px color-mix(in srgb, var(--wd-acc) 55%, transparent)); animation: wd-bob 5s ease-in-out infinite; }
+html[data-look='vetro'] body .wd-moon p b { font-size: 16px; font-weight: 800; letter-spacing: -0.03em; }
+@keyframes wd-bob { 50% { transform: translateY(-4px) rotate(4deg); } }
+html[data-look='vetro'] body .wd-qmark { font-size: 64px; opacity: 0.35; top: -8px; }
+html[data-look='vetro'] body .wd-quote p { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
+html[data-look='vetro'] body .wd-water-title b { font-size: 15px; font-weight: 800; }
+html[data-look='vetro'] body .wd-glasses button:hover { transform: translateY(-5px) scale(1.15); transition: transform .3s var(--spring); }
+html[data-look='vetro'] body .wd-clock-date { font-weight: 700; letter-spacing: -0.01em; }
+@media (prefers-reduced-motion: reduce) { html[data-look='vetro'] body .wd-moon svg { animation: none; } }
+/* orologio: numeri tondi e pesanti, secondi in accento */
+html[data-look='vetro'] body .wd-clock svg text { font-family: Outfit, -apple-system, sans-serif !important; font-weight: 800 !important; }
+html[data-look='vetro'] body .wd-clock svg > line:last-of-type { stroke: var(--wd-acc); stroke-width: 2; }
+html[data-look='vetro'] body .wd-clock svg > circle:first-child { stroke-width: 5; stroke: var(--wd-acc); opacity: 0.9; }
+html[data-look='vetro'] body .wd-clock svg > circle:nth-child(2) { display: none; }
+/* margini: calendario più alto (riempie il riquadro), appuntamenti con aria sotto */
+html[data-look='vetro'] body .wd-cal { padding: 16px 14px 16px; }
+html[data-look='vetro'] body .wd-cal-head { margin-bottom: 10px; }
+html[data-look='vetro'] body .wd-cal-grid { row-gap: 3px; }
+html[data-look='vetro'] body .wd-cal-grid b { padding-bottom: 6px; }
+html[data-look='vetro'] body .wd-cal-grid span, html[data-look='vetro'] body .wd-cal-grid button { line-height: 25px; }
+html[data-look='vetro'] body .wd-agenda { padding-bottom: 22px; }
+html[data-look='vetro'] body .wd-agenda .wd-open { margin-top: 12px; }
+html[data-look='vetro'] body .wd-fit.scroll { padding-bottom: 6px; }

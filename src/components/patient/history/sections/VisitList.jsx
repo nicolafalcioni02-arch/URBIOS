@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
+import { InvoiceIcon } from '../../../../invoices/InvoiceIcon';
 import { fmtKg, fmtDelta } from './historyFormat';
 
 // che cosa è stato fatto in una visita: documenti firmati quel giorno, misure, esami, piano alimentare, scheda di allenamento
@@ -14,15 +15,64 @@ const doneIn = (visit, patient, hasDiet) => {
     return [docs && 'documenti', filled(MEASURE_KEYS) && 'misure', Object.keys(d).some((k) => LAB_KEYS.test(k) && String(d[k] ?? '').trim() !== '') && 'esami', hasDiet && 'dieta', plan && 'scheda'].filter(Boolean);
 };
 
-export const VisitList = ({ patient, filteredVisits, getDietBadge, getWeightDelta, handleDelete, onOpenDiet, setSearchTerm, setSelectedVisit, sortedVisits }) => {
+export const VisitList = ({ patient, filteredVisits, events = [], recipes = {}, onPrintMenu, onOpenChef, onInvoice, onPrintInvoice, getDietBadge, getWeightDelta, handleDelete, onOpenDiet, setSearchTerm, setSelectedVisit, sortedVisits }) => {
+    const [menuView, setMenuView] = useState(null); // menù-evento di cui si legge la carta
     const [noteVisit, setNoteVisit] = useState(null); // visita di cui si legge la nota
     const stop = (fn) => (e) => {
         e.stopPropagation();
         fn(e);
     };
+    // i menù associati al paziente stanno nello storico come eventi speciali, ordinati per data insieme alle visite
+    const created = (m) => (/\d{10,}/.test(m.id) ? new Date(Number(String(m.id).match(/\d{10,}/)[0])).toISOString().slice(0, 10) : '1970-01-01');
+    const rows = [...filteredVisits, ...events.map((m) => ({ ev: m, id: m.id, data: m.event?.date || created(m) }))].sort((a, b) => new Date(b.data) - new Date(a.data));
     return (
         <div className="hs-list stagger">
-            {filteredVisits.map((visit, index) => {
+            {rows.map((visit, index) => {
+                if (visit.ev) {
+                    const m = visit.ev;
+                    const date = new Date(visit.data);
+                    const dishes = (m.sections || []).reduce((n, x) => n + (x.dishes || []).filter((d) => (d.rid ?? d)).length, 0);
+                    return (
+                        <div key={m.id} className="hs-step">
+                            <div className="hs-tile-date is-event" aria-hidden="true">
+                                <b>{date.getDate()}</b>
+                                <span>{date.toLocaleDateString('it-IT', { month: 'short' })}</span>
+                                <span>{date.getFullYear()}</span>
+                            </div>
+                            <div className="hs-card is-event" style={{ cursor: 'default' }}>
+                                <div className="hs-first">
+                                    <div className="hs-l1"><span className="hs-when-type">Evento speciale</span></div>
+                                    <div className="hs-l2"><span className="truncate">{m.title}</span></div>
+                                    <div className="hs-l3"></div>
+                                </div>
+                                <div className="hs-status-cell">
+                                    <div className="hs-diet hs-kind">
+                                        <span className="hs-diet-ico"><i className="ph-bold ph-chef-hat"></i></span>
+                                        <span className="min-w-0">
+                                            <span className="hs-l1">Menù</span>
+                                            <span className="hs-l2"><span className="truncate">{(m.sections || []).length} portate · {dishes} piatti</span></span>
+                                            <span className="hs-l3"><span className="truncate">{m.event?.name || m.subtitle || 'non è una visita'}</span></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="hs-actions" style={{ gridArea: 'actions' }}>
+                                    <button title="Vedi il menù" aria-label="Vedi il menù" onClick={stop(() => setMenuView(m))} className="hs-icon"><i className="ph ph-eye"></i></button>
+                                    {onInvoice && (() => {
+                                        const inv = (patient.fatture || []).find((f) => f.menuId === m.id);
+                                        return (
+                                            <>
+                                                {inv && onPrintInvoice && <button title="Ristampa la fattura" aria-label="Ristampa la fattura" onClick={stop(() => onPrintInvoice(inv))} className="hs-icon"><i className="ph ph-printer"></i></button>}
+                                                <button title={inv ? `Fattura ${inv.prefisso || ''}${inv.numero}/${inv.anno}` : 'Fattura del servizio menù'} aria-label={inv ? 'Apri la fattura' : 'Fattura del servizio menù'} onClick={stop(() => onInvoice(null, inv, m))} className="hs-icon"><InvoiceIcon /></button>
+                                            </>
+                                        );
+                                    })()}
+                                    {onPrintMenu && <button title="Stampa il menù" aria-label="Stampa il menù" onClick={stop(() => onPrintMenu(m))} className="hs-icon"><i className="ph ph-printer"></i></button>}
+                                    {onOpenChef && <button title="Apri in Chef" aria-label="Apri in Chef" onClick={stop(() => onOpenChef(m.id))} className="hs-icon"><i className="ph ph-chef-hat"></i></button>}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
                 const isIndipendente = visit.note?.includes('Solo Dieta');
                 // lo stato "attivo" conta solo se la visita ha davvero una dieta con alimenti
                 const days = visit.dettagli?.diet_plan_data;
@@ -148,6 +198,15 @@ export const VisitList = ({ patient, filteredVisits, getDietBadge, getWeightDelt
                                         <i className="ph ph-leaf"></i>
                                     </button>
                                 )}
+                                {onInvoice && (() => {
+                                    const inv = (patient.fatture || []).find((f) => String(f.visitaId) === String(visit.id));
+                                    return (
+                                        <>
+                                            {inv && onPrintInvoice && <button title="Ristampa la fattura" aria-label="Ristampa la fattura" onClick={stop(() => onPrintInvoice(inv))} className="hs-icon"><i className="ph ph-printer"></i></button>}
+                                            <button title={inv ? `Fattura ${inv.prefisso || ''}${inv.numero}/${inv.anno}` : 'Emetti fattura'} aria-label={inv ? 'Apri la fattura' : 'Emetti fattura'} onClick={stop(() => onInvoice(visit, inv, null, isIndipendente ? 'dieta' : firstVisit && firstVisit.id === visit.id ? 'prima' : 'controllo'))} className="hs-icon"><InvoiceIcon /></button>
+                                        </>
+                                    );
+                                })()}
                                 <button title="Elimina visita" aria-label="Elimina visita" onClick={stop((e) => handleDelete(e, visit))} className="hs-icon is-danger">
                                     <i className="ph ph-trash"></i>
                                 </button>
@@ -166,6 +225,29 @@ export const VisitList = ({ patient, filteredVisits, getDietBadge, getWeightDelt
                     </button>
                 </div>
             )}
+            {menuView &&
+                ReactDOM.createPortal(
+                    <div className="sheet-back" onClick={() => setMenuView(null)}>
+                        <div className="sheet" style={{ background: "color-mix(in srgb, var(--paper) 94%, #fff)" }} onClick={(e) => e.stopPropagation()}>
+                            <div className="flex justify-between items-start gap-4">
+                                <div>
+                                    <h3 className="text-[19px] font-semibold tracking-[-0.01em] text-[color:var(--ink)]">{menuView.title}</h3>
+                                    <p className="text-[13px] text-[color:var(--muted)] mt-0.5">{[menuView.event?.kind, menuView.event?.name, menuView.event?.location].filter(Boolean).join(' · ') || 'Evento speciale'}</p>
+                                </div>
+                                <button onClick={() => setMenuView(null)} className="hs-icon" aria-label="Chiudi"><i className="ph ph-x"></i></button>
+                            </div>
+                            <div className="mt-4 max-h-[60vh] overflow-y-auto grid gap-4">
+                                {(menuView.sections || []).map((sec) => (
+                                    <div key={sec.id}>
+                                        <p className="text-[11px] font-semibold tracking-[.16em] uppercase text-[color:var(--muted)]">{sec.name}</p>
+                                        {(sec.dishes || []).map((d, i) => <p key={i} className="text-[15px] text-[color:var(--ink)] mt-1">{recipes[d.rid ?? d] || '—'}</p>)}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>,
+                    document.body
+                )}
             {noteVisit &&
                 ReactDOM.createPortal(
                     <div className="sheet-back" onClick={() => setNoteVisit(null)}>

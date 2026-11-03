@@ -91,7 +91,12 @@ export const GridView = ({ weeks, di, onDay, onOpen, onAddWeek, onAddExercise, o
                             {rows.map((r, k) => (
                                 <React.Fragment key={r.k}>
                                 <tr>
-                                    <th scope="row" onClick={ssMode ? () => pick(r.k) : undefined} className={ssMode ? 'pickable' : ''}>
+                                    <th scope="row" onClick={() => {
+                                        if (ssMode) return pick(r.k);
+                                        // il nome apre l'esercizio nella prima settimana in cui è compilato
+                                        const w = weeks.find((x) => x.days[d] && x.days[d].exercises.some((e) => norm(e.name) === r.k));
+                                        if (w) onOpen(w.id, d, r.k);
+                                    }} className={ssMode ? 'pickable' : 't-grid-name'} title={ssMode ? undefined : 'Apri e modifica l’esercizio'}>
                                         {ssMode && <i className={`t-grid-check ${sel.includes(r.k) ? 'on' : ''}`}>{sel.includes(r.k) && <i className="ph-bold ph-check"></i>}</i>}
                                         {sigs[k] && <b className="t-grid-sig">{sigs[k]}</b>}{r.name}
                                     </th>

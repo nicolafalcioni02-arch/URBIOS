@@ -22,6 +22,9 @@ const newId = () => `d${Date.now().toString(36)}${seq++}`;
 
 // Centro stampa: un solo posto per comporre, sistemare e stampare (o salvare in PDF) tutti i documenti del paziente.
 // Ogni documento nasce dai dati, si impagina da solo in fogli A4 veri e resta modificabile direttamente sul foglio.
+// chiave delle modifiche a mano salvate: stesso documento con le stesse opzioni
+const editKey = (it) => `${it.type}:${JSON.stringify(it.opts || {})}`;
+
 export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = false, draft = null, initial = null, onClose }) => {
     const patient = useMemo(() => freshPatient(db, patient0), [db, patient0]);
     const prof = professionalFor(patient, db);
@@ -37,7 +40,11 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
         (spec) => {
             const s = typeof spec === 'string' ? { type: spec } : spec;
             const item = { id: newId(), type: s.type, on: true, edited: false, opts: defaultOptions(s.type, ctx, s) };
-            if (DOC_TYPES[s.type].kind === 'flow') item.html = cleanHtml(buildHtml(item, ctx));
+            if (DOC_TYPES[s.type].kind === 'flow') {
+                const saved = ctx.patient.stampaModifiche?.[editKey(item)];
+                if (saved) Object.assign(item, { html: saved, edited: true });
+                else item.html = cleanHtml(buildHtml(item, ctx));
+            }
             return item;
         },
         [ctx]
@@ -371,7 +378,15 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     const close = () => {
         commitAll();
         const edited = items.some((it) => it.edited) || dirty.current.size;
-        if (edited && !window.confirm('Chiudere il Centro stampa? Le modifiche fatte a mano ai documenti non vengono conservate.')) return;
+        if (edited) {
+            if (canSave && window.confirm('Salvare le modifiche fatte a mano? Le ritroverai la prossima volta che apri questi documenti.')) {
+                const mods = Object.fromEntries(items.filter((it) => it.edited && it.html).map((it) => [editKey(it), it.html]));
+                onUpdateDb((prev) => ({
+                    ...prev,
+                    pazienti: prev.pazienti.map((p) => (String(p.id) === String(patient.id) ? { ...p, stampaModifiche: { ...(p.stampaModifiche || {}), ...mods } } : p)),
+                }));
+            } else if (!window.confirm('Chiudere senza salvare? Le modifiche fatte a mano andranno perse.')) return;
+        }
         onClose();
     };
 

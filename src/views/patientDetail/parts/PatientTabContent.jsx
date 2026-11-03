@@ -19,6 +19,7 @@ export const PatientTabContent = ({
     visitKey = 0,
     onUpdateDb,
     onOpenDiet,
+    onOpenChef,
     patient,
     setConfigA,
     setConfigB,
@@ -39,7 +40,7 @@ export const PatientTabContent = ({
         <div className={`flex-1 overflow-y-auto relative ${['visit', 'diet', 'Allenamento'].includes(view) ? '' : 'p-4 md:p-8'} ${widgetsPad ? 'wd-padded' : ''} ${view === 'history' ? 'hs-tab' : ''}`}>
             {view === 'info' && <ClinicalFolder patient={patient} updatePatientInfo={updatePatientInfo} professionalData={professionalFor(patient, db)} />}
 
-            {view === 'history' && <HistoryView patient={patient} onUpdateDb={onUpdateDb} onOpenDiet={onOpenDiet} />}
+            {view === 'history' && <HistoryView patient={patient} events={(db?.chef_menus || []).filter((m) => m.patientId === patient.id)} recipes={Object.fromEntries((db?.diet_meal_library || []).filter((r) => r.kind === 'ricetta').map((r) => [r.id, r.title]))} onOpenChef={onOpenChef} onUpdateDb={onUpdateDb} onOpenDiet={onOpenDiet} prof={professionalFor(patient, db)} />}
 
             {(visitOpened || view === 'visit') && (
                 <div hidden={view !== 'visit'} className="h-full">

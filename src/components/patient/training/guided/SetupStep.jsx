@@ -38,7 +38,7 @@ export const SetupStep = ({ header, setHeader, weeks, setWeeks, onDone }) => {
             <section className="dg-card">
                 <p className="dg-q">1 · Come si chiama la scheda?</p>
                 <input className="fld" placeholder="Es. Mesociclo 1, Ipertrofia estate…" value={header.titolo} onChange={(e) => set({ titolo: e.target.value })} />
-                <input className="fld mt-2" placeholder="Obiettivo con parole tue (facoltativo): es. ricomposizione, prima trazione alla sbarra" value={header.obiettivo} onChange={(e) => set({ obiettivo: e.target.value })} />
+                <input className="fld mt-2" placeholder="Obiettivo con parole tue (facoltativo)" value={header.obiettivo} onChange={(e) => set({ obiettivo: e.target.value })} />
             </section>
 
             <section className="dg-card">

@@ -7,7 +7,7 @@ import fs from 'fs';
 const root = new URL('..', import.meta.url).pathname;
 const foods = JSON.parse(fs.readFileSync(root + 'src/components/patient/diet/data/foodDB.json', 'utf8'));
 const food = (q, w) => {
-    const f = foods.find((x) => x.name.toLowerCase().startsWith(q.toLowerCase()));
+    const f = foods.find((x) => x.name.toLowerCase() === q.toLowerCase()) || foods.find((x) => x.name.toLowerCase().startsWith(q.toLowerCase()));
     if (!f) throw new Error('alimento non trovato: ' + q);
     return { name: f.name, weight: w, kcal: f.energy_kcal, p: f.proteins, c: f.available_carbohydrates, f: f.lipids };
 };
@@ -42,12 +42,13 @@ const V = [
 // ---------- ricette di esempio (libreria ricette: kind 'ricetta') ----------
 // Sintetizzate in cucina, non sui ribosomi: tutti gli ingredienti esistono davvero nel database alimenti.
 const r1 = (x) => Math.round(x * 10) / 10;
+const CAT = {"es-porridge": "Colazione", "es-pancake": "Colazione", "es-yogurt": "Colazione", "es-pasta-ceci": "Primi", "es-farro": "Primi", "es-lenticchie": "Primi", "es-riso-pollo": "Primi", "es-salmone": "Secondi", "es-merluzzo": "Secondi", "es-frittata": "Secondi", "es-polpette": "Secondi", "es-hummus": "Antipasti", "ev-caprese": "Antipasti", "ev-risotto": "Primi", "ev-paccheri": "Primi", "ev-spigola": "Secondi", "ev-vitello": "Secondi", "ev-pasticceria": "Dolci", "ev-frutta": "Dolci", "ev-bevande": "Bevande", "ev-bimbi-pasta": "Primi", "ev-bimbi-pollo": "Secondi"}; // categoria di Chef per id (Antipasti, Primi, Secondi…)
 const recipe = (rid, title, servings, ings, steps, note = '', finalWeight = null) => {
     const items = ings.map(([q, w]) => ({ id: id('ri'), ...food(q, w) }));
     const t = items.reduce((a, i) => ({ kcal: a.kcal + (i.kcal * i.weight) / 100, p: a.p + ((Number(i.p) || 0) * i.weight) / 100, c: a.c + ((Number(i.c) || 0) * i.weight) / 100, f: a.f + ((Number(i.f) || 0) * i.weight) / 100, g: a.g + i.weight }), { kcal: 0, p: 0, c: 0, f: 0, g: 0 });
     const weight = finalWeight || t.g;
     return {
-        id: rid, kind: 'ricetta', esempio: true, title, servings, finalWeight, items,
+        id: rid, kind: 'ricetta', esempio: true, category: CAT[rid] || '', title, servings, finalWeight, items,
         totals: { kcal: r1(t.kcal), p: r1(t.p), c: r1(t.c), f: r1(t.f) },
         per100: { kcal: r1((t.kcal / weight) * 100), p: r1((t.p / weight) * 100), c: r1((t.c / weight) * 100), f: r1((t.f / weight) * 100) },
         portionGrams: Math.round(weight / servings), steps, note, savedAt: '01/10/2026',
@@ -91,6 +92,61 @@ const ricette = [
         ['Frulla i ceci con olio, succo di limone e qualche cucchiaio di acqua fino a una crema liscia.', 'Taglia carote e sedano a bastoncini.', 'Servi l’hummus con le verdure da intingere.'],
         'Uno spuntino salato che sazia a lungo.'),
 ];
+
+// ---------- ricette e menù di prova per Chef: «Matrimonio di Paola e Fausto» (compaiono in ogni archivio, ma non finiscono nel file) ----------
+const evRicette = [
+    recipe('ev-caprese', 'Caprese di bufala e basilico', 4, [['Mozzarella di bufala', 400], ['Pomodori, maturi', 400], ['Basilico, fresco', 10], ['Olio di oliva extra vergine', 20]],
+        ['Taglia pomodori e mozzarella a fette dello stesso spessore.', 'Alterna le fette nel piatto con le foglie di basilico.', 'Condisci con olio a filo e sale al momento di servire.'], 'Servire a 10–12 °C: la mozzarella non deve essere gelida.'),
+    recipe('ev-risotto', 'Risotto ai funghi e Parmigiano', 4, [['Riso, brillato', 320], ['Funghi coltivati, prataioli, crudi', 400], ['Cipolle, crude', 60], ['Burro', 40], ['Parmigiano Reggiano DOP', 60], ['Olio di oliva extra vergine', 20]],
+        ['Soffriggi la cipolla tritata con l’olio, aggiungi i funghi a lamelle e cuoci 8 minuti.', 'Tosta il riso, poi cuocilo aggiungendo brodo caldo poco alla volta per circa 16 minuti.', 'Manteca fuori dal fuoco con burro e Parmigiano e lascia riposare 2 minuti.'], 'Per il servizio a banchetto: cuocere il riso a 3/4 e finire la cottura in sala.'),
+    recipe('ev-paccheri', 'Paccheri al pomodoro fresco e basilico', 4, [['Pasta di semola', 320], ['Pomodori, maturi', 600], ['Aglio', 10], ['Basilico, fresco', 10], ['Olio di oliva extra vergine', 30], ['Parmigiano Reggiano DOP', 40]],
+        ['Scalda l’olio con l’aglio, aggiungi i pomodori a cubetti e cuoci 15 minuti.', 'Cuoci la pasta al dente e saltala nel sugo.', 'Completa con basilico fresco e Parmigiano.'], 'Togliere l’aglio prima di servire.'),
+    recipe('ev-spigola', 'Filetto di spigola al forno con patate', 4, [['Spigola', 800], ['Patate, crude', 600], ['Limoni, freschi', 60], ['Olio di oliva extra vergine', 30]],
+        ['Taglia le patate a fette sottili e cuocile in forno a 200 °C per 15 minuti.', 'Adagia i filetti sulle patate con olio e limone.', 'Inforna per altri 12 minuti a 180 °C.'], 'Temperatura al cuore del pesce: almeno 63 °C.'),
+    recipe('ev-vitello', 'Filetto di vitello con verdure arrosto', 4, [['Vitello, filetto, crudo', 720], ['Carote, crude', 300], ['Zucchine, crude', 300], ['Olio di oliva extra vergine', 30]],
+        ['Rosola il filetto su tutti i lati in padella molto calda.', 'Cuoci in forno a 180 °C per 15 minuti e fai riposare 5 minuti prima di affettare.', 'Servi con carote e zucchine arrostite con olio.'], 'Temperatura al cuore: 65 °C.'),
+    recipe('ev-pasticceria', 'Piccola pasticceria della casa', 4, [['Farina di frumento, tipo 00', 200], ['Burro', 100], ['Zucchero, saccarosio', 80], ['Uova di gallina, intero', 100], ['Mandorle dolci, secche', 60], ['Cioccolato, fondente', 60]],
+        ['Impasta farina, burro, zucchero e uova per una frolla morbida.', 'Forma piccoli biscotti e mini tartellette, guarnisci con mandorle e cioccolato.', 'Cuoci a 170 °C per 12–15 minuti.'], 'Preparare il giorno prima.'),
+    recipe('ev-frutta', 'Frutta fresca di stagione', 4, [['Mele, fresche, con buccia', 200], ['Arance, fresche', 200], ['Fragole, fresche', 200], ['Kiwi, freschi', 150], ['Uva, fresca', 150]],
+        ['Lava la frutta e tagliala a spicchi.', 'Disponi sui piatti da portata alla fine del servizio.'], 'Tagliare il più tardi possibile e tenere a 4 °C.'),
+    recipe('ev-bevande', 'Selezione di bevande', 1, [['Bevanda alcolica, Vino da pasto bianco', 150], ['Bevanda alcolica, Vino da pasto rosso', 150], ['Bevanda alcolica, Spumante', 100], ["Caffe' tostato", 7]],
+        ['Vino bianco a 8–10 °C, rosso a 16–18 °C, spumante a 6 °C.', 'Acqua naturale e frizzante a volontà, caffè a fine pasto.'], 'Una porzione indicativa a persona. L’acqua non è nel conteggio.'),
+    recipe('ev-bimbi-pasta', 'Pasta al burro e Parmigiano', 4, [['Pasta di semola', 240], ['Burro', 40], ['Parmigiano Reggiano DOP', 40]],
+        ['Cuoci la pasta al dente.', 'Mantecala con burro e Parmigiano.'], 'Per i bambini: porzione piccola, niente piccante.'),
+    recipe('ev-bimbi-pollo', 'Petto di pollo dorato con patate al forno', 4, [['Pollo, petto, crudo', 400], ['Patate, crude', 500], ['Olio di oliva extra vergine', 25]],
+        ['Taglia il pollo a listarelle e le patate a bastoncini.', 'Cuoci in forno a 200 °C per 20 minuti, girando a metà.'], 'Pollo ben cotto: 75 °C al cuore.'),
+];
+const L = [
+    'Questo è il menù che abbiamo pensato per Paola e Fausto: un pranzo di nozze di stagione, con piatti riconoscibili e sapori semplici, in cui gli ospiti possano ritrovarsi e stare bene a tavola. Servono 200 invitati, 20 bambini e 10 persone di staff, per un totale di 230 coperti.',
+    'Il menù è in sei momenti: antipasto, due primi, due secondi, piccola pasticceria e frutta, con le bevande. Le quantità per porzione sono già calcolate nelle schede; la lista della spesa è per 210 coperti (invitati e staff) più il menù dei bambini. Tutti i piatti vanno impiattati con lo stesso peso, perché le calorie dichiarate in tavola devono corrispondere a quelle servite.',
+    'Ci sono ospiti con esigenze alimentari precise: 3 celiaci, 2 celiaci senza lattosio, 1 senza pomodoro e senza nichel, 1 senza aglio e 1 senza frutta secca. Sono nelle pagine Special: ogni menù va preparato a parte, con utensili, pentole e piani di lavoro dedicati, e il piatto va segnalato al servizio con il nome dell’ospite.',
+    'HACCP: controllate e registrate le temperature di frigoriferi e abbattitore a inizio servizio; tenete l’etichettatura con data e ora di produzione su ogni preparazione; il personale lavora con mani lavate, guanti cambiati tra crudo e cotto e abiti puliti. Conservate gli alimenti da campionare per 72 ore.',
+    'Catena del freddo: le materie prime fresche si ricevono sotto i +4 °C e il pesce sul ghiaccio; i piatti cotti da servire freddi si abbattono da +65 °C a +10 °C in meno di 90 minuti; la conservazione è a +4 °C. Il caldo si mantiene sopra i +65 °C fino al servizio, e le rigenerazioni arrivano a +75 °C al cuore.',
+    'Contaminazioni: separate sempre il crudo dal cotto, il pesce dalla carne e i prodotti con glutine, lattosio, frutta a guscio e sedano dagli special, usando taglieri e coltelli di colori diversi. Chi serve gli special consegna il piatto di persona, mai insieme agli altri.',
+];
+const evMenu = {
+    id: 'es-menu-nozze', esempio: true, title: 'Paola e Fausto', subtitle: 'Matrimonio · Villa Falcioni',
+    event: { name: 'Paola e Fausto', kind: 'Matrimonio', guests: '210', style: 'Mediterranea di stagione', location: 'Villa Falcioni', needs: [] },
+    sections: [
+        ['Antipasto', ['ev-caprese']], ['Primi', ['ev-risotto', 'ev-paccheri']], ['Secondi', ['ev-spigola', 'ev-vitello']],
+        ['Piccola pasticceria', ['ev-pasticceria']], ['Frutta', ['ev-frutta']], ['Bevande', ['ev-bevande']],
+    ].map(([name, ids], i) => ({ id: 'es-sec-' + i, name, dishes: ids.map((rid) => ({ rid, w: {} })) })),
+    specials: [
+        { id: 'es-sp-1', kind: 'dieta', name: 'Celiaci', who: '3 ospiti', persons: '3', care: 'Nessuna traccia di glutine: pentole, acqua di cottura, taglieri e forno dedicati. Controllare le etichette di tutti i prodotti. Piatto servito per primo, con segnalino.',
+            subs: [{ from: 'Pasta di semola', to: 'Pasta di riso o mais, senza glutine' }, { from: 'Farina di frumento', to: 'Farina di riso e amido di mais, senza glutine' }] },
+        { id: 'es-sp-2', kind: 'dieta', name: 'Celiaci senza lattosio', who: '2 ospiti', persons: '2', care: 'Doppia attenzione: niente glutine e niente lattosio. Verificare che i prodotti «senza lattosio» siano anche senza glutine. Cucinare con olio, non con burro.',
+            subs: [{ from: 'Pasta di semola', to: 'Pasta di riso o mais, senza glutine' }, { from: 'Farina di frumento', to: 'Farina di riso e amido di mais, senza glutine' }, { from: 'Burro', to: 'Olio di oliva extra vergine' }, { from: 'Mozzarella', to: 'Mozzarella senza lattosio' }] },
+        { id: 'es-sp-3', kind: 'dieta', name: 'Senza pomodoro e senza nichel', who: '1 ospite', persons: '1', care: 'Nichel: evitare pomodoro, cioccolato, frutta secca e legumi; usare pentole di acciaio non graffiate e senza acidi a lungo in cottura. Acqua di cottura non riutilizzata.',
+            subs: [{ from: 'Pomodori', to: 'Zucchine grigliate' }, { from: 'Cioccolato', to: 'Crema alla vaniglia' }, { from: 'Mandorle', to: 'Zucchero a velo' }] },
+        { id: 'es-sp-4', kind: 'dieta', name: 'Senza aglio', who: '1 ospite', persons: '1', care: 'Niente aglio né derivati (anche in polvere o nei brodi pronti). Pulire il piano di lavoro prima.',
+            subs: [{ from: 'Aglio', to: 'Rosmarino fresco' }] },
+        { id: 'es-sp-5', kind: 'dieta', name: 'Senza frutta secca', who: '1 ospite', persons: '1', care: 'Allergia alla frutta a guscio: nessuna traccia, piano di lavoro e utensili dedicati. Controllare le etichette di tutti i prodotti, compresi gli impasti della pasticceria.',
+            subs: [{ from: 'Mandorle', to: 'Gocce di cioccolato' }] },
+        { id: 'es-sp-6', kind: 'bimbi', name: 'Menù bimbi', who: 'i 20 bambini', persons: '20', care: 'Porzioni piccole e senza piccante. Servire per primi, nello stesso momento degli adulti. Frutta già tagliata.',
+            subs: [], dishes: ['ev-bimbi-pasta', 'ev-bimbi-pollo', 'ev-frutta'].map((rid) => ({ rid, w: {} })) },
+    ],
+    letter: L.join('\n\n'),
+};
 const R = Object.fromEntries(ricette.map((r) => [r.id, r]));
 // una ricetta in un pasto: un solo alimento con i valori per 100 g (come fa l'app)
 const recipeItem = (rid, portions = 1) => {
@@ -265,5 +321,5 @@ const file = { format: 'URBIOS', formatVersion: 1, encrypted: false, savedAt: ne
 fs.writeFileSync(root + 'archivio_demo/URBIOS_demo.json', JSON.stringify(file, null, 2));
 // i dati di esempio che l'app aggiunge a ogni archivio (senza salvarli)
 fs.mkdirSync(root + 'src/storage/example', { recursive: true });
-fs.writeFileSync(root + 'src/storage/example/esempio.json', JSON.stringify({ paziente, ricette }));
+fs.writeFileSync(root + 'src/storage/example/esempio.json', JSON.stringify({ paziente, ricette: [...ricette, ...evRicette], menus: [evMenu] }));
 console.log('ok', visite.length, 'visite;', ricette.length, 'ricette;', JSON.stringify(file).length, 'byte');

@@ -196,4 +196,9 @@ body.wd-resizing { cursor: nwse-resize; }
 .wd-fly i { font-size: 20px; }
 
 
+/* compatti: meno righe, meno aria */
+.wd-agenda li { padding: 4px 0; } .wd-agenda .wd-sum { margin-bottom: 4px; }
+.wd-agenda .wd-more { margin: 2px 0 0; font-size: 11.5px; }
+.wd-bday li { padding: 3px 0; } .wd-bday-now { padding: 8px 10px; margin-bottom: 4px; }
+
 `;

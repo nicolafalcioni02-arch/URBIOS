@@ -2,10 +2,12 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 import { DOC_TYPES } from '../catalog';
 import { fmtDate } from '../logic/visits';
 import { artVars } from '../logic/printArt';
+import { UrbiosLogo } from '../../../../brand/UrbiosLogo';
 
 // Marchio URBIOS con copyright, in fondo a ogni foglio
 const BrandMark = ({ style }) => (
     <span className="pc-bm" style={style}>
+        <UrbiosLogo size="3.4mm" style={{ color: '#1b1b1f', flex: 'none' }} />
         <b>URBIOS</b>
         <span>© 2026</span>
     </span>
@@ -52,6 +54,11 @@ export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true
                 </div>
             )}
             {/* senza piè di pagina (copertina o piè disattivato) il marchio resta in fondo da solo */}
+            {!bare && withFoot && !theme.footer && theme.numbers && (
+                <span className="pc-bm pc-bm-num" style={{ position: 'absolute', right: `${m.s}mm`, bottom: `${Math.max(4, m.b - 4)}mm` }}>
+                    Pagina {page} di {total}
+                </span>
+            )}
             {(bare || !withFoot || !theme.footer) && <BrandMark style={{ position: 'absolute', left: '50%', bottom: `${Math.max(4, m.b - 4)}mm`, transform: 'translateX(-50%)' }} />}
         </div>
     );

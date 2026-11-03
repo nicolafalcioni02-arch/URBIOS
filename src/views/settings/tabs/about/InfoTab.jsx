@@ -1,13 +1,16 @@
 import React from 'react';
+import { UrbiosWordmark } from '../../../../brand/UrbiosLogo';
 import { ShaderCanvas } from '../../../../components/visuals/ShaderCanvas';
 import { Label } from '../../ui/kit';
 
 const TEAM = [
-    { name: 'Nicola Falcioni', title: 'Dott.', role: 'Chief Executive Officer' },
-    { name: 'Ilaria Berardi', title: 'Dott.ssa', role: 'Chief Communications Officer' },
-    { name: 'Nicole Bellanova', title: 'Dott.ssa', role: 'Chief Scientific Officer' },
+    { name: 'Nicola Falcioni', title: 'Dott.', role: 'Founder & Chief Executive Officer' },
+    { name: 'Ilaria Berardi', title: 'Dott.ssa', role: 'Science Team' },
+    { name: 'Nicole Bellanova', title: 'Dott.ssa', role: 'Science Team' },
     { name: 'Lorenzo Frattini', title: 'Dott.', role: 'Science Team' },
     { name: 'Riccardo Giardini', title: 'Dott.', role: 'Science Team' },
+    { name: 'Silvia Planchenstainer', title: 'Dott.ssa', role: 'Science Team' },
+    { name: 'Elia Falcioni', title: 'Dott.', role: 'Cryptography & Code Review Consultant' },
 ];
 // ramo d'alloro (lato sinistro); il destro e' lo stesso specchiato
 const Laurel = ({ flip }) => {
@@ -38,7 +41,9 @@ export const InfoTab = () => {
             <div className="mx-auto rounded-full overflow-hidden" style={{ width: 112, height: 112, boxShadow: '0 14px 34px rgba(18,19,23,.14)' }}>
                 <ShaderCanvas size={112} />
             </div>
-            <h1 className="mt-6 text-[22px] font-semibold tracking-[0.42em] text-[color:var(--ink)] pl-[0.42em]">URBIOS</h1>
+            <h1 className="mt-6 text-[color:var(--ink)]">
+                <UrbiosWordmark size={36} />
+            </h1>
             <p className="mt-2 text-[15px] text-[color:var(--muted)]">La piattaforma per nutrizionisti che vogliono crescere</p>
 
             {/* riconoscimento */}

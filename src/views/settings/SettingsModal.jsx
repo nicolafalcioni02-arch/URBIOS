@@ -4,6 +4,7 @@ import { useCompact } from '../../hooks/useCompact';
 import { GROUPS, SECTIONS, sectionById } from './sections';
 import { Icon } from './ui/icons';
 import { IconBtn } from './ui/kit';
+import { UrbiosWordmark } from '../../brand/UrbiosLogo';
 import './settings.css';
 
 // Guscio delle Impostazioni: solo navigazione. Le sezioni stanno in sections.js, ogni scheda in tabs/<cartella>.
@@ -65,7 +66,12 @@ export const SettingsModal = ({ db, onUpdateDb, onClose }) => {
                                     </div>
                                 </div>
                             ))}
-                            <p className="text-center text-[12px] text-[color:var(--muted)] mt-6">© 2026 URBIOS Software</p>
+                            <div className="mt-6 text-center">
+                                <div className="inline-flex items-center gap-2.5 text-[color:var(--ink)]">
+                                    <UrbiosWordmark size={30} />
+                                        </div>
+                                <p className="text-[11px] text-[color:var(--muted)] mt-2">© Software 2026</p>
+                            </div>
                         </>
                     )}
                     <div style={{ height: 32 }}></div>
@@ -94,7 +100,12 @@ export const SettingsModal = ({ db, onUpdateDb, onClose }) => {
                             ))}
                         </nav>
                     </div>
-                    <p className="text-[11.5px] text-[color:var(--muted)] px-2.5 pt-4">© 2026 URBIOS Software</p>
+                    <div className="px-2.5 pt-4">
+                        <div className="flex items-center gap-2.5 text-[color:var(--ink)]">
+                            <UrbiosWordmark size={30} />
+                        </div>
+                        <p className="text-[11px] text-[color:var(--muted)] mt-2">© Software 2026</p>
+                    </div>
                 </aside>
 
                 <main key={tab} className="flex-1 min-w-0 overflow-y-auto relative p-5 md:p-8">

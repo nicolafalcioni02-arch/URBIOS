@@ -6,23 +6,24 @@ export const LOOKS = [
     {
         id: 'classico',
         name: 'Classico',
-        sub: 'Carta calda e inchiostro, pulito e sobrio',
+        sub: 'Per i più seri, che amano l\'eleganza: carta calda, inchiostro e niente fronzoli',
         swatches: ['#F6F5F2', '#FFFFFF', '#121317', '#2F54EB'],
     },
     {
         id: 'vetro',
         name: 'Vetro',
-        sub: 'Liquid Glass come iOS e macOS, sfumature pastello',
+        sub: 'Per i più creativi e vivaci, che amano il colore: vetro, sfumature e un pizzico di follia',
         swatches: ['#F4F0E4', '#E3EC4F', '#C9C3F2', '#F6CDB4'],
     },
 ];
 
-export const DEFAULT_LOOK = 'classico';
+export const DEFAULT_LOOK = 'vetro';
 
 export const lookOf = (db) => (LOOKS.some((l) => l.id === db?.aspetto) ? db.aspetto : DEFAULT_LOOK);
 
 export const applyLook = (id) => {
     const root = document.documentElement;
-    if (!id || id === DEFAULT_LOOK) delete root.dataset.look;
-    else root.dataset.look = id;
+    const look = id || DEFAULT_LOOK;
+    if (look === 'classico') delete root.dataset.look;
+    else root.dataset.look = look;
 };

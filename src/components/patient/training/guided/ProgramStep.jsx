@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DayEditor } from './DayEditor';
+import { ToolFan } from '../../shared/GuidedParts';
 import { GridView } from './GridView';
 import { CellPanel } from './CellPanel';
 import { WeekPanel } from './WeekPanel';
@@ -114,28 +115,21 @@ export const ProgramStep = ({ weeks, setWeeks, ops, exerciseDB, suggestions, mas
     return (
         <div className="max-w-3xl mx-auto dg-in">
             {/* strumenti del passo */}
-            {!compact && <div className="dg-toolbar" style={{ marginTop: 0 }}>
-                <button className="dg-sm" onClick={onExercises}>
-                    <i className="ph ph-list-magnifying-glass"></i> {compact ? 'Esercizi' : 'Database esercizi'}
-                </button>
-                <button className="dg-sm" onClick={onTools}>
-                    <i className="ph ph-calculator"></i> {compact ? 'Massimali' : 'Massimali e calcolatori'}
-                </button>
-                <button className="dg-sm" onClick={onProgression}>
-                    <i className="ph ph-trend-up"></i> {compact ? 'Progressione' : 'Genera progressione'}
-                </button>
-                <button className="dg-sm" onClick={onAnalysis}>
-                    <i className="ph ph-chart-bar"></i> {compact ? 'Analisi' : 'Analisi della scheda'}
-                </button>
-            </div>}
-
-            <div className="t-mode" role="tablist" aria-label="Vista">
+            <div className="t-viewrow">
+                <div className="t-mode" role="tablist" aria-label="Vista">
                 <button role="tab" aria-selected={mode === 'list'} className={mode === 'list' ? 'on' : ''} onClick={() => setMode('list')}>
                     <i className="ph ph-list"></i> Lista
                 </button>
                 <button role="tab" aria-selected={mode === 'grid'} className={mode === 'grid' ? 'on' : ''} onClick={() => setMode('grid')}>
                     <i className="ph ph-table"></i> Griglia
                 </button>
+            </div>
+                {!compact && <ToolFan side="before" small label="Strumenti" icon="ph-wrench" items={[
+                    { label: 'Esercizi', icon: 'ph-list-magnifying-glass', onClick: onExercises },
+                    { label: 'Massimali', icon: 'ph-calculator', onClick: onTools },
+                    { label: 'Progressione', icon: 'ph-trend-up', onClick: onProgression },
+                    { label: 'Analisi', icon: 'ph-chart-bar', onClick: onAnalysis },
+                ]} />}
             </div>
             {mode === 'grid' ? (
                 <GridView weeks={weeks} di={di} onDay={setDi} onOpen={(weekId, dayIndex, exKey) => setCell({ weekId, dayIndex, exKey })}

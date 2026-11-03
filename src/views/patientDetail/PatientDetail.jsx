@@ -9,7 +9,7 @@ import { useCompact } from '../../hooks/useCompact';
 import { MobileTabBar } from '../../components/mobile/MobileChrome';
 import { docsSummary } from '../../components/patient/info/documentsLogic';
 
-export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = false, onOpenAgenda }) => {
+export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = false, onOpenAgenda, onOpenChef }) => {
     // un paziente senza visite parte dall'anagrafica, gli altri dallo storico
     const [view, setView] = useState(patient?.visite?.length ? 'history' : 'info');
     // lo stato è un dato del paziente (si cambia dall'Anagrafica)
@@ -243,6 +243,7 @@ export const PatientDetail = ({ patient, onBack, onUpdateDb, db, readOnly = fals
                 visitKey={visitKey}
                 onUpdateDb={onUpdateDb}
                 onOpenDiet={(visitId) => goTab('diet', visitId)}
+                onOpenChef={onOpenChef}
                 patient={patient}
                 setConfigA={setConfigA}
                 setConfigB={setConfigB}

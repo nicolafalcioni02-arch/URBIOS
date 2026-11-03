@@ -98,23 +98,23 @@ export const SmartPlotModal = ({ patient, onClose }) => {
             <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose}></div>
             <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-7xl h-[92vh] relative z-10 flex flex-col overflow-hidden fade-enter animate-in zoom-in-95 duration-300">
                 {/* Header */}
-                <div className="p-8 border-b border-gray-100 flex justify-between items-start bg-gray-50/50">
+                <div className="p-5 sm:p-8 border-b border-gray-100 flex justify-between items-start gap-3 bg-gray-50/50">
                     <div>
-                        <h2 className="text-3xl font-bold text-gray-900">Total Analytics Portal</h2>
+                        <h2 className="text-xl sm:text-3xl font-bold text-gray-900">Total Analytics Portal</h2>
                         <p className="text-gray-500 text-sm">
                             Analisi trend storico: {patient.nome} {patient.cognome}
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center hover:rotate-90 transition-all hover:bg-gray-800"
+                        className="sp-close flex-none w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black text-white flex items-center justify-center hover:rotate-90 transition-all hover:bg-gray-800"
                     >
                         <i className="ph ph-x text-2xl"></i>
                     </button>
                 </div>
 
                 {/* Selettore Metriche */}
-                <div className="p-6 bg-white border-b border-gray-100 overflow-y-auto max-h-[25vh]">
+                <div className="p-4 sm:p-6 bg-white border-b border-gray-100 overflow-y-auto max-h-[25vh]">
                     <div className="flex flex-wrap gap-2">
                         {allMetrics.map((m) => (
                             <button
@@ -130,7 +130,7 @@ export const SmartPlotModal = ({ patient, onClose }) => {
                 </div>
 
                 {/* Area Grafico */}
-                <div className="flex-1 p-8 bg-white min-h-0 relative">
+                <div className="flex-1 p-4 sm:p-8 bg-white min-h-0 relative">
                     <Line data={chartData} options={options} />
                 </div>
             </div>

@@ -18,7 +18,7 @@ settings/
     profile/          4 schede sullo stesso oggetto db.utente
       useProfile.js     [user, update] — salva subito in db (niente tasto Salva)
       ProfileTab        Dati anagrafici + professionali
-      BillingTab        Fatturazione + assicurazione
+      BillingTab        Fatturazione + valori delle nuove fatture (db.utente.fatt_*) + assicurazione
       DocumentsTab      Testi report + lettera di incarico + GDPR
       ScheduleTab       Orari, durate visite, disdette
       sections/*.jsx    i singoli gruppi di campi (props: localUser, updateUser)

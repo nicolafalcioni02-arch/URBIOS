@@ -1,6 +1,7 @@
 // Scheda per creare/modificare un appuntamento. Durate, luoghi e politica di cancellazione arrivano dalle
 // impostazioni del professionista (le stesse del contratto).
 import React, { useEffect, useMemo, useState } from 'react';
+import { ChefPick } from '../../chef/ChefPick';
 import { TIPI, STATI, defaultDur, conflictsWith, outsideHours, apptTitle, startOf, tipoOf, fmtTime } from '../../components/agenda/agendaLogic';
 
 const DURS = [15, 30, 45, 60, 90];
@@ -47,14 +48,12 @@ export const AppointmentSheet = ({ draft, isNew, db, settings, items, onSave, on
                 </div>
 
                 <label className="fld-label">Paziente</label>
-                <select className="fld" value={a.pid} onChange={(e) => set({ pid: e.target.value })}>
-                    <option value="">Nessuno (appuntamento libero)</option>
-                    {patients.map((p) => (
-                        <option key={p.id} value={p.id}>
-                            {p.nome} {p.cognome}
-                        </option>
-                    ))}
-                </select>
+                <ChefPick className="fld-pick" minSearch={0} value={a.pid} placeholder="Nessuno (appuntamento libero)" onChange={(v) => set({ pid: v })}
+                    options={[{ value: '', label: 'Nessuno (appuntamento libero)' }, ...[...patients].sort((x, y) => `${x.cognome} ${x.nome}`.localeCompare(`${y.cognome} ${y.nome}`)).map((p) => ({
+                        value: p.id,
+                        label: `${p.nome} ${p.cognome}`.trim(),
+                        sub: [p.dataNascita ? new Date(p.dataNascita).toLocaleDateString('it-IT') : '', (p.visite || []).length ? `${p.visite.length} visite` : ''].filter(Boolean).join(' · '),
+                    }))]} />
                 {!a.pid && <input className="fld mt-2" value={a.titolo} onChange={(e) => set({ titolo: e.target.value })} placeholder="Titolo (es. Riunione, Corso…)" />}
 
                 <label className="fld-label mt-4">Tipo</label>
@@ -94,15 +93,8 @@ export const AppointmentSheet = ({ draft, isNew, db, settings, items, onSave, on
                 </div>
 
                 <label className="fld-label mt-4">Luogo</label>
-                <select className="fld" value={placeOptions.includes(a.luogo) ? a.luogo : a.luogo ? '__altro' : ''} onChange={(e) => set({ luogo: e.target.value === '__altro' ? a.luogo || ' ' : e.target.value })}>
-                    <option value="">Non indicato</option>
-                    {placeOptions.map((p) => (
-                        <option key={p} value={p}>
-                            {p}
-                        </option>
-                    ))}
-                    <option value="__altro">Altro…</option>
-                </select>
+                <ChefPick className="fld-pick" searchable={false} value={placeOptions.includes(a.luogo) ? a.luogo : a.luogo ? '__altro' : ''} placeholder="Non indicato" onChange={(v) => set({ luogo: v === '__altro' ? a.luogo || ' ' : v })}
+                    options={[{ value: '', label: 'Non indicato' }, ...placeOptions.map((p) => ({ value: p, label: p })), { value: '__altro', label: 'Altro…' }]} />
                 {a.luogo && !placeOptions.includes(a.luogo) && <input className="fld mt-2" value={a.luogo.trim() === '' ? '' : a.luogo} onChange={(e) => set({ luogo: e.target.value || ' ' })} placeholder="Indirizzo o luogo" />}
                 {!places.length && <p className="ag-hint">Aggiungi l’indirizzo dello studio in Impostazioni → Dati professionali: comparirà qui.</p>}
 

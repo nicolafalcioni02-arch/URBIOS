@@ -30,6 +30,12 @@
 .st-group + .st-group, .st-page > .st-note + .st-group, .st-group + .st-note { margin-top: 14px; }
 .st-group-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
 .st-group-head:last-child { margin-bottom: 0; }
+/* telefono: se il titolo ha una spiegazione, il tasto di lato va sotto (altrimenti il testo si stringe a una colonnina) */
+@media (max-width: 639px) {
+    .st-group-head:has(.st-hint) { flex-wrap: wrap; }
+    .st-group-head:has(.st-hint) > .flex-1 { flex-basis: calc(100% - 27px); }
+    .st-group-head:has(.st-hint) > .st-btn { margin-left: 27px; }
+}
 .st-group-ico { color: var(--muted); margin-top: 1px; flex: none; }
 .st-group-title { font-size: 15px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
 .st-hint { margin-top: 3px; font-size: 13px; line-height: 1.45; color: var(--muted); }

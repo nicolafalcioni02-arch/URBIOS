@@ -39,6 +39,17 @@ export const guidedCss = `
 .dg-step.on .dg-dot { background: #fff; color: var(--ink); }
 .dg-step .dg-dot i { color: var(--ok); animation: pop .45s var(--ease) backwards; }
 /* strumenti del passo */
+.dg-fan { display: inline-flex; align-items: center; max-width: 100%; }
+.dg-fan-items { display: flex; flex-wrap: nowrap; gap: 8px; overflow: hidden; max-width: 0; opacity: 0; transition: max-width .5s var(--ease), opacity .25s, margin .5s var(--ease); }
+.dg-fan.open .dg-fan-items { max-width: 760px; opacity: 1; }
+.dg-fan > .dg-fan-items:first-child { margin-right: 0; } .dg-fan.open > .dg-fan-items:first-child { margin-right: 8px; }
+.dg-fan > .dg-fan-main + .dg-fan-items { margin-left: 0; } .dg-fan.open > .dg-fan-main + .dg-fan-items { margin-left: 6px; }
+.dg-fan-items > * { opacity: 0; transform: translateX(10px) scale(.92); transition: opacity .3s, transform .45s var(--ease), border-color .2s; transition-delay: 0s; white-space: nowrap; flex: none; }
+.dg-fan > .dg-fan-items:first-child > * { transform: translateX(14px) scale(.92); }
+.dg-fan.open .dg-fan-items > * { opacity: 1; transform: none; transition-delay: calc(var(--i) * 55ms); }
+.dg-fan-main { white-space: nowrap; flex: none; }
+.dg-fan-main.is-open { background: var(--ink); color: #fff; border-color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .dg-fan-items, .dg-fan-items > * { transition: none !important; } }
 .dg-toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
 .dg-sm { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 13px; border-radius: 999px; border: 1px solid transparent; background: var(--soft); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; }
 .dg-sm:hover { border-color: var(--ink); }

@@ -278,7 +278,8 @@ export const trainingCss = `
                 .t-grid-actions .dg-sm.t-on { background: var(--ink); color: #fff; border-color: var(--ink); }
                 .t-grid-tools2 { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
                 .t-grid-tools2 .dg-sm { flex: 1 1 calc(50% - 6px); justify-content: center; height: 42px; }
-                .t-grid tbody th.pickable { cursor: pointer; }
+                .t-grid tbody th.pickable, .t-grid tbody th.t-grid-name { cursor: pointer; }
+                .t-grid tbody th.t-grid-name:hover { text-decoration: underline; text-underline-offset: 3px; }
                 .t-grid-check { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 8px; vertical-align: -4px; border-radius: 50%; border: 1.5px solid #B5B3AE; background: #fff; color: #fff; font-size: 11px; font-style: normal; }
                 .t-grid-check.on { background: var(--ink); border-color: var(--ink); }
                 .t-grid-bar { position: sticky; bottom: 84px; z-index: 6; display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 8px; border-radius: 18px; background: #fff; border: 1px solid var(--line); box-shadow: 0 10px 28px rgba(18,19,23,.16); }
@@ -291,6 +292,9 @@ export const trainingCss = `
                 .t-grid-new .dg-sm { height: 46px; flex: none; }
                 .t-cell-done { width: 100%; height: 52px; border-radius: 16px; }
                 /* ---- vista a griglia: settimane in colonne ---- */
+                .t-viewrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 14px; }
+                .t-viewrow .t-mode { margin: 0; flex: none; }
+                .t-viewrow .dg-fan { margin-left: auto; }
                 .t-mode { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--soft); margin: 0 0 12px; }
                 .t-mode button { display: inline-flex; align-items: center; gap: 6px; height: 36px; min-height: 0; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); }
                 .t-mode button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(18,19,23,.12); }

@@ -8,11 +8,12 @@ import { DietPreviewModal } from './modals/DietPreviewModal';
 import { HistoryStatsCards } from './sections/HistoryStatsCards';
 import { HistoryToolbar } from './sections/HistoryToolbar';
 import { VisitList } from './sections/VisitList';
+import { InvoiceModal } from '../../../invoices/InvoiceModal';
 import { isIndependent } from '../diet/guided/guidedLogic';
 import { statusById } from '../shared/planCommon';
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
+export const HistoryView = ({ patient, events = [], recipes = {}, onOpenChef, onUpdateDb, onOpenDiet, prof = {} }) => {
     const [showSmartPlot, setShowSmartPlot] = useState(false);
     const [activeMenu, setActiveMenu] = useState(null);
     const [selectedVisit, setSelectedVisit] = useState(null);
@@ -23,6 +24,7 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
     const [dietVisit, setDietVisit] = useState(null); // visita di cui si guarda l'anteprima della dieta
     const [swap, setSwap] = useState(null); // 'fwd' | 'back' mentre si passa da dettaglio a piano (e ritorno): niente lampo, scorre solo il contenuto
     const [dietFromDetail, setDietFromDetail] = useState(false); // l'anteprima è stata aperta dal dettaglio della visita: la freccia indietro ci torna
+    const [invoiceFor, setInvoiceFor] = useState(null); // { visit, invoice } mentre si emette o modifica una fattura
     const [toDelete, setToDelete] = useState(null); // visita da eliminare, in attesa di conferma
 
     useEffect(() => {
@@ -129,6 +131,7 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
                 setShowSmartPlot={setShowSmartPlot}
             />
 
+            {invoiceFor && <InvoiceModal patient={patient} prof={prof} visit={invoiceFor.visit} menu={invoiceFor.menu} service={invoiceFor.service} invoice={invoiceFor.invoice} onUpdateDb={onUpdateDb} onPrint={printCenter ? (id) => printCenter.open([{ type: 'fattura', invoiceId: id }]) : null} onClose={() => setInvoiceFor(null)} />}
             {showSmartPlot && <SmartPlotModal patient={patient} onClose={() => setShowSmartPlot(false)} />}
 
             {/* ── VISITS TIMELINE ───────────────────────────────────────── */}
@@ -136,6 +139,12 @@ export const HistoryView = ({ patient, onUpdateDb, onOpenDiet }) => {
                 <VisitList
                     patient={patient}
                     filteredVisits={filteredVisits}
+                    events={searchTerm ? [] : events}
+                    recipes={recipes}
+                    onPrintMenu={printCenter ? (m) => printCenter.open([{ type: 'menu', menuId: m.id }]) : null}
+                    onOpenChef={onOpenChef}
+                    onInvoice={(visit, invoice, menu, service) => setInvoiceFor({ visit, invoice, menu, service })}
+                    onPrintInvoice={printCenter ? (inv) => printCenter.open([{ type: 'fattura', invoiceId: inv.id }]) : null}
                     getDietBadge={getDietBadge}
                     getWeightDelta={getWeightDelta}
                     handleDelete={handleDelete}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Page } from '../../ui/kit';
 import { BillingDataSection } from './sections/BillingDataSection';
+import { InvoiceDefaultsSection } from './sections/InvoiceDefaultsSection';
 import { InsuranceLegalSection } from './sections/InsuranceLegalSection';
 import { useProfile, AUTOSAVE_NOTE } from './useProfile';
 
@@ -9,6 +10,7 @@ export const BillingTab = ({ db, onUpdateDb }) => {
     return (
         <Page title="Fatturazione" intro={`Dati fiscali, pagamenti e assicurazione professionale. ${AUTOSAVE_NOTE}`}>
             <BillingDataSection localUser={user} updateUser={update} />
+            <InvoiceDefaultsSection localUser={user} updateUser={update} />
             <InsuranceLegalSection localUser={user} updateUser={update} />
         </Page>
     );

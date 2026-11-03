@@ -21,3 +21,4 @@ Come funziona l'impaginazione: ogni documento "flow" è HTML. Viene misurato in 
 visibili e diviso in pagine vere; ogni pezzo ricorda il suo elemento d'origine (`data-pc-id`), così dopo una modifica
 a mano le pagine si ricuciono (`mergeFragments`) e si reimpaginano. Le pagine dei grafici sono "fixed": già composte,
 si riducono da sole per stare nel foglio. In `db.stampa` restano solo stile, ultimo pacchetto e pacchetti salvati.
+Le modifiche a mano si salvano alla chiusura (se confermi) in `paziente.stampaModifiche`, per documento+opzioni (`editKey`), e si ripristinano all apertura.

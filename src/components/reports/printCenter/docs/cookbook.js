@@ -4,10 +4,10 @@ import { esc, fmtDate, multiline } from '../logic/visits';
 // Frontespizio, lettera "Prima di cominciare", indice, una ricetta per pagina (o due, nella vista compatta) e chiusura.
 
 export const COOKBOOK_VIEWS = [
+    { id: 'compatto', label: 'Compatto', desc: 'Più ricette per pagina, meno fogli', icon: 'ph-rows' },
     { id: 'libro', label: 'Libro', desc: 'Una ricetta per pagina, con note da scrivere', icon: 'ph-book-open' },
-    { id: 'compatto', label: 'Compatto', desc: 'Due ricette per pagina, meno fogli', icon: 'ph-rows' },
 ];
-export const COOKBOOK_DEFAULT_OPTS = { scope: 'piano', title: 'Il ricettario', intro: true, index: true, notes: true, closing: true };
+export const COOKBOOK_DEFAULT_OPTS = { scope: 'piano', title: 'Il ricettario', intro: true, index: true, notes: false, closing: true, view: 'compatto' };
 
 const n = (v) => {
     const x = parseFloat(String(v ?? '').replace(',', '.'));
@@ -35,8 +35,8 @@ const usesInPlan = (visit) => {
 };
 
 // ricette da stampare: quelle del piano (se ce ne sono) oppure tutta la libreria
-export const pickRecipes = (db, visit, scope) => {
-    const all = recipesOf(db);
+export const pickRecipes = (db, visit, scope, ids) => {
+    const all = recipesOf(db).filter((r) => !ids || ids.includes(r.id)); // ids: ricette scelte dal Chef
     const uses = usesInPlan(visit);
     const inPlan = all.filter((r) => uses.has(r.id));
     const list = scope === 'tutte' || !inPlan.length ? all : inPlan;
@@ -44,10 +44,12 @@ export const pickRecipes = (db, visit, scope) => {
 };
 
 // ordine da libro: per pasto (colazione → cena), poi alfabetico
-const COURSE_ORDER = ['colazione', 'spuntino', 'pranzo', 'merenda', 'cena'];
-const courseOf = (r, uses) => {
+const COURSE_ORDER = ['colazione', 'spuntino', 'pranzo', 'merenda', 'cena', 'antipast', 'prim', 'second', 'contorn', 'dolc', 'snack'];
+// pasto del piano; se la ricetta non è nel piano, la sua categoria (Primi, Dolci…). "Le altre ricette" solo accanto a ricette del piano
+const courseOf = (r, uses, fromPlan) => {
     const m = uses.get(r.id);
-    return m && m.size ? [...m][0] : 'Le altre ricette';
+    if (m && m.size) return [...m][0];
+    return String(r.category || '').trim() || (fromPlan ? 'Le altre ricette' : 'Ricette');
 };
 const courseRank = (c) => {
     const i = COURSE_ORDER.findIndex((x) => String(c).toLowerCase().includes(x));
@@ -86,10 +88,10 @@ ${notes && !compact ? '<div class="d-rb-notes"><b>Le tue note</b><i></i><i></i><
 
 export const buildCookbookHtml = ({ patient: p, prof, db, visit, opts = {} }) => {
     const o = { ...COOKBOOK_DEFAULT_OPTS, ...opts };
-    const compact = o.view === 'compatto';
-    const { list, uses, fromPlan } = pickRecipes(db, visit, o.scope);
+    const compact = o.view !== 'libro';
+    const { list, uses, fromPlan } = pickRecipes(db, visit, o.scope, o.ids);
     if (!list.length) return '<div class="d-doc"><p class="d-placeholder">Non ci sono ancora ricette salvate: si creano dal piano alimentare, con il pulsante «Ricetta».</p></div>';
-    const recipes = [...list].sort((a, b) => courseRank(courseOf(a, uses)) - courseRank(courseOf(b, uses)) || a.title.localeCompare(b.title, 'it'));
+    const recipes = [...list].sort((a, b) => courseRank(courseOf(a, uses, fromPlan)) - courseRank(courseOf(b, uses, fromPlan)) || a.title.localeCompare(b.title, 'it'));
     const author = [prof.nome, prof.cognome].filter(Boolean).join(' ');
     const role = prof.titolo_professionale || '';
     const patientName = `${p.nome || ''} ${p.cognome || ''}`.trim();
@@ -128,19 +130,19 @@ ${sig}
         ? (() => {
               const groups = [];
               recipes.forEach((r, i) => {
-                  const c = courseOf(r, uses);
+                  const c = courseOf(r, uses, fromPlan);
                   let g = groups.find((x) => x.c === c);
                   if (!g) groups.push((g = { c, rows: [] }));
                   g.rows.push(`<div class="d-rb-idx-r"><span class="d-rb-idx-n">${pad(i)}</span><span>${esc(r.title)}</span><i></i><small>${r0(perServing(r).kcal)} kcal</small></div>`);
               });
-              return `<section class="d-rb-index pc-break"><h2 class="d-h">Indice delle ricette</h2>${groups.map((g) => `<div class="d-rb-idx-g"><h3 class="d-rb-h">${esc(g.c)}</h3>${g.rows.join('')}</div>`).join('')}</section>`;
+              return `<section class="d-rb-index${o.intro ? ' d-rb-after' : ' pc-break'}"><h2 class="d-h">Indice delle ricette</h2>${groups.map((g) => `<div class="d-rb-idx-g"><h3 class="d-rb-h">${esc(g.c)}</h3>${g.rows.join('')}</div>`).join('')}</section>`;
           })()
         : '';
 
-    const body = recipes.map((r, i) => recipeHtml(r, i, courseOf(r, uses), { notes: o.notes, compact, breakBefore: !compact || i === 0 })).join('');
+    const body = recipes.map((r, i) => recipeHtml(r, i, courseOf(r, uses, fromPlan), { notes: o.notes, compact, breakBefore: !compact || (i === 0 && (o.intro || o.index)) })).join('');
 
     const closing = o.closing
-        ? `<section class="d-rb-end pc-break"><div class="d-rb-orn"><span></span><i>✦</i><span></span></div><h2 class="d-title d-rb-booktitle small">Buon appetito!</h2>
+        ? `<section class="d-rb-end${compact ? ' d-rb-endc' : ' pc-break'}"><div class="d-rb-orn"><span></span><i>✦</i><span></span></div><h2 class="d-title d-rb-booktitle small">Buon appetito!</h2>
 <p class="d-rb-for">Cucinare per sé è un gesto di cura. Grazie per averlo fatto insieme a noi.</p>${sig}
 <div class="d-rb-contacts">${[prof.indirizzo_studio, prof.citta_studio, prof.telefono, prof.email].filter(Boolean).map((x) => `<span>${esc(x)}</span>`).join('')}</div>
 <div class="d-rb-ed">${esc(fmtDate(new Date()))}</div></section>`

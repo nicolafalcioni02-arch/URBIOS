@@ -6,6 +6,7 @@ import { trainingContext } from '../../../../ai/trainingSection';
 import { analyzeScheda } from '../logic/analysis';
 import { goalById } from '../logic/science/guidelines';
 import { goalShort, levelShort, schedaText } from './trainingGuidedLogic';
+import { AiTextTools } from '../../../../ai/AiTextTools';
 
 // Aiuto AI per la scheda: scegli il problema, copia il prompt, incollalo nel tuo agente AI.
 // Per "costruisci tu la scheda" la risposta si incolla qui e la scheda viene compilata.
@@ -151,7 +152,9 @@ PROBLEMA: ${problem.label}${problem.ask ? `\n${problem.ask}` : ''}${detail.trim(
                             {kind && (
                                 <div className="mt-5 dg-in">
                                     <label className="fld-label">{problem.fillsPlan ? 'Indicazioni per la scheda' : 'Descrivi meglio il problema (facoltativo)'}</label>
+                                    <AiTextTools value={detail} onChange={setDetail} getEl={() => document.getElementById('ai-detail')} />
                                     <textarea
+                                        id="ai-detail"
                                         className="fld"
                                         rows={3}
                                         style={{ height: 'auto', padding: 14 }}
@@ -185,7 +188,8 @@ PROBLEMA: ${problem.label}${problem.ask ? `\n${problem.ask}` : ''}${detail.trim(
                             <p className="dg-hint" style={{ color: '#7A5B0B' }}><i className="ph ph-shield-warning"></i> Non scrivere nome, residenza, contatti o altri dati che identificano il paziente (GDPR e AI Act): solo dati clinici.</p>
                             <details className="mt-4">
                                 <summary className="cursor-pointer text-[13px] text-[color:var(--muted)]">Mostra il testo ({prompt.length.toLocaleString('it-IT')} caratteri)</summary>
-                                <pre className="mt-2 p-4 rounded-2xl bg-[color:var(--soft)] max-h-64 overflow-auto text-[12px] whitespace-pre-wrap">{prompt}</pre>
+                                <AiTextTools value={prompt} getEl={() => document.getElementById('ai-prompt')} />
+                                <pre id="ai-prompt" className="mt-2 p-4 rounded-2xl bg-[color:var(--soft)] max-h-64 overflow-auto text-[12px] whitespace-pre-wrap">{prompt}</pre>
                             </details>
                             <button className="vw-next w-full mt-5 !h-14 text-[16px]" onClick={doCopy}>
                                 <i className={`ph ${copied ? 'ph-check' : 'ph-copy'}`}></i> {copied ? 'Copiato!' : 'Clicca per copiare il prompt'}
@@ -197,9 +201,11 @@ PROBLEMA: ${problem.label}${problem.ask ? `\n${problem.ask}` : ''}${detail.trim(
                         <div className="dg-in">
                             <h3 className="text-[22px] font-semibold">Incolla la risposta dell’AI</h3>
                             <p className="dg-sub">Anche con testo prima o dopo: ripulisco io.</p>
+                            <AiTextTools value={pasted} onChange={(v) => { setPasted(v); setResult(null); }} getEl={() => document.getElementById('ai-pasted')} />
                             <textarea
+                                id="ai-pasted"
                                 autoFocus
-                                className="fld mt-4"
+                                className="fld"
                                 rows={12}
                                 style={{ height: 'auto', padding: 14, fontFamily: 'ui-monospace, Menlo, monospace', fontSize: 12.5 }}
                                 placeholder={'```json\n{ "format": "URBIOS-AI", ... }\n```'}

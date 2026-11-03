@@ -3,6 +3,7 @@ import { activeQuestions } from './interview';
 import { buildPrompt, newRequestId } from './promptBuilder';
 import { parseAiResponse } from './responseParser';
 import { GROUP_ICON, SECTIONS } from './fieldRegistry';
+import { AiTextTools } from './AiTextTools';
 import { DietReview } from './DietReview';
 import { dietContext } from './dietSection';
 import { TrainingReview } from './TrainingReview';
@@ -439,9 +440,11 @@ export const UrbiosAiModal = ({ patient, visitDraft, db, onClose, onApplyPatient
                                 ))}
                             </div>
                         )}
+                        <AiTextTools value={answers[q.id] || ''} onChange={(v) => setAnswer(q.id, v)} getEl={() => document.getElementById('uai-answer')} />
                         <textarea
+                            id="uai-answer"
                             autoFocus
-                            className="fld mt-5"
+                            className="fld"
                             rows={q.long ? 8 : 3}
                             style={{ height: 'auto', padding: 14, resize: 'vertical' }}
                             placeholder={q.placeholder}
@@ -511,7 +514,8 @@ export const UrbiosAiModal = ({ patient, visitDraft, db, onClose, onApplyPatient
                         )}
                         <details className="mt-5">
                             <summary className="cursor-pointer text-[13px] text-[color:var(--muted)]">Mostra il prompt ({prompt.length.toLocaleString('it-IT')} caratteri)</summary>
-                            <pre className="uai-pre mt-2 p-4 rounded-2xl bg-[color:var(--soft)] max-h-72 overflow-auto">{prompt}</pre>
+                            <AiTextTools value={prompt} getEl={() => document.getElementById('uai-prompt')} />
+                            <pre id="uai-prompt" className="uai-pre p-4 rounded-2xl bg-[color:var(--soft)] max-h-72 overflow-auto">{prompt}</pre>
                         </details>
                         <button className="vw-next w-full mt-5 !h-14 text-[16px]" disabled={!sections.length} onClick={doCopy}>
                             <i className={`ph ${copied ? 'ph-check' : 'ph-copy'}`}></i> {copied ? 'Copiato! Incollalo nel tuo agente AI' : 'Clicca per copiare il prompt'}
@@ -529,9 +533,11 @@ export const UrbiosAiModal = ({ patient, visitDraft, db, onClose, onApplyPatient
                     <div className="max-w-3xl mx-auto uai-in">
                         <h3 className="text-[24px] font-semibold">Incolla la risposta dell’AI</h3>
                         <p className="text-[14.5px] text-[color:var(--muted)] mt-1">Anche con testo prima o dopo il blocco: mi occupo io di ripulirla.</p>
+                        <AiTextTools value={pasted} onChange={(v) => { setPasted(v); setResult(null); }} getEl={() => document.getElementById('uai-pasted')} />
                         <textarea
+                            id="uai-pasted"
                             autoFocus
-                            className="fld mt-5 uai-pre"
+                            className="fld uai-pre"
                             rows={14}
                             style={{ height: 'auto', padding: 14 }}
                             placeholder={'```json\n{ "format": "URBIOS-AI", ... }\n```'}
@@ -693,4 +699,4 @@ const Shell = ({ children, onClose }) => (
     </div>
 );
 
-const Footer = ({ children }) => <div className="flex-none flex items-center justify-between gap-3 px-5 sm:px-8 py-4 border-t border-[color:var(--line)] bg-[var(--paper)]">{children}</div>;
+const Footer = ({ children }) => <div className="uai-foot flex-none flex items-center justify-between gap-3 px-5 sm:px-8 py-4 border-t border-[color:var(--line)] bg-[var(--paper)]" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>{children}</div>;

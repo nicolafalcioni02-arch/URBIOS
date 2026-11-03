@@ -119,7 +119,9 @@ export const TrainingGuided = ({
 
             <div className="dg-body" data-step={step}>
                 <div key={step} className={dir}>
-                <StepTitle id={step} dir="" title={TITLES[step][0]} hint={TITLES[step][1]} />
+                <div className="max-w-3xl mx-auto">
+                    <StepTitle id={step} dir="" title={TITLES[step][0]} hint={TITLES[step][1]} />
+                </div>
                 {step === 'setup' && <SetupStep header={header} setHeader={setHeader} weeks={weeks} setWeeks={setWeeks} onDone={() => setStep('program')} />}
                 {step === 'program' && (
                     <ProgramStep

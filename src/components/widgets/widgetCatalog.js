@@ -14,7 +14,7 @@ import { Birthdays } from './widgets/Birthdays';
 
 export const WIDGETS = [
     { type: 'clock', label: 'Orologio', icon: 'ph-clock', Component: ClockRoman, tone: 'carta', size: [3, 3], min: [1, 1], fit: 'contain', fixed: true },
-    { type: 'agenda', label: 'Appuntamenti', icon: 'ph-calendar-check', Component: Agenda, tone: 'carta', size: [4, 3], min: [2, 3], fit: 'width' },
+    { type: 'agenda', label: 'Appuntamenti', icon: 'ph-calendar-check', Component: Agenda, tone: 'carta', size: [4, 4], min: [2, 3], fit: 'contain' },
     { type: 'birthdays', label: 'Compleanni', icon: 'ph-cake', Component: Birthdays, tone: 'salvia', size: [3, 2], min: [2, 2], fit: 'width' },
     { type: 'postit', label: 'Foglietto', icon: 'ph-note', Component: PostIt, tone: 'sabbia', size: [3, 3], min: [2, 2], fit: 'width' },
     { type: 'todo', label: 'Da fare', icon: 'ph-list-checks', Component: TodoNotebook, tone: 'carta', size: [4, 3], min: [2, 2], fit: 'width' },

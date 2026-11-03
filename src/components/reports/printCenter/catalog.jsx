@@ -9,6 +9,10 @@ import { PROGRESS_VIEWS, buildProgressHtml } from './docs/progressReport';
 import { DIET_DEFAULT_PARTS, DIET_VIEWS, buildDietHtml } from './docs/dietReport';
 import { TRAINING_VIEWS, buildTrainingViewHtml } from './docs/trainingViews';
 import { COOKBOOK_DEFAULT_OPTS, COOKBOOK_VIEWS, buildCookbookHtml, pickRecipes, recipesOf } from './docs/cookbook';
+import { MENU_DEFAULT_OPTS, MENU_VIEWS, buildMenuHtml, menusOf, pickMenu } from './docs/menu';
+import { KITCHEN_VIEWS, KITCHEN_DEFAULT_OPTS, buildKitchenHtml } from './docs/kitchenPlan';
+import { buildInvoiceHtml, invoiceTitle, invoicesOf, pickInvoice } from './docs/invoice';
+import { LAB_DEFAULT_OPTS, LAB_KINDS, buildLabHtml, labItems } from './docs/lab';
 import { fmtDate, visitsOf } from './logic/visits';
 
 // Tutto quello che si può mettere nel documento. kind: 'flow' = testo impaginato e modificabile,
@@ -21,10 +25,14 @@ export const DOC_TYPES = {
     dieta: { label: 'Piano alimentare', icon: 'ph-fork-knife', kind: 'flow', desc: 'Menu, spesa e indicazioni' },
     training: { label: 'Scheda di allenamento', icon: 'ph-barbell', kind: 'flow', desc: 'Esercizi, serie e carichi' },
     ricettario: { label: 'Ricettario', icon: 'ph-cooking-pot', kind: 'flow', desc: 'Le ricette in un libro firmato dallo studio' },
+    menu: { label: 'Menù', icon: 'ph-fork-knife', kind: 'flow', desc: 'La carta in portate, con calorie e grafici' },
+    cucina: { label: 'Piano di lavoro', icon: 'ph-cooking-pot', kind: 'flow', desc: 'Per gli chef: spesa e ricette per N persone' },
+    fattura: { label: 'Fattura', icon: 'ph-receipt', kind: 'flow', desc: 'Parcella emessa, ristampabile identica' },
     lettera: { label: 'Incarico e privacy', icon: 'ph-signature', kind: 'flow', desc: 'Da far firmare al paziente' },
     nota: { label: 'Pagina libera', icon: 'ph-note-pencil', kind: 'flow', desc: 'Un foglio bianco da scrivere' },
+    lab: { label: 'Laboratorio', icon: 'ph-flask', kind: 'flow', desc: 'Protocolli, ricettario, magazzino e campioni' }, // non è in TYPE_ORDER: si apre solo da Laboratorio
 };
-export const TYPE_ORDER = ['copertina', 'visita', 'grafici', 'andamento', 'dieta', 'ricettario', 'training', 'lettera', 'nota'];
+export const TYPE_ORDER = ['copertina', 'visita', 'grafici', 'andamento', 'dieta', 'ricettario', 'menu', 'cucina', 'training', 'fattura', 'lettera', 'nota'];
 
 // pacchetti pronti: si tengono solo i documenti per cui ci sono dati
 export const PRESETS = [
@@ -46,6 +54,9 @@ export const availability = (type, ctx) => {
     if (type === 'dieta') return dietVisits(p).length ? { ok: true } : { ok: false, reason: 'Nessun piano alimentare salvato' };
     if (type === 'training') return getSchede(p).length ? { ok: true } : { ok: false, reason: 'Nessuna scheda salvata' };
     if (type === 'ricettario') return recipesOf(ctx.db).length ? { ok: true } : { ok: false, reason: 'Nessuna ricetta salvata' };
+    if (type === 'cucina') return menusOf(ctx.db).length ? { ok: true } : { ok: false, reason: 'Nessun menù creato in Chef' };
+    if (type === 'menu') return menusOf(ctx.db).length ? { ok: true } : { ok: false, reason: 'Nessun menù creato in Chef' };
+    if (type === 'fattura') return invoicesOf(p).length ? { ok: true } : { ok: false, reason: 'Nessuna fattura emessa: si crea dallo storico visite' };
     return { ok: true };
 };
 
@@ -61,9 +72,21 @@ export const defaultOptions = (type, ctx, hint = {}) => {
         return { visitId: String(id), parts: { ...DIET_DEFAULT_PARTS } };
     }
     if (type === 'training') return { ...TRAINING_DEFAULT_OPTS, pagePerDay: false, schedaId: hint.schedaId || pickActiveScheda(p)?.id || '' };
-    if (type === 'ricettario') return { ...COOKBOOK_DEFAULT_OPTS, visitId: String(dietVisits(p)[0]?.id || '') };
+    if (type === 'ricettario') return { ...COOKBOOK_DEFAULT_OPTS, visitId: String(dietVisits(p)[0]?.id || ''), ...(hint.ids && { ids: hint.ids, scope: 'tutte' }) };
+    if (type === 'cucina') {
+        const mid = hint.menuId || menusOf(ctx.db)[0]?.id || '';
+        const ev = pickMenu(ctx.db, mid)?.event || {};
+        return { ...KITCHEN_DEFAULT_OPTS, menuId: mid, eventName: ev.name || '', location: ev.location || '', persons: String(ev.guests || KITCHEN_DEFAULT_OPTS.persons) };
+    }
+    if (type === 'menu') {
+        const mid = hint.menuId || menusOf(ctx.db)[0]?.id || '';
+        const ev = pickMenu(ctx.db, mid)?.event || {};
+        return { ...MENU_DEFAULT_OPTS, menuId: mid, eventName: ev.name || '', location: ev.location || '' };
+    }
+    if (type === 'fattura') return { invoiceId: hint.invoiceId || invoicesOf(p)[0]?.id || '' };
     if (type === 'copertina') return { title: 'Il tuo percorso', subtitle: 'Report personale', index: true, contacts: true };
     if (type === 'nota') return { title: 'Note per te' };
+    if (type === 'lab') return { ...LAB_DEFAULT_OPTS, kind: hint.kind || 'protocolli', ids: hint.ids || null, volume: hint.volume || '' };
     return {};
 };
 
@@ -80,11 +103,15 @@ export const describe = (item, ctx) => {
         const s = getSchede(p).find((x) => x.id === o.schedaId) || pickActiveScheda(p);
         return s ? s.titolo || s.obiettivo || 'Scheda senza titolo' : '';
     }
+    if (type(item) === 'fattura') return pickInvoice(p, o.invoiceId) ? invoiceTitle(pickInvoice(p, o.invoiceId)) : '';
     if (type(item) === 'andamento') return `${visitsOf(p, ctx.draft).length} visite`;
     if (type(item) === 'copertina') return o.title || '';
+    if (type(item) === 'lab') return `${LAB_KINDS[o.kind] || ''} · ${labItems(ctx.db, o).length}`;
+    if (type(item) === 'cucina') return `${pickMenu(ctx.db, o.menuId)?.title || ''} · ${o.persons || 50} persone`;
+    if (type(item) === 'menu') return pickMenu(ctx.db, o.menuId)?.title || '';
     if (type(item) === 'ricettario') {
         const v = dietVisits(p).find((x) => String(x.id) === String(o.visitId));
-        const r = pickRecipes(ctx.db, v, o.scope);
+        const r = pickRecipes(ctx.db, v, o.scope, o.ids);
         return `${r.list.length} ${r.list.length === 1 ? 'ricetta' : 'ricette'}${r.fromPlan ? ' del piano' : ''}`;
     }
     return DOC_TYPES[item.type]?.desc || '';
@@ -101,6 +128,8 @@ export const optionChoices = (item, ctx) => {
         const days = ((v && v.dettagli?.diet_plan_data) || []).filter((d) => (d.meals || []).some((m) => (m.items || []).length));
         return { visits: dv.map((x) => ({ id: String(x.id), label: `Piano del ${fmtDate(x.data, 'short')}` })), days: days.map((d, i) => d.title || `Giorno ${i + 1}`) };
     }
+    if (item.type === 'fattura') return { invoices: invoicesOf(p).map((x) => ({ id: x.id, label: invoiceTitle(x) })) };
+    if (item.type === 'menu' || item.type === 'cucina') return { menus: menusOf(ctx.db).map((m) => ({ id: m.id, label: m.title })) };
     if (item.type === 'training') {
         const schede = getSchede(p);
         const cur = schede.find((s) => s.id === item.opts?.schedaId) || pickActiveScheda(p);
@@ -113,7 +142,7 @@ export const optionChoices = (item, ctx) => {
 };
 
 // "Come mostrarlo": i modi di presentare ogni documento (il primo è quello classico)
-export const DOC_VIEWS = { visita: VISIT_VIEWS, andamento: PROGRESS_VIEWS, dieta: DIET_VIEWS, training: TRAINING_VIEWS, ricettario: COOKBOOK_VIEWS };
+export const DOC_VIEWS = { visita: VISIT_VIEWS, andamento: PROGRESS_VIEWS, dieta: DIET_VIEWS, training: TRAINING_VIEWS, ricettario: COOKBOOK_VIEWS, menu: MENU_VIEWS, cucina: KITCHEN_VIEWS };
 export const currentView = (item) => {
     const v = DOC_VIEWS[item.type];
     return v ? v.find((x) => x.id === item.opts?.view) || v[0] : null;
@@ -124,6 +153,8 @@ export const sourceChoice = (item, ctx) => {
     const ch = optionChoices(item, ctx);
     if ((item.type === 'visita' || item.type === 'grafici') && ch.visits?.length) return { label: 'Visita', key: 'visitId', options: ch.visits };
     if ((item.type === 'dieta' || (item.type === 'ricettario' && item.opts?.scope !== 'tutte')) && ch.visits?.length) return { label: 'Piano', key: 'visitId', options: ch.visits };
+    if (item.type === 'fattura' && ch.invoices?.length > 1) return { label: 'Fattura', key: 'invoiceId', options: ch.invoices };
+    if ((item.type === 'menu' || item.type === 'cucina') && ch.menus?.length > 1) return { label: 'Menù', key: 'menuId', options: ch.menus };
     if (item.type === 'training' && ch.schede?.length) return { label: 'Scheda', key: 'schedaId', options: ch.schede, reset: { weekId: 'all' } };
     return null;
 };
@@ -139,9 +170,13 @@ export const buildHtml = (item, ctx) => {
         const v = visitsOf(p, ctx.draft).find((x) => x.id === String(o.visitId)) || visitsOf(p, ctx.draft)[0];
         return v ? buildVisitReportHtml({ patient: p, prof, visit: v, opts: o }) : '<p>Nessuna visita.</p>';
     }
+    if (item.type === 'fattura') return buildInvoiceHtml({ patient: p, opts: o });
     if (item.type === 'andamento') return buildProgressHtml({ patient: p, prof, draft: ctx.draft, opts: o });
     if (item.type === 'lettera') return `<div class="d-letter">${buildLetterHtml({ patient: p, professional: prof })}</div>`;
     if (item.type === 'nota') return notaHtml(o);
+    if (item.type === 'lab') return buildLabHtml({ db: ctx.db, opts: o });
+    if (item.type === 'cucina') return buildKitchenHtml({ prof, db: ctx.db, opts: o });
+    if (item.type === 'menu') return buildMenuHtml({ prof, db: ctx.db, opts: o });
     if (item.type === 'ricettario') return buildCookbookHtml({ patient: p, prof, db: ctx.db, visit: dietVisits(p).find((x) => String(x.id) === String(o.visitId)) || dietVisits(p)[0], opts: o });
     if (item.type === 'dieta') {
         const v = dietVisits(p).find((x) => String(x.id) === String(o.visitId)) || dietVisits(p)[0];
@@ -170,4 +205,4 @@ export const fixedPages = (item) => {
 };
 
 // documenti con una propria intestazione dello studio in prima pagina: lì l'intestazione di pagina non serve
-export const hasMasthead = (item) => ['visita', 'andamento', 'dieta', 'lettera', 'ricettario'].includes(item.type) || (item.type === 'training' && item.opts?.studio);
+export const hasMasthead = (item) => ['visita', 'andamento', 'dieta', 'fattura', 'lettera', 'ricettario', 'menu', 'cucina', 'lab'].includes(item.type) || (item.type === 'training' && item.opts?.studio);

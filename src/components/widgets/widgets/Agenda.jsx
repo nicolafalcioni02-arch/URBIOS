@@ -37,7 +37,7 @@ export const Agenda = ({ db, onOpenAgenda }) => {
                 </p>
             )}
             <ul className="wd-list">
-                {upcoming.slice(0, 8).map((a) => {
+                {upcoming.slice(0, 4).map((a) => {
                     const d = startOf(a);
                     return (
                         <li key={a.id} className={sameDay(d, now) ? 'today' : ''}>
@@ -53,6 +53,7 @@ export const Agenda = ({ db, onOpenAgenda }) => {
                     );
                 })}
             </ul>
+            {upcoming.length > 4 && <p className="wd-more">+{upcoming.length - 4} altri</p>}
             <button className="wd-open" onClick={() => onOpenAgenda({ date: dateKey(now) })}>
                 Apri agenda <i className="ph ph-arrow-right" />
             </button>

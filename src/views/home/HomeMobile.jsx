@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { UrbiosLogo } from '../../brand/UrbiosLogo';
 import { isExample } from '../../storage/example/example';
 
 // Elenco pazienti su telefono: titolo grande che si ritira nella barra scorrendo, ricerca sempre a portata,
@@ -11,7 +12,7 @@ export const HomeMobile = ({ patients, list, query, setQuery, onOpen, onAdd, las
         <div className="m-scroll" onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 36)}>
             <header className={`m-nav ${scrolled ? 'is-scrolled' : ''}`}>
                 <div className="m-nav-side">
-                    <span className="m-brand">URBIOS</span>
+                    <span className="m-brand" style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}><UrbiosLogo size={18} />URBIOS</span>
                 </div>
                 <span className="m-nav-title">Pazienti</span>
                 <div className="m-nav-side end">

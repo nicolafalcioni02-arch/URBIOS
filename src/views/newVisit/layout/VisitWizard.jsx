@@ -6,6 +6,7 @@ import { countFilled } from '../data/visitSections';
 export const VisitWizard = ({ patient, visitDraft, sections: SECTIONS, title, step, setStep, onPreview, onAnalysis, onSave, onChangeMode, renderStep }) => {
     const [dir, setDir] = useState('fwd');
     const topRef = useRef(null);
+    const railRef = useRef(null);
 
     const counts = useMemo(() => SECTIONS.map((s) => countFilled(s, visitDraft, patient)), [SECTIONS, visitDraft, patient]);
     const current = SECTIONS[step];
@@ -23,11 +24,27 @@ export const VisitWizard = ({ patient, visitDraft, sections: SECTIONS, title, st
         if (box) box.scrollTo({ top: 0, behavior: 'smooth' });
     }, [step]);
 
+    // il passo attivo resta intero nella barra (il nome si apre dopo lo scatto, quindi si ricentra a fine animazione)
+    useEffect(() => {
+        const rail = railRef.current;
+        const el = rail && rail.querySelector('.is-active');
+        if (!el) return undefined;
+        const fit = () => {
+            const over = el.offsetLeft + el.offsetWidth + 12 - (rail.scrollLeft + rail.clientWidth);
+            const under = rail.scrollLeft - (el.offsetLeft - 12);
+            if (over > 0) rail.scrollTo({ left: rail.scrollLeft + over, behavior: 'smooth' });
+            else if (under > 0) rail.scrollTo({ left: rail.scrollLeft - under, behavior: 'smooth' });
+        };
+        fit();
+        const t = setTimeout(fit, 480);
+        return () => clearTimeout(t);
+    }, [step]);
+
     return (
         <div className="visit-wizard max-w-5xl mx-auto w-full px-4 md:px-8 pt-4 md:pt-6 overflow-x-clip flex flex-col" style={{ minHeight: '100%' }} ref={topRef}>
             {/* Passi a sinistra, Analisi e Anteprima a destra: il passo attivo si allarga e mostra il nome */}
             <nav className="vw-steps sticky top-0 z-30 -mx-4 md:-mx-8 px-4 md:px-8 py-2.5 mb-5 flex items-center gap-3 rise" aria-label="Passi della visita">
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar min-w-0 flex-1">
+                <div ref={railRef} className="flex items-center gap-1.5 overflow-x-auto no-scrollbar min-w-0 flex-1 relative">
                     {SECTIONS.map((s, i) => {
                         const active = i === step;
                         const done = counts[i] > 0;

@@ -16,7 +16,7 @@ export const Birthdays = ({ db }) => {
         .filter((x) => x && x.days <= 30)
         .sort((a, b) => a.days - b.days);
     const now = list.filter((x) => x.days === 0);
-    const soon = list.filter((x) => x.days > 0).slice(0, 3);
+    const soon = list.filter((x) => x.days > 0).slice(0, 2);
     return (
         <div className="wd-card wd-bday">
             <p className="wd-title">
@@ -32,7 +32,7 @@ export const Birthdays = ({ db }) => {
                             <b>
                                 {x.p.nome} {x.p.cognome}
                             </b>
-                            <span>compie {x.age} anni 🎉</span>
+                            <span>compie {x.age} anni</span>
                         </p>
                     ))}
                 </div>

@@ -8,16 +8,18 @@ import data from './esempio.json';
 export const EXAMPLE_ID = data.paziente.id;
 export const isExample = (p) => !!p && (p.esempio === true || p.id === EXAMPLE_ID);
 const isExampleRecipe = (r) => !!r && r.esempio === true;
+const isExampleMenu = (m) => !!m && m.esempio === true;
 
 // stato iniziale dell'esempio (copia nuova a ogni apertura dell'archivio)
-export const freshExample = () => JSON.parse(JSON.stringify({ patient: data.paziente, recipes: data.ricette }));
+export const freshExample = () => JSON.parse(JSON.stringify({ patient: data.paziente, recipes: data.ricette, menus: data.menus || [] }));
 
 // database vero + esempio → quello che vede l'app
 export const withExample = (db, ex) => {
     if (!db || !ex) return db;
     const pazienti = (db.pazienti || []).filter((p) => !isExample(p));
     const library = (db.diet_meal_library || []).filter((r) => !isExampleRecipe(r));
-    return { ...db, pazienti: ex.patient ? [...pazienti, ex.patient] : pazienti, diet_meal_library: [...library, ...ex.recipes] };
+    const menus = (db.chef_menus || []).filter((m) => !isExampleMenu(m));
+    return { ...db, pazienti: ex.patient ? [...pazienti, ex.patient] : pazienti, diet_meal_library: [...library, ...ex.recipes], chef_menus: [...menus, ...(ex.menus || [])] };
 };
 
 // quello che l'app ha modificato → database vero (da salvare) + esempio (solo in memoria)
@@ -28,9 +30,13 @@ export const splitExample = (view, prev = null) => {
     const library = view.diet_meal_library || [];
     const db = { ...view, pazienti: pazienti.filter((p) => !isExample(p)) };
     const real = library.filter((r) => !isExampleRecipe(r));
+    const menus = view.chef_menus || [];
+    const realMenus = menus.filter((m) => !isExampleMenu(m));
+    if (realMenus.length || (prev && 'chef_menus' in prev)) db.chef_menus = realMenus;
+    else delete db.chef_menus;
     if (real.length || (prev && 'diet_meal_library' in prev)) db.diet_meal_library = real;
     else delete db.diet_meal_library; // archivio senza ricette sue: resta com'era
-    return { db, ex: { patient: pazienti.find(isExample) || null, recipes: library.filter(isExampleRecipe) } };
+    return { db, ex: { patient: pazienti.find(isExample) || null, recipes: library.filter(isExampleRecipe), menus: menus.filter(isExampleMenu) } };
 };
 
 // toglie l'esempio da un archivio aperto da file (es. l'archivio demo, che lo contiene già)

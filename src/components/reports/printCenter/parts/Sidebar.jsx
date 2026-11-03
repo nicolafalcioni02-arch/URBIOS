@@ -172,6 +172,21 @@ const ContentOptions = ({ item, ctx, setOpts }) => {
             ['notes', 'Righe per le note del paziente', true],
             ['closing', 'Pagina finale «Buon appetito»', true],
         ],
+        menu: [
+            ['cover', 'Prima pagina', true],
+            ['ingredients', 'Ingredienti sotto ogni piatto', true],
+            ['macros', 'Calorie di ogni piatto', true],
+            ['intro', 'Pagina «Ecco come ho pensato i piatti»', true],
+            ['charts', 'Pagina con i grafici del menù', true],
+            ['specials', 'Menù special e bimbi', true],
+        ],
+        cucina: [
+            ['summary', 'Copertina e riepilogo', true],
+            ['letter', 'Lettera agli chef', true],
+            ['shopping', 'Lista della spesa', true],
+            ['recipes', 'Scheda di ogni piatto', true],
+            ['special', 'Pagine special', true],
+        ],
         copertina: [
             ['index', 'Sommario con i numeri di pagina', true],
             ['contacts', 'Recapiti dello studio', true],
@@ -198,6 +213,23 @@ const ContentOptions = ({ item, ctx, setOpts }) => {
                         ]}
                         onChange={(v) => setOpts({ scope: v })}
                     />
+                </>
+            )}
+            {item.type === 'menu' && (
+                <>
+                    {field('Evento o nome', 'eventName')}
+                    {field('Location o catering', 'location')}
+                    {o.view === 'tavola' && (
+                        <Pick label="Quante carte" value={String(o.copies || 4)} options={[2, 4, 6, 8, 10, 12, 16, 20].map((n) => ({ id: String(n), label: `${n} carte (${n / 2} fogli)` }))} onChange={(v) => setOpts({ copies: Number(v) })} />
+                    )}
+                </>
+            )}
+            {item.type === 'cucina' && (
+                <>
+                    {field('Quante persone', 'persons')}
+                    {field('Scorta in più (%)', 'extra')}
+                    {field('Evento (in alto)', 'eventName')}
+                    {field('Location o catering', 'location')}
                 </>
             )}
             {item.type === 'training' && ch.weeks.length > 1 && (
@@ -239,13 +271,13 @@ const ItemPanel = ({ item, items, ctx, index, setOpts, onMove, onRemove, onDupli
     const src = sourceChoice(item, ctx);
     const views = DOC_VIEWS[item.type];
     const view = currentView(item);
-    const hasContent = ['visita', 'grafici', 'andamento', 'dieta', 'training', 'copertina', 'nota', 'ricettario'].includes(item.type);
+    const hasContent = ['visita', 'grafici', 'andamento', 'dieta', 'training', 'copertina', 'nota', 'ricettario', 'menu', 'cucina'].includes(item.type);
     const nextView = views ? views[(views.indexOf(view) + 1) % views.length] : null;
     return (
         <div className="pc-panel">
             {src && (
                 <div className="pc-panel-sec">
-                    <div className="pc-panel-h">{src.label === 'Visita' ? 'Da quale visita' : src.label === 'Piano' ? 'Quale piano' : 'Quale scheda'}</div>
+                    <div className="pc-panel-h">{src.label === 'Visita' ? 'Da quale visita' : src.label === 'Piano' ? 'Quale piano' : src.label === 'Menù' ? 'Da quale menù' : 'Quale scheda'}</div>
                     <Pick label={src.label} value={item.opts?.[src.key] || ''} options={src.options} onChange={(v) => setOpts({ [src.key]: v, ...(src.reset || {}) })} />
                 </div>
             )}
@@ -555,7 +587,7 @@ export const Sidebar = ({ open, items, ctx, theme, setTheme, presets, presetId, 
                             </div>
                             <div className="pc-sub">Piè di pagina</div>
                             <Switch on={theme.footer} onChange={(v) => setTheme({ footer: v })} label="Mostra il piè di pagina" />
-                            {theme.footer && <Switch on={theme.numbers} onChange={(v) => setTheme({ numbers: v })} label="Numeri di pagina" />}
+                            <Switch on={theme.numbers} onChange={(v) => setTheme({ numbers: v })} label="Numeri di pagina" />
                         </Fold>
                     </>
                 )}
