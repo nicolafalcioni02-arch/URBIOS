@@ -13,7 +13,7 @@ const Row = ({ icon, title, sub, tone, onClick }) => (
 
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
-export const Home = ({ ov, onOpen, onNew }) => {
+export const Home = ({ ov, empty, onExample, onOpen, onNew }) => {
     const mag = sectionOf('magazzino');
     const q = sectionOf('quaderno');
     const camp = sectionOf('campioni');
@@ -41,7 +41,7 @@ export const Home = ({ ov, onOpen, onNew }) => {
 
             <section className="panel lab-block">
                 <h3>Ultime pagine del quaderno</h3>
-                {ov.recenti.length ? ov.recenti.map((r) => <Row key={r.id} icon={q.icon} title={q.title(r)} sub={q.sub(r)} onClick={() => onOpen('quaderno', r.id)} />) : <p className="lab-none">Il quaderno è vuoto.</p>}
+                {ov.recenti.length ? ov.recenti.map((r) => <Row key={r.id} icon={q.icon} title={q.title(r)} sub={q.sub(r)} onClick={() => onOpen('quaderno', r.id)} />) : <p className="lab-none">Il quaderno è vuoto.{empty && <> <button className="vw-chip" onClick={onExample}>Carica dati di esempio</button></>}</p>}
             </section>
 
             <div className="lab-quick">
