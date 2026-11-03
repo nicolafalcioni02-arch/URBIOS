@@ -39,7 +39,9 @@ const LabInner = ({ db, onUpdateDb, onBack }) => {
     const go = (key) => { setView(key); setSel(null); };
     const open = (key, id) => { setView(key); setSel(id ? { record: lab[key].find((r) => r.id === id) || null, isNew: false } : null); };
     const create = (key) => { const s = sectionOf(key); setView(key); setSel({ record: { id: newId(s.prefix), ...s.empty() }, isNew: true }); };
-    const printIds = (ids) => printCenter.open([{ type: 'lab', kind: view, ids, volume: view === 'reagenti' ? vol : '' }]);
+    // il quaderno ha le sue pagine a quadretti (il quaderno completo con indici esce come documento di laboratorio); le altre sezioni escono come documenti di laboratorio
+    const printIds = (ids, extra) => printCenter.open([view === 'quaderno' && !extra ? { type: 'quaderno', ids } : { type: 'lab', kind: view, ids, volume: view === 'reagenti' ? vol : '', ...extra }]);
+    const printBlank = () => printCenter.open([{ type: 'quaderno', view: 'vuote' }]);
     const excelAll = () => downloadXlsx(`laboratorio-${stamp()}.xlsx`, sheetsFor(lab));
 
     let main;
@@ -57,6 +59,7 @@ const LabInner = ({ db, onUpdateDb, onBack }) => {
             onSave={(rec) => saveRecord(onUpdateDb, view, rec)}
             onDelete={() => { removeRecord(onUpdateDb, view, sel.record.id); setSel(null); }}
             onPrint={printIds}
+            onBlank={view === 'quaderno' ? printBlank : null}
             onExcel={() => downloadXlsx(`${view}-${stamp()}.xlsx`, sheetsFor(lab, [view]))}
             vol={vol}
             setVol={setVol}

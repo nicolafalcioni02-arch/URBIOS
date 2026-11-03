@@ -9,6 +9,7 @@ lab/
   parts/
     Sidebar.jsx     barra laterale come le Impostazioni (≥900px): ricerca su tutto, aree in gruppi (GROUPS), Excel completo, «Cambia area»
     Home.jsx        Panoramica essenziale: riepilogo, «Da fare» (scadenze, scorte, esperimenti in corso, campioni aperti), ultime pagine del quaderno, tasti «Crea»
+    NotebookPreview.jsx  Quaderno completo impaginato a destra del modulo (solo Quaderno, ≥900px): copertina, indice, indice figure e tabelle, reagentario, una pagina per esperimento; interruttore «Tutto / Solo questa pagina»; si aggiorna col salvataggio. Le parti vengono da `notebookParts` in `printCenter/docs/lab.js` (stesso codice della stampa, opzione `completo`); − / % / + in alto a destra cambiano la dimensione delle pagine (ricordata in localStorage)
     SectionView.jsx elenco (ricerca, filtri a pastiglia da section.group, selezione per stampare) + editor accanto
   sections.js       REGISTRO: campi, titoli, badge, group (filtri), sort e colonne Excel di ogni sezione. Per aggiungere un campo o una sezione si tocca solo qui
   RecordForm.jsx    editor generico (tipi: text, area, number, date, select, ref, steps, rows). SALVA DA SOLO dopo 500 ms (niente tasto Salva);
@@ -18,6 +19,7 @@ lab/
   xlsx.js           scrittura .xlsx senza librerie (usa dataExchange/zip.js); sheetsFor() in sections.js compone i fogli
   labStyles.js      CSS lab-*: stesso linguaggio delle Impostazioni (set-side, .panel, bottoni come st-btn), solo token di index.css
   ui/icons.jsx      <Icon name="..."/>: SVG a tratto 1.6, 24x24 (niente Phosphor nel Laboratorio). Nuova icona = voce in PATHS
+  print/            stampa del quaderno: notebookPages.js (pura: testo a capo con misure vere, una riga per quadretto, pagine con «Dalla/Alla pagina»), NotebookPage.jsx (A4 a quadretti da 5 mm, intestazione, firme)
   LabIcon.jsx       icona SVG (beuta)
 ```
 
@@ -27,3 +29,4 @@ lab/
 - Excel: una sezione alla volta (tasto «Excel» sopra l'elenco) o tutto in un file con un foglio per sezione. Testi lunghi (passaggi, componenti) in una sola cella.
 - Entrata: scelta area dopo il login (`views/ModeSelect.jsx`, gestita in `App.jsx`); «Cambia area» torna alla scelta.
 - Possibili passi successivi: collegare i componenti delle ricette agli articoli di magazzino (scarico automatico), allegati/foto, import da Excel.
+- Quaderno stampato: tipo `quaderno` (kind `notebook`) nel Centro stampa, pagine intere senza intestazione/piè del Centro stampa. Viste: «Con gli esperimenti» o «Pagine vuote» (numerate, da compilare a mano; tasto «Pagine vuote» sopra l'elenco). Opzioni: N. quaderno, numero della prima pagina, quante pagine.

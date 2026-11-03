@@ -24,3 +24,5 @@ si riducono da sole per stare nel foglio. In `db.stampa` restano solo stile, ult
 Le modifiche a mano si salvano alla chiusura (se confermi) in `paziente.stampaModifiche`, per documento+opzioni (`editKey`), e si ripristinano all apertura.
 
 `PrintCenterProvider scope="lab"` (Laboratorio, `src/lab/`): il Centro stampa mostra solo i documenti passati a `open()`, senza gruppi (`PresetPicker`) né «Aggiungi un documento» (`AddMenu`), e non salva l'ultimo gruppo usato.
+
+Kind `notebook` (tipo `quaderno`, solo Laboratorio): pagine già composte a tutto foglio (`Sheet bare noBrand`), elenco da `notebookPagesOf` in `catalog.jsx`; grafica in `src/lab/print/`.

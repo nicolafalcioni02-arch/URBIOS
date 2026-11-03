@@ -201,6 +201,13 @@ const ContentOptions = ({ item, ctx, setOpts }) => {
                 </>
             )}
             {item.type === 'nota' && field('Titolo', 'title')}
+            {item.type === 'quaderno' && (
+                <>
+                    {field('N. quaderno', 'book')}
+                    {field('Numero della prima pagina', 'startPage')}
+                    {o.view === 'vuote' && field('Quante pagine', 'count')}
+                </>
+            )}
             {item.type === 'ricettario' && (
                 <>
                     {field('Titolo del libro', 'title')}
@@ -271,7 +278,7 @@ const ItemPanel = ({ item, items, ctx, index, setOpts, onMove, onRemove, onDupli
     const src = sourceChoice(item, ctx);
     const views = DOC_VIEWS[item.type];
     const view = currentView(item);
-    const hasContent = ['visita', 'grafici', 'andamento', 'dieta', 'training', 'copertina', 'nota', 'ricettario', 'menu', 'cucina'].includes(item.type);
+    const hasContent = ['visita', 'grafici', 'andamento', 'dieta', 'training', 'copertina', 'nota', 'ricettario', 'menu', 'cucina', 'quaderno'].includes(item.type);
     const nextView = views ? views[(views.indexOf(view) + 1) % views.length] : null;
     return (
         <div className="pc-panel">

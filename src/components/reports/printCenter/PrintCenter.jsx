@@ -4,7 +4,8 @@ import { ChartsPage } from '../../../views/analisi/ChartsReport';
 import { buildBodyModel } from '../../../views/analisi/logic/bodyModel';
 import { computeSomatotype } from '../../../views/analisi/logic/somatotype';
 import { DOCS, docOf, oggi } from '../../patient/info/documentsLogic';
-import { DOC_TYPES, PRESETS, availability, buildHtml, currentView, defaultOptions, fixedPages, hasMasthead } from './catalog';
+import { DOC_TYPES, PRESETS, availability, buildHtml, currentView, defaultOptions, fixedPages, hasMasthead, notebookPagesOf } from './catalog';
+import { NotebookPage } from '../../../lab/print/NotebookPage';
 import { cleanHtml, mergeFragments, paginateHtml } from './logic/paginate';
 import { DEFAULT_THEME, MM, geometry, layoutById, loadLayoutFonts, themeKey } from './logic/theme';
 import { ageAt, findVisit, fmtDate, freshPatient, sexOf } from './logic/visits';
@@ -176,6 +177,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     visible.forEach((it) => {
         const kind = DOC_TYPES[it.type].kind;
         if (kind === 'cover') pages.push({ kind, item: it, key: `${it.id}:c` });
+        else if (kind === 'notebook') notebookPagesOf(it, ctx).forEach((np, i) => pages.push({ kind, item: it, np, i, key: `${it.id}:n${i}` }));
         else if (kind === 'fixed') fixedPages(it).forEach((n, i) => pages.push({ kind, item: it, n, i, key: `${it.id}:f${n}` }));
         else {
             const f = frags[it.id];
@@ -428,6 +430,12 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
             sheet = (
                 <Sheet g={g} theme={theme} layoutClass={layoutClass} accent={theme.accent} bare prof={prof}>
                     <CoverPage item={it} patient={patient} prof={prof} index={index} />
+                </Sheet>
+            );
+        } else if (p.kind === 'notebook') {
+            sheet = (
+                <Sheet g={g} theme={theme} layoutClass="pc-nb" accent="#1B1B1F" bare noBrand prof={prof}>
+                    <NotebookPage page={p.np} />
                 </Sheet>
             );
         } else if (p.kind === 'fixed') {

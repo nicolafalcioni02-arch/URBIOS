@@ -73,6 +73,17 @@ export const labStyles = `
 
 /* elenco + editor */
 .lab-split{display:grid;grid-template-columns:minmax(300px,390px) minmax(0,1fr);height:100%;min-height:0}
+.lab-split.with-page{grid-template-columns:minmax(240px,300px) minmax(340px,430px) minmax(0,1fr)}
+.lab-pagescol{min-width:0;min-height:0;height:100%;display:flex;flex-direction:column;border-left:1px solid var(--line)}
+.lab-pageshead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--surface)}
+.lab-pages{flex:1;min-width:0;min-height:0;overflow:auto;background:var(--soft);padding:20px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.lab-zoom{position:sticky;top:0;z-index:5;align-self:flex-end;display:flex;border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden;box-shadow:0 2px 8px rgba(30,25,15,.12)}
+.lab-zoom button{border:0;background:none;color:var(--ink);font:inherit;font-size:13px;min-width:34px;height:28px;padding:0 8px;cursor:pointer}
+.lab-zoom button:hover{background:var(--soft)}
+.lab-zoom button+button{border-left:1px solid var(--line)}
+.lab-pages-empty{margin:auto;color:var(--muted);font-size:14px}
+.lab-sheet{flex:none;position:relative}
+.lab-sheet.on{box-shadow:0 0 0 2px var(--accent),0 12px 34px rgba(30,25,15,.13)}
 .narrow .lab-split{grid-template-columns:minmax(0,1fr)}
 .lab-listcol{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
 .narrow .lab-listcol{border-right:0}
@@ -115,6 +126,9 @@ export const labStyles = `
 .lab-form{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}
 .lab-form .full{grid-column:1/-1}
 @media (max-width:639px){.lab-form{grid-template-columns:1fr}.lab-hide-s{display:none}.lab-pane{padding:0 16px 40px}.lab-page-head{align-items:flex-start;flex-wrap:wrap}}
+.lab-pane .fld,.lab-modal .fld{background:var(--soft);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(0,0,0,.03)}
+.lab-pane .fld:hover,.lab-modal .fld:hover{border-color:var(--muted)}
+.lab-pane .fld:focus,.lab-modal .fld:focus{background:var(--surface);border-color:var(--ink);outline:none}
 .lab-rows{display:grid;gap:6px}
 .lab-row{display:grid;gap:6px;align-items:center}
 .lab-row .fld{height:40px;min-width:0}

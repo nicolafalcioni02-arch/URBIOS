@@ -12,6 +12,7 @@ import { COOKBOOK_DEFAULT_OPTS, COOKBOOK_VIEWS, buildCookbookHtml, pickRecipes, 
 import { MENU_DEFAULT_OPTS, MENU_VIEWS, buildMenuHtml, menusOf, pickMenu } from './docs/menu';
 import { KITCHEN_VIEWS, KITCHEN_DEFAULT_OPTS, buildKitchenHtml } from './docs/kitchenPlan';
 import { buildInvoiceHtml, invoiceTitle, invoicesOf, pickInvoice } from './docs/invoice';
+import { notebookPages } from '../../../lab/print/notebookPages';
 import { LAB_DEFAULT_OPTS, LAB_KINDS, buildLabHtml, labItems } from './docs/lab';
 import { fmtDate, visitsOf } from './logic/visits';
 
@@ -30,6 +31,7 @@ export const DOC_TYPES = {
     fattura: { label: 'Fattura', icon: 'ph-receipt', kind: 'flow', desc: 'Parcella emessa, ristampabile identica' },
     lettera: { label: 'Incarico e privacy', icon: 'ph-signature', kind: 'flow', desc: 'Da far firmare al paziente' },
     nota: { label: 'Pagina libera', icon: 'ph-note-pencil', kind: 'flow', desc: 'Un foglio bianco da scrivere' },
+    quaderno: { label: 'Pagine del quaderno', icon: 'ph-notebook', kind: 'notebook', desc: 'Pagine a quadretti con intestazione e firme' }, // idem: solo da Laboratorio
     lab: { label: 'Laboratorio', icon: 'ph-flask', kind: 'flow', desc: 'Protocolli, ricettario, magazzino e campioni' }, // non è in TYPE_ORDER: si apre solo da Laboratorio
 };
 export const TYPE_ORDER = ['copertina', 'visita', 'grafici', 'andamento', 'dieta', 'ricettario', 'menu', 'cucina', 'training', 'fattura', 'lettera', 'nota'];
@@ -86,6 +88,7 @@ export const defaultOptions = (type, ctx, hint = {}) => {
     if (type === 'fattura') return { invoiceId: hint.invoiceId || invoicesOf(p)[0]?.id || '' };
     if (type === 'copertina') return { title: 'Il tuo percorso', subtitle: 'Report personale', index: true, contacts: true };
     if (type === 'nota') return { title: 'Note per te' };
+    if (type === 'quaderno') return { view: hint.view || 'compilato', ids: hint.ids || null, book: '', startPage: '1', count: '10' };
     if (type === 'lab') return { ...LAB_DEFAULT_OPTS, kind: hint.kind || 'protocolli', ids: hint.ids || null, volume: hint.volume || '' };
     return {};
 };
@@ -106,6 +109,7 @@ export const describe = (item, ctx) => {
     if (type(item) === 'fattura') return pickInvoice(p, o.invoiceId) ? invoiceTitle(pickInvoice(p, o.invoiceId)) : '';
     if (type(item) === 'andamento') return `${visitsOf(p, ctx.draft).length} visite`;
     if (type(item) === 'copertina') return o.title || '';
+    if (type(item) === 'quaderno') { const n = notebookPages(ctx.db, o).length; return `${n} ${n === 1 ? 'pagina' : 'pagine'}${o.view === 'vuote' ? ' vuote' : ''}`; }
     if (type(item) === 'lab') return `${LAB_KINDS[o.kind] || ''} · ${labItems(ctx.db, o).length}`;
     if (type(item) === 'cucina') return `${pickMenu(ctx.db, o.menuId)?.title || ''} · ${o.persons || 50} persone`;
     if (type(item) === 'menu') return pickMenu(ctx.db, o.menuId)?.title || '';
@@ -142,7 +146,11 @@ export const optionChoices = (item, ctx) => {
 };
 
 // "Come mostrarlo": i modi di presentare ogni documento (il primo è quello classico)
-export const DOC_VIEWS = { visita: VISIT_VIEWS, andamento: PROGRESS_VIEWS, dieta: DIET_VIEWS, training: TRAINING_VIEWS, ricettario: COOKBOOK_VIEWS, menu: MENU_VIEWS, cucina: KITCHEN_VIEWS };
+export const QUADERNO_VIEWS = [
+    { id: 'compilato', label: 'Con gli esperimenti', desc: 'Le pagine con il testo degli esperimenti, allineato ai quadretti', icon: 'ph-notebook' },
+    { id: 'vuote', label: 'Pagine vuote', desc: 'Pagine a quadretti da compilare a mano, già numerate', icon: 'ph-file' },
+];
+export const DOC_VIEWS = { quaderno: QUADERNO_VIEWS, visita: VISIT_VIEWS, andamento: PROGRESS_VIEWS, dieta: DIET_VIEWS, training: TRAINING_VIEWS, ricettario: COOKBOOK_VIEWS, menu: MENU_VIEWS, cucina: KITCHEN_VIEWS };
 export const currentView = (item) => {
     const v = DOC_VIEWS[item.type];
     return v ? v.find((x) => x.id === item.opts?.view) || v[0] : null;
@@ -197,6 +205,9 @@ export const buildHtml = (item, ctx) => {
     }
     return '';
 };
+
+// pagine di un documento "notebook" (quaderno di laboratorio)
+export const notebookPagesOf = (item, ctx) => notebookPages(ctx.db, item.opts || {});
 
 // pagine di un documento "fixed"
 export const fixedPages = (item) => {

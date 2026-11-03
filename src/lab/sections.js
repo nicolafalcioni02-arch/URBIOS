@@ -34,6 +34,7 @@ export const SECTIONS = [
             { key: 'protocolloId', label: 'Protocollo seguito', type: 'ref', from: 'protocolli' },
             { key: 'obiettivo', label: 'Obiettivo / ipotesi', type: 'area', full: true },
             { key: 'materiali', label: 'Materiali, reagenti e lotti usati', type: 'rows', cols: [{ key: 'nome', label: 'Voce', w: 3 }, { key: 'quantita', label: 'Quantità', w: 1 }, { key: 'unita', label: 'Unità', w: 1 }, { key: 'note', label: 'Lotto / note', w: 2 }], full: true },
+            { key: 'figure', label: 'Figure (didascalia e riferimento al file)', type: 'rows', cols: [{ key: 'nome', label: 'Didascalia', w: 3 }, { key: 'note', label: 'File / riferimento', w: 2 }], full: true },
             { key: 'procedura', label: 'Procedura svolta e deviazioni dal protocollo', type: 'area', full: true },
             { key: 'osservazioni', label: 'Osservazioni', type: 'area', full: true },
             { key: 'risultati', label: 'Risultati', type: 'area', full: true },
@@ -45,7 +46,7 @@ export const SECTIONS = [
         search: textOf,
         xlsx: [
             ['codice', 'Pagina', 16], ['data', 'Data', 12], ['titolo', 'Titolo', 34], ['progetto', 'Progetto', 18], ['stato', 'Stato', 12], ['operatore', 'Eseguito da', 16],
-            ['protocollo', 'Protocollo', 28, (r, lab) => (lab.protocolli.find((p) => p.id === r.protocolloId) || {}).titolo || ''], ['obiettivo', 'Obiettivo', 36], ['materiali', 'Materiali', 40, (r) => join(r.materiali)],
+            ['protocollo', 'Protocollo', 28, (r, lab) => (lab.protocolli.find((p) => p.id === r.protocolloId) || {}).titolo || ''], ['obiettivo', 'Obiettivo', 36], ['materiali', 'Materiali', 40, (r) => join(r.materiali)], ['figure', 'Figure', 30, (r) => (r.figure || []).map((f) => f.nome).filter(Boolean).join('; ')],
             ['procedura', 'Procedura', 40], ['osservazioni', 'Osservazioni', 36], ['risultati', 'Risultati', 40], ['conclusioni', 'Conclusioni', 36], ['prossimi', 'Prossimi passi', 30], ['verificatoDa', 'Verificato da', 16], ['dataVerifica', 'Data verifica', 14],
         ],
     },

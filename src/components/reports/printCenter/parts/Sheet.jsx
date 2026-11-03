@@ -14,16 +14,18 @@ const BrandMark = ({ style }) => (
 );
 
 // Foglio A4 con intestazione e piè di pagina; il contenuto sta in .pc-body, nell'area utile calcolata dal tema
-export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true, page, total, patientName, prof, title, children, bare = false }) => {
+export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true, page, total, patientName, prof, title, children, bare = false, noBrand = false }) => {
     const m = g.m;
     const top = m.t + (withHead ? g.head : 0);
     const studio = [prof.nome, prof.cognome].filter(Boolean).join(' ');
     return (
         <div className={`pc-sheet pc-theme ${layoutClass}`} style={{ '--accent': accent, ...artVars(accent), '--pc-scale': theme.scale, '--m-t': `${m.t}mm`, '--m-s': `${m.s}mm`, '--m-b': `${m.b}mm` }}>
-            <div className="pc-deco">
-                <i />
-                <i />
-            </div>
+            {!noBrand && (
+                <div className="pc-deco">
+                    <i />
+                    <i />
+                </div>
+            )}
             {!bare && withHead && (
                 <div className="pc-head" style={{ top: `${m.t}mm`, left: `${m.s}mm`, right: `${m.s}mm` }}>
                     <span>
@@ -59,7 +61,7 @@ export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true
                     Pagina {page} di {total}
                 </span>
             )}
-            {(bare || !withFoot || !theme.footer) && <BrandMark style={{ position: 'absolute', left: '50%', bottom: `${Math.max(4, m.b - 4)}mm`, transform: 'translateX(-50%)' }} />}
+            {!noBrand && (bare || !withFoot || !theme.footer) && <BrandMark style={{ position: 'absolute', left: '50%', bottom: `${Math.max(4, m.b - 4)}mm`, transform: 'translateX(-50%)' }} />}
         </div>
     );
 };

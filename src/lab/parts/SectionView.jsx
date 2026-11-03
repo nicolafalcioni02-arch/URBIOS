@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { Icon } from '../ui/icons';
 import { RecordForm } from '../RecordForm';
+import { NotebookPreview } from './NotebookPreview';
 
 // Una sezione: elenco (ricerca, filtri, selezione per stampare) e, accanto, l'editor (schermi larghi) o a finestra (telefono/tablet).
 // Il record aperto è `sel = { record, isNew }`.
-export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, onDelete, onPrint, onExcel, vol, setVol }) => {
+export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, onDelete, onPrint, onBlank, onExcel, vol, setVol }) => {
     const [q, setQ] = useState('');
     const [group, setGroup] = useState('');
     const [picked, setPicked] = useState([]);
@@ -25,9 +26,10 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
     const toggle = (id) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
     const ids = picked.length ? picked : list.map((r) => r.id);
     const activeId = sel?.record.id;
+    const page = wide && section.key === 'quaderno'; // il quaderno impaginato a destra del modulo
 
     return (
-        <div className="lab-split">
+        <div className={`lab-split${page ? ' with-page' : ''}`}>
             <div className="lab-listcol">
                 <div className="lab-listhead">
                     <header className="lab-page-head" style={{ marginBottom: 0 }}>
@@ -48,6 +50,7 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
                         {section.key === 'reagenti' && <input className="fld" style={{ height: 38, flex: '1 1 130px' }} value={vol} onChange={(e) => setVol(e.target.value)} placeholder="Volume da preparare" aria-label="Volume da preparare in stampa" title="Se compilato, le quantità in stampa si scalano su questo volume finale" />}
                         <button className="lab-btn is-secondary is-sm" disabled={!list.length} onClick={onExcel}><Icon name="table" size={16} />Excel</button>
                         <button className="lab-btn is-secondary is-sm" disabled={!list.length} onClick={() => onPrint(ids)}><Icon name="printer" size={16} />{picked.length ? `Stampa ${picked.length}` : 'Stampa'}</button>
+                        {onBlank && <button className="lab-btn is-secondary is-sm" onClick={onBlank} title="Pagine a quadretti numerate, da compilare a mano"><Icon name="notebook" size={16} />Pagine vuote</button>}
                         {picked.length > 0 && <button className="lab-btn is-ghost is-sm" onClick={() => setPicked([])}>Deseleziona</button>}
                     </div>
                 </div>
@@ -81,6 +84,7 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
                     )}
                 </div>
             )}
+            {page && <NotebookPreview lab={lab} activeId={activeId} onPrintAll={() => onPrint(null, { completo: true })} />}
         </div>
     );
 };
