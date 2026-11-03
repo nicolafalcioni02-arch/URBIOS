@@ -214,7 +214,8 @@ export const paginateHtml = async (html, { body, flow, limits, isCancelled = () 
             clone = node.cloneNode(true);
             cur[chain.length].appendChild(clone);
         }
-        if (fits()) {
+        // un contenitore che sta tutto in una pagina ma ha dentro interruzioni forzate (.pc-break) si scompone comunque
+        if (fits() && !(clone.querySelector && clone.querySelector('.pc-break'))) {
             placed++;
             if (forcedAfter(clone)) breakPage();
             return;

@@ -13,15 +13,15 @@ const byDateDesc = (a, b) => String(b.data || '').localeCompare(String(a.data ||
 export const SECTIONS = [
     {
         key: 'quaderno',
-        group: (r) => r.stato,
+        group: () => '',
         label: 'Quaderno',
         single: 'esperimento',
         icon: 'notebook',
         hint: 'Diario degli esperimenti: obiettivo, materiali, procedura svolta, osservazioni e risultati. Dal più recente.',
         prefix: 'qdl',
         title: (r) => r.titolo || 'Esperimento senza titolo',
-        sub: (r) => [r.codice, r.data && fmtDay(r.data), r.progetto].filter(Boolean).join(' · '),
-        badge: (r) => (r.stato ? { label: r.stato, tone: r.stato === 'Concluso' ? 'ok' : r.stato === 'Da ripetere' ? 'bad' : 'warn' } : null),
+        sub: (r) => (r.data ? fmtDay(r.data) : ''),
+        badge: () => null,
         sort: byDateDesc,
         empty: () => ({ stato: 'In corso', data: new Date().toISOString().slice(0, 10), materiali: [] }),
         fields: [

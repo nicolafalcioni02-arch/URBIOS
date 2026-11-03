@@ -8,14 +8,31 @@ const uiCss = `
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; }
 .pc-overlay button { font-family: inherit; color: inherit; }
 .pc-overlay.pc-embedded { position: relative; inset: auto; z-index: auto; height: 100%; min-height: 0; border-left: 1px solid var(--line, #E6E4DE); }
-.pc-embedded .pc-pages { padding: 20px 12px 40px; }
-/* incorporato: pannelli a scomparsa e barra compatta, come sugli schermi stretti */
-.pc-embedded .pc-brand, .pc-embedded .pc-bar { display: none !important; }
-.pc-embedded .pc-side { position: absolute; z-index: 5; top: 0; bottom: 0; left: 0; transform: translateX(-102%); transition: transform .3s var(--ease, ease); width: min(340px, 90%); box-shadow: 10px 0 40px rgba(0,0,0,.18); }
-.pc-embedded .pc-side.open { transform: none; }
-.pc-embedded .pc-scrim { display: block; position: absolute; inset: 0; background: rgba(0,0,0,.25); z-index: 4; opacity: 0; pointer-events: none; transition: opacity .3s; }
-.pc-embedded .pc-scrim.open { opacity: 1; pointer-events: auto; }
-.pc-embedded .pc-side-toggle { display: inline-grid !important; }
+.pc-embedded .pc-pages { padding: 20px 22px 40px; }
+.pc-embedded .pc-zoom { display: none !important; }
+/* incorporato: solo barra essenziale e fogli */
+.pc-embedded .pc-deco { display: none !important; }
+.pc-overlay.pc-embedded, .pc-embedded .pc-main, .pc-embedded .pc-desk { background: #DEDEDE !important; }
+.pc-embedded .pc-top { background: #F3F3F3 !important; border-bottom: 1px solid #C9C9C9; backdrop-filter: none !important; }
+.pc-embedded .pc-btn { background: #fff !important; color: #000 !important; border: .5px solid #000 !important; box-shadow: none !important; }
+.pc-embedded .pc-btn.primary { background: #000 !important; color: #fff !important; }
+.pc-embedded .pc-zoom, .pc-embedded .pc-zoom button { background: #fff !important; color: #000 !important; }
+.pc-embedded .pc-zoom { border: .5px solid #000; border-radius: 999px; height: 34px; overflow: hidden; }
+.pc-embedded .pc-btn { height: 34px; border-radius: 999px !important; padding: 0 12px; }
+.pc-embedded .pc-top .seg { background: #fff; border: .5px solid #000; border-radius: 999px; padding: 2px; }
+.pc-embedded .pc-top .seg button { border-radius: 999px; padding: 5px 12px; font-size: 12.5px; color: #000; }
+.pc-embedded .pc-top .seg button.on { background: #000; color: #fff; box-shadow: none; }
+.pc-embedded .pc-count { display: none !important; }
+
+.pc-embedded .pc-top { gap: 8px; padding: 10px 12px; flex-wrap: wrap; row-gap: 8px; }
+.pc-embedded .pc-zoom button:first-child, .pc-embedded .pc-zoom span { display: none; }
+.pc-embedded .pc-top .pc-spacer { display: none; }
+.pc-embedded .pc-top .seg { margin-right: auto; }
+.pc-embedded .pc-fontset { display: inline-flex; gap: 6px; }
+.pc-embedded .pc-fontset select { height: 34px; border: .5px solid #000; border-radius: 999px; background: #fff; color: #000; font: 500 12.5px Inter, system-ui, sans-serif; padding: 0 8px; max-width: 104px; }
+.pc-embedded .pc-busy { border-color: #000 !important; border-top-color: transparent !important; }
+.pc-embedded .pc-brand, .pc-embedded .pc-bar, .pc-embedded .pc-side-toggle { display: none !important; }
+
 .pc-top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface, #fff); border-bottom: 1px solid var(--line, #E6E4DE); flex: none; min-width: 0; }
 .pc-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .pc-brand h1 { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 600; font-size: 22px; line-height: 1; margin: 0; white-space: nowrap; }

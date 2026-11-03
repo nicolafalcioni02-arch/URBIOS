@@ -69,7 +69,7 @@ ${r.verificatoDa ? meta([['Verificato da', r.verificatoDa], ['Data verifica', fm
 </section>`;
 };
 
-const frontPage = (title, kicker, inner) => `<section class="d-rb-recipe pc-break"><div class="d-rb-head"><div><span class="d-kicker">${esc(kicker)}</span><h2 class="d-title d-rb-title">${esc(title)}</h2></div></div>${inner}</section>`;
+const frontPage = (title, kicker, inner, cls = '') => `<section class="d-rb-recipe${cls} pc-break"><div class="d-rb-head"><div><span class="d-kicker">${esc(kicker)}</span><h2 class="d-title d-rb-title">${esc(title)}</h2></div></div>${inner}</section>`;
 const emptyNote = (t) => `<p class="d-placeholder">${esc(t)}</p>`;
 
 // Il quaderno completo, a parti (copertina, indici, reagentario, pagine): ogni parte è un foglio nell'anteprima, in stampa si impagina di seguito.
@@ -79,22 +79,28 @@ export const notebookParts = (lab, onlyId) => {
     const nums = notebookNumbering(sorted);
     const dates = sorted.map((r) => r.data).filter(Boolean);
     const people = [...new Set(sorted.map((r) => r.operatore).filter(Boolean))];
-    const toc = rowsTable(['Pagina', 'Codice', 'Data', 'Esperimento', 'Stato'], sorted.map((r, i) => [String(i + 1), cell(r.codice), cell(fmtDay(r.data)), esc(r.titolo || 'Esperimento senza titolo'), cell(r.stato)]));
+    const cnt = (k) => lab[k].length;
+    const contents = [['Esperimenti', sorted.length], ['Protocolli', cnt('protocolli')], ['Ricettario reagenti', cnt('reagenti')], ['Magazzino', cnt('magazzino')], ['Registro campioni', cnt('campioni')], ['Bibliografia', cnt('articoli')]].filter(([, n]) => n);
+    const toc = (contents.length ? rowsTable(['Sezione', 'Voci'], contents.map(([t, n]) => [esc(t), String(n)])) : '')
+        + (sorted.length ? `<h3 class="d-rb-h">Pagine del quaderno</h3>${rowsTable(['Pagina', 'Codice', 'Data', 'Esperimento', 'Stato'], sorted.map((r, i) => [String(i + 1), cell(r.codice), cell(fmtDay(r.data)), esc(r.titolo || 'Esperimento senza titolo'), cell(r.stato)]))}` : '');
     const figRows = [];
     const tabRows = [];
     sorted.forEach((r, i) => {
         if (nums[i].tab) tabRows.push([`Tabella ${nums[i].tab}`, `Materiali, reagenti e lotti · ${esc(r.titolo || '')}`, String(nums[i].page)]);
         captions(r).forEach((f, k) => figRows.push([`Figura ${nums[i].figs[k]}`, esc(f.nome || ''), String(nums[i].page)]));
     });
-    const reag = [...lab.reagenti].sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'it'));
-    const reagRows = reag.map((r) => [esc(r.nome), cell(r.categoria), cell(r.concentrazione), cell(r.volumeFinale ? `${r.volumeFinale} ${r.unitaVolume || 'mL'}` : ''), cell(r.conservazione), cell(r.validita)]);
+    const byName = (k, f) => [...lab[k]].sort((a, b) => String(a[f]).localeCompare(String(b[f]), 'it'));
     const all = [
-        { key: '__cover', html: frontPage('Quaderno di laboratorio', 'Laboratorio', meta([['Periodo', dates.length ? `${fmtDay(dates[0])} – ${fmtDay(dates[dates.length - 1])}` : ''], ['Pagine', String(sorted.length)], ['Operatori', people.join(', ')]])) },
-        { key: '__toc', html: frontPage('Indice', 'Quaderno di laboratorio', toc || emptyNote('Nessun esperimento.')) },
-        { key: '__fig', html: frontPage('Indice delle figure', 'Quaderno di laboratorio', figRows.length ? rowsTable(['Figura', 'Didascalia', 'Pagina'], figRows) : emptyNote('Nessuna figura registrata.')) },
-        { key: '__tab', html: frontPage('Indice delle tabelle', 'Quaderno di laboratorio', tabRows.length ? rowsTable(['Tabella', 'Contenuto', 'Pagina'], tabRows) : emptyNote('Nessuna tabella.')) },
-        { key: '__reag', html: frontPage('Reagentario', 'Quaderno di laboratorio', reagRows.length ? rowsTable(['Soluzione', 'Categoria', 'Concentrazione', 'Volume', 'Conservazione', 'Validità'], reagRows) : emptyNote('Nessuna ricetta nel ricettario.')) },
+        { key: '__cover', html: frontPage('Quaderno di laboratorio', 'Laboratorio', meta([['Periodo', dates.length ? `${fmtDay(dates[0])} – ${fmtDay(dates[dates.length - 1])}` : ''], ['Pagine', String(sorted.length)], ['Operatori', people.join(', ')]]), ' nb-cover') },
+        { key: '__toc', html: frontPage('Indice', 'Quaderno di laboratorio', toc || emptyNote('Il quaderno è vuoto.')) },
+        ...(figRows.length ? [{ key: '__fig', html: frontPage('Indice delle figure', 'Quaderno di laboratorio', rowsTable(['Figura', 'Didascalia', 'Pagina'], figRows)) }] : []),
+        ...(tabRows.length ? [{ key: '__tab', html: frontPage('Indice delle tabelle', 'Quaderno di laboratorio', rowsTable(['Tabella', 'Contenuto', 'Pagina'], tabRows)) }] : []),
         ...sorted.map((r, i) => ({ key: r.id, html: entryHtml(r, 1, lab, nums[i]) })),
+        ...byName('protocolli', 'titolo').map((r) => ({ key: r.id, html: protocolHtml(r, 1) })),
+        ...byName('reagenti', 'nome').map((r) => ({ key: r.id, html: reagentHtml(r, 1, '') })),
+        ...(lab.magazzino.length ? [{ key: '__mag', html: magazzinoHtml(lab.magazzino) }] : []),
+        ...(lab.campioni.length ? [{ key: '__cam', html: campioniHtml(lab.campioni, lab) }] : []),
+        ...(lab.articoli.length ? [{ key: '__art', html: articoliHtml(lab.articoli) }] : []),
     ];
     return onlyId ? all.filter((p) => p.key === onlyId) : all;
 };
@@ -116,13 +122,27 @@ ${block('Sicurezza', r.sicurezza)}${block('Note', r.note)}
 </section>`;
 };
 
-const listHtml = (title, head, rows, count) => `<section class="d-rb-recipe"><div class="d-rb-head"><div><span class="d-kicker">Laboratorio · ${esc(fmtDay(new Date().toISOString().slice(0, 10)))}</span><h2 class="d-title d-rb-title">${esc(title)}</h2></div></div>
+const listHtml = (title, head, rows, count) => `<section class="d-rb-recipe pc-break"><div class="d-rb-head"><div><span class="d-kicker">Laboratorio · ${esc(fmtDay(new Date().toISOString().slice(0, 10)))}</span><h2 class="d-title d-rb-title">${esc(title)}</h2></div></div>
 <p class="d-placeholder" style="font-style:normal">${count} ${count === 1 ? 'voce' : 'voci'}</p>${rowsTable(head, rows)}</section>`;
+
+const articoliHtml = (items) => {
+    const rows = [...items].sort((a, b) => String(b.anno || '').localeCompare(String(a.anno || ''))).map((r) => [`<b>${esc(r.titolo)}</b>${r.tag ? `<br><small>${esc(r.tag)}</small>` : ''}`, cell(r.autori), cell(r.rivista), cell(r.anno), cell(r.doi), cell(r.lettura)]);
+    return listHtml('Bibliografia', ['Titolo', 'Autori', 'Rivista', 'Anno', 'DOI', 'Lettura'], rows, items.length);
+};
+const magazzinoHtml = (items) => {
+    const rows = [...items].sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'it')).map((r) => [esc(r.nome), cell(r.lotto), cell([r.quantita, r.unita].filter(Boolean).join(' ')), cell(fmtDay(r.scadenza)), cell(r.posizione), esc(stockState(r).label)]);
+    return listHtml('Magazzino reagenti', ['Articolo', 'Lotto', 'Quantità', 'Scadenza', 'Posizione', 'Stato'], rows, items.length);
+};
+const campioniHtml = (items, lab) => {
+    const rows = [...items].sort((a, b) => String(a.codice).localeCompare(String(b.codice), 'it')).map((r) => [esc(r.codice), cell(r.tipo), cell(r.descrizione), cell(fmtDay(r.data)), cell(r.posizione), cell(r.stato), cell((lab.protocolli.find((p) => p.id === r.protocolloId) || {}).codice)]);
+    return listHtml('Registro campioni', ['Codice', 'Tipo', 'Descrizione', 'Ricezione', 'Posizione', 'Stato', 'Protocollo'], rows, items.length);
+};
 
 export const buildLabHtml = ({ db, opts = {} }) => {
     const o = { ...LAB_DEFAULT_OPTS, ...opts };
     const items = labItems(db, o);
-    if (!items.length) return `<div class="d-doc"><p class="d-placeholder">Non c’è ancora nulla da stampare in «${esc(LAB_KINDS[o.kind] || '')}».</p></div>`;
+    const whole = o.kind === 'quaderno' && o.completo; // il quaderno intero ha sempre la copertina e gli indici
+    if (!items.length && !whole) return `<div class="d-doc"><p class="d-placeholder">Non c’è ancora nulla da stampare in «${esc(LAB_KINDS[o.kind] || '')}».</p></div>`;
     if (o.kind === 'quaderno') {
         const lab = labOf(db);
         if (o.completo) return `<div class="d-doc d-rb">${notebookParts(lab).map((p) => p.html).join('')}</div>`;
@@ -130,17 +150,25 @@ export const buildLabHtml = ({ db, opts = {} }) => {
         const nums = notebookNumbering(sorted);
         return `<div class="d-doc d-rb">${sorted.map((r, i) => [r, nums[i]]).filter(([r]) => items.includes(r)).map(([r, n], i) => entryHtml(r, i, lab, n)).join('')}</div>`;
     }
-    if (o.kind === 'articoli') {
-        const rows = [...items].sort((a, b) => String(b.anno || '').localeCompare(String(a.anno || ''))).map((r) => [`<b>${esc(r.titolo)}</b>${r.tag ? `<br><small>${esc(r.tag)}</small>` : ''}`, cell(r.autori), cell(r.rivista), cell(r.anno), cell(r.doi), cell(r.lettura)]);
-        return `<div class="d-doc d-rb">${listHtml('Bibliografia', ['Titolo', 'Autori', 'Rivista', 'Anno', 'DOI', 'Lettura'], rows, items.length)}</div>`;
-    }
+    if (o.kind === 'articoli') return `<div class="d-doc d-rb">${articoliHtml(items)}</div>`;
     if (o.kind === 'protocolli') return `<div class="d-doc d-rb">${items.map(protocolHtml).join('')}</div>`;
     if (o.kind === 'reagenti') return `<div class="d-doc d-rb">${items.map((r, i) => reagentHtml(r, i, o.volume)).join('')}</div>`;
-    if (o.kind === 'magazzino') {
-        const rows = [...items].sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'it')).map((r) => [esc(r.nome), cell(r.lotto), cell([r.quantita, r.unita].filter(Boolean).join(' ')), cell(fmtDay(r.scadenza)), cell(r.posizione), esc(stockState(r).label)]);
-        return `<div class="d-doc d-rb">${listHtml('Magazzino reagenti', ['Articolo', 'Lotto', 'Quantità', 'Scadenza', 'Posizione', 'Stato'], rows, items.length)}</div>`;
-    }
-    const lab = labOf(db);
-    const rows = [...items].sort((a, b) => String(a.codice).localeCompare(String(b.codice), 'it')).map((r) => [esc(r.codice), cell(r.tipo), cell(r.descrizione), cell(fmtDay(r.data)), cell(r.posizione), cell(r.stato), cell((lab.protocolli.find((p) => p.id === r.protocolloId) || {}).codice)]);
-    return `<div class="d-doc d-rb">${listHtml('Registro campioni', ['Codice', 'Tipo', 'Descrizione', 'Ricezione', 'Posizione', 'Stato', 'Protocollo'], rows, items.length)}</div>`;
+    if (o.kind === 'magazzino') return `<div class="d-doc d-rb">${magazzinoHtml(items)}</div>`;
+    return `<div class="d-doc d-rb">${campioniHtml(items, labOf(db))}</div>`;
 };
+
+// Word apre volentieri l'HTML: stessa pagina del quaderno, stile minimo (titoli, tabelle, interruzioni di pagina)
+export const wordFile = (html, title = 'Quaderno di laboratorio', font = '') => `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${esc(title)}</title>
+<style>
+@page { size: 21cm 29.7cm; margin: 2cm; }
+body { font-family: ${font || 'Arial, Helvetica, sans-serif'}; font-size: 10.5pt; color: #000; line-height: 1.35; }
+.pc-break { page-break-before: always; }
+.d-kicker { display: block; font-size: 8pt; letter-spacing: 1.5pt; text-transform: uppercase; color: #000; }
+.d-rb-title { font-size: 22pt; font-weight: bold; margin: 2pt 0 10pt; }
+.d-rb-h { font-size: 12pt; margin: 14pt 0 4pt; }
+.d-rb-meta div { display: inline-block; margin: 0 18pt 6pt 0; } .d-rb-meta span { display: block; font-size: 8pt; color: #000; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0 8pt; }
+th, td { border: 0.5pt solid #000; padding: 3pt 5pt; font-size: 10pt; text-align: left; vertical-align: top; }
+th { background: #fff; border-bottom: 1.5pt solid #000; }
+small { color: #444; }
+</style></head><body>${html}</body></html>`;

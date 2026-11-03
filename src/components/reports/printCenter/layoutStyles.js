@@ -417,4 +417,32 @@ const previews = `
 .pv-fresco .d1 { left: 14px; top: -6px; width: 22px; height: 16px; border-radius: 50%; background: var(--c); filter: blur(4px); opacity: .6; } .pv-fresco .d2 { left: -6px; bottom: -4px; width: 22px; height: 14px; border-radius: 50%; background: var(--c); filter: blur(4px); opacity: .45; } .pv-fresco .t { background: #1b1b1f; }
 `;
 
-export const layoutCss = base + elegante + giocoso + planner + energia + geometrico + naturale + editoriale + istituzionale + pastello + fresco + previews;
+// ---------- Rigore: quaderno di laboratorio incorporato (solo Laboratorio). Bianco e nero, un solo carattere, nessuna decorazione ----------
+const rigore = `
+.pc-l-rigore.pc-l-rigore, .pc-l-rigore.pc-l-rigore *:not(i) { font-family: var(--pc-font, 'Inter', system-ui, sans-serif) !important; font-style: normal !important; }
+.pc-sheet.pc-l-rigore { background: #fff; color: #000; }
+.pc-l-rigore .pc-flow { font-size: 10.5pt; line-height: 1.5; color: #000; }
+.pc-l-rigore .d-rb-recipe { margin: 0 0 7mm; }
+.pc-l-rigore .d-rb-head { display: block; padding: 0 0 2.5mm; margin-bottom: 4mm; border-radius: 0; background: none; border-bottom: .45mm solid #000; }
+.pc-l-rigore .d-kicker { color: #000; font-size: 8pt; font-weight: 700; letter-spacing: .12em; margin-bottom: 1.5mm; }
+.pc-theme.pc-l-rigore .d-rb .d-rb-title, .pc-l-rigore .d-rb-title { font-size: 18pt; font-weight: 700; letter-spacing: -.005em; line-height: 1.2; }
+.pc-l-rigore .d-rb-meta { border-top: .25mm solid #000; border-bottom: .25mm solid #000; margin-bottom: 4mm; }
+.pc-l-rigore .d-rb-meta > div + div { border-left: .2mm solid #000; }
+.pc-l-rigore .d-rb-meta span { color: #000; font-size: 7.5pt; font-weight: 700; letter-spacing: .1em; }
+.pc-l-rigore .d-rb-meta b { font-size: 10.5pt; font-weight: 600; }
+.pc-l-rigore .d-rb-h { color: #000; font-size: 9pt; font-weight: 700; letter-spacing: .1em; margin: 5mm 0 2mm; padding-bottom: 1mm; border-bottom: .2mm solid #000; }
+.pc-l-rigore .d-prose p { text-align: justify; hyphens: auto; margin: 0 0 2mm; }
+.pc-l-rigore .d-table { font-size: 9.5pt; border-top: .35mm solid #000; border-bottom: .35mm solid #000; }
+.pc-l-rigore .d-table th { color: #000; font-size: 8pt; font-weight: 700; letter-spacing: .06em; border-bottom: .25mm solid #000; background: none; }
+.pc-l-rigore .d-table td { border-bottom: .15mm solid #9a9a9a; }
+.pc-l-rigore .d-table small, .pc-l-rigore small { color: #444; }
+.pc-l-rigore .d-rb-steps li::marker { color: #000; font-weight: 700; font-size: 9pt; }
+.pc-l-rigore .d-placeholder { color: #333; font-size: 9.5pt; }
+.pc-l-rigore .nb-cover { padding-top: 62mm; }
+.pc-l-rigore .nb-cover .d-rb-head { border-bottom: .8mm solid #000; padding-bottom: 5mm; margin-bottom: 8mm; }
+.pc-l-rigore .nb-cover .d-rb-title { font-size: 30pt; font-weight: 700; }
+.pc-l-rigore .nb-cover .d-rb-meta { border-top: 0; }
+.pc-l-rigore .pc-foot, .pc-l-rigore .pc-foot * , .pc-l-rigore .pc-bm, .pc-l-rigore .pc-bm * { color: #000 !important; }
+`;
+
+export const layoutCss = base + elegante + giocoso + planner + energia + geometrico + naturale + editoriale + istituzionale + pastello + fresco + rigore + previews;

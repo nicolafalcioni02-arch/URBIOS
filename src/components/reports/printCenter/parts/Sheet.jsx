@@ -19,7 +19,7 @@ export const Sheet = ({ g, theme, layoutClass, accent, withHead, withFoot = true
     const top = m.t + (withHead ? g.head : 0);
     const studio = [prof.nome, prof.cognome].filter(Boolean).join(' ');
     return (
-        <div className={`pc-sheet pc-theme ${layoutClass}`} style={{ '--accent': accent, ...artVars(accent), '--pc-scale': theme.scale, '--m-t': `${m.t}mm`, '--m-s': `${m.s}mm`, '--m-b': `${m.b}mm` }}>
+        <div className={`pc-sheet pc-theme ${layoutClass}`} style={{ '--accent': accent, ...artVars(accent), '--pc-scale': theme.scale, '--pc-font': theme.font || undefined, '--m-t': `${m.t}mm`, '--m-s': `${m.s}mm`, '--m-b': `${m.b}mm` }}>
             {!noBrand && (
                 <div className="pc-deco">
                     <i />
