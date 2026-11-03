@@ -22,7 +22,7 @@ lab/
 ```
 
 - Layout: sotto i 900px niente barra laterale: intestazione con schede scorrevoli ed editor a finestra (`useCompact(899)` in `Lab.jsx`).
-- Stampa: Centro stampa, tipo `lab` (`printCenter/docs/lab.js`). Non è in `TYPE_ORDER`, quindi nella scheda paziente non compare.
+- Stampa: Centro stampa in modalità `scope="lab"` (prop di `PrintCenterProvider`): solo documenti di laboratorio, niente gruppi di documenti, niente «Aggiungi un documento», nessun dato del paziente. Tipo `lab` (`printCenter/docs/lab.js`). Non è in `TYPE_ORDER`, quindi nella scheda paziente non compare.
   Opzioni: `kind` (quaderno | protocolli | reagenti | magazzino | campioni | articoli), `ids`, `volume` (scala le quantità del ricettario sul volume finale voluto).
 - Excel: una sezione alla volta (tasto «Excel» sopra l'elenco) o tutto in un file con un foglio per sezione. Testi lunghi (passaggi, componenti) in una sola cella.
 - Entrata: scelta area dopo il login (`views/ModeSelect.jsx`, gestita in `App.jsx`); «Cambia area» torna alla scelta.

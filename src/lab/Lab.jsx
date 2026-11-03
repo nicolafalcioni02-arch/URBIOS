@@ -18,7 +18,7 @@ import { labStyles } from './labStyles';
 const STUDIO = { id: '__lab', nome: '', cognome: '', visite: [] };
 
 export const Lab = (props) => (
-    <PrintCenterProvider patient={STUDIO} db={props.db} onUpdateDb={props.onUpdateDb}>
+    <PrintCenterProvider patient={STUDIO} db={props.db} onUpdateDb={props.onUpdateDb} scope="lab">
         <LabInner {...props} />
     </PrintCenterProvider>
 );

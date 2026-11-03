@@ -23,7 +23,8 @@ export const usePrintDraft = (getDraft) => {
     }, [api]);
 };
 
-export const PrintCenterProvider = ({ patient, db, onUpdateDb, readOnly = false, children }) => {
+// scope="lab": Centro stampa del Laboratorio, solo documenti di laboratorio (niente pacchetti né documenti del paziente)
+export const PrintCenterProvider = ({ patient, db, onUpdateDb, readOnly = false, scope = null, children }) => {
     const [req, setReq] = useState(null);
     const draftRef = useRef(null);
     const api = useMemo(() => ({ open: (items = null) => setReq({ items, n: Date.now() }), draftRef }), []);
@@ -38,7 +39,7 @@ export const PrintCenterProvider = ({ patient, db, onUpdateDb, readOnly = false,
     return (
         <Ctx.Provider value={api}>
             {children}
-            {req && <PrintCenterHost key={req.n} req={req} patient={patient} db={db} onUpdateDb={onUpdateDb} readOnly={readOnly} draft={draft} onClose={() => setReq(null)} />}
+            {req && <PrintCenterHost key={req.n} req={req} patient={patient} db={db} onUpdateDb={onUpdateDb} readOnly={readOnly} scope={scope} draft={draft} onClose={() => setReq(null)} />}
         </Ctx.Provider>
     );
 };

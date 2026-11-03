@@ -22,3 +22,5 @@ visibili e diviso in pagine vere; ogni pezzo ricorda il suo elemento d'origine (
 a mano le pagine si ricuciono (`mergeFragments`) e si reimpaginano. Le pagine dei grafici sono "fixed": già composte,
 si riducono da sole per stare nel foglio. In `db.stampa` restano solo stile, ultimo pacchetto e pacchetti salvati.
 Le modifiche a mano si salvano alla chiusura (se confermi) in `paziente.stampaModifiche`, per documento+opzioni (`editKey`), e si ripristinano all apertura.
+
+`PrintCenterProvider scope="lab"` (Laboratorio, `src/lab/`): il Centro stampa mostra solo i documenti passati a `open()`, senza gruppi (`PresetPicker`) né «Aggiungi un documento» (`AddMenu`), e non salva l'ultimo gruppo usato.

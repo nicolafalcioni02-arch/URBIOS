@@ -25,16 +25,16 @@ const newId = () => `d${Date.now().toString(36)}${seq++}`;
 // chiave delle modifiche a mano salvate: stesso documento con le stesse opzioni
 const editKey = (it) => `${it.type}:${JSON.stringify(it.opts || {})}`;
 
-export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = false, draft = null, initial = null, onClose }) => {
+export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = false, scope = null, draft = null, initial = null, onClose }) => {
     const patient = useMemo(() => freshPatient(db, patient0), [db, patient0]);
     const prof = professionalFor(patient, db);
-    const ctx = useMemo(() => ({ patient, db, prof, draft }), [patient, db, prof, draft]);
+    const ctx = useMemo(() => ({ patient, db, prof, draft, scope }), [patient, db, prof, draft, scope]);
     const stored = db?.stampa || {};
     const canSave = !!onUpdateDb && !readOnly;
 
     const [theme, setThemeState] = useState(() => ({ ...DEFAULT_THEME, ...(stored.tema || {}) }));
     const customPresets = (stored.pacchetti || []).map((p) => ({ ...p, custom: true }));
-    const presets = [...PRESETS, ...customPresets];
+    const presets = scope === 'lab' ? [] : [...PRESETS, ...customPresets];
 
     const makeItem = useCallback(
         (spec) => {
@@ -54,6 +54,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     const [presetId, setPresetId] = useState(() => (initial ? null : stored.ultimoPacchetto || 'consegna'));
     const [items, setItems] = useState(() => {
         if (initial) return fromTypes(initial);
+        if (scope === 'lab') return [];
         const p = presets.find((x) => x.id === (stored.ultimoPacchetto || 'consegna')) || PRESETS[0];
         return fromTypes(p.types);
     });
@@ -211,7 +212,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
         setPresetId(p.id);
         dirty.current.clear();
         setItems(fromTypes(p.types));
-        if (canSave) onUpdateDb((prev) => ({ ...prev, stampa: { ...(prev.stampa || {}), ultimoPacchetto: p.id } }));
+        if (canSave && scope !== 'lab') onUpdateDb((prev) => ({ ...prev, stampa: { ...(prev.stampa || {}), ultimoPacchetto: p.id } }));
     };
     const savePreset = (name) => {
         if (!canSave) {

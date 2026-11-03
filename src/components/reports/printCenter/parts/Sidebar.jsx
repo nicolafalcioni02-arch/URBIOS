@@ -425,7 +425,7 @@ export const Sidebar = ({ open, items, ctx, theme, setTheme, presets, presetId, 
 
                 {tab === 'contenuto' && (
                     <>
-                        <PresetPicker presets={presets} presetId={presetId} ctx={ctx} onPreset={onPreset} onDeletePreset={onDeletePreset} onSavePreset={onSavePreset} canSaveNow={items.length > 0} />
+                        {ctx.scope !== 'lab' && <PresetPicker presets={presets} presetId={presetId} ctx={ctx} onPreset={onPreset} onDeletePreset={onDeletePreset} onSavePreset={onSavePreset} canSaveNow={items.length > 0} />}
 
                         <div className="pc-list">
                             {items.map((it, i) => {
@@ -507,7 +507,7 @@ export const Sidebar = ({ open, items, ctx, theme, setTheme, presets, presetId, 
                             {items.length === 0 && <div className="pc-empty">Nessun documento: scegli un gruppo qui sopra o aggiungine uno.</div>}
                         </div>
 
-                        <AddMenu items={items} ctx={ctx} onAdd={(t) => setOpenId(onAdd(t))} />
+                        {ctx.scope !== 'lab' && <AddMenu items={items} ctx={ctx} onAdd={(t) => setOpenId(onAdd(t))} />}
                     </>
                 )}
 
