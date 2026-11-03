@@ -8,7 +8,7 @@ const uiCss = `
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; }
 .pc-overlay button { font-family: inherit; color: inherit; }
 .pc-overlay.pc-embedded { position: relative; inset: auto; z-index: auto; height: 100%; min-height: 0; border-left: 1px solid var(--line, #E6E4DE); }
-.pc-embedded .pc-pages { padding: 20px 22px 40px; }
+.pc-embedded .pc-pages { padding: 20px 8px 40px; }
 .pc-embedded .pc-zoom { display: none !important; }
 /* incorporato: solo barra essenziale e fogli */
 .pc-embedded .pc-deco { display: none !important; }
