@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from './ui/icons';
+import { FiguresEditor } from './FiguresEditor';
 
 // Editor di un record: i campi vengono dal registro (sections.js). Salva da solo (come le Impostazioni): niente tasto Salva.
 // Un record nuovo viene creato appena il primo campo (titolo/codice) è compilato.
@@ -79,6 +80,7 @@ export const RecordForm = ({ section, record, lab, isNew, inline, onSave, onDele
         if (f.type === 'select') return <select className="fld" value={d[f.key] || ''} onChange={(e) => set(f.key, e.target.value)}>{f.options.map((o) => <option key={o}>{o}</option>)}</select>;
         if (f.type === 'ref') return <select className="fld" value={d[f.key] || ''} onChange={(e) => set(f.key, e.target.value)}><option value="">—</option>{lab[f.from].map((r) => <option key={r.id} value={r.id}>{[r.codice, r.titolo].filter(Boolean).join(' · ')}</option>)}</select>;
         if (f.type === 'steps') return <Steps value={d[f.key]} onChange={(v) => set(f.key, v)} />;
+        if (f.type === 'figures') return <FiguresEditor value={d[f.key]} onChange={(v) => set(f.key, v)} />;
         if (f.type === 'rows') return <Rows cols={f.cols} value={d[f.key]} onChange={(v) => set(f.key, v)} />;
         const listId = f.list ? `lab-dl-${section.key}-${f.key}` : undefined;
         return (

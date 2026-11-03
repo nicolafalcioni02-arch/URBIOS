@@ -1,4 +1,5 @@
 import { esc, multiline } from '../logic/visits';
+import { figureVisual } from '../../../../lab/figures';
 import { labOf, fmtDay, num, scaleFactor, scaledQty, stockState } from '../../../../lab/labLogic';
 
 // Laboratorio: protocolli, ricette di reagenti, magazzino e registro campioni (db.lab). Si apre da Laboratorio (src/lab/).
@@ -38,7 +39,7 @@ ${block('Sicurezza e smaltimento', r.sicurezza)}${block('Riferimenti', r.riferim
 };
 
 const sign = (a, b) => `<div class="d-rb-meta" style="margin-top:8mm"><div><span>${a}</span><b>&nbsp;</b></div><div><span>${b}</span><b>&nbsp;</b></div></div>`;
-const captions = (r) => (r.figure || []).filter((f) => String(f.nome || '').trim());
+const captions = (r) => (r.figure || []).filter((f) => String(f.nome || '').trim() || f.img || f.chart);
 
 // Numerazione del quaderno: pagina, tabella (materiali) e figura progressive su tutto il quaderno
 export const notebookNumbering = (sorted) => {
@@ -62,7 +63,7 @@ ${meta([['Eseguito da', r.operatore], ['Stato', r.stato], ['Protocollo', proto ?
 ${block('Obiettivo', r.obiettivo)}
 ${mats ? `<h3 class="d-rb-h">${n && n.tab ? `Tabella ${n.tab} · ` : ''}Materiali, reagenti e lotti</h3>${mats}` : ''}
 ${block('Procedura svolta', r.procedura)}${block('Osservazioni', r.osservazioni)}${block('Risultati', r.risultati)}
-${figs.length ? `<h3 class="d-rb-h">Figure</h3><div class="d-prose">${figs.map((f, k) => `<p><b>Figura ${n ? n.figs[k] : k + 1}.</b> ${esc(f.nome)}${f.note ? ` <small>· ${esc(f.note)}</small>` : ''}</p>`).join('')}</div>` : ''}
+${figs.length ? `<h3 class="d-rb-h">Figure</h3><div class="d-prose">${figs.map((f, k) => `<div style="break-inside:avoid">${figureVisual(f)}<p><b>Figura ${n ? n.figs[k] : k + 1}.</b> ${esc(f.nome)}${f.note ? ` <small>· ${esc(f.note)}</small>` : ''}</p></div>`).join('')}</div>` : ''}
 ${block('Conclusioni', r.conclusioni)}${block('Prossimi passi', r.prossimi)}
 ${r.verificatoDa ? meta([['Verificato da', r.verificatoDa], ['Data verifica', fmtDay(r.dataVerifica)]]) : sign('Firma di chi ha eseguito', 'Firma del verificatore')}
 </section>`;
@@ -83,7 +84,7 @@ export const notebookParts = (lab, onlyId) => {
     const tabRows = [];
     sorted.forEach((r, i) => {
         if (nums[i].tab) tabRows.push([`Tabella ${nums[i].tab}`, `Materiali, reagenti e lotti · ${esc(r.titolo || '')}`, String(nums[i].page)]);
-        captions(r).forEach((f, k) => figRows.push([`Figura ${nums[i].figs[k]}`, esc(f.nome), String(nums[i].page)]));
+        captions(r).forEach((f, k) => figRows.push([`Figura ${nums[i].figs[k]}`, esc(f.nome || ''), String(nums[i].page)]));
     });
     const reag = [...lab.reagenti].sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'it'));
     const reagRows = reag.map((r) => [esc(r.nome), cell(r.categoria), cell(r.concentrazione), cell(r.volumeFinale ? `${r.volumeFinale} ${r.unitaVolume || 'mL'}` : ''), cell(r.conservazione), cell(r.validita)]);

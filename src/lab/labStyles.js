@@ -142,6 +142,21 @@ export const labStyles = `
 .lab-step{display:grid;grid-template-columns:26px minmax(0,1fr) 92px 34px;gap:6px;align-items:start}
 .lab-step>span{font-size:12px;font-weight:600;color:var(--muted);padding-top:11px;text-align:center}
 .lab-step textarea{min-height:40px;resize:vertical}
+.lab-fig{display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.lab-fig-head{display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:6px}
+.lab-fig-img{display:grid;gap:6px;justify-items:start}.lab-fig-img img{max-width:100%;max-height:260px;border-radius:8px;border:1px solid var(--line)}
+.lab-chart{display:grid;gap:8px}.lab-chart-top{display:flex;gap:6px;flex-wrap:wrap}
+.lab-chart-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px}
+.lab-chip{height:32px;padding:0 12px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:500;color:var(--muted)}
+.lab-chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.lab-sheet{display:grid;gap:4px}.lab-sheet-row{display:grid;grid-template-columns:var(--tpl);gap:4px;align-items:center}
+.lab-chart-hint{font-size:12.5px;color:var(--muted);margin:0}
+.lab-sheet{padding:8px;background:var(--soft);border-radius:10px}
+.lab-sheet .fld{background:var(--surface);border:1px solid var(--line);min-width:0}
+.lab-sheet-h{font-size:12px;font-weight:600;color:var(--muted)}
+.lab-sheet-name{font-weight:600;text-align:center}
+.lab-sheet-row input:focus{border-color:var(--accent);outline:none}
+.lab-chart-view{border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff}
 .lab-x{width:34px;height:40px;display:grid;place-items:center;color:var(--muted);border-radius:10px}
 .lab-x:hover{color:var(--bad)}
 .lab-add{align-self:flex-start;font-size:13px;font-weight:500;color:var(--ink);display:inline-flex;gap:6px;align-items:center;height:34px;padding:0 12px;border:1px dashed var(--line);border-radius:10px}

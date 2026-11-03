@@ -34,7 +34,7 @@ export const SECTIONS = [
             { key: 'protocolloId', label: 'Protocollo seguito', type: 'ref', from: 'protocolli' },
             { key: 'obiettivo', label: 'Obiettivo / ipotesi', type: 'area', full: true },
             { key: 'materiali', label: 'Materiali, reagenti e lotti usati', type: 'rows', cols: [{ key: 'nome', label: 'Voce', w: 3 }, { key: 'quantita', label: 'Quantità', w: 1 }, { key: 'unita', label: 'Unità', w: 1 }, { key: 'note', label: 'Lotto / note', w: 2 }], full: true },
-            { key: 'figure', label: 'Figure (didascalia e riferimento al file)', type: 'rows', cols: [{ key: 'nome', label: 'Didascalia', w: 3 }, { key: 'note', label: 'File / riferimento', w: 2 }], full: true },
+            { key: 'figure', label: 'Figure (immagini e grafici)', type: 'figures', full: true },
             { key: 'procedura', label: 'Procedura svolta e deviazioni dal protocollo', type: 'area', full: true },
             { key: 'osservazioni', label: 'Osservazioni', type: 'area', full: true },
             { key: 'risultati', label: 'Risultati', type: 'area', full: true },
