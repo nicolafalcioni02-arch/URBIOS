@@ -15,8 +15,6 @@ import { Research } from '../research/Research';
 import { Chef } from '../chef/Chef';
 import { InvoiceIcon } from '../invoices/InvoiceIcon';
 import { InvoicesView } from '../invoices/InvoicesView';
-import { Lab } from '../lab/Lab';
-import { LabIcon } from '../lab/LabIcon';
 
 // Voce della barra alta (desktop): solo icona; al passaggio si ingrandisce come sotto una lente e mostra il nome (stile .hq in index.css)
 const BarBtn = ({ icon, label, note, badge, onClick, className = '' }) => (
@@ -34,7 +32,7 @@ const BarBtn = ({ icon, label, note, badge, onClick, className = '' }) => (
     </button>
 );
 
-export const ProfessionalSuite = ({ data, onUpdateDb }) => {
+export const ProfessionalSuite = ({ data, onUpdateDb, onSwitchArea }) => {
     const [selectedPatientId, setSelectedPatientId] = useState(null);
     const [showSettings, setShowSettings] = useState(false);
     const [studentMode, setStudentMode] = useState(false);
@@ -51,7 +49,6 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     const [chef, setChef] = useState(false); // Chef URBIOS (src/chef/)
     const [invoices, setInvoices] = useState(false); // gestionale fatture (src/invoices/)
     const [research, setResearch] = useState(false); // unità Ricerca (src/research/)
-    const [lab, setLab] = useState(false); // gestionale di laboratorio (src/lab/)
     const compact = useCompact(639); // telefono: cornice da app nativa
     const [form, setForm] = useState({ nome: '', cognome: '', sesso: 'M' });
     const { dirty, ephemeral, saveFile, openExitDialog } = useArchive();
@@ -222,9 +219,6 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
     if (research) {
         return <Research db={data} onBack={() => setResearch(false)} />;
     }
-    if (lab) {
-        return <Lab db={data} onUpdateDb={onUpdateDb} onBack={() => setLab(false)} />;
-    }
 
     const agendaView = agenda && (
         <>
@@ -294,7 +288,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                                 { label: 'Ricerca', icon: 'ph-chart-line', onClick: () => setResearch(true) },
                                 { label: 'Chef', icon: 'ph-chef-hat', onClick: () => setChef(true) },
                                 { label: 'Contabilità', icon: <InvoiceIcon />, onClick: () => setInvoices(true) },
-                                { label: 'Laboratorio', icon: <LabIcon />, onClick: () => setLab(true) },
+                                ...(onSwitchArea ? [{ label: 'Cambia area', icon: 'ph-squares-four', onClick: onSwitchArea }] : []),
                             ],
                             [
                                 { label: 'Student', icon: 'ph-student', note: 'presto', onClick: () => setStudentSoonOpen(true) },
@@ -327,7 +321,7 @@ export const ProfessionalSuite = ({ data, onUpdateDb }) => {
                         <BarBtn icon="ph-chef-hat" label="Chef" onClick={() => setChef(true)} />
                         <BarBtn icon="ph-chart-line" label="Ricerca" note="anteprima" onClick={() => setResearch(true)} />
                         <BarBtn icon={<InvoiceIcon size="1.3em" />} label="Contabilità" onClick={() => setInvoices(true)} />
-                        <BarBtn icon={<LabIcon size="1.3em" />} label="Laboratorio" onClick={() => setLab(true)} />
+                        {onSwitchArea && <BarBtn icon="ph-swap" label="Cambia area" onClick={onSwitchArea} />}
                         <BarBtn icon="ph-calendar-dots" label="Agenda" badge={todayAppts || null} onClick={() => setAgenda({ date: dateKey(new Date()) })} />
                         <BarBtn icon={widgetsEditing ? 'ph-check' : 'ph-squares-four'} label={widgetsEditing ? 'Fine' : 'Widget'} onClick={() => setWidgetsEditing((v) => !v)} className="max-[1359px]:!hidden" />
                         <BarBtn icon="ph-gear" label="Impostazioni" onClick={() => setShowSettings(true)} />

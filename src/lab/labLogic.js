@@ -1,6 +1,6 @@
 // Laboratorio: funzioni pure (niente React). Dati in db.lab = { protocolli, reagenti, magazzino, campioni }.
 
-export const LAB_KEYS = ['protocolli', 'reagenti', 'magazzino', 'campioni'];
+export const LAB_KEYS = ['quaderno', 'protocolli', 'reagenti', 'magazzino', 'campioni', 'articoli'];
 
 export const labOf = (db) => {
     const l = (db && db.lab) || {};

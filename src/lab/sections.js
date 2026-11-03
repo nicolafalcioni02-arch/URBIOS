@@ -8,7 +8,46 @@ const join = (a) => (a || []).map((r) => [r.nome, [r.quantita, r.unita].filter(B
 const stepsText = (a) => (a || []).map((s, i) => `${i + 1}. ${s.testo}${s.durata ? ` (${s.durata})` : ''}`).join('\n');
 const textOf = (r) => JSON.stringify(r).toLowerCase();
 
+const byDateDesc = (a, b) => String(b.data || '').localeCompare(String(a.data || ''));
+
 export const SECTIONS = [
+    {
+        key: 'quaderno',
+        label: 'Quaderno',
+        single: 'esperimento',
+        icon: 'ph-notebook',
+        hint: 'Diario degli esperimenti: obiettivo, materiali, procedura svolta, osservazioni e risultati. Dal più recente.',
+        prefix: 'qdl',
+        title: (r) => r.titolo || 'Esperimento senza titolo',
+        sub: (r) => [r.codice, r.data && fmtDay(r.data), r.progetto].filter(Boolean).join(' · '),
+        badge: (r) => (r.stato ? { label: r.stato, tone: r.stato === 'Concluso' ? 'ok' : r.stato === 'Da ripetere' ? 'bad' : 'warn' } : null),
+        sort: byDateDesc,
+        empty: () => ({ stato: 'In corso', data: new Date().toISOString().slice(0, 10), materiali: [] }),
+        fields: [
+            { key: 'titolo', label: 'Titolo', type: 'text', full: true },
+            { key: 'codice', label: 'Pagina / codice (es. QL-2026-014)', type: 'text' },
+            { key: 'data', label: 'Data', type: 'date' },
+            { key: 'progetto', label: 'Progetto', type: 'text', list: 'categorie' },
+            { key: 'stato', label: 'Stato', type: 'select', options: ['In corso', 'Concluso', 'Da ripetere'] },
+            { key: 'operatore', label: 'Eseguito da', type: 'text' },
+            { key: 'protocolloId', label: 'Protocollo seguito', type: 'ref', from: 'protocolli' },
+            { key: 'obiettivo', label: 'Obiettivo / ipotesi', type: 'area', full: true },
+            { key: 'materiali', label: 'Materiali, reagenti e lotti usati', type: 'rows', cols: [{ key: 'nome', label: 'Voce', w: 3 }, { key: 'quantita', label: 'Quantità', w: 1 }, { key: 'unita', label: 'Unità', w: 1 }, { key: 'note', label: 'Lotto / note', w: 2 }], full: true },
+            { key: 'procedura', label: 'Procedura svolta e deviazioni dal protocollo', type: 'area', full: true },
+            { key: 'osservazioni', label: 'Osservazioni', type: 'area', full: true },
+            { key: 'risultati', label: 'Risultati', type: 'area', full: true },
+            { key: 'conclusioni', label: 'Conclusioni', type: 'area', full: true },
+            { key: 'prossimi', label: 'Prossimi passi', type: 'area', full: true },
+            { key: 'verificatoDa', label: 'Verificato da', type: 'text' },
+            { key: 'dataVerifica', label: 'Data verifica', type: 'date' },
+        ],
+        search: textOf,
+        xlsx: [
+            ['codice', 'Pagina', 16], ['data', 'Data', 12], ['titolo', 'Titolo', 34], ['progetto', 'Progetto', 18], ['stato', 'Stato', 12], ['operatore', 'Eseguito da', 16],
+            ['protocollo', 'Protocollo', 28, (r, lab) => (lab.protocolli.find((p) => p.id === r.protocolloId) || {}).titolo || ''], ['obiettivo', 'Obiettivo', 36], ['materiali', 'Materiali', 40, (r) => join(r.materiali)],
+            ['procedura', 'Procedura', 40], ['osservazioni', 'Osservazioni', 36], ['risultati', 'Risultati', 40], ['conclusioni', 'Conclusioni', 36], ['prossimi', 'Prossimi passi', 30], ['verificatoDa', 'Verificato da', 16], ['dataVerifica', 'Data verifica', 14],
+        ],
+    },
     {
         key: 'protocolli',
         label: 'Protocolli',
@@ -136,6 +175,38 @@ export const SECTIONS = [
         xlsx: [
             ['codice', 'Codice', 16], ['tipo', 'Tipo', 16], ['descrizione', 'Descrizione', 30], ['data', 'Data ricezione', 14], ['origine', 'Origine', 18], ['stato', 'Stato', 14], ['posizione', 'Posizione', 18], ['conservazione', 'Conservazione', 16],
             ['protocollo', 'Protocollo', 28, (r, lab) => (lab.protocolli.find((p) => p.id === r.protocolloId) || {}).titolo || ''], ['operatore', 'Operatore', 16], ['risultati', 'Risultati', 40], ['note', 'Note', 30],
+        ],
+    },
+    {
+        key: 'articoli',
+        label: 'Articoli',
+        single: 'articolo scientifico',
+        icon: 'ph-article',
+        hint: 'Bibliografia: articoli scientifici con DOI, appunti e collegamento ai protocolli.',
+        prefix: 'art',
+        title: (r) => r.titolo || 'Articolo senza titolo',
+        sub: (r) => [r.autori, r.rivista, r.anno].filter(Boolean).join(' · '),
+        badge: (r) => (r.lettura ? { label: r.lettura, tone: r.lettura === 'Letto' ? 'ok' : r.lettura === 'Da leggere' ? 'warn' : 'muted' } : null),
+        sort: (a, b) => String(b.anno || '').localeCompare(String(a.anno || '')) || String(a.titolo).localeCompare(String(b.titolo), 'it'),
+        empty: () => ({ lettura: 'Da leggere' }),
+        fields: [
+            { key: 'titolo', label: 'Titolo', type: 'text', full: true },
+            { key: 'autori', label: 'Autori', type: 'text', full: true },
+            { key: 'rivista', label: 'Rivista', type: 'text' },
+            { key: 'anno', label: 'Anno', type: 'text' },
+            { key: 'doi', label: 'DOI', type: 'text' },
+            { key: 'pmid', label: 'PMID', type: 'text' },
+            { key: 'url', label: 'Link / percorso del PDF', type: 'text' },
+            { key: 'lettura', label: 'Lettura', type: 'select', options: ['Da leggere', 'In lettura', 'Letto', 'Da citare'] },
+            { key: 'tag', label: 'Parole chiave (separate da virgola)', type: 'text' },
+            { key: 'protocolloId', label: 'Protocollo collegato', type: 'ref', from: 'protocolli' },
+            { key: 'riassunto', label: 'Riassunto / punti chiave', type: 'area', full: true },
+            { key: 'appunti', label: 'Appunti e commenti', type: 'area', full: true },
+        ],
+        search: textOf,
+        xlsx: [
+            ['titolo', 'Titolo', 50], ['autori', 'Autori', 32], ['rivista', 'Rivista', 24], ['anno', 'Anno', 8, (r) => (Number(r.anno) || r.anno || '')], ['doi', 'DOI', 26], ['pmid', 'PMID', 12], ['url', 'Link', 30], ['lettura', 'Lettura', 12], ['tag', 'Parole chiave', 24],
+            ['protocollo', 'Protocollo', 28, (r, lab) => (lab.protocolli.find((p) => p.id === r.protocolloId) || {}).titolo || ''], ['riassunto', 'Riassunto', 40], ['appunti', 'Appunti', 40],
         ],
     },
 ];

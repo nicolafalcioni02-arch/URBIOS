@@ -5,7 +5,7 @@ import { labOf, fmtDay, num, scaleFactor, scaledQty, stockState } from '../../..
 // opts: { kind: 'protocolli'|'reagenti'|'magazzino'|'campioni', ids?: [id], volume?: volume finale a cui scalare le ricette }
 
 export const LAB_DEFAULT_OPTS = { kind: 'protocolli', ids: null, volume: '' };
-export const LAB_KINDS = { protocolli: 'Protocolli', reagenti: 'Ricettario reagenti', magazzino: 'Magazzino', campioni: 'Registro campioni' };
+export const LAB_KINDS = { quaderno: 'Quaderno di laboratorio', articoli: 'Bibliografia', protocolli: 'Protocolli', reagenti: 'Ricettario reagenti', magazzino: 'Magazzino', campioni: 'Registro campioni' };
 
 export const labItems = (db, o) => {
     const all = labOf(db)[o.kind] || [];
@@ -37,7 +37,21 @@ ${block('Sicurezza e smaltimento', r.sicurezza)}${block('Riferimenti', r.riferim
 </section>`;
 };
 
-const reagentHtml = (r, i, volume) => {
+const sign = (a, b) => `<div class="d-rb-meta" style="margin-top:8mm"><div><span>${a}</span><b>&nbsp;</b></div><div><span>${b}</span><b>&nbsp;</b></div></div>`;
+const entryHtml = (r, i, lab) => {
+    const proto = lab.protocolli.find((p) => p.id === r.protocolloId);
+    const mats = rowsTable(['Voce', 'Quantità', 'Lotto / note'], withName(r.materiali).map((m) => [esc(m.nome), cell([m.quantita, m.unita].filter(Boolean).join(' ')), cell(m.note)]));
+    return `<section class="d-rb-recipe${i ? ' pc-break' : ''}">
+<div class="d-rb-head"><div><span class="d-kicker">${esc([r.codice, fmtDay(r.data), r.progetto].filter(Boolean).join(' · ') || 'Quaderno di laboratorio')}</span><h2 class="d-title d-rb-title">${esc(r.titolo || 'Esperimento senza titolo')}</h2></div></div>
+${meta([['Eseguito da', r.operatore], ['Stato', r.stato], ['Protocollo', proto ? [proto.codice, proto.titolo].filter(Boolean).join(' · ') : '']])}
+${block('Obiettivo', r.obiettivo)}
+${mats ? `<h3 class="d-rb-h">Materiali, reagenti e lotti</h3>${mats}` : ''}
+${block('Procedura svolta', r.procedura)}${block('Osservazioni', r.osservazioni)}${block('Risultati', r.risultati)}${block('Conclusioni', r.conclusioni)}${block('Prossimi passi', r.prossimi)}
+${r.verificatoDa ? meta([['Verificato da', r.verificatoDa], ['Data verifica', fmtDay(r.dataVerifica)]]) : sign('Firma di chi ha eseguito', 'Firma del verificatore')}
+</section>`;
+};
+
+const reagentHtml =(r, i, volume) => {
     const f = scaleFactor(r, volume);
     const unit = r.unitaVolume || 'mL';
     const base = num(r.volumeFinale);
@@ -61,6 +75,14 @@ export const buildLabHtml = ({ db, opts = {} }) => {
     const o = { ...LAB_DEFAULT_OPTS, ...opts };
     const items = labItems(db, o);
     if (!items.length) return `<div class="d-doc"><p class="d-placeholder">Non c’è ancora nulla da stampare in «${esc(LAB_KINDS[o.kind] || '')}».</p></div>`;
+    if (o.kind === 'quaderno') {
+        const lab = labOf(db);
+        return `<div class="d-doc d-rb">${[...items].sort((a, b) => String(a.data).localeCompare(String(b.data))).map((r, i) => entryHtml(r, i, lab)).join('')}</div>`;
+    }
+    if (o.kind === 'articoli') {
+        const rows = [...items].sort((a, b) => String(b.anno || '').localeCompare(String(a.anno || ''))).map((r) => [`<b>${esc(r.titolo)}</b>${r.tag ? `<br><small>${esc(r.tag)}</small>` : ''}`, cell(r.autori), cell(r.rivista), cell(r.anno), cell(r.doi), cell(r.lettura)]);
+        return `<div class="d-doc d-rb">${listHtml('Bibliografia', ['Titolo', 'Autori', 'Rivista', 'Anno', 'DOI', 'Lettura'], rows, items.length)}</div>`;
+    }
     if (o.kind === 'protocolli') return `<div class="d-doc d-rb">${items.map(protocolHtml).join('')}</div>`;
     if (o.kind === 'reagenti') return `<div class="d-doc d-rb">${items.map((r, i) => reagentHtml(r, i, o.volume)).join('')}</div>`;
     if (o.kind === 'magazzino') {

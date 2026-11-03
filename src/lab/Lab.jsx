@@ -22,7 +22,7 @@ const LabInner = ({ db, onUpdateDb, onBack }) => {
     const printCenter = usePrintCenter();
     const compact = useCompact(639);
     const lab = useMemo(() => labOf(db), [db]);
-    const [tab, setTab] = useState('protocolli');
+    const [tab, setTab] = useState('quaderno');
     const [q, setQ] = useState('');
     const [edit, setEdit] = useState(null); // { record, isNew }
     const [picked, setPicked] = useState([]);
@@ -32,7 +32,8 @@ const LabInner = ({ db, onUpdateDb, onBack }) => {
     const list = useMemo(() => {
         if (!section) return [];
         const s = q.trim().toLowerCase();
-        return lab[tab].filter((r) => !s || section.search(r).includes(s));
+        const found = lab[tab].filter((r) => !s || section.search(r).includes(s));
+        return section.sort ? [...found].sort(section.sort) : found;
     }, [lab, tab, q, section]);
 
     const switchTab = (k) => { setTab(k); setQ(''); setPicked([]); };

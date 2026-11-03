@@ -1,4 +1,5 @@
 import { esc, fmtDate, multiline } from '../logic/visits';
+import { titoloProf } from '../../../../logic/titolo';
 import { dishNutrition, menuTotals, normalizeMenu } from '../../../../chef/chefLogic';
 
 // Menù: una carta in portate (db.chef_menus) con i piatti del ricettario, le calorie e i macro di ogni piatto
@@ -52,7 +53,7 @@ export const buildMenuHtml = ({ prof, db, opts = {} }) => {
     const byId = Object.fromEntries((db?.diet_meal_library || []).filter((m) => m && m.kind === 'ricetta').map((r) => [r.id, r]));
     const author = [prof?.nome, prof?.cognome].filter(Boolean).join(' ');
     // firma piccola: «Dott. Nome Cognome» e, sotto, la location o il catering
-    const credit = `<div class="d-mn-credit">${author ? `<span>Dott. ${esc(author)}</span>` : ''}${o.location ? `<b>${esc(o.location)}</b>` : ''}</div>`;
+    const credit = `<div class="d-mn-credit">${author ? `<span>${titoloProf(prof)} ${esc(author)}</span>` : ''}${o.location ? `<b>${esc(o.location)}</b>` : ''}</div>`;
     const hasCredit = Boolean(author || o.location);
     const forWho = o.eventName && o.eventName !== menu.title ? `<div class="d-kicker d-mn-for">${esc(o.eventName)}</div>` : '';
 
@@ -140,7 +141,7 @@ ${sp.who ? `<p class="d-mn-sub">per ${esc(sp.who)}</p>` : ''}
 <h1 class="d-title d-mn-covertitle">${esc(o.coverText || COVER_TEXT)}</h1>
 ${o.eventName && o.eventName !== menu.title ? `<p class="d-rb-for">per <b>${esc(o.eventName)}</b></p>` : ''}
 <div class="d-rb-orn"><span></span><i>✦</i><span></span></div>
-<div class="d-rb-by"><small>a cura di</small>${author ? `<b>Dott. ${esc(author)}</b>` : ''}${o.location ? `<span>${esc(o.location)}</span>` : ''}</div>
+<div class="d-rb-by"><small>a cura di</small>${author ? `<b>${titoloProf(prof)} ${esc(author)}</b>` : ''}${o.location ? `<span>${esc(o.location)}</span>` : ''}</div>
 <div class="d-rb-ed">${esc(month)}</div>
 </div></section></div>`
         : '';

@@ -1,4 +1,5 @@
 import { esc, multiline } from '../logic/visits';
+import { titoloProf } from '../../../../logic/titolo';
 import { dishNutrition, gramsOf, normalizeMenu } from '../../../../chef/chefLogic';
 import { menusOf, pickMenu } from './menu';
 
@@ -97,7 +98,7 @@ export const buildKitchenHtml = ({ prof, db, opts = {} }) => {
 <h1 class="d-title d-mn-covertitle">${esc(o.eventName || menu.title)}</h1>
 ${o.eventName && menu.title && o.eventName !== menu.title ? `<p class="d-rb-for">${esc(menu.title)}</p>` : ''}
 <div class="d-rb-orn"><span></span><i>✦</i><span></span></div>
-<div class="d-rb-by"><small>a cura di</small>${author ? `<b>Dott. ${esc(author)}</b>` : ''}${o.location ? `<span>${esc(o.location)}</span>` : ''}</div>
+<div class="d-rb-by"><small>a cura di</small>${author ? `<b>${titoloProf(prof)} ${esc(author)}</b>` : ''}${o.location ? `<span>${esc(o.location)}</span>` : ''}</div>
 <div class="d-rb-ed">${esc(month)}</div>
 </div></section></div>`
         : '';
@@ -113,12 +114,12 @@ ${o.eventName && menu.title && o.eventName !== menu.title ? `<p class="d-rb-for"
     const letter = o.letter && (menu.letter || '').trim()
         ? `<section class="d-kp-letter pc-break"><div class="d-kicker">${esc(o.eventName || menu.title)}</div><h2 class="d-title d-kp-title">Ai nostri chef</h2>
 <div class="d-kp-letterbody">${multiline(menu.letter)}</div>
-<div class="d-kp-sign">${author ? `<span>Dott. ${esc(author)}</span>` : ''}</div></section>`
+<div class="d-kp-sign">${author ? `<span>${titoloProf(prof)} ${esc(author)}</span>` : ''}</div></section>`
         : '';
 
     const summary = o.summary
         ? `<section class="d-kp-sum pc-break">
-<div class="d-kp-band"><span class="d-kicker">Piano di lavoro${o.eventName ? ` · ${esc(o.eventName)}` : ''}</span><h1 class="d-title d-kp-main">${esc(menu.title)}</h1><p class="d-kp-menu">${[menu.subtitle, o.location, author ? `Dott. ${author}` : ''].filter(Boolean).map(esc).join(' · ')}</p></div>
+<div class="d-kp-band"><span class="d-kicker">Piano di lavoro${o.eventName ? ` · ${esc(o.eventName)}` : ''}</span><h1 class="d-title d-kp-main">${esc(menu.title)}</h1><p class="d-kp-menu">${[menu.subtitle, o.location, author ? `${titoloProf(prof)} ${author}` : ''].filter(Boolean).map(esc).join(' · ')}</p></div>
 <div class="d-kp-facts"><div class="d-kpi"><b>${persons}</b><span>persone</span></div><div class="d-kpi"><b>${dishes.length}</b><span>${dishes.length === 1 ? 'piatto' : 'piatti'}</span></div><div class="d-kpi"><b>${shopRows.length}</b><span>ingredienti</span></div><div class="d-kpi"><b>${qty(totalKg)}</b><span>di spesa${num(o.extra, 0) ? ` (+${r0(num(o.extra, 0))}%)` : ''}</span></div></div>
 <div class="d-kp-menuList">${sections.map((s) => `<div class="d-kp-mrow"><h3>${esc(s.name)}</h3><div>${s.rows.map((x) => `<p>${esc(x.r.title)}<small>${r0(x.nut.grams)} g a porzione · ${r0(x.nut.kcal)} kcal</small></p>`).join('')}</div></div>`).join('')}</div>
 ${spBrief}</section>`
