@@ -13,10 +13,17 @@ import { CoverPage, FitBox, Sheet } from './parts/Sheet';
 import { Sidebar } from './parts/Sidebar';
 import { TextTools } from './parts/TextTools';
 import { printCenterCss } from './printCenterStyles';
+import { wordFile } from './docs/lab';
 import { professionalFor } from '../../../storage/example/example';
 
 // Safari (e ogni browser su iPhone/iPad) salva i PDF con il motore WebKit: alcuni effetti vanno semplificati in stampa
 const IS_SAFARI = typeof navigator !== 'undefined' && /Apple/.test(navigator.vendor || '');
+
+// incorporato (Laboratorio): aspetto fisso, pulito, senza intestazioni
+const EMBED_THEME = { ...DEFAULT_THEME, accent: '#000000', header: 'mai' };
+export const NB_FONTS = [['', 'Inter (URBIOS)'], ['Arial, Helvetica, sans-serif', 'Arial'], ['"Times New Roman", Times, serif', 'Times New Roman'], ['Georgia, serif', 'Georgia']];
+const NB_SIZES = [[0.9, 'Piccolo'], [1, 'Normale'], [1.1, 'Grande'], [1.2, 'Molto grande']];
+const RIGORE = { id: 'rigore', fonts: ['400 1em Inter', '600 1em Inter', '700 1em Inter'] }; // bianco e nero, un solo carattere (quello di URBIOS)
 
 let seq = 0;
 const newId = () => `d${Date.now().toString(36)}${seq++}`;
@@ -26,14 +33,14 @@ const newId = () => `d${Date.now().toString(36)}${seq++}`;
 // chiave delle modifiche a mano salvate: stesso documento con le stesse opzioni
 const editKey = (it) => `${it.type}:${JSON.stringify(it.opts || {})}`;
 
-export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = false, scope = null, draft = null, initial = null, embedded = false, onClose }) => {
+export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = false, scope = null, draft = null, initial = null, embedded = false, bar = null, onClose }) => {
     const patient = useMemo(() => freshPatient(db, patient0), [db, patient0]);
     const prof = professionalFor(patient, db);
     const ctx = useMemo(() => ({ patient, db, prof, draft, scope }), [patient, db, prof, draft, scope]);
     const stored = db?.stampa || {};
     const canSave = !!onUpdateDb && !readOnly;
 
-    const [theme, setThemeState] = useState(() => ({ ...DEFAULT_THEME, ...(stored.tema || {}) }));
+    const [theme, setThemeState] = useState(() => (embedded ? EMBED_THEME : { ...DEFAULT_THEME, ...(stored.tema || {}) }));
     const customPresets = (stored.pacchetti || []).map((p) => ({ ...p, custom: true }));
     const presets = scope === 'lab' ? [] : [...PRESETS, ...customPresets];
 
@@ -112,7 +119,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
     const measureFlow = useRef(null);
     const pageRefs = useRef({});
 
-    const layout = layoutById(theme.layout);
+    const layout = embedded ? RIGORE : layoutById(theme.layout);
     const layoutClass = `pc-l-${layout.id}`;
     const g = useMemo(() => geometry(theme), [theme]);
     const tKey = themeKey(theme);
@@ -322,7 +329,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
         if (ro) ro.observe(el);
         return () => ro && ro.disconnect();
     }, []);
-    const z = zoom === 'fit' ? fitZoom : zoom;
+    const z = embedded ? 0.85 : zoom === 'fit' ? fitZoom : zoom; // incorporato: sempre A4 a grandezza vera
     const zz = grid ? Math.min(z, 0.34) : z;
     const stepZoom = (d) => setZoom(Math.min(2, Math.max(0.3, Math.round((z + d) * 10) / 10)));
 
@@ -337,6 +344,19 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
         const t0 = Date.now();
         while (busyRef.current && Date.now() - t0 < 8000) await new Promise((r) => setTimeout(r, 60));
         await new Promise((r) => setTimeout(r, 120));
+    };
+    // Word: il testo com'è sui fogli (con le modifiche a mano), come file .doc
+    const exportWord = () => {
+        commitAll();
+        setTimeout(() => {
+            const html = itemsRef.current.filter((it) => it.on && it.html).map((it) => it.html).join('');
+            const blob = new Blob(['\ufeff', wordFile(html, undefined, theme.font)], { type: 'application/msword' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `quaderno-di-laboratorio-${new Date().toISOString().slice(0, 10)}.doc`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        }, 0);
     };
     const doPrint = async (pdf = false) => {
         setMenu(false);
@@ -550,14 +570,17 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
         );
     };
 
-    return ReactDOM.createPortal(
-        <div className={`pc-overlay${IS_SAFARI ? ' pc-safari' : ''}${scope === 'lab' ? ' pc-lab' : ''}`} style={{ '--accent-ui': theme.accent }}>
+    const ui = (
+        <div ref={rootRef} className={`pc-overlay${IS_SAFARI ? ' pc-safari' : ''}${scope === 'lab' ? ' pc-lab' : ''}${embedded ? ' pc-embedded' : ''}`} style={{ '--accent-ui': theme.accent }}>
             <style>{printCenterCss}</style>
 
             <div className="pc-top">
-                <button className="pc-ic pc-side-toggle" onClick={() => setSideOpen((o) => !o)} aria-label="Contenuto e stile">
-                    <i className="ph ph-sidebar-simple"></i>
-                </button>
+                {embedded && bar}
+                {!embedded && (
+                    <button className="pc-ic pc-side-toggle" onClick={() => setSideOpen((o) => !o)} aria-label="Contenuto e stile">
+                        <i className="ph ph-sidebar-simple"></i>
+                    </button>
+                )}
                 <div className="pc-brand">
                     <div style={{ minWidth: 0 }}>
                         <h1>Centro stampa</h1>
@@ -589,13 +612,27 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                         <i className="ph ph-plus"></i>
                     </button>
                 </div>
-                <div style={{ position: 'relative' }}>
-                    <button className="pc-btn" onClick={() => setMenu((m) => !m)} disabled={!total}>
-                        <i className="ph ph-paper-plane-tilt"></i>
-                        <span className="lbl">PDF e invio</span>
-                        <i className="ph ph-caret-down" style={{ fontSize: 13 }}></i>
+                {embedded && (
+                    <span className="pc-fontset">
+                        <select value={theme.scale} onChange={(e) => setTheme({ scale: Number(e.target.value) })} aria-label="Dimensione del testo" title="Dimensione del testo">
+                            {NB_SIZES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                        </select>
+                    </span>
+                )}
+                {embedded ? (
+                    <button className="pc-btn" onClick={exportWord} disabled={!total} title="Scarica il quaderno come documento Word">
+                        <i className="ph ph-file-doc"></i>
+                        <span className="lbl">Word</span>
                     </button>
-                </div>
+                ) : (
+                    <div style={{ position: 'relative' }}>
+                        <button className="pc-btn" onClick={() => setMenu((m) => !m)} disabled={!total}>
+                            <i className="ph ph-paper-plane-tilt"></i>
+                            <span className="lbl">PDF e invio</span>
+                            <i className="ph ph-caret-down" style={{ fontSize: 13 }}></i>
+                        </button>
+                    </div>
+                )}
                 <button className="pc-btn primary" onClick={() => doPrint(false)} disabled={!total}>
                     <i className="ph ph-printer"></i>
                     <span className="lbl">Stampa</span>
@@ -633,10 +670,10 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                 </div>
             )}
 
-            <TextTools active={!!activeFlow} />
+            {!embedded && <TextTools active={!!activeFlow} />}
 
             <div className="pc-main" onClick={() => menu && setMenu(false)}>
-                <Sidebar
+                {!embedded && <Sidebar
                     open={sideOpen}
                     items={items}
                     ctx={ctx}
@@ -658,8 +695,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                     onGoTo={goTo}
                     tab={tab}
                     setTab={setTab}
-                />
-                <div className={`pc-scrim ${sideOpen ? 'open' : ''}`} onClick={() => setSideOpen(false)} />
+                />}
                 <div className="pc-desk" ref={deskRef}>
                     {total > 0 ? (
                         <div className={`pc-pages ${grid ? 'grid' : ''}`} style={IS_SAFARI ? undefined : { zoom: zz }}>
@@ -700,7 +736,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
             </nav>
 
             {/* foglio di misura: stessa larghezza, caratteri e layout dei fogli veri */}
-            <div className={`pc-theme pc-measure ${layoutClass}`} style={{ '--accent': theme.accent, '--pc-scale': theme.scale, width: `${g.contentW}mm` }} aria-hidden="true">
+            <div className={`pc-theme pc-measure ${layoutClass}`} style={{ '--accent': theme.accent, '--pc-scale': theme.scale, '--pc-font': theme.font || undefined, width: `${g.contentW}mm` }} aria-hidden="true">
                 <div className="pc-body" ref={measureBody}>
                     <div className="pc-flow" ref={measureFlow} />
                 </div>

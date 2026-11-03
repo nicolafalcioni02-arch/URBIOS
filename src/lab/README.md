@@ -9,7 +9,7 @@ lab/
   parts/
     Sidebar.jsx     barra laterale come le Impostazioni (≥900px): ricerca su tutto, aree in gruppi (GROUPS), Excel completo, «Cambia area»
     Home.jsx        Panoramica essenziale: riepilogo, «Da fare» (scadenze, scorte, esperimenti in corso, campioni aperti), ultime pagine del quaderno, tasti «Crea»
-    NotebookPreview.jsx  Quaderno completo impaginato a destra del modulo (solo Quaderno, ≥900px): copertina, indice, indice figure e tabelle, reagentario, una pagina per esperimento; interruttore «Tutto / Solo questa pagina»; si aggiorna col salvataggio. Le parti vengono da `notebookParts` in `printCenter/docs/lab.js` (stesso codice della stampa, opzione `completo`); − / % / + in alto a destra cambiano la dimensione delle pagine (ricordata in localStorage)
+    NotebookPreview.jsx  Quaderno unico a destra del modulo (solo Quaderno, ≥900px): il Centro stampa incorporato (`PrintCenter embedded`), fisso a destra, sempre visibile (niente Centro stampa a finestra per il Quaderno). Dentro c'è tutto il laboratorio: copertina, indice, indice figure/tabelle, esperimenti, protocolli, ricettario, magazzino, campioni, bibliografia (`notebookParts` in `printCenter/docs/lab.js`). Aspetto fisso bianco e nero; barra: zoom, carattere e dimensione del testo, Word (.doc), Stampa/PDF. Interruttore «Tutto / Solo questa pagina»
     SectionView.jsx elenco (ricerca, filtri a pastiglia da section.group, selezione per stampare) + editor accanto
   sections.js       REGISTRO: campi, titoli, badge, group (filtri), sort e colonne Excel di ogni sezione. Per aggiungere un campo o una sezione si tocca solo qui
   RecordForm.jsx    editor generico (tipi: text, area, number, date, select, ref, steps, rows). SALVA DA SOLO dopo 500 ms (niente tasto Salva);

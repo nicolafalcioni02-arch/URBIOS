@@ -47,4 +47,4 @@ export const loadLayoutFonts = async (layout) => {
     await Promise.all((layout.fonts || []).map((f) => document.fonts.load(f).catch(() => null)));
 };
 
-export const themeKey = (t) => [t.layout, t.margins, t.scale, t.footer ? 1 : 0].join('|');
+export const themeKey = (t) => [t.layout, t.margins, t.scale, t.footer ? 1 : 0, t.font || ''].join('|');

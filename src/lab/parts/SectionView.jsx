@@ -26,17 +26,17 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
     const toggle = (id) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
     const ids = picked.length ? picked : list.map((r) => r.id);
     const activeId = sel?.record.id;
-    const page = wide && section.key === 'quaderno'; // il quaderno impaginato a destra del modulo
+    const page = wide; // il quaderno impaginato, fisso a destra del modulo, per ogni sezione
 
     return (
         <div className={`lab-split${page ? ' with-page' : ''}`}>
             <div className="lab-listcol">
                 <div className="lab-listhead">
-                    <header className="lab-page-head" style={{ marginBottom: 0 }}>
+                    <header className="lab-page-head" style={{ marginBottom: 0, alignItems: 'center' }}>
                         <div>
                             <h1 className="lab-title">{section.label}</h1>
                         </div>
-                        <button className="lab-btn is-primary" onClick={onNew}><Icon name="plus" size={16} />Nuovo</button>
+                        <button className="lab-btn is-primary is-sm" onClick={onNew}><Icon name="plus" size={14} />Nuovo</button>
                     </header>
                     <input className="fld" value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Cerca in ${section.label.toLowerCase()}`} aria-label="Cerca" />
                     {groups.length > 1 && (
@@ -48,8 +48,8 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
                     <div className="lab-tools">
                         {section.key === 'reagenti' && <input className="fld" style={{ height: 38, flex: '1 1 130px' }} value={vol} onChange={(e) => setVol(e.target.value)} placeholder="Volume da preparare" aria-label="Volume da preparare in stampa" title="Se compilato, le quantità in stampa si scalano su questo volume finale" />}
                         <button className="lab-btn is-secondary is-sm" disabled={!list.length} onClick={onExcel}><Icon name="table" size={16} />Excel</button>
-                        <button className="lab-btn is-secondary is-sm" disabled={!list.length} onClick={() => onPrint(ids)}><Icon name="printer" size={16} />{picked.length ? `Stampa ${picked.length}` : 'Stampa'}</button>
-                        {onBlank && <button className="lab-btn is-secondary is-sm" onClick={onBlank} title="Pagine a quadretti numerate, da compilare a mano"><Icon name="notebook" size={16} />Pagine vuote</button>}
+                        {!page && <button className="lab-btn is-secondary is-sm" disabled={!list.length} onClick={() => onPrint(ids)}><Icon name="printer" size={16} />{picked.length ? `Stampa ${picked.length}` : 'Stampa'}</button>}
+                        {onBlank && !page && <button className="lab-btn is-secondary is-sm" onClick={onBlank} title="Pagine a quadretti numerate, da compilare a mano"><Icon name="notebook" size={16} />Pagine vuote</button>}
                         {picked.length > 0 && <button className="lab-btn is-ghost is-sm" onClick={() => setPicked([])}>Deseleziona</button>}
                     </div>
                 </div>
@@ -78,12 +78,12 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
             </div>
             {wide && (
                 <div className="lab-detail">
-                    {sel ? <RecordForm key={sel.record.id} inline section={section} record={sel.record} isNew={sel.isNew} lab={lab} onSave={onSave} onDelete={onDelete} onPrint={onPrint && ((rec) => onPrint([rec.id]))} onClose={() => onSelect(null)} /> : (
+                    {sel ? <RecordForm key={sel.record.id} inline section={section} record={sel.record} isNew={sel.isNew} lab={lab} onSave={onSave} onDelete={onDelete} onPrint={onPrint && !page && ((rec) => onPrint([rec.id]))} onClose={() => onSelect(null)} /> : (
                         <div className="lab-detail-empty"><Icon name={section.icon} size={30} /><p>Seleziona una voce dall’elenco o creane una nuova.</p></div>
                     )}
                 </div>
             )}
-            {page && <NotebookPreview db={db} activeId={activeId} />}
+            {page && <NotebookPreview db={db} activeId={activeId} kind={section.key} vol={section.key === 'reagenti' ? vol : ''} />}
         </div>
     );
 };
