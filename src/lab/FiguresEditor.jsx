@@ -25,16 +25,16 @@ const Chart = ({ chart, onChange }) => {
                 {!pie && <input className="fld" placeholder="Asse Y (es. Assorbanza)" value={c.yLabel} onChange={(e) => set({ yLabel: e.target.value })} />}
             </div>
             <p className="lab-chart-hint">Scrivi nelle caselle: a sinistra le etichette, nelle colonne a destra i valori numerici (una colonna per ogni serie).</p>
-            <div className="lab-sheet" style={{ '--tpl': tpl }}>
-                <div className="lab-sheet-row head">
-                    <span className="lab-sheet-h">{pie ? 'Etichetta' : 'Asse X'}</span>
+            <div className="lab-grid" style={{ '--tpl': tpl }}>
+                <div className="lab-grid-row head">
+                    <span className="lab-grid-h">{pie ? 'Etichetta' : 'Asse X'}</span>
                     {c.series.slice(0, cols).map((s, si) => (
-                        <input key={si} className="fld lab-sheet-name" placeholder="Nome serie" value={s.name} aria-label="Nome serie" onChange={(e) => set({ series: c.series.map((x, k) => (k === si ? { ...x, name: e.target.value } : x)) })} />
+                        <input key={si} className="fld lab-grid-name" placeholder="Nome serie" value={s.name} aria-label="Nome serie" onChange={(e) => set({ series: c.series.map((x, k) => (k === si ? { ...x, name: e.target.value } : x)) })} />
                     ))}
                     <span />
                 </div>
                 {c.cats.map((k, i) => (
-                    <div className="lab-sheet-row" key={i}>
+                    <div className="lab-grid-row" key={i}>
                         <input className="fld" placeholder="es. 0 h" value={k} aria-label="Categoria" onChange={(e) => setCat(i, e.target.value)} />
                         {c.series.slice(0, cols).map((s, si) => <input key={si} className="fld" placeholder="valore" inputMode="decimal" value={s.vals[i] ?? ''} aria-label={s.name} onChange={(e) => setVal(si, i, e.target.value)} />)}
                         <button type="button" className="lab-x" aria-label="Togli riga" onClick={() => delRow(i)}><Icon name="x" size={16} /></button>
@@ -46,7 +46,7 @@ const Chart = ({ chart, onChange }) => {
                 {!pie && <button type="button" className="lab-add" onClick={addSeries}><Icon name="plus" size={15} />Serie</button>}
                 {!pie && c.series.length > 1 && <button type="button" className="lab-add" onClick={() => set({ series: c.series.slice(0, -1) })}>Togli ultima serie</button>}
             </div>
-            {hasChart(c) && <div className="lab-chart-view" dangerouslySetInnerHTML={{ __html: chartSvg(c) }} />}
+            <div className="lab-chart-view">{hasChart(c) ? <div dangerouslySetInnerHTML={{ __html: chartSvg(c) }} /> : <span>Il grafico comparirà qui appena scrivi i valori.</span>}</div>
         </div>
     );
 };

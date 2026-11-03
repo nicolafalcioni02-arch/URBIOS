@@ -83,6 +83,7 @@ html[data-look='vetro'] .lab-side{--lab-side-bg:radial-gradient(52vmax 44vmax at
 /* elenco + editor */
 .lab-split{display:grid;grid-template-columns:minmax(300px,390px) minmax(0,1fr);height:100%;min-height:0}
 .lab-split.with-page{min-width:1220px;grid-template-columns:240px minmax(240px,1fr) 740px}
+.with-page .lab-pane{max-width:none}
 .with-page .lab-listhead{padding:22px 16px 10px;gap:10px}
 .with-page .lab-listhead .lab-intro{display:none}
 .with-page .lab-listscroll{padding:0 16px 24px}
@@ -159,16 +160,17 @@ html[data-look='vetro'] .lab-side{--lab-side-bg:radial-gradient(52vmax 44vmax at
 .lab-chart-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px}
 .lab-chip{height:32px;padding:0 12px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:500;color:var(--muted)}
 .lab-chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
-.lab-sheet{display:grid;gap:4px}.lab-sheet-row{display:grid;grid-template-columns:var(--tpl);gap:4px;align-items:center}
 .lab-chart-hint{font-size:12.5px;color:var(--muted);margin:0}
-.lab-sheet{padding:8px;background:var(--soft);border-radius:10px}
-.lab-sheet .fld{background:var(--surface);border:1px solid var(--line);min-width:0;padding:0 6px}
-.lab-sheet .lab-x{width:26px}
-.lab-sheet{overflow-x:auto}
-.lab-sheet-h{font-size:12px;font-weight:600;color:var(--muted)}
-.lab-sheet-name{font-weight:600;text-align:center}
-.lab-sheet-row input:focus{border-color:var(--accent);outline:none}
-.lab-chart-view{border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff}
+.lab-grid{display:grid;gap:6px;padding:10px;background:var(--soft);border-radius:12px;overflow-x:auto}
+.lab-grid-row{display:grid;grid-template-columns:var(--tpl);gap:6px;align-items:center}
+.lab-grid-h{font-size:12px;font-weight:600;color:var(--muted);padding-left:2px}
+.lab-pane .lab-grid .fld{height:36px;border-radius:8px;padding:0 10px;background:var(--surface);border:1px solid var(--line);box-shadow:none;min-width:0}
+.lab-pane .lab-grid .fld:focus{border-color:var(--accent)}
+.lab-pane .lab-grid .lab-grid-name{font-weight:600;text-align:center}
+.lab-grid .lab-x{width:26px;height:36px}
+.lab-chart-view{aspect-ratio:520/300;display:grid;place-items:center;border:1px solid var(--line);border-radius:12px;background:#fff;padding:8px;overflow:hidden}
+.lab-chart-view>div{width:100%}.lab-chart-view>span{font-size:13px;color:var(--muted);text-align:center}
+.lab-pane,.lab-modal{overflow-anchor:none}
 .lab-x{width:34px;height:40px;display:grid;place-items:center;color:var(--muted);border-radius:10px}
 .lab-x:hover{color:var(--bad)}
 .lab-add{align-self:flex-start;font-size:13px;font-weight:500;color:var(--ink);display:inline-flex;gap:6px;align-items:center;height:34px;padding:0 12px;border:1px dashed var(--line);border-radius:10px}

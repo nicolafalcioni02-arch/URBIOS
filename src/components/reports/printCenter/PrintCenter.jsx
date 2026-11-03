@@ -559,7 +559,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                         {num} / {total}
                     </span>
                 </div>
-                {IS_SAFARI ? (
+                {IS_SAFARI && !embedded ? (
                     <div className="pc-zfit" style={{ width: 210 * MM * zz, height: 297 * MM * zz }}>
                         <div className="pc-zfit-in" style={{ transform: `scale(${zz})`, transformOrigin: '0 0', width: 210 * MM, height: 297 * MM }}>{sheet}</div>
                     </div>
@@ -698,7 +698,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
                 />}
                 <div className="pc-desk" ref={deskRef}>
                     {total > 0 ? (
-                        <div className={`pc-pages ${grid ? 'grid' : ''}`} style={IS_SAFARI ? undefined : { zoom: zz }}>
+                        <div className={`pc-pages ${grid ? 'grid' : ''}`} style={IS_SAFARI && !embedded ? undefined : { zoom: zz }}>
                             {pages.map(renderPage)}
                         </div>
                     ) : (
