@@ -1,3 +1,4 @@
+import { SendToPatient } from '../../../../connect/ui/SendToPatient';
 import React, { useMemo } from 'react';
 import { analyzeScheda } from '../logic/analysis';
 import { STATUSES, statusById } from '../../shared/planCommon';
@@ -16,7 +17,7 @@ const Action = ({ icon, title, sub, onClick, primary }) => (
     </button>
 );
 
-export const DeliverStep = ({ weeks, header, setHeader, massimali, profile, onPrint, onAnalysis, onProgression, onTools, onProgram }) => {
+export const DeliverStep = ({ db, patient, schedaId, onUpdateDb, weeks, header, setHeader, massimali, profile, onPrint, onAnalysis, onProgression, onTools, onProgram }) => {
     const A = useMemo(() => analyzeScheda({ weeks, header, massimali, profile }), [weeks, header, massimali, profile]);
     const st = statusById(header.stato);
     const warnings = A.warnings.filter((w) => w.level === 'warn' || w.level === 'info');
@@ -89,6 +90,7 @@ export const DeliverStep = ({ weeks, header, setHeader, massimali, profile, onPr
 
             <div className="grid sm:grid-cols-2 gap-3 mt-5">
                 <Action primary icon="ph-printer" title="Anteprima e stampa" sub="La scheda pronta da consegnare" onClick={onPrint} />
+                <SendToPatient db={db} patient={patient} kind="training" source={{ id: schedaId, scheda: { ...header, weeks } }} status={header.stato} onUpdateDb={onUpdateDb} />
                 <Action icon="ph-chart-bar" title="Analisi della scheda" sub="Volume per muscolo, carico, avvisi" onClick={onAnalysis} />
                 <Action icon="ph-trend-up" title="Genera progressione" sub="Costruisce le settimane successive" onClick={onProgression} />
                 <Action icon="ph-calculator" title="Massimali e calcolatori" sub="1RM, cardio, energia, recupero" onClick={onTools} />

@@ -12,62 +12,62 @@
    ============================================================ */
 
 html[data-look='vetro'] {
-    --lg-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    --lg-filter: blur(12px) saturate(1.9) brightness(1.06);
+    --vl-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --vl-filter: blur(12px) saturate(1.9) brightness(1.06);
     /* vetro neutro: riflesso morbido in alto a sinistra sopra un velo bianco */
-    --lg-fill:
+    --vl-fill:
         radial-gradient(120% 90% at 28% -10%, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0) 55%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.24) 100%);
-    --lg-fill-hover:
+    --vl-fill-hover:
         radial-gradient(120% 90% at 28% -10%, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 55%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.36) 100%);
     /* bordo luminoso, riflesso netto in alto, bagliore di rifrazione in basso */
-    --lg-rim:
+    --vl-rim:
         inset 0 0 0 0.5px rgba(255, 255, 255, 0.8),
         inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
         inset 0 -1px 1px rgba(255, 255, 255, 0.5),
         inset 0 -10px 18px -12px rgba(255, 255, 255, 0.95),
         inset 0 8px 14px -12px rgba(0, 0, 0, 0.1);
-    --lg-drop: 0 0.5px 1px rgba(0, 0, 0, 0.08), 0 6px 18px -6px rgba(40, 30, 10, 0.22);
-    --lg-drop-hi: 0 1px 2px rgba(0, 0, 0, 0.1), 0 14px 30px -10px rgba(40, 30, 10, 0.3);
+    --vl-drop: 0 0.5px 1px rgba(0, 0, 0, 0.08), 0 6px 18px -6px rgba(40, 30, 10, 0.22);
+    --vl-drop-hi: 0 1px 2px rgba(0, 0, 0, 0.1), 0 14px 30px -10px rgba(40, 30, 10, 0.3);
     /* riempimento "vibrant": quello che diventa il vetro quando sta dentro altro vetro */
-    --lg-vibrant: rgba(118, 118, 128, 0.12);
-    --lg-vibrant-hover: rgba(118, 118, 128, 0.2);
+    --vl-vibrant: rgba(118, 118, 128, 0.12);
+    --vl-vibrant-hover: rgba(118, 118, 128, 0.2);
     /* vetro colorato dell'azione principale: l'accento, l'unico colore dell'aspetto */
-    --lg-tint: 91, 87, 217;
-    --lg-tint-fill:
+    --vl-tint: 91, 87, 217;
+    --vl-tint-fill:
         radial-gradient(120% 90% at 28% -10%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 50%),
-        linear-gradient(180deg, rgba(var(--lg-tint), 0.82) 0%, rgba(var(--lg-tint), 0.96) 100%);
-    --lg-tint-rim:
+        linear-gradient(180deg, rgba(var(--vl-tint), 0.82) 0%, rgba(var(--vl-tint), 0.96) 100%);
+    --vl-tint-rim:
         inset 0 0 0 0.5px rgba(255, 255, 255, 0.22),
         inset 0 1px 0 rgba(255, 255, 255, 0.4),
         inset 0 -10px 18px -12px rgba(255, 255, 255, 0.35);
-    --lg-ring: 0 0 0 3px rgba(91, 87, 217, 0.5);
+    --vl-ring: 0 0 0 3px rgba(91, 87, 217, 0.5);
 }
 
 /* ---------- vetro neutro (livello dei controlli) ---------- */
 html[data-look='vetro'] body :is(.vw-back, .vw-chip, .m-pill:not(.save), button.rounded-full.bg-gray-100, button.rounded-full.bg-white) {
-    background: var(--lg-fill);
-    -webkit-backdrop-filter: var(--lg-filter);
-    backdrop-filter: var(--lg-filter);
+    background: var(--vl-fill);
+    -webkit-backdrop-filter: var(--vl-filter);
+    backdrop-filter: var(--vl-filter);
     border: 0;
     color: var(--ink);
-    box-shadow: var(--lg-rim), var(--lg-drop);
-    transition: transform 0.45s var(--lg-spring), box-shadow 0.3s ease, background 0.3s ease, filter 0.2s ease;
+    box-shadow: var(--vl-rim), var(--vl-drop);
+    transition: transform 0.45s var(--vl-spring), box-shadow 0.3s ease, background 0.3s ease, filter 0.2s ease;
 }
 html[data-look='vetro'] body :is(.vw-back, .vw-chip, .m-pill:not(.save), button.rounded-full.bg-gray-100, button.rounded-full.bg-white):hover:not(:disabled) {
-    background: var(--lg-fill-hover);
-    box-shadow: var(--lg-rim), var(--lg-drop-hi);
+    background: var(--vl-fill-hover);
+    box-shadow: var(--vl-rim), var(--vl-drop-hi);
 }
 
 /* pulsanti icona e "indietro" delle barre: cerchi e capsule di vetro che galleggiano, 44 pt */
 html[data-look='vetro'] .m-icon:not(.solid),
 html[data-look='vetro'] .m-back {
-    background: var(--lg-fill);
-    -webkit-backdrop-filter: var(--lg-filter);
-    backdrop-filter: var(--lg-filter);
-    box-shadow: var(--lg-rim), var(--lg-drop);
-    transition: transform 0.45s var(--lg-spring), background 0.3s ease;
+    background: var(--vl-fill);
+    -webkit-backdrop-filter: var(--vl-filter);
+    backdrop-filter: var(--vl-filter);
+    box-shadow: var(--vl-rim), var(--vl-drop);
+    transition: transform 0.45s var(--vl-spring), background 0.3s ease;
 }
 html[data-look='vetro'] .m-icon { width: 44px; height: 44px; }
 html[data-look='vetro'] .m-icon.solid { width: 44px; height: 44px; margin: 0; font-size: 19px; }
@@ -77,35 +77,35 @@ html[data-look='vetro'] .m-pill { height: 36px; padding: 0 14px; }
 
 /* voci della barra in alto (home desktop): come la barra di macOS, la lente appare al passaggio */
 html[data-look='vetro'] .home-quiet {
-    transition: transform 0.45s var(--lg-spring), background 0.3s ease, box-shadow 0.3s ease, color 0.2s;
+    transition: transform 0.45s var(--vl-spring), background 0.3s ease, box-shadow 0.3s ease, color 0.2s;
 }
 html[data-look='vetro'] .home-quiet:hover {
-    background: var(--lg-fill-hover);
-    box-shadow: var(--lg-rim), var(--lg-drop);
+    background: var(--vl-fill-hover);
+    box-shadow: var(--vl-rim), var(--vl-drop);
     color: var(--ink);
 }
 
 /* ---------- vetro colorato: l'azione principale della vista ---------- */
 html[data-look='vetro'] body :is(.vw-next, .m-icon.solid, .m-pill.save) {
-    background: var(--lg-tint-fill);
-    -webkit-backdrop-filter: var(--lg-filter);
-    backdrop-filter: var(--lg-filter);
+    background: var(--vl-tint-fill);
+    -webkit-backdrop-filter: var(--vl-filter);
+    backdrop-filter: var(--vl-filter);
     color: #fff;
     border: 0;
-    box-shadow: var(--lg-tint-rim), 0 1px 2px rgba(0, 0, 0, 0.12), 0 12px 26px -10px rgba(var(--lg-tint), 0.55);
-    transition: transform 0.45s var(--lg-spring), box-shadow 0.3s ease, filter 0.2s ease;
+    box-shadow: var(--vl-tint-rim), 0 1px 2px rgba(0, 0, 0, 0.12), 0 12px 26px -10px rgba(var(--vl-tint), 0.55);
+    transition: transform 0.45s var(--vl-spring), box-shadow 0.3s ease, filter 0.2s ease;
 }
 html[data-look='vetro'] .vw-next { font-weight: 600; letter-spacing: -0.01em; }
 html[data-look='vetro'] body :is(.vw-next, .m-icon.solid, .m-pill.save):hover:not(:disabled) {
     transform: none;
     filter: brightness(1.1);
-    box-shadow: var(--lg-tint-rim), 0 1px 2px rgba(0, 0, 0, 0.12), 0 16px 32px -10px rgba(var(--lg-tint), 0.6);
+    box-shadow: var(--vl-tint-rim), 0 1px 2px rgba(0, 0, 0, 0.12), 0 16px 32px -10px rgba(var(--vl-tint), 0.6);
 }
 /* un solo controllo colorato per vista: se c'è "Salva" (dati da salvare), il "+" accanto torna vetro neutro */
 html[data-look='vetro'] body .m-pill.save ~ .m-icon.solid {
-    background: var(--lg-fill);
+    background: var(--vl-fill);
     color: var(--ink);
-    box-shadow: var(--lg-rim), var(--lg-drop);
+    box-shadow: var(--vl-rim), var(--vl-drop);
 }
 
 /* ---------- pressione: il vetro si gonfia e rimbalza ---------- */
@@ -117,13 +117,13 @@ html[data-look='vetro'] body :is(.vw-back, .vw-next, .vw-chip, .home-quiet, .m-i
 
 /* ---------- mai vetro su vetro: dentro pannelli e fogli i controlli diventano riempimenti vibrant ---------- */
 html[data-look='vetro'] body :is(.panel, .sheet, .m-group, .patient-row, .bg-white) :is(.vw-back, .vw-chip, .m-pill:not(.save), button.rounded-full.bg-gray-100, button.rounded-full.bg-white, .m-icon:not(.solid)) {
-    background: var(--lg-vibrant);
+    background: var(--vl-vibrant);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     box-shadow: none;
 }
 html[data-look='vetro'] body :is(.panel, .sheet, .m-group, .patient-row, .bg-white) :is(.vw-back, .vw-chip, .m-pill:not(.save), button.rounded-full.bg-gray-100, button.rounded-full.bg-white, .m-icon:not(.solid)):hover:not(:disabled) {
-    background: var(--lg-vibrant-hover);
+    background: var(--vl-vibrant-hover);
     box-shadow: none;
 }
 html[data-look='vetro'] body :is(.panel, .sheet, .m-group, .bg-white) .vw-next {
@@ -134,11 +134,11 @@ html[data-look='vetro'] body :is(.panel, .sheet, .m-group, .bg-white) .vw-next {
 /* ---------- controllo a segmenti (contenuto): binario vibrant, la voce scelta è la lente chiara ---------- */
 html[data-look='vetro'] .seg {
     padding: 3px;
-    background: var(--lg-vibrant);
+    background: var(--vl-vibrant);
     border: 0;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
-html[data-look='vetro'] .seg button { font-weight: 500; color: #57554F; transition: background 0.3s ease, color 0.2s, box-shadow 0.3s ease, transform 0.45s var(--lg-spring); }
+html[data-look='vetro'] .seg button { font-weight: 500; color: #57554F; transition: background 0.3s ease, color 0.2s, box-shadow 0.3s ease, transform 0.45s var(--vl-spring); }
 html[data-look='vetro'] .seg button.on {
     background: rgba(255, 255, 255, 0.92);
     color: var(--ink);
@@ -148,17 +148,17 @@ html[data-look='vetro'] .seg button.on {
 /* mentre lo si tocca il segmento diventa vetro per un attimo (controlli transitori) */
 html[data-look='vetro'] .seg button:active {
     transform: scale(1.05);
-    background: var(--lg-fill-hover);
-    box-shadow: var(--lg-rim), var(--lg-drop);
+    background: var(--vl-fill-hover);
+    box-shadow: var(--vl-rim), var(--vl-drop);
 }
 
 /* passi della nuova visita: il passo attivo è una lente neutra (il colore resta al pulsante "Avanti") */
 html[data-look='vetro'] .vw-step.is-active {
     background: rgba(255, 255, 255, 0.9);
     color: var(--ink);
-    box-shadow: var(--lg-rim), 0 6px 16px -8px rgba(40, 30, 10, 0.25);
+    box-shadow: var(--vl-rim), 0 6px 16px -8px rgba(40, 30, 10, 0.25);
 }
-html[data-look='vetro'] .vw-step-dot { background: var(--lg-vibrant); box-shadow: none; }
+html[data-look='vetro'] .vw-step-dot { background: var(--vl-vibrant); box-shadow: none; }
 html[data-look='vetro'] .vw-step.is-active .vw-step-dot { background: var(--ink); color: #fff; }
 html[data-look='vetro'] .vw-step.is-done .vw-step-dot { background: rgba(62, 154, 94, 0.18); color: var(--ok); }
 
@@ -178,48 +178,25 @@ html[data-look='vetro'] .m-brand { padding-left: 4px; }
 /* barra delle sezioni: capsula di vetro sospesa, etichette monocromatiche, la scheda scelta ha la sua lente */
 html[data-look='vetro'] .m-tabbar {
     margin: 0 16px max(10px, env(safe-area-inset-bottom));
-    padding: 5px;
-    gap: 2px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
     border: 0;
-    border-radius: 999px;
-    background: var(--lg-fill);
-    -webkit-backdrop-filter: var(--lg-filter);
-    backdrop-filter: var(--lg-filter);
-    box-shadow: var(--lg-rim), var(--lg-drop-hi);
-}
-html[data-look='vetro'] .m-tab {
-    min-height: 54px;
-    padding-top: 6px;
-    border-radius: 999px;
-    font-weight: 500;
-    color: #5E5B55;
-    transition: background 0.35s ease, box-shadow 0.35s ease, color 0.2s, transform 0.45s var(--lg-spring);
-}
-html[data-look='vetro'] .m-tab i { font-size: 24px; }
-html[data-look='vetro'] .m-tab.on {
-    color: var(--ink);
-    background: rgba(118, 118, 128, 0.14);
-    box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-html[data-look='vetro'] .m-tab:active { transform: scale(1.08); }
-html[data-look='vetro'] .m-tab:active i { transform: none; }
-/* il "+" nella barra è vetro neutro dentro la capsula: niente secondo colore, niente vetro su vetro */
-html[data-look='vetro'] .m-tab-fab {
-    width: 52px;
-    height: 30px;
-    background: var(--ink);
-    color: #fff;
+    background: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    box-shadow: none;
 }
+.m-tab-ico { position: relative; display: inline-grid; place-items: center; font-size: 24px; line-height: 1; }
+.m-tab-ico i { font-size: 24px; }
+.m-gbtn { flex: none; width: 44px; height: 44px; margin: 0 2px; }
+.m-gbtn i { font-size: 22px; line-height: 1; }
 html[data-look='vetro'] .m-tab-dot,
 html[data-look='vetro'] .m-tab-badge { border-color: rgba(255, 255, 255, 0.9); }
 
 /* ---------- accessibilità ---------- */
 html[data-look='vetro'] body :is(.vw-back, .vw-next, .vw-chip, .home-quiet, .m-icon, .m-back, .m-pill, .m-tab, .seg button):focus-visible {
     outline: none;
-    box-shadow: var(--lg-rim), var(--lg-ring);
+    box-shadow: var(--vl-rim), var(--vl-ring);
 }
 
 /* Riduci trasparenza: il vetro diventa opaco e smette di sfocare */
@@ -232,7 +209,7 @@ html[data-look='vetro'] body :is(.vw-back, .vw-next, .vw-chip, .home-quiet, .m-i
         mask-image: none;
     }
     html[data-look='vetro'] body :is(.vw-next, .m-icon.solid, .m-pill.save) {
-        background: rgb(var(--lg-tint));
+        background: rgb(var(--vl-tint));
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
     }
@@ -241,9 +218,9 @@ html[data-look='vetro'] body :is(.vw-back, .vw-next, .vw-chip, .home-quiet, .m-i
 /* Aumenta contrasto: bordi netti, niente riflessi, accento più scuro */
 @media (prefers-contrast: more) {
     html[data-look='vetro'] {
-        --lg-tint: 62, 58, 178;
-        --lg-vibrant: rgba(23, 24, 27, 0.1);
-        --lg-vibrant-hover: rgba(23, 24, 27, 0.16);
+        --vl-tint: 62, 58, 178;
+        --vl-vibrant: rgba(23, 24, 27, 0.1);
+        --vl-vibrant-hover: rgba(23, 24, 27, 0.16);
     }
     html[data-look='vetro'] body :is(.vw-back, .vw-chip, .m-pill:not(.save), .m-icon:not(.solid), .m-back, .m-tabbar, .home-quiet:hover, button.rounded-full.bg-gray-100, button.rounded-full.bg-white) {
         background: rgba(255, 255, 255, 0.96);
@@ -261,9 +238,9 @@ html[data-look='vetro'] body :is(.vw-back, .vw-next, .vw-chip, .home-quiet, .m-i
 
 /* barra alta: il vetro della voce sta nella "lente" (::before, vedi .hq in index.css), non sul tasto */
 html[data-look='vetro'] .home-quiet.hq:hover { box-shadow: none; }
-html[data-look='vetro'] .hq::before { background: var(--lg-fill-hover); box-shadow: var(--lg-rim), var(--lg-drop); }
+html[data-look='vetro'] .hq::before { background: var(--vl-fill-hover); box-shadow: var(--vl-rim), var(--vl-drop); }
 /* niente vetro su vetro: l'etichetta sta dentro la barra, quindi materiale chiaro e testo nitido */
-html[data-look='vetro'] .hq-tip { background: rgba(255, 255, 255, 0.92); border: 0; box-shadow: var(--lg-rim), var(--lg-drop); font-weight: 400; }
+html[data-look='vetro'] .hq-tip { background: rgba(255, 255, 255, 0.92); border: 0; box-shadow: var(--vl-rim), var(--vl-drop); font-weight: 400; }
 /* la pillola di vetro ha 8px di bordo attorno ai tasti: l'etichetta scende un po' di più per staccarsi */
 html[data-look='vetro'] .hq-text { top: calc(100% + 18px); }
 
@@ -273,11 +250,11 @@ html[data-look='vetro'] .vw-progress span { background: var(--accent); }
 
 /* tasto di chiusura delle finestre grafiche (Smart Plot): lente di vetro invece del nero pieno */
 html[data-look='vetro'] body .sp-close {
-    background: var(--lg-fill);
+    background: var(--vl-fill);
     color: var(--ink);
-    -webkit-backdrop-filter: var(--lg-filter);
-    backdrop-filter: var(--lg-filter);
-    box-shadow: var(--lg-rim), var(--lg-drop);
+    -webkit-backdrop-filter: var(--vl-filter);
+    backdrop-filter: var(--vl-filter);
+    box-shadow: var(--vl-rim), var(--vl-drop);
 }
 
 /* assistente AI: la barra dei tasti in basso lascia vedere lo sfondo, niente fascia con bordo netto */
@@ -332,20 +309,20 @@ html[data-look='vetro'] body .pc-overlay { background: var(--v-bg); background-a
 html[data-look='vetro'] body .pc-top { background: transparent; border-bottom: 0; }
 html[data-look='vetro'] body .pc-brand h1 { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Outfit, sans-serif; font-style: normal; font-weight: 600; font-size: 24px; letter-spacing: -0.03em; }
 html[data-look='vetro'] body :is(.pc-ic:not(.on), .pc-btn:not(.primary)) {
-    background: var(--lg-fill);
-    -webkit-backdrop-filter: var(--lg-filter);
-    backdrop-filter: var(--lg-filter);
+    background: var(--vl-fill);
+    -webkit-backdrop-filter: var(--vl-filter);
+    backdrop-filter: var(--vl-filter);
     border: 0;
-    box-shadow: var(--lg-rim), var(--lg-drop);
+    box-shadow: var(--vl-rim), var(--vl-drop);
 }
 html[data-look='vetro'] body .pc-btn.primary,
 html[data-look='vetro'] body .pc-bar .pc-bar-print {
-    background: var(--lg-tint-fill);
+    background: var(--vl-tint-fill);
     border: 0;
     color: #fff;
-    box-shadow: var(--lg-tint-rim), 0 8px 22px -8px rgba(var(--lg-tint), 0.6);
+    box-shadow: var(--vl-tint-rim), 0 8px 22px -8px rgba(var(--vl-tint), 0.6);
 }
-html[data-look='vetro'] body .pc-tools { background: var(--lg-fill); border-bottom: 0; -webkit-backdrop-filter: var(--lg-filter); backdrop-filter: var(--lg-filter); }
+html[data-look='vetro'] body .pc-tools { background: var(--vl-fill); border-bottom: 0; -webkit-backdrop-filter: var(--vl-filter); backdrop-filter: var(--vl-filter); }
 html[data-look='vetro'] body .pc-menu { background: rgba(251, 249, 244, 0.86); -webkit-backdrop-filter: blur(32px) saturate(1.7); backdrop-filter: blur(32px) saturate(1.7); border: 0; border-radius: 24px; }
 html[data-look='vetro'] body :is(.pc-item, .pc-chip:not(.on)) { background: var(--v-material); border-color: var(--v-edge); }
 html[data-look='vetro'] body .pc-item { border-radius: 20px; }
@@ -357,13 +334,13 @@ html[data-look='vetro'] body .pc-item { border-radius: 20px; }
         padding: 5px;
         border: 0;
         border-radius: 999px;
-        background: var(--lg-fill);
-        -webkit-backdrop-filter: var(--lg-filter);
-        backdrop-filter: var(--lg-filter);
-        box-shadow: var(--lg-rim), var(--lg-drop-hi);
+        background: var(--vl-fill);
+        -webkit-backdrop-filter: var(--vl-filter);
+        backdrop-filter: var(--vl-filter);
+        box-shadow: var(--vl-rim), var(--vl-drop-hi);
     }
     html[data-look='vetro'] body .pc-bar button { border-radius: 999px; }
-    html[data-look='vetro'] body .pc-bar button.on { background: var(--lg-vibrant); }
+    html[data-look='vetro'] body .pc-bar button.on { background: var(--vl-vibrant); }
     /* pannelli: foglio di vetro che galleggia sopra la barra */
     html[data-look='vetro'] body .pc-side {
         left: 8px;
@@ -375,7 +352,7 @@ html[data-look='vetro'] body .pc-item { border-radius: 20px; }
         background: rgba(251, 249, 244, 0.82);
         -webkit-backdrop-filter: blur(32px) saturate(1.7);
         backdrop-filter: blur(32px) saturate(1.7);
-        box-shadow: var(--lg-rim), var(--lg-drop-hi);
+        box-shadow: var(--vl-rim), var(--vl-drop-hi);
     }
     html[data-look='vetro'] body .pc-side::before { background: rgba(60, 60, 67, 0.3); }
     html[data-look='vetro'] body .pc-scrim { background: rgba(40, 36, 28, 0.14); }
@@ -427,11 +404,11 @@ html[data-look='vetro'] body .wd-remove {
     box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.5), 0 2px 6px rgba(0, 0, 0, 0.22);
 }
 html[data-look='vetro'] body :is(.wd-seg, .wd-dots, .wd-plus) {
-    background: var(--lg-fill);
-    -webkit-backdrop-filter: var(--lg-filter);
-    backdrop-filter: var(--lg-filter);
+    background: var(--vl-fill);
+    -webkit-backdrop-filter: var(--vl-filter);
+    backdrop-filter: var(--vl-filter);
     border: 0;
-    box-shadow: var(--lg-rim), var(--lg-drop);
+    box-shadow: var(--vl-rim), var(--vl-drop);
 }
 html[data-look='vetro'] body .wd-tray,
 html[data-look='vetro'] body .wd-pick {
@@ -439,13 +416,13 @@ html[data-look='vetro'] body .wd-pick {
     -webkit-backdrop-filter: blur(32px) saturate(1.7);
     backdrop-filter: blur(32px) saturate(1.7);
     border: 0;
-    box-shadow: var(--lg-rim), var(--lg-drop-hi);
+    box-shadow: var(--vl-rim), var(--vl-drop-hi);
 }
 html[data-look='vetro'] body .wd-tray { border-radius: 32px; }
 html[data-look='vetro'] body .wd-pick { border-radius: 26px; }
-html[data-look='vetro'] body .wd-tile { background: var(--lg-vibrant); border: 0; border-radius: 18px; }
-html[data-look='vetro'] body .wd-done { background: var(--lg-tint-fill); box-shadow: var(--lg-tint-rim); }
-html[data-look='vetro'] body .wd-fly { background: var(--lg-fill); -webkit-backdrop-filter: var(--lg-filter); backdrop-filter: var(--lg-filter); border: 0; box-shadow: var(--lg-rim), var(--lg-drop-hi); }
+html[data-look='vetro'] body .wd-tile { background: var(--vl-vibrant); border: 0; border-radius: 18px; }
+html[data-look='vetro'] body .wd-done { background: var(--vl-tint-fill); box-shadow: var(--vl-tint-rim); }
+html[data-look='vetro'] body .wd-fly { background: var(--vl-fill); -webkit-backdrop-filter: var(--vl-filter); backdrop-filter: var(--vl-filter); border: 0; box-shadow: var(--vl-rim), var(--vl-drop-hi); }
 html[data-look='vetro'] body .wd-ghost { border-radius: 26px; }
 
 /* ---------- WIDGET 2026: più grandi di carattere, molle, un po' pazzerelli ---------- */

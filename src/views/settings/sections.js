@@ -9,6 +9,7 @@ import { LookTab } from './tabs/look/LookTab';
 import { FormulasTab } from './tabs/formulas/FormulasTab';
 import { DataExchangeTab } from './tabs/dataExchange/DataExchangeTab';
 import { SecurityTab } from './tabs/security/SecurityTab';
+import { ConnectTab } from './tabs/connect/ConnectTab';
 import { CiteTab } from './tabs/about/CiteTab';
 import { InfoTab } from './tabs/about/InfoTab';
 
@@ -34,6 +35,7 @@ export const GROUPS = [
         items: [
             { id: 'dati', label: 'Importa ed esporta', sub: 'CSV, documenti, anonimo', icon: 'exchange', Component: DataExchangeTab },
             { id: 'sicurezza', label: 'Sicurezza e archivio', sub: 'Salvataggio e cifratura', icon: 'shield', Component: SecurityTab },
+            { id: 'connettivita', label: 'Connettività', sub: 'App paziente e dispositivi', icon: 'link', Component: ConnectTab },
         ],
     },
     {

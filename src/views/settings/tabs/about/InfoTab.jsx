@@ -10,7 +10,7 @@ const TEAM = [
     { name: 'Lorenzo Frattini', title: 'Dott.', role: 'Science Team' },
     { name: 'Riccardo Giardini', title: 'Dott.', role: 'Science Team' },
     { name: 'Silvia Planchenstainer', title: 'Dott.ssa', role: 'Science Team' },
-    { name: 'Elia Falcioni', title: 'Dott.', role: 'Cryptography & Code Review Consultant' },
+    { name: 'Elia Falcioni', title: 'Dott.', role: 'External Consultant' },
 ];
 // ramo d'alloro (lato sinistro); il destro e' lo stesso specchiato
 const Laurel = ({ flip }) => {

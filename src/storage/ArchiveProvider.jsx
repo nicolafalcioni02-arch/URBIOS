@@ -3,6 +3,7 @@
 // e il FILE scaricato resta la fonte di verità.
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createVault, unlockVault, rewrapPassword, rewrapRecovery, isCryptoAvailable } from './cryptoVault';
+import { connectManager } from '../connect/manager';
 import { buildEncryptedText, buildPlainText, parseArchiveText, openEncrypted } from './archiveFile';
 import { createEmptyDb, normalizeDb } from './schema';
 import { saveWorking, loadWorking, clearWorking } from './workingCopy';
@@ -78,6 +79,20 @@ export const ArchiveProvider = ({ children }) => {
             }),
         []
     );
+
+    // ---- connettività (src/connect): sottochiave derivata dalla chiave master, mai la master stessa ----
+    const deriveKey = useCallback(async (purpose) => {
+        if (!masterRef.current) return null; // archivio non cifrato o bloccato: connect non parte
+        const base = await crypto.subtle.importKey('raw', masterRef.current, 'HKDF', false, ['deriveBits']);
+        const bits = await crypto.subtle.deriveBits({ name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(0), info: new TextEncoder().encode(`urbios/v1/${purpose}`) }, base, 256);
+        return new Uint8Array(bits);
+    }, []);
+    const connCfg = db && db.connect;
+    useEffect(() => {
+        // Online solo con archivio aperto, cifrato e interruttore acceso; in ogni altro caso tutto si ferma (anche su Blocca/Esci).
+        if (status === 'open' && encrypted && connCfg && connCfg.mode === 'online' && connCfg.relayUrl) connectManager.start({ settings: connCfg, deriveKey });
+        else connectManager.stop();
+    }, [status, encrypted, connCfg && connCfg.mode, connCfg && connCfg.relayUrl, deriveKey]);
 
     // ---- avvio: c'è qualcosa da riprendere? ----
     useEffect(() => {
@@ -360,6 +375,7 @@ export const ArchiveProvider = ({ children }) => {
         openExitDialog: () => setExitDialogOpen(true),
         closeExitDialog: () => setExitDialogOpen(false),
         cryptoAvailable: isCryptoAvailable(),
+        verifyPassword,
         createArchive,
         openFileText,
         recoverFromText,

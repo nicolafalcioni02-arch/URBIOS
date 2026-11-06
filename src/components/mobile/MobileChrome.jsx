@@ -1,28 +1,34 @@
 import React, { useRef, useState } from 'react';
+import { TabBar, Button } from 'glisse';
 
 // Cornice delle schermate su telefono: barra delle sezioni in basso e foglio di azioni.
 // Stessa logica delle app native: in alto solo dove sei, in basso dove puoi andare.
 
-// items: [{ id, label, icon, badge?, dot?, primary? }]
+// items: [{ id, label, icon, badge?, dot? }]
+// Barra delle sezioni in vetro liquido (glisse): la pastiglia segue il dito e si solleva come una lente.
 export const MobileTabBar = ({ items, active, onSelect }) => (
     <nav className="m-tabbar" aria-label="Sezioni">
-        {items.map((it) => {
-            const on = it.id === active;
-            return (
-                <button key={it.id} className={`m-tab ${on ? 'on' : ''}`} onClick={() => onSelect(it.id)} aria-current={on ? 'page' : undefined}>
-                    {it.primary ? (
-                        <span className="m-tab-fab">
-                            <i className={`ph-bold ${it.icon}`}></i>
-                        </span>
-                    ) : (
-                        <i className={`${on ? 'ph-fill' : 'ph'} ${it.icon}`}></i>
-                    )}
-                    <span>{it.label}</span>
-                    {it.badge ? <span className="m-tab-badge">{it.badge}</span> : it.dot ? <span className="m-tab-dot" style={it.dot === true ? undefined : { background: it.dot }}></span> : null}
-                </button>
-            );
-        })}
+        <TabBar
+            aria-label="Sezioni"
+            value={active}
+            onValueChange={onSelect}
+            items={items.map((it) => ({
+                value: it.id,
+                label: it.label,
+                icon: (
+                    <span className="m-tab-ico">
+                        <i className={`${it.id === active ? 'ph-fill' : 'ph'} ${it.icon}`}></i>
+                        {it.badge ? <span className="m-tab-badge">{it.badge}</span> : it.dot ? <span className="m-tab-dot" style={it.dot === true ? undefined : { background: it.dot }}></span> : null}
+                    </span>
+                ),
+            }))}
+        />
     </nav>
+);
+
+// Tasto tondo in vetro per le barre in alto (glisse Button): `solid` = azione principale con l'accento.
+export const GlassIconButton = ({ icon, solid, ...rest }) => (
+    <Button className="m-gbtn" variant={solid ? 'filled' : 'glass'} icon={<i className={`ph${solid ? '-bold' : ''} ${icon}`}></i>} {...rest} />
 );
 
 // groups: [[{ label, icon, onClick, note?, tone?: 'danger', disabled? }]]

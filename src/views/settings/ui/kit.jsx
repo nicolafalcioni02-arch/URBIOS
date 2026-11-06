@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button, SegmentedControl } from 'glisse';
 import { Icon } from './icons';
 
 // Kit delle Impostazioni: gli unici mattoni da usare nelle schede (stile in ../settings.css, classi st-*).
@@ -46,11 +47,9 @@ export const Btn = ({ children, variant = 'primary', icon, size, className = '',
     </button>
 );
 
-// Bottone solo icona (chiudi, elimina...)
+// Bottone solo icona in vetro (glisse): chiudi, elimina...
 export const IconBtn = ({ icon, label, className = '', ...props }) => (
-    <button type="button" aria-label={label} title={label} {...props} className={`st-iconbtn ${className}`}>
-        <Icon name={icon} size={18} />
-    </button>
+    <Button type="button" aria-label={label} title={label} {...props} className={`st-iconbtn ${className}`} icon={<Icon name={icon} size={18} />} />
 );
 
 export const Check = ({ label, hint, checked, onChange, disabled }) => (
@@ -91,15 +90,9 @@ export const Field = ({ label, className = '', ...props }) => (
     </label>
 );
 
-// Interruttore a due o più voci
+// Interruttore a due o più voci (glisse: la lente segue il dito)
 export const Segmented = ({ options, value, onChange }) => (
-    <div className="st-seg" role="tablist">
-        {options.map(([k, l]) => (
-            <button key={k} type="button" role="tab" aria-selected={value === k} className={value === k ? 'on' : ''} onClick={() => onChange(k)}>
-                {l}
-            </button>
-        ))}
-    </div>
+    <SegmentedControl aria-label="Scelta" items={options.map(([k, l]) => ({ value: k, label: l }))} value={value} onValueChange={onChange} />
 );
 
 // Nota/avviso. tone: neutral | ok | warn | bad (cambia solo il filo a sinistra e l'icona, non lo sfondo)

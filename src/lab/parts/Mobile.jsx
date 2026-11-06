@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../ui/icons';
+import { Pill } from '../ui/Pill';
 import { SECTIONS, sectionOf } from '../sections';
 import { scaleFactor, scaledQty, searchAll, newId } from '../labLogic';
 import { fmtDay, latestVersions, stockState, versionsOf } from '../labLogic';
@@ -13,10 +14,16 @@ import { readDocx } from '../docx';
 import { WhereButton, WhereSheet } from './WhereSheet';
 import { Desktop } from './Desktop';
 import { UrbiosWordmark } from '../../brand/UrbiosLogo';
+import { Button } from 'glisse';
 
 // Laboratorio per iPhone: una schermata alla volta, tasti grandi in basso (zona del pollice).
 // Home a icone → elenco → scheda. Niente barra laterale, niente anteprima del quaderno. Stili: mobileStyles.js
 const TILES = ['quaderno', 'protocolli', 'reagenti', 'magazzino', 'campioni', 'articoli'];
+
+// Tasto tondo in vetro (glisse): `on` = attivo, `fill` = azione principale in nero
+const GBtn = ({ icon, size = 22, stroke, on, fill, ...rest }) => (
+    <Button className={`m-gbtn${on ? ' on' : ''}`} variant={fill ? 'filled' : 'glass'} tint={fill ? 'var(--ink)' : undefined} icon={<Icon name={icon} size={size} stroke={stroke} />} {...rest} />
+);
 
 const Bar = ({ title, right }) => (
     <header className="m-bar">
@@ -36,8 +43,8 @@ const Home = ({ lab, ov, empty, onExample, onOpen, onGo }) => {
                 <div className="m-hello-row">
                     <h1 className="m-hello">Laboratorio</h1>
                     <div className="m-hello-btns">
-                        <button className={`m-ib${find ? ' on' : ''}`} onClick={() => { setFind((f) => !f); setQ(''); }} aria-label="Cerca"><Icon name="search" size={22} /></button>
-                        <button className="m-ib" onClick={() => onGo('calcolatrice')} aria-label="Calcolatrice"><Icon name="calc" size={22} /></button>
+                        <GBtn icon="search" on={find} onClick={() => { setFind((f) => !f); setQ(''); }} aria-label="Cerca" />
+                        <GBtn icon="calc" onClick={() => onGo('calcolatrice')} aria-label="Calcolatrice" />
                     </div>
                 </div>
                 {q.trim().length >= 2 ? (
@@ -142,9 +149,9 @@ const ListScreen = ({ section, lab, onOpen, onNew, onNewFrom, onNewPage, selId, 
                 <div className="m-hello-row">
                     <h1 className="m-hello">{section.label}</h1>
                     <div className="m-hello-btns">
-                        <button className={`m-ib${find || q ? ' on' : ''}`} onClick={() => { setFind((f) => !f); setQ(''); }} aria-label="Cerca"><Icon name="search" size={22} /></button>
-                        {(tools || []).map((t) => <button key={t.label} className={`m-ib${t.green ? ' xl' : ''}`} onClick={t.onClick} aria-label={t.label} title={t.label}><Icon name={t.icon} size={22} /></button>)}
-                        <button className="m-ib m-ib-fill" onClick={plus} aria-label={`Nuovo ${section.single}`}><Icon name="plus" size={22} stroke={2} /></button>
+                        <GBtn icon="search" on={find || q} onClick={() => { setFind((f) => !f); setQ(''); }} aria-label="Cerca" />
+                        {(tools || []).map((t) => <GBtn key={t.label} icon={t.icon} onClick={t.onClick} aria-label={t.label} title={t.label} />)}
+                        <GBtn fill icon="plus" stroke={2} onClick={plus} aria-label={`Nuovo ${section.single}`} />
                     </div>
                 </div>
                 {groups.length > 1 && (
@@ -213,7 +220,7 @@ const Recipe = ({ rec, lab, section, onEdit, onSaveStock }) => {
     const unit = rec.unitaVolume || 'mL';
     return (
         <div className="m-screen">
-            <Bar title="Prepara" right={<button className="m-pillbtn" onClick={onEdit}>Modifica</button>} />
+            <Bar title="Prepara" right={<Pill onClick={onEdit}>Modifica</Pill>} />
             <div className="m-scroll m-recipe">
                 <h2>{section.title(rec)}</h2>
                 {section.sub(rec) && <p className="m-sub">{section.sub(rec)}</p>}
@@ -269,14 +276,14 @@ const ProtoView = ({ rec, lab, section, onSave, onDelete, onPrint, onUse }) => {
     if (edit) {
         return (
             <div className="m-screen m-edit">
-                <header className="m-bar"><button className="m-pillbtn light" onClick={() => setEdit(false)}>‹ Esci dalla modifica</button></header>
+                <header className="m-bar"><Pill light onClick={() => setEdit(false)}>‹ Fine</Pill></header>
                 <RecordForm key={v.id} inline accordion section={section} record={v} isNew={false} lab={lab} onSave={onSave} onDelete={onDelete} onPrint={(r) => onPrint([r.id])} onClose={() => setEdit(false)} />
             </div>
         );
     }
     return (
         <div className="m-screen">
-            <Bar title="Protocollo" right={<button className="m-pillbtn" onClick={() => setEdit(true)}>Modifica</button>} />
+            <Bar title="Protocollo" right={<Pill onClick={() => setEdit(true)}>Modifica</Pill>} />
             <div className="m-scroll m-recipe">
                 <h2>{v.titolo || 'Protocollo senza titolo'}</h2>
                 {section.sub(v) && <p className="m-sub">{section.sub(v)}</p>}
@@ -326,7 +333,7 @@ const ArticleView = ({ rec, lab, section, onSave, onDelete, onPrint }) => {
     if (edit) {
         return (
             <div className="m-screen m-edit">
-                <header className="m-bar"><button className="m-pillbtn light" onClick={() => setEdit(false)}>‹ Esci dalla modifica</button></header>
+                <header className="m-bar"><Pill light onClick={() => setEdit(false)}>‹ Fine</Pill></header>
                 <RecordForm key={rec.id} inline accordion section={section} record={rec} isNew={false} lab={lab} onSave={onSave} onDelete={onDelete} onPrint={(r) => onPrint([r.id])} onClose={() => setEdit(false)} />
             </div>
         );
@@ -338,7 +345,7 @@ const ArticleView = ({ rec, lab, section, onSave, onDelete, onPrint }) => {
     const rows = [['Dov’è', rec.posizione], ['Conservazione', rec.conservazione], ['Lotto', rec.lotto], ['Scadenza', rec.scadenza && fmtDay(rec.scadenza)], ['Scorta minima', rec.sogliaMin && `${rec.sogliaMin} ${rec.unita || ''}`], ['N. inventario', rec.numero], ['Pericolo', rec.pericolo], ['N. CAS', rec.cas], ['Produttore', rec.marca], ['Fornitore', rec.fornitore]].filter((x) => x[1]);
     return (
         <div className="m-screen">
-            <Bar title="Magazzino" right={<button className="m-pillbtn" onClick={() => setEdit(true)}>Modifica</button>} />
+            <Bar title="Magazzino" right={<Pill onClick={() => setEdit(true)}>Modifica</Pill>} />
             <div className="m-scroll m-recipe">
                 <h2>{rec.nome || 'Articolo senza nome'}</h2>
                 {[rec.codice, rec.categoria].filter(Boolean).length > 0 && <p className="m-sub">{[rec.codice, rec.categoria].filter(Boolean).join(', ')}</p>}
@@ -376,7 +383,7 @@ export const Detail = ({ rec, isNew, section, lab, onSave, onDelete, onPrint, on
     return (
         <div className="m-screen m-edit">
             {['quaderno', 'reagenti'].includes(section.key) && !isNew ? (
-                <header className="m-bar"><button className="m-pillbtn light" onClick={() => setEditing(false)}>{section.key === 'quaderno' ? '‹ Torna al lavoro' : '‹ Ricetta'}</button></header>
+                <header className="m-bar"><Pill light onClick={() => setEditing(false)}>{section.key === 'quaderno' ? '‹ Lavoro' : '‹ Ricetta'}</Pill></header>
             ) : <Bar title={section.single[0].toUpperCase() + section.single.slice(1)} />}
             <RecordForm inline accordion section={section} record={rec} isNew={isNew} lab={lab} onSave={onSave} onDelete={onDelete} onPrint={(r) => onPrint([r.id])} onClose={onLeave} />
         </div>
@@ -393,8 +400,8 @@ const MiniApp = ({ k, lab, onSaveIn, onRemove, onPrint, onNewFrom, onNewPage, on
     return (
         <div className="m-screen mini">
             <div className="mini-bar">
-                {sel ? <button className="m-pillbtn light" onClick={() => setSel(null)}>‹ {section.label}</button> : <span />}
-                <button className="m-pillbtn light" onClick={() => onOpenSection(sel ? { k, id: sel.rec.id } : { k })}><Icon name="lanes" size={16} /> Apri nella sezione</button>
+                {sel ? <Pill light onClick={() => setSel(null)}>‹ {section.label}</Pill> : <span />}
+                <Pill light onClick={() => onOpenSection(sel ? { k, id: sel.rec.id } : { k })}><Icon name="lanes" size={16} /> Apri nella sezione</Pill>
             </div>
             {sel ? (
                 <Detail key={sel.rec.id} rec={rec} isNew={sel.isNew} section={section} lab={lab}
@@ -451,9 +458,9 @@ export const Mobile = (props) => {
         <div className={`m-swipe${props.view === 'calcolatrice' ? ' m-dark' : ''}`} onTouchStart={start} onTouchEnd={end}>
             <Screens {...props} backRef={backRef} />
             {!props.embed && <nav className="m-dock" aria-label="Navigazione">
-                <button onClick={() => backRef.current && backRef.current()} aria-label={props.view === 'home' ? 'Cambia area' : 'Indietro'}><Icon name="back" size={24} /></button>
+                <GBtn icon="back" size={24} onClick={() => backRef.current && backRef.current()} aria-label={props.view === 'home' ? 'Cambia area' : 'Indietro'} />
                 <span className="m-dock-brand"><UrbiosWordmark size={26} /></span>
-                <button onClick={props.onSettings} aria-label="Impostazioni"><Icon name="sliders" size={22} /></button>
+                <GBtn icon="sliders" onClick={props.onSettings} aria-label="Impostazioni" />
             </nav>}
         </div>
     );

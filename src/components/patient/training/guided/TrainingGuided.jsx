@@ -35,6 +35,7 @@ const ORDER = ['setup', 'program', 'deliver'];
 export const TrainingGuided = ({
     patient,
     db,
+    onUpdateDb,
     schedaId,
     header,
     setHeader,
@@ -141,7 +142,7 @@ export const TrainingGuided = ({
                     />
                 )}
                 {step === 'deliver' && (
-                    <DeliverStep weeks={weeks} header={header} setHeader={setHeader} massimali={massimali} profile={profile} onPrint={onPrint} onAnalysis={onAnalysis} onProgression={onProgression} onTools={onTools} onProgram={() => setStep('program')} />
+                    <DeliverStep db={db} patient={patient} schedaId={schedaId} onUpdateDb={onUpdateDb} weeks={weeks} header={header} setHeader={setHeader} massimali={massimali} profile={profile} onPrint={onPrint} onAnalysis={onAnalysis} onProgression={onProgression} onTools={onTools} onProgram={() => setStep('program')} />
                 )}
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
+import { Button } from 'glisse';
 import { useCompact } from '../../hooks/useCompact';
 import { GROUPS as ALL_GROUPS, sectionById } from './sections';
 import { Icon } from './ui/icons';
@@ -27,16 +28,12 @@ export const SettingsModal = ({ db, onUpdateDb, onClose, scope }) => {
                 <header className="m-nav is-solid">
                     <div className="m-nav-side">
                         {tab && (
-                            <button className="m-back" aria-label="Torna alle impostazioni" onClick={() => setTab(null)}>
-                                <Icon name="chevronLeft" size={26} />
-                            </button>
+                            <Button className="m-gbtn" aria-label="Torna alle impostazioni" onClick={() => setTab(null)} icon={<Icon name="chevronLeft" size={22} />} />
                         )}
                     </div>
                     <span className="m-nav-title is-on">{current ? current.label : 'Impostazioni'}</span>
                     <div className="m-nav-side end">
-                        <button className="m-back" style={{ fontWeight: 600, paddingRight: 10 }} onClick={onClose}>
-                            Fine
-                        </button>
+                        <Button className="m-gbtn-text" onClick={onClose}>Fine</Button>
                     </div>
                 </header>
                 <div className="m-scroll">

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from '../ui/icons';
+import { Pill } from '../ui/Pill';
 import { Mic, addText, beep, clock, parseDur } from '../RecordForm';
 import { fmtDay, stockState } from '../labLogic';
 import { COND, condOf } from './cond';
@@ -78,7 +79,7 @@ export const Work = ({ rec, lab, section, onSave, onEdit, protoVersion, onSavePr
         <div className="m-screen">
             <header className="m-bar">
                 <h1>{edit ? (df.total ? `${df.total} ${df.total === 1 ? 'modifica' : 'modifiche'}` : 'Tocca per cambiare') : 'Al lavoro'}</h1>
-                <div className="m-bar-r">{!edit && <button className="m-pillbtn light" onClick={() => setMep(true)}>Mise en place</button>}<button className={`m-pillbtn${edit ? ' light' : ''}`} onClick={() => { setEdit((x) => !x); setOpen(null); }}>{edit ? 'Fine' : 'Modifica'}</button></div>
+                <div className="m-bar-r">{!edit && <Pill light onClick={() => setMep(true)}>Mise en place</Pill>}<Pill light={edit} onClick={() => { setEdit((x) => !x); setOpen(null); }}>{edit ? 'Fine' : 'Modifica'}</Pill></div>
             </header>
             <div className="m-scroll m-recipe qd-sheet">
                 <div className="wk-title"><h2>{section.title(d)}</h2><button type="button" className="wk-color" style={d.colore ? { background: d.colore } : undefined} onClick={() => setPalette(true)} aria-label="Colore della pagina" /></div>

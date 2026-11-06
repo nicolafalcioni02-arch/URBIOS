@@ -1,0 +1,15 @@
+.aw-ov { position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(18, 19, 23, .45); }
+.aw-card { width: min(680px, 100%); max-height: calc(100vh - 32px); display: flex; flex-direction: column; border-radius: 20px; background: #fff; color: var(--ink); border: 1px solid var(--line); box-shadow: 0 24px 60px rgba(0, 0, 0, .18); }
+.aw-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px 8px; }
+.aw-head h3 { margin: 0; font-size: 18px; font-weight: 600; }
+.aw-x { width: 34px; height: 34px; border: 0; border-radius: 10px; background: var(--soft); color: var(--ink); font-size: 20px; line-height: 1; cursor: pointer; }
+.aw-steps { display: flex; gap: 6px; flex-wrap: wrap; list-style: none; margin: 0; padding: 4px 22px 12px; border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+.aw-steps li { display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 999px; }
+.aw-steps li span { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--soft); font-size: 11px; }
+.aw-steps li.is-on { color: var(--ink); font-weight: 600; } .aw-steps li.is-on span { background: var(--accent); color: #fff; }
+.aw-steps li.is-done span { background: var(--ok); color: #fff; }
+.aw-body { padding: 18px 22px 22px; overflow-y: auto; }
+.aw-lead { margin: 0 0 12px; font-weight: 500; }
+.aw-link { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; text-decoration: underline; cursor: pointer; }
+.aw-send { margin-top: 14px; max-width: 420px; }
+.aw-hd-r { display: inline-flex; align-items: center; gap: 8px; }

@@ -1,0 +1,52 @@
+# App paziente (src/patient/)
+
+App **separata** dal programma del medico: `patient.html` + `vite.patient.config.js` → `dist-patient/` (file multipli, da pubblicare su GitHub Pages).
+Il medico invia diete e schede cifrate; il paziente le legge. **Non esiste il nome del paziente**: solo codici anonimi.
+
+## Comandi (li lancia l'utente; non eseguiti in sessione)
+```bash
+npm run dev:patient     # prova in locale (CSP tolta in sviluppo)
+npm run build:patient   # produce dist-patient/
+npm run test:connect    # include i test di src/patient/test
+```
+
+## File
+| File | Ruolo |
+|---|---|
+| `runtime.js` | logica senza UI: cassaforte (passphrase), consenso, collegamento da QR, sync, documenti. Testata in Node |
+| `App.jsx` | macchina a stati: consenso → passphrase → (collega) → home; blocco per inattività 5 min |
+| `ui/Welcome.jsx` `bits.jsx` (AuthShell) | prima schermata con logo, cornice comune di Informativa / Passphrase («Accedi») / Collegamento, con i 3 passi |
+| `ui/Shell.jsx` | dopo il collegamento: 4 tab (Home, Dieta, Schede, Profilo) con dock a capsula; `Home.jsx` (riquadro del giorno + elenco), `TrainDetail.jsx` (esercizi), `Live.jsx` (allenamento guidato, timer di riposo, bip/vibrazione), `Nutrition.jsx` + `MealSheet.jsx` (dieta e registro pasto), `logic.js` (lettura «4x10», «90s», chiavi del diario) |
+| `ui/Consent.jsx` `Passphrase.jsx` `Pair.jsx` `Home.jsx` `DocView.jsx` `Settings.jsx` `bits.jsx` | schermate (classi `pt-*` in `patient.css`) |
+| `scan.js` | lettura QR con fotocamera (jsQR, tutto sul dispositivo) |
+
+Riusa `src/connect/` (stessi moduli del medico, `role: 'patient'`) e `storage/cryptoVault.js` (PBKDF2 600k + AES-GCM).
+
+## Come funziona
+1. **Primo avvio:** informativa + 3 consensi distinti (dati salute, condizioni, scambio) → passphrase ≥ 12 caratteri → cassaforte. Il consenso (versione, data) si salva cifrato.
+2. **Collegamento:** il medico mostra il QR; il paziente lo inquadra (o incolla il testo). L'indirizzo del relay è **nel QR** (nessun endpoint nel codice). Codice di verifica uguale sui due schermi → conferme → collegato.
+3. **Uso:** ogni 30 s (e col tasto Aggiorna) controlla la casella, riceve documenti, manda la conferma di ricezione. Tutto resta cifrato sul telefono (IndexedDB, chiave dalla passphrase).
+4. **Blocco:** 5 minuti senza azioni dell'utente (o al ritorno da sfondo) ⇒ chiave dalla memoria, serve la passphrase. «Elimina tutto» = revoca + cancellazione locale.
+
+## Sicurezza: cosa c'è e cosa NO
+- CSP via `<meta>` (`script-src 'self'`, niente inline); `connect-src https:` perché il relay arriva dal QR. **`frame-ancestors` non è applicabile da `<meta>`** (GitHub Pages non permette header): clickjacking non mitigato dalla CSP.
+- Nessun `innerHTML` nel codice dell'app (solo nodi React). Nessun font/script esterno.
+- **Non c'è service worker:** l'app non funziona offline (decisione D-01: è l'app online; la cache della shell si può aggiungere dopo, con attenzione).
+- **Testo dell'informativa e consensi da far revisionare** a un consulente privacy/DPO (SEC-97: DPIA, titolare/responsabile, conservazione).
+- Passphrase persa = dati persi (il medico può rinviare). Nessun recupero per scelta.
+- Documenti: dieta (giorni → pasti → voci) e scheda (settimane → giorni → esercizi) hanno una vista dedicata con schede a tab; qualunque altra forma ricade nella vista generica.
+- **Non provata** su dispositivo reale né nel browser (fotocamera, IndexedDB, iOS Safari): solo logica in Node e compilazione con esbuild. Da provare: scansione, riavvio, blocco, installazione come app.
+- Ereditati: ratchet scritto da noi (D-13), Worker del relay mai distribuito, nessuna revisione crittografica esterna.
+
+## Interfaccia (tema scuro, specifica del brief grafico)
+- Colori e forme come da brief (lime, lavanda, rosa, riquadri a 28 px, dock bianco). Tutto in `patient.css`.
+- **Diario locale** (`rt.log`: serie fatte, carichi, pasti, fuori piano): salvato cifrato sul telefono PRIMA di tutto, anche senza rete. **Non viene mai inviato** al professionista (il canale è a senso unico: scrive solo il medico).
+- **Non presenti perché i dati non esistono** nei documenti inviati: foto/nome del paziente (anonimato), video e immagini degli esercizi, calorie bruciate, orari dei pasti, sostituzioni consentite, notifiche. Il tracker mostra serie fatte e tempo; lo sfondo è un gradiente.
+- Non provata su telefono vero (vibrazione e audio dipendono dal dispositivo; iOS richiede un tocco per attivare l'audio).
+
+## Modalità prova (solo sviluppo)
+In `npm run dev:patient` le prime schermate hanno in basso **«Salta (solo prova)»**: apre l'app con dati finti (`demo.js`: 2 schede, 1 dieta con 2 giorni), senza cassaforte né collegamento; nulla viene salvato. Il tasto dipende da `import.meta.env.DEV`: nella versione pubblicata (`build:patient`) non compare. «Blocca ora» dalle Impostazioni esce dalla prova.
+
+- **Sfondo «acqua»** (`bits.jsx: Backdrop`): riflessi di luce che si muovono come sul fondo di una piscina, disegnati in piccolo su un canvas (90×160 punti, 20 fps); fermo se la pagina è nascosta o con «riduci animazioni».
+- **Stato degli allenamenti** (`logic.js: dayStatus, currentWeek`): ogni giorno è *fatto* (tutte le serie, con data), *in corso* o *da fare*; si vede su Home (spunta, «Fatto il …», «X di Y fatti»), tessere settimana (pallini) e selettore giorni. Il riquadro in alto mostra il PROSSIMO allenamento da fare. La **home è minimale**: data, prossimo allenamento, «Cosa mangiamo?» / «Alleniamoci!», «Registra il peso» e «Fuori piano»; gli elenchi stanno nelle tab Schede e Dieta, «Controlla nuovi piani» nel Profilo.
+- **Tab Schede** (`Schede.jsx`): parte alta FISSA (logo lime + una voce per scheda/visita, che si rimpiccioliscono se sono tante) sullo sfondo d'acqua con gli angoli in basso arrotondati; parte bassa bianca che scorre: riepilogo (allenamenti, serie, muscoli), **omino** davanti/dietro con i muscoli colorati (`BodyMap.jsx`), serie per settimana, serie per muscolo, **forza** (variazione media del carico massimo e volume in kg rispetto al periodo precedente, per esercizio; le ripetizioni non si registrano), archivio delle schede finite. Toccando una voce si aprono settimane e giorni. Tutto calcolato dal diario locale (`log.hist`, `log.weights`); i muscoli vengono dal NOME dell'esercizio (`muscles.js`, regole per parole in italiano/inglese: un esercizio con nome insolito non colora nulla). Le schede ritirate dal professionista non compaiono.

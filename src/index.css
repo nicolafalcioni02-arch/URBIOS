@@ -1217,3 +1217,22 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 .ch-more { width: 40px; padding: 0; justify-content: center; flex: none; }
 .ch-pop-e { padding: 14px; text-align: center; font-size: 13px; color: var(--muted); }
 .ch-pick.fld-pick { width: 100%; flex: none; height: 44px; background: var(--surface); border-color: var(--line); font-weight: 500; }
+
+/* glisse (vetro liquido): i suoi colori seguono i token di URBIOS, un solo accento */
+:root {
+    --lg-fill: #5B57D9;
+    --lg-foreground: var(--ink);
+    --lg-destructive: var(--bad);
+    --lg-on: var(--ok);
+}
+.m-tabbar [aria-selected='true'], .m-tabbar [aria-current='page'], .m-tabbar [data-selected='true'] { color: var(--ink); }
+
+/* telefono: icone piccole delle righe con area di tocco da 44px (senza cambiare il disegno) */
+@media (pointer: coarse), (max-width: 639px) {
+    .hs-icon { position: relative; }
+    .hs-icon::after { content: ''; position: absolute; inset: 50% auto auto 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }
+}
+.m-gbtn-text { flex: none; height: 40px; padding: 0 18px; font-weight: 600; }
+
+/* le Impostazioni aperte dal Laboratorio non ereditano il riempimento di .m-scroll del lab */
+.m-settings > .m-scroll { padding: 0; }

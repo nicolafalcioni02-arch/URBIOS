@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
+import { Button } from 'glisse';
 import { docsSummary } from '../../../components/patient/info/documentsLogic';
 import { isExample } from '../../../storage/example/example';
 
@@ -15,15 +16,9 @@ const PatientNavMobile = ({ onBack, patient, status, view, readOnly, onAi, print
         <header className="m-nav is-solid">
             <div className="m-nav-side">
                 {inVisit ? (
-                    <button className="m-back" onClick={onCloseVisit} aria-label="Torna alla scheda">
-                        <i className="ph ph-caret-left"></i>
-                        Scheda
-                    </button>
+                    <Button className="m-gbtn-text" onClick={onCloseVisit} aria-label="Torna alla scheda" icon={<i className="ph ph-caret-left"></i>}>Scheda</Button>
                 ) : (
-                    <button className="m-back" onClick={onBack} aria-label="Torna ai pazienti">
-                        <i className="ph ph-caret-left"></i>
-                        Pazienti
-                    </button>
+                    <Button className="m-gbtn-text" onClick={onBack} aria-label="Torna ai pazienti" icon={<i className="ph ph-caret-left"></i>}>Pazienti</Button>
                 )}
             </div>
             <span className="m-nav-title is-on">
@@ -33,9 +28,7 @@ const PatientNavMobile = ({ onBack, patient, status, view, readOnly, onAi, print
             <div className="m-nav-side end">
                 {printButton}
                 {onAi && !readOnly && (
-                    <button className="m-icon" onClick={onAi} aria-label="URBIOS AI">
-                        <i className="ph ph-sparkle"></i>
-                    </button>
+                    <Button className="m-gbtn" onClick={onAi} aria-label="URBIOS AI" icon={<i className="ph ph-sparkle"></i>} />
                 )}
             </div>
         </header>

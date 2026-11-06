@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Button } from 'glisse';
 import { WidgetDock } from '../../components/widgets/WidgetDock';
 import { PatientHeader } from './parts/PatientHeader';
 import { PatientTabContent } from './parts/PatientTabContent';
@@ -291,9 +292,7 @@ const PrintButton = ({ compact = false }) => {
     if (!pc) return null;
     if (compact)
         return (
-            <button className="m-icon" onClick={() => pc.open()} aria-label="Centro stampa">
-                <i className="ph ph-printer"></i>
-            </button>
+            <Button className="m-gbtn" onClick={() => pc.open()} aria-label="Centro stampa" icon={<i className="ph ph-printer"></i>} />
         );
     return (
         <button className="vw-chip !px-0 w-10 !h-10 justify-center flex-none" onClick={() => pc.open()} title="Centro stampa: tutti i documenti del paziente, pronti da stampare o inviare" aria-label="Centro stampa">

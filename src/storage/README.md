@@ -39,3 +39,6 @@ e non devono restare su un computer che non è più il proprio.
 `ArchiveProvider` li aggiunge alla vista del database (`db` del contesto) in ogni archivio, ma il database salvato
 (copia di lavoro e file) contiene solo i dati veri: ogni modifica passa da `splitExample`, che tiene in memoria la parte
 di esempio. Così l'esempio non crea "modifiche non salvate", non si esporta e torna com'era a ogni apertura.
+
+## Connettività (src/connect)
+`ArchiveProvider` espone `verifyPassword(pwd)` e avvia/ferma `connectManager` in base a `db.connect.mode` (default offline). La chiave dei dati di `connect/` è una **sottochiave HKDF** della chiave master (`urbios/v1/connect/dek-v1`): con archivio non cifrato o bloccato `connect/` non parte. Blocca/Esci fermano tutto e azzerano la chiave. Vedi `docs/sicurezza/` e `src/connect/README.md`.

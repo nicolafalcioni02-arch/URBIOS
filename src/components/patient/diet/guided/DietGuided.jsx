@@ -244,6 +244,7 @@ export const DietGuided = ({
                         )}
                         {step === 'deliver' && configured && (
                             <DeliverStep
+                                db={db}
                                 patient={patient}
                                 targets={targets}
                                 dietDays={dietDays}

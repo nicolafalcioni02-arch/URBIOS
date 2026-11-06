@@ -27,6 +27,7 @@ settings/
     formulas/           FormulasTab (db.formule, stato interno) + formulaPrompt.js (testo per l'assistente AI)
     dataExchange/       DataExchangeTab → ExportSection, ImportSection, AnonymizePanel (logica in src/dataExchange/)
     security/           SecurityTab (useArchive da src/storage/ArchiveProvider)
+    connect/            ConnectTab: interruttore Offline/Online → db.connect = { mode, relayUrl }; richiede archivio cifrato e password; avvio/arresto in ArchiveProvider (src/connect/manager.js)
     about/              CiteTab (APA/BibTeX), InfoTab (team, manifesto)
 ```
 
@@ -48,3 +49,6 @@ Le cartelle in `tabs/` sono indipendenti: chat diverse possono lavorarci insieme
 - **Nuova sezione**: crea `tabs/<cartella>/XTab.jsx` che ritorna `<Page title intro>…</Page>`, poi una riga in `sections.js`.
 - **Nuova icona**: una voce in `PATHS` di `ui/icons.jsx` (solo path, tratto, niente riempimenti).
 - **Nuovo campo profilo**: aggiungi `<InputGroup name="chiave" …/>` nella sezione giusta di `tabs/profile/sections/`; si salva in `db.utente.chiave`.
+
+## Connettività (tabs/connect/)
+`ConnectTab` (interruttore, relay, password), `PairPatient` (QR → codice di verifica → conferma; usa `connectManager.api().pairing`), `QrView` (QR come SVG, libreria `qrcode-generator`, niente innerHTML). Il collegamento si salva in `db.pazienti[i].connessione = { pid, collegatoIl }` (`pid` = codice anonimo, mai il nome).

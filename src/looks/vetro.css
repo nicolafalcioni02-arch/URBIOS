@@ -201,15 +201,15 @@ html[data-look='vetro'] .m-search input { background: rgba(255, 255, 255, 0.55);
 
 
 /* --- HOME (desktop): barra a pillola di vetro, titolo gigante sottile, pazienti in griglia di card --- */
-/* la barra è navigazione: Liquid Glass vero (variabili --lg-* in vetro-liquid.css) */
+/* la barra è navigazione: Liquid Glass vero (variabili --vl-* in vetro-liquid.css) */
 html[data-look='vetro'] .home-bar {
     padding: 8px 8px 8px 22px;
     border-radius: 999px;
-    background: var(--lg-fill);
+    background: var(--vl-fill);
     border: 0;
-    -webkit-backdrop-filter: var(--lg-filter);
-    backdrop-filter: var(--lg-filter);
-    box-shadow: var(--lg-rim), var(--lg-drop-hi);
+    -webkit-backdrop-filter: var(--vl-filter);
+    backdrop-filter: var(--vl-filter);
+    box-shadow: var(--vl-rim), var(--vl-drop-hi);
 }
 html[data-look='vetro'] .home-quiet { font-weight: 400; color: #5E5C57; }
 html[data-look='vetro'] .home-quiet:hover { background: rgba(255, 255, 255, 0.85); }

@@ -253,7 +253,7 @@ export const NewVisitView = ({ patient, visitDraft, updateDraft, handleFinalizeV
 
     if (inPlans) {
         return (
-            <PlansWorkspace patient={patient} active={plan} setActive={setPlan} onDone={onDone}>
+            <PlansWorkspace patient={patient} active={plan} setActive={setPlan} onDone={onDone} >
                 {plan === 'dieta' ? <DietPlan patient={patient} onUpdateDb={onUpdateDb} db={db} initialVisitId={initialVisitId} /> : <TrainingPlan patient={patient} onUpdateDb={onUpdateDb} db={db} />}
             </PlansWorkspace>
         );

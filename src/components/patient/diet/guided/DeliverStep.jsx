@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { ActionSheet } from '../../../mobile/MobileChrome';
 import { SupplementSheet } from './MealSheets';
 import { confetti } from '../../shared/fx';
+import { SendToPatient } from '../../../../connect/ui/SendToPatient';
 import { STATUSES, dayTarget, dayTypeOf, dayStatus, dayTotals, patchVisit, setPlanStatus, statusOf } from './guidedLogic';
 
 // Passo 3 — Consegna: controllo finale, poi stampa, analisi e stato del piano.
@@ -18,7 +19,7 @@ const Action = ({ icon, title, sub, onClick, primary }) => (
     </button>
 );
 
-export const DeliverStep = ({ patient, targets, dietDays, visitaAttiva, onUpdateDb, onPrint, onAnalysis, onChart, onMenu }) => {
+export const DeliverStep = ({ db, patient, targets, dietDays, visitaAttiva, onUpdateDb, onPrint, onAnalysis, onChart, onMenu }) => {
     const tdee = targets?.isConfigured ? targets.kcal : 0;
     const tdeeOf = (d) => (dayTarget(d, targets)?.isConfigured ? dayTarget(d, targets).kcal : 0);
     const rows = dietDays.map((d) => ({ d, st: dayStatus(d, tdeeOf(d)), tot: dayTotals(d), emptyMeals: d.meals.filter((m) => m.items.length === 0).length }));
@@ -124,6 +125,7 @@ export const DeliverStep = ({ patient, targets, dietDays, visitaAttiva, onUpdate
 
             <div className="grid sm:grid-cols-2 gap-3 mt-5">
                 <Action primary icon="ph-printer" title="Anteprima e stampa" sub="Il piano pronto da consegnare" onClick={onPrint} />
+                <SendToPatient db={db} patient={patient} kind="diet" source={{ visit: visitaAttiva }} status={statusOf(visitaAttiva).id} onUpdateDb={onUpdateDb} />
                 <Action icon="ph-chart-line-up" title="Grafici" sub="Macro, kcal e andamento (si aggiungono alla stampa)" onClick={onChart} />
                 <Action icon="ph-stethoscope" title="Analisi nutrienti" sub="Vitamine, minerali e valori di riferimento" onClick={onAnalysis} />
             </div>

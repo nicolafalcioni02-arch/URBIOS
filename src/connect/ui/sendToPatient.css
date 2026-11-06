@@ -1,0 +1,19 @@
+/* Riquadro «Invia all'app»: stesso formato degli altri riquadri di Consegna (.dg-action), con l'unico accento dell'app. */
+.sp-cell { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+.dg-action.sp-tile { width: 100%; border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: color-mix(in srgb, var(--accent) 9%, #fff); }
+.dg-action.sp-tile:hover:not(:disabled) { border-color: var(--accent); }
+.dg-action.sp-tile > i:first-child { color: var(--accent); }
+.dg-action.sp-tile:disabled { opacity: .6; cursor: progress; }
+.dg-action.sp-tile small.sp-ok { color: var(--ok); } .dg-action.sp-tile small.sp-bad { color: var(--bad); }
+.sp-link { align-self: flex-start; padding: 2px 6px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 12.5px; text-decoration: underline; cursor: pointer; }
+.sp-err { margin: 0; color: var(--bad); font-size: 13px; }
+.sp-list { margin-top: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+.sp-list h4 { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.sp-empty, .sp-note { margin: 4px 0 0; font-size: 12.5px; color: var(--muted); }
+.sp-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+.sp-row:first-of-type { border-top: 0; }
+.sp-name { flex: 1 1 160px; min-width: 0; color: var(--ink); } .sp-name em { color: var(--muted); font-style: normal; font-size: 12px; }
+.sp-chip { padding: 3px 10px; border-radius: 999px; font-size: 12px; background: var(--soft); color: var(--muted); }
+.sp-chip.is-ok { background: color-mix(in srgb, var(--ok) 14%, #fff); color: var(--ok); }
+.sp-chip.is-wait { background: color-mix(in srgb, var(--warn) 16%, #fff); color: var(--warn); }
+.sp-chip.is-fail { background: color-mix(in srgb, var(--bad) 12%, #fff); color: var(--bad); }

@@ -1,8 +1,9 @@
 // Agenda su telefono: striscia della settimana (si scorre col dito), mese che si apre toccando il titolo,
 // filtro per sede quando ce n'e' piu' d'una, e la giornata come elenco con gli spazi liberi gia' pronti da prenotare.
+import { Button } from 'glisse';
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { addDays, apptTitle, isOnline, placeColor as placeColorOf, placeMark, dateKey, fmtTime, isActive, minutesOf, mondayOf, sameDay, startOf, tipoOf } from '../../components/agenda/agendaLogic';
-import { ActionSheet } from '../../components/mobile/MobileChrome';
+import { ActionSheet, GlassIconButton } from '../../components/mobile/MobileChrome';
 import { DayList } from './DayList';
 
 const WD = ['L', 'M', 'M', 'G', 'V', 'S', 'D'];
@@ -181,19 +182,13 @@ export const AgendaMobile = ({ db, items, settings, date, setDate, onNew, onOpen
                 <header className="m-nav is-solid">
                     <div className="m-nav-side">
                         {!isToday && (
-                            <button className="m-pill agm-today" onClick={() => setDate(new Date())}>
-                                Oggi
-                            </button>
+                            <Button className="m-gbtn-text agm-today" onClick={() => setDate(new Date())}>Oggi</Button>
                         )}
                     </div>
                     <span className="m-nav-title is-on">Agenda</span>
                     <div className="m-nav-side end">
-                        <button className="m-icon" onClick={() => setMenu(true)} aria-label="Altre azioni">
-                            <i className="ph ph-dots-three-circle"></i>
-                        </button>
-                        <button className="m-icon solid" onClick={() => onNew(date, null)} aria-label="Nuovo appuntamento">
-                            <i className="ph-bold ph-plus"></i>
-                        </button>
+                        <GlassIconButton icon="ph-dots-three-circle" onClick={() => setMenu(true)} aria-label="Altre azioni" />
+                        <GlassIconButton solid icon="ph-plus" onClick={() => onNew(date, null)} aria-label="Nuovo appuntamento" />
                     </div>
                 </header>
 
@@ -207,12 +202,8 @@ export const AgendaMobile = ({ db, items, settings, date, setDate, onNew, onOpen
                 {monthOpen ? (
                     <div className="agm-cal rise">
                         <div className="agm-cal-nav">
-                            <button className="m-icon" onClick={() => setDate(new Date(date.getFullYear(), date.getMonth() - 1, 1))} aria-label="Mese precedente">
-                                <i className="ph ph-caret-left"></i>
-                            </button>
-                            <button className="m-icon" onClick={() => setDate(new Date(date.getFullYear(), date.getMonth() + 1, 1))} aria-label="Mese successivo">
-                                <i className="ph ph-caret-right"></i>
-                            </button>
+                            <GlassIconButton icon="ph-caret-left" onClick={() => setDate(new Date(date.getFullYear(), date.getMonth() - 1, 1))} aria-label="Mese precedente" />
+                            <GlassIconButton icon="ph-caret-right" onClick={() => setDate(new Date(date.getFullYear(), date.getMonth() + 1, 1))} aria-label="Mese successivo" />
                         </div>
                         <div className="agm-grid">
                             {WD.map((d, i) => (

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { Button } from 'glisse';
 import { UrbiosLogo } from '../../brand/UrbiosLogo';
+import { GlassIconButton } from '../../components/mobile/MobileChrome';
 import { isExample } from '../../storage/example/example';
 
 // Elenco pazienti su telefono: titolo grande che si ritira nella barra scorrendo, ricerca sempre a portata,
@@ -17,14 +19,9 @@ export const HomeMobile = ({ patients, list, query, setQuery, onOpen, onAdd, las
                 <span className="m-nav-title">Pazienti</span>
                 <div className="m-nav-side end">
                     {showSave && (
-                        <button className="m-pill save" onClick={onSave}>
-                            <i className="ph-bold ph-floppy-disk"></i>
-                            Salva
-                        </button>
+                        <Button className="m-gbtn-text" variant="filled" tint="var(--bad)" onClick={onSave} icon={<i className="ph-bold ph-floppy-disk"></i>}>Salva</Button>
                     )}
-                    <button className="m-icon solid" onClick={onAdd} aria-label="Nuovo paziente">
-                        <i className="ph-bold ph-plus"></i>
-                    </button>
+                    <GlassIconButton solid icon="ph-plus" onClick={onAdd} aria-label="Nuovo paziente" />
                 </div>
             </header>
 

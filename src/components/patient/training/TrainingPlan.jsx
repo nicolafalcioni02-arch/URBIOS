@@ -99,6 +99,7 @@ export const TrainingPlan = ({ patient, db, onUpdateDb }) => {
             <TrainingGuided
                 patient={patient}
                 db={db}
+                onUpdateDb={onUpdateDb}
                 schedaId={schedaId}
                 header={header}
                 setHeader={setHeader}
