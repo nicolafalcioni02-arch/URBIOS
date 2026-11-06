@@ -16,7 +16,7 @@ export const GROUPS = [
 ];
 export const NAV = GROUPS.flatMap((g) => g.items);
 
-export const Sidebar = ({ lab, view, alerts, onView, onOpen, onExcel, onBack }) => {
+export const Sidebar = ({ lab, view, alerts, onView, onOpen, onExcel, onSaveDay, saveState, onBack, onSettings }) => {
     const [q, setQ] = useState('');
     const hits = searchAll(lab, SECTIONS, q);
     return (
@@ -54,7 +54,14 @@ export const Sidebar = ({ lab, view, alerts, onView, onOpen, onExcel, onBack }) 
                 </nav>
             </div>
             <div>
+                {onSaveDay && (
+                    <button className="set-side lab-foot-btn" onClick={onSaveDay} title={saveState === 'dirty' ? 'Ci sono modifiche non salvate' : 'Salva l’archivio nel file'}>
+                        <Icon name={saveState === 'saved' ? 'check' : saveState === 'demo' ? 'info' : 'save'} /><span className="lab-side-text">{saveState === 'saved' ? 'Giornata salvata' : saveState === 'demo' ? 'Demo: nulla si salva' : 'Salva giornata di lavoro'}</span>
+                        {saveState === 'dirty' && <i className="lab-dirty" aria-label="modifiche non salvate" />}
+                    </button>
+                )}
                 <button className="set-side lab-foot-btn" onClick={onExcel}><Icon name="table" /><span className="lab-side-text">Esporta tutto in Excel</span></button>
+                {onSettings && <button className="set-side lab-foot-btn" onClick={onSettings}><Icon name="sliders" /><span className="lab-side-text">Impostazioni</span></button>}
                 <button className="set-side lab-foot-btn" onClick={onBack}><Icon name="swap" /><span className="lab-side-text">Cambia area</span></button>
                 <div className="px-2.5 pt-4"><UrbiosWordmark size={30} /></div>
             </div>

@@ -329,7 +329,7 @@ export const PrintCenter = ({ patient: patient0, db, onUpdateDb, readOnly = fals
         if (ro) ro.observe(el);
         return () => ro && ro.disconnect();
     }, []);
-    const z = embedded ? 0.85 : zoom === 'fit' ? fitZoom : zoom; // incorporato: sempre A4 a grandezza vera
+    const z = embedded ? Math.min(0.85, fitZoom) : zoom === 'fit' ? fitZoom : zoom; // incorporato: sempre A4 a grandezza vera
     const zz = grid ? Math.min(z, 0.34) : z;
     const stepZoom = (d) => setZoom(Math.min(2, Math.max(0.3, Math.round((z + d) * 10) / 10)));
 

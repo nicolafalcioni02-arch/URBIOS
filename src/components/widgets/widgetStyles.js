@@ -92,6 +92,7 @@ body.wd-resizing { cursor: nwse-resize; }
 .wd-notice { font-size: 11.5px; color: #B8453D; background: #fff; border: 1px solid #F0C9C5; border-radius: 12px; padding: 6px 10px; max-width: 90%; text-align: center; animation: rise .3s var(--ease); pointer-events: auto; }
 .wd-pick-layer { position: fixed; inset: 0; z-index: 60; }
 .wd-pick { position: fixed; background: rgba(255,255,255,.97); backdrop-filter: blur(14px); border: 1px solid var(--line); border-radius: 20px; padding: 10px; box-shadow: 0 22px 60px rgba(18,19,23,.26); overflow-y: auto; animation: pop .22s var(--ease); transform-origin: bottom center; }
+.wd-pick-hint { font-size: 11.5px; color: var(--muted); padding: 8px 6px 2px; }
 .wd-pick-title { font-size: 12px; font-weight: 600; color: var(--muted); padding: 2px 6px 8px; }
 .wd-pick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
 .wd-pick-grid button { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: 13px; font-size: 13px; font-weight: 600; color: var(--ink); text-align: left; transition: background-color .15s, transform .15s var(--ease); }
@@ -108,12 +109,20 @@ body.wd-resizing { cursor: nwse-resize; }
 
 /* ---- orologio ---- */
 .wd-clock { padding: 12px 12px 10px; } .wd-clock svg { width: 100%; display: block; }
+.wd-clock.full { padding: 4px; } .wd-clock.full svg { width: 100%; height: auto; }
+.wd-dclock { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 14px 12px; }
+.wd-dclock-time { font-size: 64px; font-weight: 600; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wd-dclock-time small { font-size: 22px; letter-spacing: 0; margin-left: 6px; color: var(--wd-mut); font-weight: 500; }
+.wd-dclock-date { margin-top: 8px; font-size: 18px; font-weight: 600; color: var(--wd-fg); text-transform: capitalize; white-space: nowrap; }
 .wd-clock-date { text-align: center; margin-top: 4px; font-size: 12.5px; font-weight: 500; color: var(--wd-mut); }
 
 /* ---- foglietto ---- */
 .wd-postit { min-height: 150px; padding: 26px 16px 12px; }
 .wd-pin { position: absolute; top: 9px; left: 14px; font-size: 16px; color: var(--wd-acc); transform: rotate(18deg); }
 .wd-postit textarea { width: 100%; min-height: 112px; resize: none; background: transparent; border: 0; outline: 0; font-family: 'Caveat', 'Bradley Hand', cursive; font-size: 23px; line-height: 1.15; }
+.wd-fill > .wd-card { height: 100%; }
+.wd-fill .wd-postit { min-height: 0; display: flex; flex-direction: column; padding: 20px 14px 10px; }
+.wd-fill .wd-postit textarea { flex: 1; min-height: 0; font-size: 20px; }
 .wd-postit textarea::placeholder { color: var(--wd-mut); opacity: .7; }
 
 /* ---- lista ---- */
@@ -195,6 +204,44 @@ body.wd-resizing { cursor: nwse-resize; }
 .wd-fly { position: fixed; z-index: 70; pointer-events: none; transform: translate(-50%, -50%) rotate(-3deg); display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 16px; background: #fff; border: 1px solid var(--line); box-shadow: 0 18px 40px rgba(18,19,23,.3); font-size: 13px; font-weight: 600; }
 .wd-fly i { font-size: 20px; }
 
+
+/* ---- Laboratorio: fascia in alto nel flusso della pagina, solo schermi larghi ---- */
+@media (min-width: 1360px) and (hover: hover) {
+  .wd-dock.lab { display: block; position: relative; z-index: 10; order: -1; flex: none; height: 156px; }
+  .wd-dock.lab .wd-rail { position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: auto; border-radius: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+  /* il + sta a destra, a metà altezza */
+  .wd-dock.lab .wd-add, .wd-dock.lab .wd-rail.empty .wd-add { z-index: 8; left: auto; right: 24px; width: 24px; top: 0; bottom: 0; justify-content: center; align-items: center; }
+  .wd-dock.lab .wd-notice { position: absolute; right: calc(100% + 12px); top: 50%; transform: translateY(-50%); white-space: nowrap; max-width: none; }
+  .wd-dock.lab .wd-plus { opacity: .7; transform: none; width: 24px; height: 24px; font-size: 12px; box-shadow: 0 2px 8px rgba(18,19,23,.16); }
+  .wd-dock.lab .wd-rail:hover .wd-plus, .wd-dock.lab.is-editing .wd-plus { opacity: 1; width: 46px; height: 46px; font-size: 20px; box-shadow: 0 4px 14px rgba(18,19,23,.22); }
+  /* in modifica: tutto il resto dello schermo si scurisce e sfoca, la fascia resta in luce; il cassetto sta appena sotto */
+  .wd-dock.lab .wd-rail::-webkit-scrollbar { display: none; }
+}
+
+/* portale sul body: copre tutto lo schermo (barra laterale e dock compresi), sotto il selettore (z 60) */
+.wd-tray.in-lab { position: fixed; bottom: auto; z-index: 55; }
+.wd-labshade { position: fixed; inset: 0; z-index: 50; background: rgba(18,19,23,.5); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); animation: wd-shade .25s var(--ease); }
+/* ---- Laboratorio: stessi widget ridisegnati per la fascia bassa e larga (riquadro senza scala, due righe di celle) ---- */
+.wd-fill > .wd-card { overflow-y: auto; scrollbar-width: none; } .wd-fill > .wd-card::-webkit-scrollbar { display: none; }
+.wd-cal.lab { padding: 6px 12px 6px; display: flex; flex-direction: column; justify-content: space-between; }
+.wd-cal.lab .wd-cal-head { margin-bottom: 2px; font-size: 14px; }
+.wd-cal.lab .wd-cal-grid { gap: 0 2px; } .wd-cal.lab .wd-cal-grid b { padding-bottom: 1px; font-size: 9.5px; } .wd-cal.lab .wd-cal-grid { gap: 2px 2px; } .wd-cal.lab .wd-cal-grid button { height: 24px; line-height: 19px; font-size: 12.5px; border-radius: 9px; }
+.wd-cal.lab .wd-cal-grid button.has::after { bottom: 1px; width: 3px; height: 3px; }
+.wd-timer.lab { display: flex; align-items: center; gap: 10px; text-align: left; padding: 8px 12px; }
+.wd-timer.lab .wd-timer-presets button { padding: 2px 6px; } .wd-timer.lab .wd-timer-presets { gap: 3px; } .wd-timer.lab .wd-timer-actions button { padding: 0 11px; }
+.wd-timer.lab .wd-timer-ring { width: 74px; flex: none; margin: 0; } .wd-timer.lab .wd-timer-ring strong { font-size: 15px; } .wd-timer.lab .wd-timer-ring strong.end { font-size: 12px; }
+.wd-timer.lab .wd-timer-ctl { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.wd-timer.lab .wd-timer-presets, .wd-timer.lab .wd-timer-actions { margin: 0; justify-content: flex-start; } .wd-timer.lab .wd-timer-actions button { height: 30px; }
+.wd-moon.lab { display: flex; align-items: center; gap: 12px; text-align: left; padding: 10px 14px; } .wd-moon.lab svg { width: 74px; flex: none; margin: 0; }
+.wd-moon.lab p { margin: 0; } .wd-moon.lab p b { font-size: 16px; } .wd-moon.lab p span { font-size: 12px; }
+.wd-quote.lab { min-height: 0; padding: 10px 28px 8px 16px; } .wd-quote.lab .wd-qmark { display: none; } .wd-quote.lab p { margin: 0; font-size: 14px; line-height: 1.3; } .wd-quote.lab small { margin-top: 5px; }
+.wd-water.lab { padding: 10px 14px; display: flex; flex-direction: column; justify-content: center; }
+.wd-water.lab .wd-glasses { margin-top: 6px; gap: 4px; } .wd-water.lab .wd-glasses button svg { max-height: 38px; } .wd-water.lab .wd-water-sub { margin-top: 6px; }
+.wd-todo.lab { padding: 8px 12px; display: flex; flex-direction: column; height: 100%; } .wd-todo.lab .wd-title { margin-bottom: 2px; }
+.wd-todo.lab ul { flex: 1; min-height: 0; max-height: none; } .wd-todo.lab li { padding: 3px 0; font-size: 13px; } .wd-todo.lab form { padding-top: 4px; }
+/* Panoramica: la parte a destra che nelle altre schermate non c'è (a sinistra, dove nelle schede c'è l'elenco: i widget stanno sempre nella stessa posizione e qui non vanno) */
+.is-editing .wd-rail[data-reserve]::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: var(--wd-reserve); border-right: 1.5px dashed var(--line); background: repeating-linear-gradient(135deg, transparent 0 8px, rgba(18,19,23,.05) 8px 9px); pointer-events: none; }
+@keyframes wd-shade { from { opacity: 0; } to { opacity: 1; } }
 
 /* compatti: meno righe, meno aria */
 .wd-agenda li { padding: 4px 0; } .wd-agenda .wd-sum { margin-bottom: 4px; }

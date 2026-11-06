@@ -26,7 +26,8 @@ const beep = () => {
 };
 
 // Timer da cucina: il traguardo è salvato (endAt), quindi continua a correre anche se cambi schermata.
-export const Timer = ({ data, setData }) => {
+export const Timer = ({ data, setData, db }) => {
+    const lab = !!(db && db.labOv);
     const total = data.total || 10 * 60000;
     const [, tick] = useState(0);
     const running = !!data.endAt;
@@ -49,7 +50,7 @@ export const Timer = ({ data, setData }) => {
     const R = 42;
     const finished = !running && data.left === 0;
     return (
-        <div className="wd-card wd-timer">
+        <div className={`wd-card wd-timer${lab ? ' lab' : ''}`}>
             <div className="wd-timer-ring">
                 <svg viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r={R} fill="none" style={{ stroke: 'var(--wd-soft)' }} strokeWidth="7" />
@@ -57,6 +58,7 @@ export const Timer = ({ data, setData }) => {
                 </svg>
                 <strong className={finished ? 'end' : ''}>{finished ? 'Tempo!' : fmt(left)}</strong>
             </div>
+            <div className="wd-timer-ctl">
             <div className="wd-timer-presets">
                 {PRESETS.map((m) => (
                     <button key={m} className={!running && total === m * 60000 ? 'on' : ''} disabled={running} onClick={() => setData({ total: m * 60000, left: m * 60000, endAt: null })}>
@@ -77,6 +79,7 @@ export const Timer = ({ data, setData }) => {
                 <button onClick={() => setData({ endAt: null, left: total })} aria-label="Azzera">
                     <i className="ph ph-arrow-counter-clockwise" />
                 </button>
+            </div>
             </div>
         </div>
     );

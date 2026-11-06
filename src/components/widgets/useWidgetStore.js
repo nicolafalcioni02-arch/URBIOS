@@ -3,24 +3,24 @@
 //   item = { id, type, tone, c, r, w, h }   (cella di partenza, larghezza e altezza in celle)
 // c/r nulli = widget appena aggiunto: la colonna gli trova il primo posto libero.
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { widgetByType } from './widgetCatalog';
+import { widgetByType, sizeIn } from './widgetCatalog';
 
 export const MAX_PER_SIDE = 12;
 const newId = () => 'w' + Math.random().toString(36).slice(2, 9);
 
-export const useWidgetStore = (db, onUpdateDb) => {
-    const w = (db && db.widgets) || {};
+export const useWidgetStore = (db, onUpdateDb, key = 'widgets') => {
+    const w = (db && db[key]) || {};
     const lists = { left: Array.isArray(w.left) ? w.left : [], right: Array.isArray(w.right) ? w.right : [] };
     const data = w.data || {};
 
     const write = useCallback(
         (fn) =>
             onUpdateDb((prev) => {
-                const cur = prev.widgets || {};
+                const cur = prev[key] || {};
                 const next = fn({ left: [...(cur.left || [])], right: [...(cur.right || [])], data: { ...(cur.data || {}) } });
-                return { ...prev, widgets: { ...cur, ...next } };
+                return { ...prev, [key]: { ...cur, ...next } };
             }),
-        [onUpdateDb]
+        [onUpdateDb, key]
     );
 
     const add = useCallback(
@@ -28,10 +28,10 @@ export const useWidgetStore = (db, onUpdateDb) => {
             write((s) => {
                 const def = widgetByType(type);
                 if (!def || s[side].length >= MAX_PER_SIDE) return s;
-                s[side].push({ id: newId(), type, tone: def.tone || 'carta', c: pos.c ?? null, r: pos.r ?? null, w: def.size[0], h: def.size[1] });
+                s[side].push({ id: newId(), type, tone: def.tone || 'carta', c: pos.c ?? null, r: pos.r ?? null, w: sizeIn(def, key === 'widgetsLab')[0], h: sizeIn(def, key === 'widgetsLab')[1] });
                 return s;
             }),
-        [write]
+        [write, key]
     );
 
     const remove = useCallback(

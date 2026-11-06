@@ -29,11 +29,11 @@ const QUOTES = [
 const dayIndex = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
 
 // Pensiero del giorno: cambia da solo a mezzanotte; con la freccia si sfoglia.
-export const DailyQuote = () => {
+export const DailyQuote = ({ db }) => {
     const [shift, setShift] = useState(0);
     const [text, by] = QUOTES[(dayIndex() + shift) % QUOTES.length];
     return (
-        <div className="wd-card wd-quote">
+        <div className={`wd-card wd-quote${db && db.labOv ? ' lab' : ''}`}>
             <span className="wd-qmark" aria-hidden="true">
                 “
             </span>

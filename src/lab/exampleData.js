@@ -1,14 +1,15 @@
 import { LAB_KEYS, labOf } from './labLogic';
+import { extraLab } from './exampleExtra';
 
 // Dati di esempio per provare il Laboratorio (aspetto, stampa, Excel). Si caricano dalla Panoramica quando il laboratorio è vuoto.
 const day = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 
-export const exampleLab = () => {
+const baseLab = () => {
     const sop = 'ex_prt_1';
     return {
         protocolli: [
             {
-                id: sop, titolo: 'Estrazione di DNA da sangue intero', codice: 'SOP-012', categoria: 'Biologia molecolare', versione: '2.1', data: day(-40), stato: 'In vigore', autore: 'M. Rossi',
+                id: sop, titolo: 'Estrazione di DNA da sangue intero', codice: 'SOP-012', stanza: 'Lab 2, banco biologia molecolare', posizioni: 'Campioni su ghiaccio a sinistra. Tubi da 1,5 mL nel rack blu. Kit nel frigo B, ripiano alto. Rifiuti biologici nel contenitore giallo.', categoria: 'Biologia molecolare', versione: '2.1', data: day(-40), stato: 'In vigore', autore: 'M. Rossi',
                 scopo: 'Estrazione di DNA genomico da 200 µL di sangue intero in EDTA per PCR e sequenziamento.',
                 materiali: [
                     { nome: 'Sangue intero in EDTA', quantita: '200', unita: 'µL', note: '' },
@@ -84,10 +85,10 @@ export const exampleLab = () => {
             },
         ],
         magazzino: [
-            { id: 'ex_mag_1', nome: 'Proteinasi K', codice: 'P2308', fornitore: 'Sigma-Aldrich', categoria: 'Enzimi', lotto: 'SLCD1234', quantita: '4', unita: 'mL', sogliaMin: '2', scadenza: day(400), apertura: day(-60), posizione: 'Freezer -20 °C, ripiano 2', conservazione: '-20 °C', pericolo: 'H334', note: '' },
-            { id: 'ex_mag_2', nome: 'Etanolo assoluto', codice: 'E7023', fornitore: 'Carlo Erba', categoria: 'Solventi', lotto: 'L2201', quantita: '1', unita: 'L', sogliaMin: '2', scadenza: day(200), apertura: '', posizione: 'Armadio infiammabili', conservazione: 'Temperatura ambiente', pericolo: 'H225, H319', note: '' },
-            { id: 'ex_mag_3', nome: 'Taq polimerasi', codice: 'M0273', fornitore: 'NEB', categoria: 'Enzimi', lotto: 'T0821', quantita: '500', unita: 'U', sogliaMin: '100', scadenza: day(18), apertura: day(-90), posizione: 'Freezer -20 °C, ripiano 1', conservazione: '-20 °C', pericolo: '', note: '' },
-            { id: 'ex_mag_4', nome: 'Agarosio', codice: 'A9539', fornitore: 'Sigma-Aldrich', categoria: 'Elettroforesi', lotto: 'SLBX9981', quantita: '250', unita: 'g', sogliaMin: '50', scadenza: day(-12), apertura: day(-400), posizione: 'Scaffale B', conservazione: 'Temperatura ambiente', pericolo: '', note: 'Da smaltire.' },
+            { id: 'ex_mag_1', numero: '1', marca: 'Sigma-Aldrich', cas: '', dataArrivo: day(-100), ordine: 'DDT-2201', prezzo: '85', nome: 'Proteinasi K', codice: 'P2308', fornitore: 'Sigma-Aldrich', categoria: 'Enzimi', lotto: 'SLCD1234', quantita: '4', unita: 'mL', sogliaMin: '2', scadenza: day(400), apertura: day(-60), posizione: 'Freezer -20 °C, ripiano 2', conservazione: '-20 °C', pericolo: 'H334', note: '' },
+            { id: 'ex_mag_2', numero: '2', marca: 'Carlo Erba', cas: '64-17-5', dataArrivo: day(-300), ordine: 'DDT-2202', prezzo: '28', nome: 'Etanolo assoluto', codice: 'E7023', fornitore: 'Carlo Erba', categoria: 'Solventi', lotto: 'L2201', quantita: '1', unita: 'L', sogliaMin: '2', scadenza: day(200), apertura: '', posizione: 'Armadio infiammabili', conservazione: 'Temperatura ambiente', pericolo: 'H225, H319', note: '' },
+            { id: 'ex_mag_3', numero: '3', marca: 'NEB', cas: '', dataArrivo: day(-120), ordine: 'DDT-2203', prezzo: '190', nome: 'Taq polimerasi', codice: 'M0273', fornitore: 'NEB', categoria: 'Enzimi', lotto: 'T0821', quantita: '500', unita: 'U', sogliaMin: '100', scadenza: day(18), apertura: day(-90), posizione: 'Freezer -20 °C, ripiano 1', conservazione: '-20 °C', pericolo: '', note: '' },
+            { id: 'ex_mag_4', numero: '4', marca: 'Sigma-Aldrich', cas: '9012-36-6', dataArrivo: day(-420), ordine: 'DDT-2204', prezzo: '64', nome: 'Agarosio', codice: 'A9539', fornitore: 'Sigma-Aldrich', categoria: 'Elettroforesi', lotto: 'SLBX9981', quantita: '250', unita: 'g', sogliaMin: '50', scadenza: day(-12), apertura: day(-400), posizione: 'Scaffale B', conservazione: 'Temperatura ambiente', pericolo: '', note: 'Da smaltire.' },
         ],
         campioni: [
             { id: 'ex_cmp_1', codice: 'CMP-0142', tipo: 'Siero', descrizione: 'Paziente di controllo, prelievo a digiuno', data: day(-6), origine: 'Reparto di Medicina', stato: 'Analizzato', posizione: 'Freezer -80 °C, rack 3', conservazione: '-80 °C', protocolloId: sop, operatore: 'L. Bianchi', risultati: 'DNA 48 ng/µL, A260/280 1,87.', note: '' },
@@ -99,6 +100,11 @@ export const exampleLab = () => {
             { id: 'ex_art_2', titolo: 'Optimizing primer annealing temperature in PCR', autori: 'Rychlik W, Spencer WJ, Rhoads RE', rivista: 'Nucleic Acids Research', anno: '1990', doi: '', pmid: '', url: '', lettura: 'Da leggere', tag: 'PCR, primer', protocolloId: '', riassunto: '', appunti: '' },
         ],
     };
+};
+
+export const exampleLab = () => {
+    const a = baseLab(), b = extraLab();
+    return Object.fromEntries(Object.keys(a).map((k) => [k, [...a[k], ...(b[k] || [])]]));
 };
 
 export const labIsEmpty = (lab) => LAB_KEYS.every((k) => !lab[k].length);

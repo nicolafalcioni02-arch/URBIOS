@@ -48,7 +48,7 @@ const AppShell = () => {
             {content}
             {a.pendingRecoveryCode && <RecoveryCodeModal code={a.pendingRecoveryCode} onConfirm={a.acknowledgeRecoveryCode} />}
             {a.exitDialogOpen && a.status === 'open' && <ExitDialog />}
-            {a.status === 'open' && welcomeDone && <ArchiveStatusChip />}
+            {a.status === 'open' && welcomeDone && mode !== 'lab' && <ArchiveStatusChip />}
         </>
     );
 };

@@ -9,15 +9,89 @@ export const labOf = (db) => {
 
 export const newId = (prefix) => `${prefix}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
+const today = () => new Date().toISOString().slice(0, 10);
+const round6 = (x) => Math.round(x * 1e6) / 1e6;
+
+// conversione tra unità della stessa famiglia (massa, volume); stessa unità o unità vuota = nessuna conversione
+const UNITS = { ug: ['m', 1e-6], mg: ['m', 1e-3], g: ['m', 1], kg: ['m', 1e3], ul: ['v', 1e-6], ml: ['v', 1e-3], l: ['v', 1] };
+const unitKey = (u) => String(u || '').trim().toLowerCase().replace(/[µμ]/g, 'u');
+export const convertQty = (q, from, to) => {
+    const a = unitKey(from);
+    const b = unitKey(to);
+    if (!a || !b || a === b) return q;
+    const x = UNITS[a];
+    const y = UNITS[b];
+    return x && y && x[0] === y[0] ? (q * x[1]) / y[1] : null;
+};
+
+const addLog = (art, entry, rif) => {
+    const list = (art.storico || []).filter((e) => !(rif && e.rif === rif));
+    return [entry, ...list].slice(0, 120);
+};
+
+// aggiornamento a mano della quantità: data «aggiornato» e riga nello storico (più cambi nello stesso giorno si uniscono)
+const trackManual = (old, rec) => {
+    const out = { ...rec, storico: old ? old.storico || [] : [], aggiornato: old ? old.aggiornato : undefined };
+    if (!old || String(old.quantita ?? '') === String(rec.quantita ?? '')) return out;
+    out.aggiornato = today();
+    const last = out.storico[0];
+    if (last && last.tipo === 'manuale' && last.g === today()) {
+        out.storico = last.da === rec.quantita ? out.storico.slice(1) : [{ ...last, a: rec.quantita }, ...out.storico.slice(1)];
+    } else out.storico = addLog(out, { g: today(), tipo: 'manuale', da: old.quantita ?? '', a: rec.quantita ?? '' });
+    return out;
+};
+
+// scarico automatico: i materiali dell'esperimento collegati a un articolo scalgono la scorta; si ricalcola a ogni salvataggio
+// (rec.scaricato = quanto è già stato tolto per articolo, così il totale non si somma due volte)
+const deduct = (old, rec, mag) => {
+    const prevSc = (old && old.scaricato) || {};
+    const want = {};
+    (rec.materiali || []).forEach((m) => {
+        const art = m.articoloId && mag.find((a) => a.id === m.articoloId);
+        const q = num(m.quantita);
+        if (!art || q === null) return;
+        const c = convertQty(q, m.unita, art.unita);
+        if (c !== null) want[art.id] = round6((want[art.id] || 0) + c);
+    });
+    const ids = [...new Set([...Object.keys(prevSc), ...Object.keys(want)])];
+    const newSc = {};
+    let list = mag;
+    ids.forEach((id) => {
+        const art = list.find((a) => a.id === id);
+        if (!art) return;
+        const had = prevSc[id] || 0;
+        const now = want[id] || 0;
+        const stock = num(art.quantita);
+        if (stock === null) return;
+        if (now) newSc[id] = now;
+        if (Math.abs(now - had) < 1e-9) return;
+        const qty = String(Math.max(0, round6(stock - (now - had)))).replace('.', ',');
+        const entry = now ? { g: today(), tipo: 'esperimento', rif: rec.id, titolo: rec.titolo || rec.codice || 'Esperimento', usato: now } : null;
+        const upd = { ...art, quantita: qty, aggiornato: today(), storico: entry ? addLog(art, entry, rec.id) : (art.storico || []).filter((e) => e.rif !== rec.id) };
+        list = list.map((a) => (a.id === id ? upd : a));
+    });
+    return { rec: { ...rec, scaricato: newSc }, mag: list };
+};
+
 // salva un record (nuovo o modificato) / lo elimina
 export const saveRecord = (onUpdateDb, key, rec) =>
     onUpdateDb((prev) => {
         const lab = labOf(prev);
-        const list = lab[key].some((x) => x.id === rec.id) ? lab[key].map((x) => (x.id === rec.id ? rec : x)) : [...lab[key], rec];
-        return { ...prev, lab: { ...(prev.lab || {}), [key]: list } };
+        const old = lab[key].find((x) => x.id === rec.id);
+        let next = rec;
+        let mag = lab.magazzino;
+        if (key === 'magazzino') next = trackManual(old, rec);
+        if (key === 'quaderno') ({ rec: next, mag } = deduct(old, rec, mag));
+        const list = old ? lab[key].map((x) => (x.id === rec.id ? next : x)) : [...lab[key], next];
+        return { ...prev, lab: { ...(prev.lab || {}), [key]: list, ...(key === 'quaderno' ? { magazzino: mag } : {}) } };
     });
 export const removeRecord = (onUpdateDb, key, id) =>
-    onUpdateDb((prev) => ({ ...prev, lab: { ...(prev.lab || {}), [key]: labOf(prev)[key].filter((x) => x.id !== id) } }));
+    onUpdateDb((prev) => {
+        const lab = labOf(prev);
+        const old = lab[key].find((x) => x.id === id);
+        const mag = key === 'quaderno' && old ? deduct(old, { ...old, materiali: [] }, lab.magazzino).mag : lab.magazzino; // tolto l'esperimento, la scorta torna
+        return { ...prev, lab: { ...(prev.lab || {}), [key]: lab[key].filter((x) => x.id !== id), ...(key === 'quaderno' ? { magazzino: mag } : {}) } };
+    });
 
 export const num = (v) => {
     const x = parseFloat(String(v ?? '').replace(',', '.'));
@@ -102,3 +176,9 @@ export const searchAll = (lab, sections, q, max = 12) => {
     if (s.length < 2) return [];
     return sections.flatMap((sec) => lab[sec.key].filter((r) => sec.search(r).includes(s)).map((rec) => ({ key: sec.key, rec }))).slice(0, max);
 };
+
+// Versioni di un protocollo: le copie salvate dal lavoro portano `origineId` (il primo della famiglia)
+const rootOf = (r) => r.origineId || r.id;
+const vnum = (v) => String(v || '0').split('.').map((n) => +n || 0);
+export const versionsOf = (protocolli, rec) => protocolli.filter((p) => rootOf(p) === rootOf(rec)).sort((a, b) => { const x = vnum(a.versione); const y = vnum(b.versione); return (y[0] - x[0]) || ((y[1] || 0) - (x[1] || 0)) || String(b.data || '').localeCompare(String(a.data || '')); });
+export const latestVersions = (protocolli) => { const seen = new Set(); return protocolli.filter((p) => (seen.has(rootOf(p)) ? false : (seen.add(rootOf(p)), true))).map((p) => versionsOf(protocolli, p)[0]); };

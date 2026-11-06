@@ -8,7 +8,8 @@ const polar = (deg, r) => [100 + r * Math.sin((deg * Math.PI) / 180), 100 - r * 
 const fg = { stroke: 'var(--wd-fg)' };
 
 // Orologio con numeri romani: colori dal tono scelto, lancetta dei secondi continua, finestrella della data.
-export const ClockRoman = () => {
+export const ClockRoman = ({ db }) => {
+    const full = !!(db && db.labOv); // laboratorio: il quadrante riempie tutto il riquadro, senza riga della data
     const [now, setNow] = useState(() => new Date());
     useEffect(() => {
         const t = setInterval(() => setNow(new Date()), 100);
@@ -19,7 +20,7 @@ export const ClockRoman = () => {
     const h = (now.getHours() % 12) + m / 60;
     const hand = (deg, back, len, w) => <line x1={polar(deg + 180, back)[0]} y1={polar(deg + 180, back)[1]} x2={polar(deg, len)[0]} y2={polar(deg, len)[1]} style={fg} strokeWidth={w} strokeLinecap="round" />;
     return (
-        <div className="wd-card wd-clock">
+        <div className={`wd-card wd-clock${full ? ' full' : ''}`}>
             <svg viewBox="0 0 200 200" role="img" aria-label={now.toLocaleTimeString('it-IT')}>
                 <circle cx="100" cy="100" r="96" fill="none" style={fg} strokeWidth="2.5" />
                 <circle cx="100" cy="100" r="90" fill="none" style={{ stroke: 'var(--wd-line)' }} strokeWidth="1" />
@@ -51,9 +52,9 @@ export const ClockRoman = () => {
                 {hand(s * 6, 16, 74, 1.2)}
                 <circle cx="100" cy="100" r="4.2" style={{ fill: 'var(--wd-bg)', stroke: 'var(--wd-acc)' }} strokeWidth="2" />
             </svg>
-            <p className="wd-clock-date">
+            {!full && <p className="wd-clock-date">
                 {DAYS[now.getDay()]} · {now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}
-            </p>
+            </p>}
         </div>
     );
 };

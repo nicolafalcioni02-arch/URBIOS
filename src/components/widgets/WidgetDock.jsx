@@ -3,7 +3,8 @@
 // figura di Word (1×1, 2×1, 3×2…) e lo si lascia dove si vuole. "Widget" in alto apre la modifica (tremolio
 // stile iOS, cassetto, toni, rimozione). Solo desktop: sotto i 1360px di larghezza il dock sparisce.
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { WIDGETS, widgetByType } from './widgetCatalog';
+import { createPortal } from 'react-dom';
+import { widgetsFor, widgetByType, sizeIn, minIn, fixedIn } from './widgetCatalog';
 import { useWidgetStore } from './useWidgetStore';
 import { COLS, PADX, PADY, geom, pixelRect, isFree, nearestFree, firstFree } from './grid';
 import { WidgetItem } from './WidgetItem';
@@ -13,7 +14,7 @@ import { widgetStyles } from './widgetStyles';
 const LONG_PRESS_MS = 550;
 const NODRAG = 'input,textarea,select,button,a,[data-wd-nodrag]';
 
-const Rail = ({ side, store, db, onOpenAgenda, editing, drag, ghost, preview, setRef, onItemDown, onHandleDown, rows, onRows }) => {
+const Rail = ({ reserve, band, list, side, store, db, onOpenAgenda, editing, drag, ghost, preview, setRef, onItemDown, onHandleDown, rows, onRows }) => {
     const ref = useRef(null);
     const [g, setG] = useState({ pitch: 60, rows: 10, left: 0, top: 0, width: 240, height: 800 });
     const [picker, setPicker] = useState(false);
@@ -39,9 +40,13 @@ const Rail = ({ side, store, db, onOpenAgenda, editing, drag, ghost, preview, se
     // widget nuovi (o salvati con un formato vecchio): primo posto libero; se non c'è, la colonna è piena
     useLayoutEffect(() => {
         // i widget a misura bloccata tornano alla loro misura (anche se erano stati salvati ridimensionati)
+        // colonne basse (fascia del laboratorio): il widget si rimpicciolisce in altezza per starci
+        const fitSize = (d, w, h) => (h > g.rows ? [fixedIn(d, band) ? Math.max(minIn(d, band)[0], Math.round((w * g.rows) / h)) : w, g.rows] : [w, h]);
         const wrongSize = (i) => {
             const d = widgetByType(i.type);
-            return !!d && d.fixed && (i.w !== d.size[0] || i.h !== d.size[1]);
+            if (!d || !fixedIn(d, band)) return false;
+            const [w, h] = fitSize(d, ...sizeIn(d, band));
+            return i.w !== w || i.h !== h;
         };
         const fresh = items.filter((i) => i.c == null || i.r == null || !i.w || wrongSize(i));
         if (!fresh.length) return;
@@ -50,7 +55,7 @@ const Rail = ({ side, store, db, onOpenAgenda, editing, drag, ghost, preview, se
         const gone = [];
         fresh.forEach((it) => {
             const def = widgetByType(it.type);
-            const [w, h] = def ? (def.fixed ? def.size : [it.w || def.size[0], it.h || def.size[1]]) : [2, 2];
+            const [w, h] = def ? fitSize(def, ...(fixedIn(def, band) ? sizeIn(def, band) : [it.w || sizeIn(def, band)[0], it.h || sizeIn(def, band)[1]])) : [2, 2];
             const spot = firstFree(placed, g.rows, w, h);
             if (!spot) {
                 gone.push(it.id);
@@ -70,8 +75,10 @@ const Rail = ({ side, store, db, onOpenAgenda, editing, drag, ghost, preview, se
     return (
         <aside
             ref={ref}
+            data-pitch={band ? 60 : undefined}
+            data-reserve={reserve || undefined}
             className={`wd-rail wd-${side} ${items.length === 0 ? 'empty' : ''} ${drag ? 'armed' : ''}`}
-            style={{ '--wd-pitch': `${g.pitch}px`, '--wd-padx': `${PADX}px`, '--wd-pady': `${PADY}px` }}
+            style={{ '--wd-reserve': `${reserve || 0}px`, '--wd-pitch': `${g.pitch}px`, '--wd-padx': `${PADX}px`, '--wd-pady': `${PADY}px` }}
             aria-label={side === 'left' ? 'Scrivania sinistra' : 'Scrivania destra'}
         >
             {items
@@ -105,6 +112,9 @@ const Rail = ({ side, store, db, onOpenAgenda, editing, drag, ghost, preview, se
             </div>
             {picker && (
                 <WidgetPicker
+                    list={list}
+                    below={!!band}
+                    hint={band ? 'Per modificare un widget, tieni premuto su di esso' : ''}
                     anchor={plusRef.current}
                     onClose={() => setPicker(false)}
                     onPick={(type) => {
@@ -117,8 +127,10 @@ const Rail = ({ side, store, db, onOpenAgenda, editing, drag, ghost, preview, se
     );
 };
 
-export const WidgetDock = ({ db, onUpdateDb, editing, onEditingChange, onOpenAgenda, mode = 'home', top = 6, hidden = false }) => {
-    const store = useWidgetStore(db, onUpdateDb);
+export const WidgetDock = ({ db, onUpdateDb, editing, onEditingChange, onOpenAgenda, mode = 'home', top = 6, hidden = false, reserve = 0 }) => {
+    const lab = mode === 'lab'; // Laboratorio: una sola colonna a destra, widget propri (db.widgetsLab)
+    const list = widgetsFor(mode);
+    const store = useWidgetStore(db, onUpdateDb, lab ? 'widgetsLab' : 'widgets');
     const storeRef = useRef(store);
     storeRef.current = store;
     const rails = useRef({});
@@ -130,6 +142,23 @@ export const WidgetDock = ({ db, onUpdateDb, editing, onEditingChange, onOpenAge
     const ghostRef = useRef(null);
     const previewRef = useRef(null);
     const press = useRef(null);
+    // Laboratorio, in modifica: tutto lo schermo si scurisce tranne la fascia dei widget e il cassetto appena sotto
+    const dockRef = useRef(null);
+    const [hole, setHole] = useState(null);
+    const shaded = lab && editing;
+    useLayoutEffect(() => {
+        if (!shaded) return setHole(null);
+        const upd = () => {
+            const d = dockRef.current && dockRef.current.getBoundingClientRect();
+            const t = dockRef.current && dockRef.current.querySelector('.wd-tray');
+            const tr = t && t.getBoundingClientRect();
+            if (d) setHole({ band: [d.left, d.top, d.right, d.bottom], tray: null });
+        };
+        upd();
+        const raf = requestAnimationFrame(upd); // il cassetto compare dopo il primo disegno
+        window.addEventListener('resize', upd);
+        return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', upd); };
+    }, [shaded]);
 
     useEffect(() => {
         if (!editing) return undefined;
@@ -167,7 +196,7 @@ export const WidgetDock = ({ db, onUpdateDb, editing, onEditingChange, onOpenAge
         let begun = false;
         const el = spec.item ? document.querySelector(`[data-wd-id="${spec.item.id}"]`) : null;
         const startRect = el ? el.getBoundingClientRect() : null;
-        const size = spec.item ? [spec.item.w, spec.item.h] : widgetByType(spec.type).size;
+        const size = spec.item ? [spec.item.w, spec.item.h] : sizeIn(widgetByType(spec.type), lab);
 
         const onMove = (ev) => {
             const dx = ev.clientX - sx;
@@ -185,7 +214,7 @@ export const WidgetDock = ({ db, onUpdateDb, editing, onEditingChange, onOpenAge
             // cella dell'angolo in alto a sinistra del widget trascinato
             const tlx = spec.item ? startRect.left + dx : ev.clientX - (w * hit.g.pitch) / 2;
             const tly = spec.item ? startRect.top + dy : ev.clientY - (h * hit.g.pitch) / 2;
-            const want = { c: Math.round((tlx - hit.g.left - PADX) / hit.g.pitch), r: Math.round((tly - hit.g.top - PADY) / hit.g.pitch), w, h };
+            const want = { c: Math.round((tlx - hit.g.left - PADX - (hit.g.off || 0)) / hit.g.pitch), r: Math.round((tly - hit.g.top - PADY) / hit.g.pitch), w, h };
             const found = nearestFree(placedOf(hit.side), hit.g.rows, want, spec.item && spec.item.id);
             setGhostBoth(found ? { side: hit.side, ...found, w, h } : { side: hit.side, c: Math.max(0, Math.min(COLS - w, want.c)), r: Math.max(0, Math.min(hit.g.rows - h, want.r)), w, h, invalid: true });
         };
@@ -241,7 +270,7 @@ export const WidgetDock = ({ db, onUpdateDb, editing, onEditingChange, onOpenAge
         e.stopPropagation();
         const side = storeRef.current.lists.left.some((i) => i.id === item.id) ? 'left' : 'right';
         const def = widgetByType(item.type);
-        const [minW, minH] = def.min;
+        const [minW, minH] = minIn(def, lab);
         const sx = e.clientX;
         const sy = e.clientY;
         document.body.classList.add('wd-dragging', 'wd-resizing');
@@ -294,14 +323,36 @@ export const WidgetDock = ({ db, onUpdateDb, editing, onEditingChange, onOpenAge
     const trayDef = tray && widgetByType(tray.type);
     if (hidden) return null;
     return (
-        <div className={`wd-dock ${mode === 'patient' ? 'patient' : ''} ${editing ? 'is-editing' : ''}`} style={{ '--wd-top': `${top}px` }}>
+        <div ref={dockRef} className={`wd-dock ${mode === 'patient' ? 'patient' : ''} ${lab ? 'lab' : ''} ${editing ? 'is-editing' : ''}`} style={{ '--wd-top': `${top}px` }}>
             <style>{widgetStyles}</style>
-            <Rail side="left" {...railProps} />
-            <Rail side="right" {...railProps} />
-            {editing && (
-                <div className="wd-tray" role="toolbar" aria-label="Strumenti">
+            {hole && createPortal(
+                <div className="wd-labshade" aria-hidden="true" onPointerDown={() => onEditingChange(false)}
+                    style={{ clipPath: `path(evenodd, 'M0 0H${window.innerWidth}V${window.innerHeight}H0Z ${[hole.band, hole.tray].filter(Boolean).map(([l, t, r, b]) => `M${l} ${t}H${r}V${b}H${l}Z`).join(' ')}')` }} />,
+                document.body
+            )}
+            {!lab && <Rail list={list} side="left" {...railProps} />}
+            <Rail reserve={reserve} band={lab} list={list} side="right" {...railProps} />
+            {editing && (lab ? createPortal(
+                <div className={`wd-tray${lab ? ' in-lab' : ''}`} style={lab && hole ? { top: hole.band[3] + 10 } : undefined} role="toolbar" aria-label="Strumenti">
                     <span className="wd-tray-hint">Trascina uno strumento su una colonna</span>
-                    {WIDGETS.map((w) => (
+                    {list.map((w) => (
+                        <div key={w.type} className="wd-tile" onMouseDown={(e) => e.preventDefault()} onPointerDown={(e) => {
+                                e.preventDefault(); // niente selezione di testo mentre si trascina
+                                beginDrag(e, { type: w.type });
+                            }}>
+                            <i className={`ph ${w.icon}`} />
+                            <span>{w.label}</span>
+                        </div>
+                    ))}
+                    <button className="wd-done" onClick={() => onEditingChange(false)}>
+                        Fine
+                    </button>
+                </div>,
+                document.body
+            ) : (
+                <div className={`wd-tray${lab ? ' in-lab' : ''}`} style={lab && hole ? { top: hole.band[3] + 10 } : undefined} role="toolbar" aria-label="Strumenti">
+                    <span className="wd-tray-hint">Trascina uno strumento su una colonna</span>
+                    {list.map((w) => (
                         <div key={w.type} className="wd-tile" onMouseDown={(e) => e.preventDefault()} onPointerDown={(e) => {
                                 e.preventDefault(); // niente selezione di testo mentre si trascina
                                 beginDrag(e, { type: w.type });
@@ -314,7 +365,7 @@ export const WidgetDock = ({ db, onUpdateDb, editing, onEditingChange, onOpenAge
                         Fine
                     </button>
                 </div>
-            )}
+            ))}
             {tray && trayDef && (
                 <div className="wd-fly" style={{ left: tray.x, top: tray.y }}>
                     <i className={`ph ${trayDef.icon}`} />

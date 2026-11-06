@@ -29,11 +29,11 @@ const form = (rows) => {
 };
 const stepsIn = (list) => {
     const s = (list || []).filter((x) => String(x.testo || '').trim());
-    return s.length ? `<ol class="d-rb-steps">${s.map((x) => `<li>${multiline(x.testo)}${x.durata ? ` <small>(${esc(x.durata)})</small>` : ''}</li>`).join('')}</ol>` : '';
+    return s.length ? `<ol class="d-rb-steps">${s.map((x) => `<li>${multiline(x.testo)}${x.durata ? ` <small>(${esc(x.durata)})</small>` : ''}${x.note ? `<br><small>${multiline(x.note)}</small>` : ''}</li>`).join('')}</ol>` : '';
 };
 
 const protocolHtml = (r, brk) => {
-    const mats = rowsTable(['Voce', 'Quantità', 'Note'], withName(r.materiali).map((m) => [esc(m.nome), cell([m.quantita, m.unita].filter(Boolean).join(' ')), cell(m.note)]));
+    const mats = rowsTable(['Voce', 'Quantità', 'Note / materiale'], withName(r.materiali).map((m) => [esc(m.nome), cell([m.quantita, m.unita].filter(Boolean).join(' ')), cell(m.note)]));
     return `<section class="d-rb-recipe${brk ? ' pc-break' : ''}">
 <div class="d-rb-head"><div><h2 class="d-title d-rb-title">${esc(r.titolo || 'Protocollo senza titolo')}</h2><span class="d-kicker">${esc([r.codice, r.categoria].filter(Boolean).join(', ') || 'Protocollo')}</span></div></div>
 ${meta([['Versione', r.versione], ['Revisione', fmtDay(r.data)], ['Stato', r.stato], ['Redatto da', r.autore]])}
@@ -61,7 +61,7 @@ const entryHtml = (r, brk, lab, n) => {
     const figs = captions(r);
     return `<section class="d-rb-recipe${brk ? ' pc-break' : ''}">
 <div class="d-rb-head"><div><h2 class="d-title d-rb-title">${esc(r.titolo || 'Esperimento senza titolo')}</h2><span class="d-kicker">${esc([fmtDay(r.data), r.operatore, r.progetto, proto ? [proto.codice, proto.titolo].filter(Boolean).join(' ') : ''].filter(Boolean).join(', '))}</span></div></div>
-${form([['Obiettivo', txt(r.obiettivo)], [n && n.tab ? `Materiali (tab. ${n.tab})` : 'Materiali', mats], ['Procedura svolta', stepsIn(r.passaggi) || txt(r.procedura)], ['Osservazioni', txt(r.osservazioni)], ['Risultati', txt(r.risultati)]])}
+${form([['Obiettivo', txt(r.obiettivo)], [n && n.tab ? `Materiali (tab. ${n.tab})` : 'Materiali', mats], ['Procedura svolta', stepsIn(r.passaggi) || txt(r.procedura)], ['Misure', rowsTable(['Misura', 'Valore', 'Nota'], withName(r.misure).map((m) => [esc(m.nome), cell([m.valore, m.unita].filter(Boolean).join(' ')), cell(m.note)]))], ['Osservazioni', txt(r.osservazioni)], ['Risultati', txt(r.risultati)]])}
 ${figs.map((f, k) => `<div class="d-fig" style="break-inside:avoid">${figureVisual(f)}<p><b>Figura ${n ? n.figs[k] : k + 1}:</b> ${esc(f.nome)}${f.note ? ` <small>(${esc(f.note)})</small>` : ''}</p></div>`).join('')}
 ${form([['Conclusioni', txt(r.conclusioni)], ['Prossimi passi', txt(r.prossimi)]])}
 </section>`;
@@ -125,8 +125,9 @@ const articoliHtml = (items) => {
     return listHtml('Bibliografia', ['Titolo', 'Autori', 'Rivista', 'Anno', 'DOI', 'Lettura'], rows, items.length);
 };
 const magazzinoHtml = (items) => {
-    const rows = [...items].sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'it')).map((r) => [esc(r.nome), cell(r.marca), cell(r.lotto), cell([r.quantita, r.unita].filter(Boolean).join(' ')), cell(fmtDay(r.scadenza)), cell(r.posizione)]);
-    return listHtml('Magazzino reagenti', ['Articolo', 'Marca', 'Lotto', 'Quantità', 'Scadenza', 'Posizione'], rows, items.length);
+    const blank = '&nbsp;';
+    const rows = [...items].sort((a, b) => (parseInt(a.numero, 10) || 1e9) - (parseInt(b.numero, 10) || 1e9) || String(a.nome).localeCompare(String(b.nome), 'it')).map((r) => [cell(r.numero), `<b>${esc(r.nome)}</b>`, cell(r.marca), cell(r.lotto), cell(fmtDay(r.dataArrivo)), cell([r.quantita, r.unita].filter(Boolean).join(' ')), cell(r.posizione), blank, r.aggiornato ? esc(fmtDay(r.aggiornato)) : blank]);
+    return listHtml('Magazzino reagenti', ['N.', 'Articolo', 'Produttore', 'Lotto', 'Inserito il', 'Quantità', 'Posizione', 'Q.tà attuale', 'Aggiornato il'], rows, items.length);
 };
 const campioniHtml = (items, lab) => {
     const rows = [...items].sort((a, b) => String(a.codice).localeCompare(String(b.codice), 'it')).map((r) => [esc(r.codice), cell(r.tipo), cell(r.descrizione), cell(fmtDay(r.data)), cell(r.posizione), cell(r.stato), cell((lab.protocolli.find((p) => p.id === r.protocolloId) || {}).codice)]);

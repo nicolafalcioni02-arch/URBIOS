@@ -104,7 +104,9 @@ export const FiguresEditor = ({ value, onChange }) => {
     const file = useRef(null);
     const target = useRef(0);
     const gelMode = useRef(false);
-    const openFile = (i, gel) => { target.current = i; gelMode.current = gel; file.current.click(); };
+    const cam = useRef(null);
+    const touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0;
+    const openFile = (i, gel, shoot) => { target.current = i; gelMode.current = gel; (shoot ? cam : file).current.click(); };
     const set = (i, patch) => onChange(list.map((f, k) => (k === i ? { ...f, ...patch } : f)));
     const listRef = useRef(list);
     listRef.current = list;
@@ -123,6 +125,7 @@ export const FiguresEditor = ({ value, onChange }) => {
     return (
         <div className="lab-rows">
             <input ref={file} type="file" accept="image/*" hidden onChange={pick} />
+            <input ref={cam} type="file" accept="image/*" capture="environment" hidden onChange={pick} />
             {list.map((f, i) => (
                 <div className="lab-fig" key={i}>
                     <div className="lab-fig-head">
@@ -139,6 +142,7 @@ export const FiguresEditor = ({ value, onChange }) => {
                     {f.chart && <Chart chart={f.chart} onChange={(c) => set(i, { chart: c })} />}
                     {!f.img && !f.chart && !f.gel && (
                         <div className="lab-chart-top">
+                            {touch && <button type="button" className="lab-add lab-shoot" onClick={() => openFile(i, false, true)}><Icon name="camera" size={16} />Scatta foto</button>}
                             <button type="button" className="lab-add" onClick={() => openFile(i, false)}><Icon name="plus" size={15} />Carica immagine</button>
                             <button type="button" className="lab-add" onClick={() => { set(i, { gel: emptyGel() }); openFile(i, true); }}><Icon name="plus" size={15} />Gel</button>
                             <button type="button" className="lab-add" onClick={() => set(i, { chart: emptyChart() })}><Icon name="plus" size={15} />Crea grafico</button>

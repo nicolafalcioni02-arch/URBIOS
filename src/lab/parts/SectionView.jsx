@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { Icon } from '../ui/icons';
 import { RecordForm } from '../RecordForm';
 import { NotebookPreview } from './NotebookPreview';
@@ -40,7 +40,7 @@ const ExperimentCalendar = ({ items, onClose }) => {
                         return <button type="button" key={k} className={`lab-cal-d${has ? ' has' : ''}${day === k ? ' sel' : ''}`} onClick={() => has && setDay(day === k ? '' : k)} aria-label={has ? `${i + 1} ${MESI[m]}: ${byDay[k].length} esperimenti` : undefined}>{i + 1}</button>;
                     })}
                 </div>
-                {shown.length > 0 && <div className="lab-cal-list">{shown.map((r) => <p key={r.id}>{r.titolo || 'Esperimento senza titolo'}{r.codice && <small> · {r.codice}</small>}</p>)}</div>}
+                {shown.length > 0 && <div className="lab-cal-list">{shown.map((r) => <p key={r.id}>{r.titolo || 'Esperimento senza titolo'}{r.codice && <small>, {r.codice}</small>}</p>)}</div>}
             </div>
         </>
     );
@@ -48,7 +48,7 @@ const ExperimentCalendar = ({ items, onClose }) => {
 
 // Una sezione: elenco (ricerca, filtri, selezione per stampare) e, accanto, l'editor (schermi larghi) o a finestra (telefono/tablet).
 // Il record aperto è `sel = { record, isNew }`.
-export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, onDelete, onPrint, onBlank, onExcel, db, vol, setVol }) => {
+export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, onDelete, onPrint, onBlank, onExcel, onImport, db, vol, setVol }) => {
     const [q, setQ] = useState('');
     const [group, setGroup] = useState('');
     const [fopen, setFopen] = useState(false);
@@ -88,6 +88,7 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
                                     {calOpen && <ExperimentCalendar items={all} onClose={() => setCalOpen(false)} />}
                                 </div>
                             )}
+                            {onImport && <button className="lab-btn is-secondary is-sm is-ico" onClick={onImport} aria-label="Importa da Excel" title="Importa da Excel"><Icon name="upload" size={17} /></button>}
                             <button className="lab-btn is-ok is-sm is-ico" disabled={!list.length} onClick={onExcel} aria-label="Esporta in Excel" title="Esporta in Excel"><Icon name="table" size={17} /></button>
                             <button className="lab-btn is-primary is-sm is-ico" onClick={onNew} aria-label={`Nuovo ${section.single}`} title={`Nuovo ${section.single}`}><Icon name="plus" size={17} /></button>
                         </div>
@@ -125,10 +126,11 @@ export const SectionView = ({ section, lab, wide, sel, onSelect, onNew, onSave, 
                                 const b = section.badge(r);
                                 const on = picked.includes(r.id);
                                 return (
-                                    <div key={r.id} className={`lab-item${activeId === r.id ? ' sel' : ''}`}>
+                                    <div key={r.id} className={`lab-item${activeId === r.id ? ' sel' : ''}${section.key === 'magazzino' && b ? ` tone-${b.tone}` : ''}`} title={section.key === 'magazzino' && b ? b.label : undefined}>
                                         <button type="button" className="lab-item-main" onClick={() => onSelect(r)} aria-current={activeId === r.id ? 'true' : undefined}>
-                                            <span className="lab-item-top"><b>{section.title(r)}</b>{b && <span className={`lab-pill ${b.tone}`} title={b.label}>{b.label}</span>}</span>
+                                            <span className="lab-item-top"><b>{section.title(r)}</b></span>
                                             {section.sub(r) && <small>{section.sub(r)}</small>}
+                                            {b && section.key !== 'magazzino' && <span className={`lab-pill ${b.tone}`} title={b.label}>{b.label}</span>}
                                         </button>
                                         <button type="button" className={`lab-check${on ? ' on' : ''}`} aria-label={on ? 'Togli dalla selezione' : 'Seleziona per stampare'} aria-pressed={on} onClick={() => toggle(r.id)}>{on && <Icon name="check" size={13} stroke={2.4} />}</button>
                                     </div>

@@ -4,11 +4,11 @@ const GOAL = 8;
 const today = () => new Date().toLocaleDateString('sv-SE'); // AAAA-MM-GG locale
 
 // Contatore dei bicchieri d'acqua: si azzera da solo ogni giorno.
-export const WaterGlasses = ({ data, setData }) => {
+export const WaterGlasses = ({ data, setData, db }) => {
     const count = data.day === today() ? data.count || 0 : 0;
     const set = (n) => setData({ day: today(), count: n });
     return (
-        <div className="wd-card wd-water">
+        <div className={`wd-card wd-water${db && db.labOv ? ' lab' : ''}`}>
             <p className="wd-water-title">
                 Acqua di oggi <b>{(count * 0.25).toLocaleString('it-IT', { maximumFractionDigits: 2 })} L</b>
             </p>

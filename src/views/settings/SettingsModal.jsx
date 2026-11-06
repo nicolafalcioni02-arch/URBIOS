@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useCompact } from '../../hooks/useCompact';
-import { GROUPS, SECTIONS, sectionById } from './sections';
+import { GROUPS as ALL_GROUPS, sectionById } from './sections';
 import { Icon } from './ui/icons';
 import { IconBtn } from './ui/kit';
 import { UrbiosWordmark } from '../../brand/UrbiosLogo';
 import './settings.css';
 
 // Guscio delle Impostazioni: solo navigazione. Le sezioni stanno in sections.js, ogni scheda in tabs/<cartella>.
-export const SettingsModal = ({ db, onUpdateDb, onClose }) => {
+// Dal Laboratorio (scope 'lab') compaiono solo le schede che servono lì: niente studio, fatturazione, orari, formule, esportazioni di pazienti
+const LAB_IDS = ['aspetto', 'sicurezza', 'cita', 'info'];
+
+export const SettingsModal = ({ db, onUpdateDb, onClose, scope }) => {
+    const GROUPS = scope === 'lab' ? ALL_GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => LAB_IDS.includes(i.id)) })).filter((g) => g.items.length) : ALL_GROUPS;
+    const SECTIONS = GROUPS.flatMap((g) => g.items);
     const compact = useCompact(639);
     // su telefono si parte dall'elenco (tab = null) e si entra con un tocco
     const [tab, setTab] = useState(compact ? null : SECTIONS[0].id);

@@ -1,7 +1,7 @@
 // Un widget nella colonna: scheda scalata per riempire il riquadro w×h, maniglie di ridimensionamento sui lati
 // (come una figura di Word) e, in modifica, il pallino "−" e la barra dei toni.
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { widgetByType } from './widgetCatalog';
+import { widgetByType, fitIn, fixedIn } from './widgetCatalog';
 import { TONES, toneVars } from './tones';
 
 export const DESIGN_W = 220; // larghezza di progetto dei widget: poi si scala per riempire il riquadro
@@ -39,6 +39,7 @@ export const WidgetItem = ({ item, rect, editing, lift, onItemDown, onHandleDown
     const def = widgetByType(item.type);
     if (!def) return null;
     const { Component } = def;
+    const lab = !!(db && db.labOv);
     return (
         <div
             className={`wd-item ${editing ? 'editing' : ''} ${lift ? 'is-lifted' : ''}`}
@@ -48,14 +49,20 @@ export const WidgetItem = ({ item, rect, editing, lift, onItemDown, onHandleDown
         >
             <div className="wd-jig">
                 <div className="wd-box" style={toneVars(item.tone)}>
-                    <Fit w={rect.width} h={rect.height} mode={def.fit}>
+                    {fitIn(def, lab) === 'fill' ? (
+                        <div className="wd-fit wd-fill">
+                            <Component id={item.id} data={store.data[item.id] || {}} setData={(patch) => store.setData(item.id, patch)} db={db} tone={item.tone} onOpenAgenda={onOpenAgenda} />
+                        </div>
+                    ) : (
+                    <Fit w={rect.width} h={rect.height} mode={fitIn(def, lab)}>
                         <Component id={item.id} data={store.data[item.id] || {}} setData={(patch) => store.setData(item.id, patch)} db={db} tone={item.tone} onOpenAgenda={onOpenAgenda} />
                     </Fit>
+                    )}
                 </div>
             </div>
             {editing && (
                 <>
-                    {!def.fixed && HANDLES.map((d) => (
+                    {!fixedIn(def, lab) && HANDLES.map((d) => (
                         <span key={d} className={`wd-h wd-h-${d}`} onPointerDown={(e) => onHandleDown(e, item, DIRS[d])} aria-hidden="true" />
                     ))}
                     <button className="wd-remove" onClick={() => store.remove(item.id)} aria-label="Togli il widget">

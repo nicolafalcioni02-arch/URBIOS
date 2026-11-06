@@ -163,7 +163,7 @@ const Histogram = ({ gel, proc, onLevels }) => {
                     <line x1="0" y1="255" x2="255" y2="0" className="gs-diag" />
                     <path d={path} className="gs-curve" />
                 </svg>
-                {list.map((q, i) => <i key={i} className={`gs-cp${sel === i ? ' on' : ''}`} style={{ left: `${(q[0] / 255) * 100}%`, top: `${((255 - q[1]) / 255) * 100}%` }} title="Trascina · doppio clic per togliere"
+                {list.map((q, i) => <i key={i} className={`gs-cp${sel === i ? ' on' : ''}`} style={{ left: `${(q[0] / 255) * 100}%`, top: `${((255 - q[1]) / 255) * 100}%` }} title="Trascina, doppio clic per togliere"
                     onPointerDown={dragPoint(list, i)} onDoubleClick={(e) => { e.stopPropagation(); if (pts && i > 0 && i < list.length - 1) { setPts(list.filter((_, k) => k !== i)); setSel(-1); } }} />)}
             </div>
             <div className="gs-lvstrip" ref={null}>
@@ -230,7 +230,7 @@ const CropBox = ({ src, crop, onCommit }) => {
     );
 };
 
-const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave }) => {
+const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave, embedded }) => {
     const [tool, setTool] = useState('foto');
     const [zoom, setZoom] = useState(100);
     const [cutDir, setCutDir] = useState('v');
@@ -272,7 +272,7 @@ const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave }) => {
         const cur = gRef.current; const src = cur.src || cur.img;
         let next = cur;
         if (src) { try { next = { ...cur, src, ...(await processGel(src, { ...defaultProc(), ...(cur.proc || {}) })) }; } catch (e) { next = cur; } }
-        onSave(next);
+        try { await onSave(next); } finally { setSaving(false); }
     };
     const fns = useRef(); fns.current = { undo, redo, onClose: askClose };
     useEffect(() => {
@@ -373,8 +373,8 @@ const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave }) => {
     const [openS, setOpenS] = useState('foto');
     const [grp, setGrp] = useState('img');
     // su schermi larghi i due gruppi stanno insieme, su quelli stretti si sceglie dalla barra
-    const [wide, setWide] = useState(() => window.innerWidth >= 1500);
-    useEffect(() => { const f = () => setWide(window.innerWidth >= 1500); window.addEventListener('resize', f); return () => window.removeEventListener('resize', f); }, []);
+    const [wide, setWide] = useState(() => !embedded && window.innerWidth >= 1680);
+    useEffect(() => { const f = () => setWide(!embedded && window.innerWidth >= 1680); window.addEventListener('resize', f); return () => window.removeEventListener('resize', f); }, []);
     const ANNOT = ['corsie', 'marker', 'bande', 'tagli'];
     const openSec = (k) => {
         setOpenS(k);
@@ -400,6 +400,7 @@ const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave }) => {
     const cropped = proc.l || proc.t || proc.r || proc.b;
     const segs = (d) => (d === 'v' ? L.ax : L.ay).segs;
     useEffect(() => { // sfondo fermo: la pagina sotto non scorre mentre il box è aperto
+        if (embedded) return undefined;
         const b = document.body; const prev = b.style.overflow;
         b.style.overflow = 'hidden';
         return () => { b.style.overflow = prev; };
@@ -473,7 +474,7 @@ const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave }) => {
                 <Rng label="Meno rumore" value={proc.denoise} min={0} max={4} step={1} onChange={(v) => setProc({ denoise: v })} />
                 <div className="lab-row gs-tint"><span className="gs-lbl">Colora</span>
                     <button type="button" className={`lab-dot none${!proc.tint ? ' on' : ''}`} aria-label="Nessun colore" title="Nessun colore" onClick={() => setProc({ tint: '' })} />
-                    {GEL_TINTS.filter(([v]) => v).map(([v, l]) => <button type="button" key={v} className={`lab-dot${proc.tint === v ? ' on' : ''}`} style={{ background: v }} aria-label={`Colora: ${l}`} title={`Colora: ${l}`} onClick={() => setProc({ tint: v })} />)}
+                    {GEL_TINTS.filter(([v]) => v).map(([v, l]) => <button type="button" key={v} className={`lab-dot${proc.tint === v ? ' on' : ''}`} style={{ background: v }} aria-label={`Colora: ${l}`} title={`Colora: ${l}`} onClick={() => setProc({ tint: proc.tint === v ? '' : v })} />)}
                 </div>
                 <div className="gs-btns four">
                     <Btn icon="image" label="Cambia foto" onClick={onPickPhoto}>Foto</Btn>
@@ -495,7 +496,7 @@ const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave }) => {
                 {zoneTool && zoneTool !== 'free' && <span className="lab-note">Trascina sulla foto.</span>}
                 {!zoneTool && zones.length === 0 && <span className="lab-note">Scegli una forma e disegnala sulla foto: puoi farne quante vuoi.</span>}
                 {zones.length > 0 && (<>
-                    <div className="gs-lbl">Zone ({zones.length}) · clicca per modificare</div>
+                    <div className="gs-lbl">Zone ({zones.length}), clicca per modificare</div>
                     <div className="gs-btns">{zones.map((_, i) => <Btn key={i} label={`Zona ${i + 1}`} on={selZ === i} onClick={() => setSelZ(i)}>{i + 1}</Btn>)}</div>
                 </>)}
                 {Z && (<>
@@ -510,7 +511,7 @@ const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave }) => {
                     </div>
                     <div className="lab-row gs-tint"><span className="gs-lbl">Colora</span>
                         <button type="button" className={`lab-dot none${!Z.tint ? ' on' : ''}`} aria-label="Nessun colore" title="Nessun colore" onClick={() => setZ({ tint: '' })} />
-                        {GEL_TINTS.filter(([v]) => v).map(([v, l]) => <button type="button" key={v} className={`lab-dot${Z.tint === v ? ' on' : ''}`} style={{ background: v }} aria-label={`Colora: ${l}`} title={`Colora: ${l}`} onClick={() => setZ({ tint: v })} />)}
+                        {GEL_TINTS.filter(([v]) => v).map(([v, l]) => <button type="button" key={v} className={`lab-dot${Z.tint === v ? ' on' : ''}`} style={{ background: v }} aria-label={`Colora: ${l}`} title={`Colora: ${l}`} onClick={() => setZ({ tint: Z.tint === v ? '' : v })} />)}
                     </div>
                     <div className="gs-btns four">
                         <Btn icon="undo" label="Ripristina questa zona" onClick={() => patchZ({ adj: zoneDef(), feather: 0, inv: false })}>Ripristina</Btn>
@@ -520,7 +521,13 @@ const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave }) => {
             </>);
         }
         if (tool === 'ritaglio') return (
-            <div className="gs-btns"><Btn icon="x" label="Togli il ritaglio" disabled={!cropped} onClick={() => setProc({ l: 0, t: 0, r: 0, b: 0 })}>Togli ritaglio</Btn><span className="lab-note">{cropped ? 'Foto ritagliata' : 'Foto intera'}</span></div>
+            <>
+                <div className="gs-btns">
+                    <Btn icon="crop" label="Scegli la parte da tenere: trascina i bordi sulla foto" on={openS === 'ritaglio'} disabled={!g.img} onClick={() => openSec('ritaglio')}>Ritaglia</Btn>
+                    <Btn icon="x" label="Togli il ritaglio" disabled={!cropped} onClick={() => setProc({ l: 0, t: 0, r: 0, b: 0 })}>Togli ritaglio</Btn>
+                </div>
+                <span className="lab-note">{cropped ? 'Foto ritagliata' : 'Foto intera'}</span>
+            </>
         );
         if (tool === 'tagli') return (<>
             <div className="gs-lbl">Dove tagliare (poi clicca sul gel)</div>
@@ -568,6 +575,7 @@ const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave }) => {
             ))}
         </>);
         if (tool === 'bande') return (<>
+            <Rng label="Testo bande" value={st.size3 || st.size2} def={st.size2} min={8} max={24} step={0.5} onChange={(v) => setSt({ size3: v })} />
             {marks.length === 0 && <p className="lab-note">Nessuna banda indicata. Clicca sul gel.</p>}
             {marks.map((m, i) => (
                 <div className="lab-item" key={i}>
@@ -593,14 +601,16 @@ const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave }) => {
                 <Sw label="Marcatori" value={st.ladder} onChange={(v) => setSt({ ladder: v })} />
                 <Sw label="Bande" value={st.marks} onChange={(v) => set({ style: { ...(g.style || {}), marks: v }, marks: marks.map((m) => ({ ...m, color: undefined })) })} />
             </div>
-            <Rng label="Testo corsie" value={st.size} min={8} max={20} step={0.5} onChange={(v) => setSt({ size: v })} />
+            <Rng label="Testo corsie" value={st.size} min={8} max={40} step={0.5} onChange={(v) => setSt({ size: v })} />
             <Rng label="Testo misure" value={st.size2} min={8} max={18} step={0.5} onChange={(v) => setSt({ size2: v })} />
+            <Rng label="Testo bande" value={st.size3 || st.size2} def={st.size2} min={8} max={24} step={0.5} onChange={(v) => setSt({ size3: v })} />
             <div className="gs-btns"><Btn icon="undo" label="Colori e dimensioni di partenza" onClick={() => set({ style: {} })}>Ripristina</Btn></div>
         </>);
     };
 
-    return createPortal(
-        <div className="sheet-back lab-gel-back" onMouseDown={(e) => { if (e.target === e.currentTarget) askClose(); }}>
+    const wrap = (node) => (embedded ? <div className="lab-gel-emb">{node}</div> : createPortal(node, document.body));
+    return wrap(
+        <div className="sheet-back lab-gel-back" onMouseDown={(e) => { if (e.target === e.currentTarget && !embedded) askClose(); }}>
             <div className={`lab-gel-win${wide ? ' gs-wide' : ''}`} onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-label="Gel">
                 <header className="gs-head">
                     <input className="fld" placeholder="Titolo del gel (es. SDS-PAGE 12%)" value={g.title || ''} onChange={(e) => set({ title: e.target.value })} />
@@ -681,16 +691,15 @@ const GelStudioInner = ({ gel, onChange, onPickPhoto, onClose, onSave }) => {
                 </div>
             </div>
         </div>,
-        document.body,
     );
 };
 
 const n0 = (v) => { const x = Number(v); return Number.isFinite(x) ? x : 0; };
 
 // il box lavora su una copia: il quaderno si aggiorna solo con Salva
-export const GelStudio = ({ gel, onChange, onPickPhoto, onClose }) => {
+export const GelStudio = ({ gel, onChange, onPickPhoto, onClose, embedded }) => {
     const [local, setLocal] = useState(gel);
     const first = useRef(true);
     useEffect(() => { if (first.current) { first.current = false; return; } setLocal(gel); }, [gel]);
-    return <GelStudioInner gel={local} onChange={setLocal} onPickPhoto={onPickPhoto} onClose={onClose} onSave={(g) => { onChange(g); onClose(); }} />;
+    return <GelStudioInner gel={local} onChange={setLocal} onPickPhoto={onPickPhoto} onClose={onClose} embedded={embedded} onSave={async (g) => { await onChange(g); if (!embedded) onClose(); }} />;
 };

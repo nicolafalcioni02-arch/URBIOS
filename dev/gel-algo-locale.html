@@ -1,0 +1,143 @@
+<!doctype html><meta charset="utf-8"><title>Prova algoritmo gel</title>
+<body style="margin:0;background:#000">
+<canvas id="c" style="display:block;width:100vw" title="clic = originale / risultato"></canvas>
+<script type="module">
+// minimo/massimo mobile 1D (coda monotona) su righe o colonne
+const lineExt=(src,dst,w,h,r,vert,isMax)=>{
+  const len=vert?h:w,lines=vert?w:h,q=new Int32Array(len+1);
+  for(let l=0;l<lines;l++){
+    const at=i=>vert?i*w+l:l*w+i;
+    let hd=0,tl=0;
+    for(let i=0;i<len+r;i++){
+      if(i<len){
+        const v=src[at(i)];
+        while(tl>hd&&(isMax?src[at(q[tl-1])]<=v:src[at(q[tl-1])]>=v))tl--;
+        q[tl++]=i;
+      }
+      const c=i-r;
+      if(c>=0){
+        while(q[hd]<c-r)hd++;
+        dst[at(c)]=src[at(q[hd])];
+      }
+    }
+  }
+};
+const ext=(a,w,h,rx,ry,mx)=>{
+  let o=a;
+  if(rx>0){const t=new Float32Array(a.length);lineExt(o,t,w,h,rx,false,mx);o=t}
+  if(ry>0){const t=new Float32Array(a.length);lineExt(o,t,w,h,ry,true,mx);o=t}
+  return o;
+};
+const opening=(a,w,h,rx,ry)=>ext(ext(a,w,h,rx,ry,false),w,h,rx,ry,true);
+// sfocatura a scatola separabile
+const blur=(a,w,h,rx,ry)=>{
+  const pass=(src,len,lines,step,lstep,r)=>{
+    const o=new Float32Array(src.length);
+    for(let l=0;l<lines;l++){
+      const b=l*lstep;let sum=0;
+      for(let i=-r;i<=r;i++)sum+=src[b+Math.min(len-1,Math.max(0,i))*step];
+      for(let i=0;i<len;i++){
+        o[b+i*step]=sum/(2*r+1);
+        sum+=src[b+Math.min(len-1,i+r+1)*step]-src[b+Math.max(0,i-r)*step];
+      }
+    }
+    return o;
+  };
+  return pass(pass(a,w,h,1,w,rx),h,w,w,1,ry);
+};
+
+const im=await new Promise(r=>{
+  const i=new Image();i.onload=()=>r(i);i.src='gel.jpg';
+});
+const W=1400,H=Math.round(im.height*W/im.width);
+const c=document.getElementById('c');
+c.width=W;c.height=H;
+const x=c.getContext('2d');
+x.drawImage(im,0,0,W,H);
+const src=x.getImageData(0,0,W,H);
+const N=W*H;
+const Y=new Float32Array(N);
+for(let i=0;i<N;i++)Y[i]=src.data[i*4];
+
+// === STIMA PARAMETRI ADATTIVI (dall'immagine) ===
+const samp=[];
+for(let i=0;i<N;i+=53)samp.push(Y[i]);
+samp.sort((a,b)=>a-b);
+const capV=samp[Math.floor(samp.length*0.98)];
+
+const diffs=[];
+for(let y=2;y<H-2;y+=5)for(let xx=2;xx<W-2;xx+=5){
+  const cc=Y[y*W+xx];
+  const m=(Y[(y-1)*W+xx]+Y[(y+1)*W+xx]+Y[y*W+xx-1]+Y[y*W+xx+1])*0.25;
+  diffs.push(Math.abs(cc-m));
+}
+diffs.sort((a,b)=>a-b);
+const noise=Math.max(0.5,diffs[diffs.length>>1]);
+
+let orig=false;
+const sstep=(a,b,v)=>{
+  const t=Math.min(1,Math.max(0,(v-a)/(b-a)));
+  return t*t*(3-2*t);
+};
+
+const draw=()=>{
+  const out=x.createImageData(W,H);
+  if(orig){out.data.set(src.data);x.putImageData(out,0,0);return}
+
+  // 1) DENOISE leggermente orientato
+  const Ysm=blur(blur(Y,W,H,1,1),W,H,2,1);
+
+  // 2) RIMOZIONE PUNTINI con OPENING ANISOTROPA
+  const spx=Math.max(6,Math.round(W/180));
+  const spy=Math.max(1,Math.round(spx/6));
+  const Yd=opening(Ysm,W,H,spx,spy);
+
+  const wlo=Math.max(3,noise*2);
+  const whi=Math.max(12,noise*5);
+  const Y1=new Float32Array(N);
+  for(let i=0;i<N;i++){
+    const d=Ysm[i]-Yd[i];
+    Y1[i]=Ysm[i]-d*sstep(wlo,whi,d);
+  }
+
+  // 3) LOG con offset adattivo al rumore
+  const E=Math.max(3,noise*1.5);
+  const Lg=new Float32Array(N);
+  const Ls=new Float32Array(N);
+  for(let i=0;i<N;i++){
+    Lg[i]=Math.log(Y1[i]+E);
+    Ls[i]=Math.log(Math.min(Y1[i],capV)+E);
+  }
+
+  // 4) FONDO locale multi-scala dal segnale saturato
+  let Lb=blur(Ls,W,H,Math.round(W*0.025),Math.round(H*0.03));
+  Lb=blur(Lb,W,H,Math.round(W*0.02),Math.round(H*0.025));
+
+  // 5) RAPPORTO BANDA/FONDO
+  const R=new Float32Array(N);
+  for(let i=0;i<N;i++) R[i]=Lg[i]-Lb[i];
+
+  // 5b) UNSHARP MASK direzionale
+  const Rsm=blur(R,W,H,2,4);
+  const R2=new Float32Array(N);
+  for(let i=0;i<N;i++) R2[i]=R[i]+0.5*(R[i]-Rsm[i]);
+
+  // 6) NORMALIZZAZIONE ROBUSTA
+  const vals=[];
+  for(let i=0;i<N;i+=29) vals.push(R2[i]);
+  vals.sort((a,b)=>a-b);
+  const lo=vals[Math.floor(vals.length*0.01)];
+  const hi=vals[Math.floor(vals.length*0.998)];
+  const span=Math.max(1e-6,hi-lo);
+
+  for(let i=0;i<N;i++){
+    const t=Math.min(1,Math.max(0,(R2[i]-lo)/span));
+    const v=255*Math.pow(t,0.85);
+    out.data[i*4]=out.data[i*4+1]=out.data[i*4+2]=v;
+    out.data[i*4+3]=255;
+  }
+  x.putImageData(out,0,0);
+};
+c.onclick=()=>{orig=!orig;draw()};
+draw();
+</script>

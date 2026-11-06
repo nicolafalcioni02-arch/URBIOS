@@ -5,7 +5,7 @@ const NEW_MOON = Date.UTC(2000, 0, 6, 18, 14); // luna nuova di riferimento
 const NAMES = ['Luna nuova', 'Luna crescente', 'Primo quarto', 'Gibbosa crescente', 'Luna piena', 'Gibbosa calante', 'Ultimo quarto', 'Luna calante'];
 
 // Fase lunare calcolata offline, disegnata con il terminatore ellittico. Colori dal tono scelto.
-export const MoonPhase = () => {
+export const MoonPhase = ({ db }) => {
     const age = ((((Date.now() - NEW_MOON) / 86400000) % SYNODIC) + SYNODIC) % SYNODIC;
     const p = age / SYNODIC; // 0 nuova, .5 piena
     const k = Math.cos(2 * Math.PI * p);
@@ -14,7 +14,7 @@ export const MoonPhase = () => {
     const path = `M 0 ${-r} A ${r} ${r} 0 0 1 0 ${r} A ${Math.abs(k) * r} ${r} 0 0 ${k > 0 ? 0 : 1} 0 ${-r} Z`;
     const name = NAMES[Math.round(p * 8) % 8];
     return (
-        <div className="wd-card wd-moon">
+        <div className={`wd-card wd-moon${db && db.labOv ? ' lab' : ''}`}>
             <svg viewBox="0 0 100 100" role="img" aria-label={name}>
                 <g transform="translate(50 50)">
                     <circle r={r} style={{ fill: 'color-mix(in srgb, var(--wd-fg) 14%, var(--wd-bg))' }} />

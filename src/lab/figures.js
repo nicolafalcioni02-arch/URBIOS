@@ -150,7 +150,7 @@ export const chartSvg = (c) => {
             const col = TONES[si % TONES.length];
             if (gs[si]) body += `<line x1="${X(x0)}" y1="${Y(gs[si].m * x0 + gs[si].b)}" x2="${X(x1)}" y2="${Y(gs[si].m * x1 + gs[si].b)}" stroke="${col}" stroke-width="1.6" stroke-dasharray="5 3"/>`;
             body += pts[si].map((q) => `<circle cx="${X(q[0])}" cy="${Y(q[1])}" r="3.6" fill="${col}"/>`).join('');
-            if (gs[si]) body += `<text x="${L + 8}" y="${top + 14 + si * 14}" font-size="10.5" fill="${col}" ${fs}>${esc(series.length > 1 ? `${s.name || `Serie ${si + 1}`}: ` : '')}${esc(eqText(gs[si]))} · R² = ${fmt(gs[si].r2)}</text>`;
+            if (gs[si]) body += `<text x="${L + 8}" y="${top + 14 + si * 14}" font-size="10.5" fill="${col}" ${fs}>${esc(series.length > 1 ? `${s.name || `Serie ${si + 1}`}: ` : '')}${esc(eqText(gs[si]))}, R² = ${fmt(gs[si].r2)}</text>`;
         });
         const g0 = gs[0];
         if (g0 && g0.m) (c.unknowns || []).forEach((u) => {
@@ -203,7 +203,7 @@ export const chartSvg = (c) => {
 // tilt (gradi: inclinazione delle corsie), angle (0|45|90), ladder: [{ text, y }], marks: [{ text, x, y, color? }],
 // cuts: [{ dir: 'v'|'h', pos }] (taglia la foto in parti), hide: { v: [n parte], h: [n parte] }, gap (px tra le parti),
 // proc: { l, t, r, b (% ritaglio), rot (0|90|180|270), deg (raddrizza, gradi), gray, invert, bright, contr (-100..100), tint },
-// style: { title, lanes, ladder, marks (colori), size (corsie), size2 (marcatori e bande) } }
+// style: { title, lanes, ladder, marks (colori), size (corsie), size2 (marcatori), size3 (testo delle bande; se manca vale size2) } }
 export const defaultProc = () => ({ l: 0, t: 0, r: 0, b: 0, rot: 0, deg: 0, gray: false, invert: false, bright: 0, contr: 0, tint: '', flat: 0, denoise: 0, local: 0, lo: 0, hi: 255, zones: [], curve: null });
 export const gelStyle = (g) => ({ title: '#121317', lanes: '#121317', ladder: '#121317', marks: '#121317', size: 11.5, size2: 11, ...(g.style || {}) });
 export const emptyGel = () => ({ img: '', src: '', w: 0, h: 0, title: '', lanes: ['M', '1', '2', '3'], x0: 8, x1: 92, laneDx: [], tilt: 0, angle: 45, ladder: [], marks: [], cuts: [], hide: {}, gap: 8, proc: defaultProc(), style: {} });
@@ -431,7 +431,9 @@ export const gelSvg = (g, opt = {}) => {
     }));
     if (opt.guides) {
         (g.cuts || []).forEach((c) => { b += c.dir === 'v' ? `<line x1="${X(n(c.pos))}" x2="${X(n(c.pos))}" y1="${mt - 4}" y2="${mt + H + 4}" stroke="#C2413A" stroke-dasharray="4 3"/>` : `<line y1="${Y(n(c.pos))}" y2="${Y(n(c.pos))}" x1="${ml - 4}" x2="${ml + W + 4}" stroke="#C2413A" stroke-dasharray="4 3"/>`; });
-        lanes.forEach((_, i) => { const p = laneTop(g, i); b += `<line x1="${X(p)}" x2="${X(p + L.shift)}" y1="${mt}" y2="${mt + H}" stroke="#121317" stroke-width="1" stroke-dasharray="3 3" opacity=".75"/>`; });
+        lanes.forEach((_, i) => { const p = laneTop(g, i); b += `<line x1="${X(p)}" x2="${X(p + L.shift)}" y1="${mt}" y2="${mt + H}" stroke="#fff" stroke-width="1.5" stroke-dasharray="4 3" style="mix-blend-mode:difference"/>`; });
+        // bordi laterali (prima e ultima corsia): linee continue, sempre in colore inverso a quello del gel
+        [n(g.x0), n(g.x1)].forEach((p) => { b += `<line x1="${X(p)}" x2="${X(p + L.shift)}" y1="${mt}" y2="${mt + H}" stroke="#fff" stroke-width="2" style="mix-blend-mode:difference"/>`; });
     }
     if (g.title) b += `<text x="${ml + W / 2}" y="16" text-anchor="middle" font-size="13" font-weight="600" fill="${st.title}" ${fs}>${esc(g.title)}</text>`;
     lanes.forEach((l, i) => {
@@ -446,7 +448,7 @@ export const gelSvg = (g, opt = {}) => {
     });
     (g.marks || []).forEach((m) => {
         const y = Y(n(m.y)); const x = X(n(m.x)); const col = m.color || st.marks;
-        b += `<line x1="${x}" x2="${ml + W + 8}" y1="${y}" y2="${y}" stroke="${col}" stroke-width="1"/><circle cx="${x}" cy="${y}" r="2.2" fill="${col}"/><text x="${ml + W + 12}" y="${y + st.size2 / 3}" font-size="${st.size2}" fill="${col}" ${fs}>${esc(m.text)}</text>`;
+        b += `<line x1="${x}" x2="${ml + W + 8}" y1="${y}" y2="${y}" stroke="${col}" stroke-width="1"/><circle cx="${x}" cy="${y}" r="2.2" fill="${col}"/><text x="${ml + W + 12}" y="${y + (st.size3 || st.size2) / 3}" font-size="${st.size3 || st.size2}" fill="${col}" ${fs}>${esc(m.text)}</text>`;
     });
     capLines(g, tw).forEach((ln, i) => { b += `<text x="${ml}" y="${mt + H + 20 + i * 13}" font-size="10.5" fill="${st.title}" ${fs}>${esc(ln)}</text>`; });
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${tw} ${th}" width="${opt.px || '100%'}"${opt.px ? ` height="${Math.round((opt.px * th) / tw)}"` : ''} role="img">${b}</svg>`;

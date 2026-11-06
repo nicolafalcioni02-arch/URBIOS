@@ -109,6 +109,7 @@ export const buildExport = (db, options) => {
         if (anonymized) {
             // foglietti, liste e agenda (note, luoghi, orari) non devono uscire in un export anonimo
             delete out.widgets;
+            delete out.widgetsLab;
             delete out.agenda;
         }
         if (!o.include.archivi)

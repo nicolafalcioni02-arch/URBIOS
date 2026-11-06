@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // Lista delle cose da fare.
-export const TodoNotebook = ({ data, setData }) => {
+export const TodoNotebook = ({ data, setData, db }) => {
     const items = data.items || [];
     const [draft, setDraft] = useState('');
     const add = (e) => {
@@ -15,7 +15,7 @@ export const TodoNotebook = ({ data, setData }) => {
     const del = (id) => setData({ items: items.filter((x) => x.id !== id) });
     const left = items.filter((x) => !x.d).length;
     return (
-        <div className="wd-card wd-todo">
+        <div className={`wd-card wd-todo${db && db.labOv ? ' lab' : ''}`}>
             <p className="wd-title">
                 Da fare
                 {items.length > 0 && <small>{left === 0 ? 'tutto fatto ✓' : `${left} da completare`}</small>}

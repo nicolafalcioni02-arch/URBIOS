@@ -4,7 +4,7 @@ import { daysTo, fmtDay, stockState } from './labLogic';
 // Tipi di campo: text, area, number, date, select(options), steps (elenco di passaggi), rows(cols: tabella di righe)
 // list: cosa mostra la scheda nell'elenco. xlsx: colonne del foglio Excel (tutti i campi + stato).
 
-const join = (a) => (a || []).map((r) => [r.nome, [r.quantita, r.unita].filter(Boolean).join(' ')].filter(Boolean).join(' ')).join(' · ');
+const join = (a) => (a || []).map((r) => [r.nome, [r.quantita, r.unita].filter(Boolean).join(' ')].filter(Boolean).join(' ')).join(', ');
 const stepsText = (a) => (a || []).map((s, i) => `${i + 1}. ${s.testo}${s.durata ? ` (${s.durata})` : ''}`).join('\n');
 const textOf = (r) => JSON.stringify(r).toLowerCase();
 
@@ -13,7 +13,9 @@ const byDateDesc = (a, b) => String(b.data || '').localeCompare(String(a.data ||
 export const SECTIONS = [
     {
         key: 'quaderno',
-        groups: [{ title: 'Identificazione', keys: ['titolo', 'codice', 'data', 'progetto', 'operatore'] }, { title: 'Impostazione', keys: ['protocolloId', 'obiettivo', 'materiali'] }, { title: 'Procedura', keys: ['passaggi'] }, { title: 'Dati e figure', keys: ['osservazioni', 'risultati', 'figure'] }, { title: 'Chiusura', keys: ['conclusioni', 'prossimi', 'verificatoDa', 'dataVerifica'] }],
+        groups: [{ title: 'Identificazione', keys: ['titolo', 'codice', 'data', 'progetto', 'operatore'] }, { title: 'Impostazione', keys: ['protocolloId', 'stanza', 'posizioni', 'obiettivo', 'materiali'] }, { title: 'Procedura', keys: ['passaggi'] }, { title: 'Dati e figure', keys: ['misure', 'osservazioni', 'risultati', 'figure'] }, { title: 'Chiusura', keys: ['conclusioni', 'prossimi', 'verificatoDa', 'dataVerifica'] }],
+        // telefono: passi corti nell'ordine in cui si lavora al banco
+        phoneGroups: [{ title: 'Essenziale', keys: ['titolo', 'data', 'protocolloId', 'stanza', 'posizioni'] }, { title: 'Materiali', keys: ['materiali'] }, { title: 'Procedura', keys: ['passaggi'] }, { title: 'Osservazioni e risultati', keys: ['misure', 'osservazioni', 'risultati', 'figure'] }, { title: 'Chiusura', keys: ['conclusioni', 'prossimi'] }, { title: 'Altri dati', keys: ['codice', 'progetto', 'operatore', 'obiettivo', 'verificatoDa', 'dataVerifica'] }],
         group: () => '',
         label: 'Quaderno',
         single: 'esperimento',
@@ -32,8 +34,11 @@ export const SECTIONS = [
             { key: 'progetto', label: 'Progetto', type: 'text', list: 'categorie' },
             { key: 'operatore', label: 'Eseguito da', type: 'text' },
             { key: 'protocolloId', label: 'Protocollo seguito', type: 'ref', from: 'protocolli' },
+            { key: 'stanza', label: 'Dove si svolge', ph: 'es. Lab 2, cappa chimica', type: 'text', list: 'stanze' },
+            { key: 'posizioni', label: 'Dove metto le cose', ph: 'es. ghiaccio sul banco 2, tubi nel rack blu', type: 'area', full: true },
             { key: 'obiettivo', label: 'Obiettivo / ipotesi', type: 'area', full: true },
-            { key: 'materiali', label: 'Materiali, reagenti e lotti usati', type: 'rows', cols: [{ key: 'nome', label: 'Voce', w: 3 }, { key: 'quantita', label: 'Quantità', w: 1 }, { key: 'unita', label: 'Unità', w: 1 }, { key: 'note', label: 'Lotto / note', w: 2 }], full: true },
+            { key: 'materiali', label: 'Materiali, reagenti e lotti usati', type: 'rows', cols: [{ key: 'nome', label: 'Voce', w: 3 }, { key: 'quantita', label: 'Quantità', w: 1 }, { key: 'unita', label: 'Unità', w: 1 }, { key: 'articoloId', label: 'Dal magazzino (scarico automatico)', type: 'stock', w: 3 }, { key: 'note', label: 'Lotto / note', w: 2 }], full: true },
+            { key: 'misure', label: 'Misure (pesi, volumi, temperature)', type: 'rows', cols: [{ key: 'nome', label: 'Misura', w: 3 }, { key: 'valore', label: 'Valore', w: 1 }, { key: 'unita', label: 'Unità', w: 1 }, { key: 'note', label: 'Nota', w: 2 }], full: true },
             { key: 'figure', label: 'Figure (immagini e grafici)', type: 'figures', full: true },
             { key: 'passaggi', label: 'Passaggi svolti', type: 'steps', full: true },
             { key: 'osservazioni', label: 'Osservazioni', type: 'area', full: true },
@@ -52,7 +57,7 @@ export const SECTIONS = [
     },
     {
         key: 'protocolli',
-        groups: [{ title: 'Identificazione', keys: ['titolo', 'codice', 'categoria', 'versione', 'data', 'stato', 'autore'] }, { title: 'Scopo e materiali', keys: ['scopo', 'materiali'] }, { title: 'Procedura', keys: ['passaggi'] }, { title: 'Sicurezza e note', keys: ['sicurezza', 'riferimenti', 'note'] }],
+        groups: [{ title: 'Identificazione', keys: ['titolo', 'codice', 'categoria', 'versione', 'data', 'stato', 'autore'] }, { title: 'Scopo e materiali', keys: ['scopo', 'stanza', 'posizioni', 'materiali'] }, { title: 'Procedura', keys: ['passaggi'] }, { title: 'Sicurezza e note', keys: ['sicurezza', 'riferimenti', 'note'] }],
         group: (r) => r.stato,
         label: 'Protocolli',
         single: 'protocollo',
@@ -60,7 +65,7 @@ export const SECTIONS = [
         hint: 'Procedure operative standard con passaggi, materiali e versione.',
         prefix: 'prt',
         title: (r) => r.titolo || 'Protocollo senza titolo',
-        sub: (r) => [r.codice, r.categoria, r.versione && `v. ${r.versione}`].filter(Boolean).join(' · '),
+        sub: (r) => [r.codice, r.categoria, r.versione && `v. ${r.versione}`].filter(Boolean).join(', '),
         badge: (r) => (r.stato ? { label: r.stato, tone: r.stato === 'In vigore' ? 'ok' : r.stato === 'Archiviato' ? 'muted' : 'warn' } : null),
         empty: () => ({ stato: 'Bozza', versione: '1.0', data: new Date().toISOString().slice(0, 10), materiali: [], passaggi: [] }),
         fields: [
@@ -72,7 +77,9 @@ export const SECTIONS = [
             { key: 'stato', label: 'Stato', type: 'select', options: ['Bozza', 'In vigore', 'Archiviato'] },
             { key: 'autore', label: 'Redatto da', type: 'text' },
             { key: 'scopo', label: 'Scopo e campo di applicazione', type: 'area', full: true },
-            { key: 'materiali', label: 'Materiali, reagenti e strumenti', type: 'rows', cols: [{ key: 'nome', label: 'Voce', w: 3 }, { key: 'quantita', label: 'Quantità', w: 1 }, { key: 'unita', label: 'Unità', w: 1 }, { key: 'note', label: 'Note', w: 2 }], full: true },
+            { key: 'stanza', label: 'Dove si svolge', ph: 'es. Lab 2, cappa chimica', type: 'text', list: 'stanze' },
+            { key: 'posizioni', label: 'Dove metto le cose', ph: 'es. ghiaccio sul banco 2, tubi nel rack blu', type: 'area', full: true },
+            { key: 'materiali', label: 'Materiali, reagenti e strumenti', type: 'rows', cols: [{ key: 'nome', label: 'Voce', w: 3 }, { key: 'quantita', label: 'Quantità', w: 1 }, { key: 'unita', label: 'Unità', w: 1 }, { key: 'note', label: 'Note / materiale', w: 2 }], full: true },
             { key: 'passaggi', label: 'Procedura', type: 'steps', full: true },
             { key: 'sicurezza', label: 'Sicurezza e smaltimento', type: 'area', full: true },
             { key: 'riferimenti', label: 'Riferimenti e bibliografia', type: 'area', full: true },
@@ -94,7 +101,7 @@ export const SECTIONS = [
         hint: 'Soluzioni, tamponi e terreni con componenti, volume finale e conservazione.',
         prefix: 'rea',
         title: (r) => r.nome || 'Soluzione senza nome',
-        sub: (r) => [r.categoria, r.volumeFinale && `${r.volumeFinale} ${r.unitaVolume || 'mL'}`, r.ph && `pH ${r.ph}`].filter(Boolean).join(' · '),
+        sub: (r) => [r.categoria, r.volumeFinale && `${r.volumeFinale} ${r.unitaVolume || 'mL'}`, r.ph && `pH ${r.ph}`].filter(Boolean).join(', '),
         badge: () => null,
         empty: () => ({ unitaVolume: 'mL', componenti: [], passaggi: [] }),
         fields: [
@@ -120,7 +127,7 @@ export const SECTIONS = [
     },
     {
         key: 'magazzino',
-        groups: [{ title: 'Articolo', keys: ['nome', 'codice', 'marca', 'fornitore', 'categoria'] }, { title: 'Scorta e scadenza', keys: ['lotto', 'quantita', 'unita', 'sogliaMin', 'scadenza', 'apertura'] }, { title: 'Conservazione e sicurezza', keys: ['posizione', 'conservazione', 'pericolo', 'note'] }],
+        groups: [{ title: 'Articolo', keys: ['numero', 'nome', 'codice', 'marca', 'cas', 'categoria'] }, { title: 'Acquisto', keys: ['fornitore', 'dataArrivo', 'ordine', 'prezzo'] }, { title: 'Scorta e scadenza', keys: ['lotto', 'quantita', 'unita', 'sogliaMin', 'scadenza', 'apertura'] }, { title: 'Conservazione e sicurezza', keys: ['posizione', 'conservazione', 'pericolo', 'cond', 'scheda', 'note'] }, { title: 'Storico quantità', keys: ['storico'] }],
         group: (r) => (stockState(r).id === 'scadenza' ? 'In scadenza' : stockState(r).label),
         label: 'Magazzino',
         single: 'reagente',
@@ -128,15 +135,20 @@ export const SECTIONS = [
         hint: 'Reagenti e consumabili con lotto, scadenza e scorta minima.',
         prefix: 'mag',
         title: (r) => r.nome || 'Articolo senza nome',
-        sub: (r) => [r.quantita !== undefined && r.quantita !== '' && `${r.quantita} ${r.unita || ''}`.trim(), r.lotto && `lotto ${r.lotto}`, r.scadenza && `scad. ${fmtDay(r.scadenza)}`].filter(Boolean).join(' · '),
+        sub: (r) => [r.quantita !== undefined && r.quantita !== '' && `${r.quantita} ${r.unita || ''}`.trim(), r.lotto && `lotto ${r.lotto}`, r.scadenza && `scad. ${fmtDay(r.scadenza)}`].filter(Boolean).join(', '),
         badge: (r) => stockState(r),
-        empty: () => ({ unita: 'pz' }),
+        empty: (lab) => ({ unita: 'pz', dataArrivo: new Date().toISOString().slice(0, 10), numero: String(Math.max(0, ...((lab && lab.magazzino) || []).map((r) => parseInt(r.numero, 10) || 0)) + 1) }),
         fields: [
+            { key: 'numero', label: 'N. inventario', type: 'text' },
             { key: 'nome', label: 'Nome', type: 'text', full: true },
             { key: 'codice', label: 'Codice catalogo', type: 'text' },
-            { key: 'marca', label: 'Marca', type: 'text' },
-            { key: 'fornitore', label: 'Fornitore', type: 'text' },
+            { key: 'marca', label: 'Produttore', type: 'text' },
+            { key: 'cas', label: 'N. CAS', type: 'text' },
             { key: 'categoria', label: 'Categoria', type: 'text', list: 'categorie' },
+            { key: 'fornitore', label: 'Fornitore', type: 'text' },
+            { key: 'dataArrivo', label: 'Data di arrivo', type: 'date' },
+            { key: 'ordine', label: 'N. ordine / DDT', type: 'text' },
+            { key: 'prezzo', label: 'Prezzo (€)', type: 'number' },
             { key: 'lotto', label: 'Lotto', type: 'text' },
             { key: 'quantita', label: 'Quantità', type: 'number' },
             { key: 'unita', label: 'Unità', type: 'text' },
@@ -146,12 +158,16 @@ export const SECTIONS = [
             { key: 'posizione', label: 'Posizione', ph: 'frigo, scaffale…', type: 'text' },
             { key: 'conservazione', label: 'Conservazione', type: 'text' },
             { key: 'pericolo', label: 'Pericolo', ph: 'frasi H', type: 'text' },
+            { key: 'cond', label: 'Condizione nel lavoro', type: 'select', options: ['Automatica', 'Ghiaccio', 'Pericolo', 'Nessuna'] },
+            { key: 'scheda', label: 'Scheda tecnica', ph: 'uso, stabilità, precauzioni, smaltimento', type: 'area', full: true },
             { key: 'note', label: 'Note', type: 'area', full: true },
+            { key: 'storico', label: 'Storico', type: 'storico', full: true },
         ],
         search: textOf,
         xlsx: [
-            ['nome', 'Nome', 30], ['codice', 'Codice catalogo', 16], ['marca', 'Marca', 16], ['fornitore', 'Fornitore', 18], ['categoria', 'Categoria', 16], ['lotto', 'Lotto', 14], ['quantita', 'Quantità', 10, (r) => (Number(String(r.quantita).replace(',', '.')) || r.quantita || '')], ['unita', 'Unità', 8],
-            ['sogliaMin', 'Scorta minima', 12, (r) => (Number(String(r.sogliaMin).replace(',', '.')) || r.sogliaMin || '')], ['scadenza', 'Scadenza', 12], ['giorni', 'Giorni alla scadenza', 12, (r) => daysTo(r.scadenza) ?? ''], ['apertura', 'Aperto il', 12], ['posizione', 'Posizione', 18], ['conservazione', 'Conservazione', 16], ['pericolo', 'Pericolo', 16],
+            ['numero', 'N. inventario', 12, (r) => (Number(r.numero) || r.numero || '')], ['nome', 'Nome', 30], ['codice', 'Codice catalogo', 16], ['marca', 'Produttore', 18], ['cas', 'N. CAS', 14], ['categoria', 'Categoria', 16], ['fornitore', 'Fornitore', 18], ['dataArrivo', 'Data di arrivo', 13, (r) => fmtDay(r.dataArrivo)], ['ordine', 'N. ordine / DDT', 16], ['prezzo', 'Prezzo (€)', 11, (r) => (Number(String(r.prezzo).replace(',', '.')) || r.prezzo || '')],
+            ['lotto', 'Lotto', 14], ['quantita', 'Quantità', 10, (r) => (Number(String(r.quantita).replace(',', '.')) || r.quantita || '')], ['unita', 'Unità', 8], ['aggiornato', 'Aggiornato il', 13, (r) => fmtDay(r.aggiornato)], ['sogliaMin', 'Scorta minima', 12, (r) => (Number(String(r.sogliaMin).replace(',', '.')) || r.sogliaMin || '')],
+            ['scadenza', 'Scadenza', 12, (r) => fmtDay(r.scadenza)], ['giorni', 'Giorni alla scadenza', 12, (r) => daysTo(r.scadenza) ?? ''], ['apertura', 'Aperto il', 12, (r) => fmtDay(r.apertura)], ['posizione', 'Posizione', 18], ['conservazione', 'Conservazione', 16], ['pericolo', 'Pericolo', 16],
             ['stato', 'Stato', 14, (r) => stockState(r).label], ['note', 'Note', 30],
         ],
     },
@@ -165,7 +181,7 @@ export const SECTIONS = [
         hint: 'Registro dei campioni con codice, stato, posizione e protocollo applicato.',
         prefix: 'cmp',
         title: (r) => r.codice || 'Campione senza codice',
-        sub: (r) => [r.tipo, r.descrizione, r.data && fmtDay(r.data)].filter(Boolean).join(' · '),
+        sub: (r) => [r.tipo, r.descrizione, r.data && fmtDay(r.data)].filter(Boolean).join(', '),
         badge: (r) => (r.stato ? { label: r.stato, tone: r.stato === 'Analizzato' ? 'ok' : r.stato === 'In lavorazione' ? 'warn' : 'muted' } : null),
         empty: () => ({ stato: 'Ricevuto', data: new Date().toISOString().slice(0, 10) }),
         fields: [
@@ -198,7 +214,7 @@ export const SECTIONS = [
         hint: 'Bibliografia: articoli scientifici con DOI, appunti e collegamento ai protocolli.',
         prefix: 'art',
         title: (r) => r.titolo || 'Articolo senza titolo',
-        sub: (r) => [r.autori, r.rivista, r.anno].filter(Boolean).join(' · '),
+        sub: (r) => [r.autori, r.rivista, r.anno].filter(Boolean).join(', '),
         badge: (r) => (r.lettura ? { label: r.lettura, tone: r.lettura === 'Letto' ? 'ok' : r.lettura === 'Da leggere' ? 'warn' : 'muted' } : null),
         sort: (a, b) => String(b.anno || '').localeCompare(String(a.anno || '')) || String(a.titolo).localeCompare(String(b.titolo), 'it'),
         empty: () => ({ lettura: 'Da leggere' }),

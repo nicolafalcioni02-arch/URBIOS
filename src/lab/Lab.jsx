@@ -1,17 +1,19 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useCompact } from '../hooks/useCompact';
+import { useArchive } from '../storage/ArchiveProvider';
 import { PrintCenterProvider, usePrintCenter } from '../components/reports/printCenter/PrintCenterProvider';
 import { SECTIONS, sectionOf, sheetsFor } from './sections';
 import { labOf, newId, overview, removeRecord, saveRecord } from './labLogic';
 import { downloadXlsx } from './xlsx';
-import { RecordForm } from './RecordForm';
-import { Calc } from './Calc';
-import { Icon } from './ui/icons';
-import { Home } from './parts/Home';
+import { StockImport } from './parts/StockImport';
 import { labIsEmpty, loadExample } from './exampleData';
-import { Sidebar, NAV } from './parts/Sidebar';
-import { SectionView } from './parts/SectionView';
+import { Sidebar } from './parts/Sidebar';
 import { labStyles } from './labStyles';
+import { SettingsModal } from '../views/settings/SettingsModal';
+import { mobileStyles } from './mobileStyles';
+import { Mobile } from './parts/Mobile';
+import { Workspace } from './parts/Workspace';
+import { WidgetDock } from '../components/widgets/WidgetDock';
 
 // Laboratorio: una workstation a sé (non una sottopagina). Barra laterale + Panoramica + elenco/editor per ogni area.
 // Dati in db.lab. Mappa: README.md
@@ -28,71 +30,140 @@ const stamp = () => new Date().toISOString().slice(0, 10);
 
 const LabInner = ({ db, onUpdateDb, onBack }) => {
     const printCenter = usePrintCenter();
-    const wide = !useCompact(899); // sotto i 900px: schede in alto ed editor a finestra
+    const { dirty, ephemeral, saveFile } = useArchive();
+    // «Salva giornata di lavoro»: scrive l'archivio su file (in demo non si salva nulla)
+    const [note, setNote] = useState(''); // risposta breve sul tasto: 'saved' | 'demo'
+    const saveDay = async () => {
+        const flash = (n) => { setNote(n); setTimeout(() => setNote(''), 2500); };
+        if (ephemeral) return flash('demo');
+        try { const res = await saveFile(); if (res && res.ok) flash('saved'); else if (res && !res.cancelled) alert('Salvataggio non riuscito'); } catch (e) { alert('Salvataggio non riuscito: ' + (e.message || e)); }
+    };
+    const phone = useCompact(639); // iPhone: schermate a un tasto per volta (parts/Mobile.jsx)
+    const desk = !useCompact(1099); // da 1100px: barra laterale + due colonne; sotto: barra in basso (iPad)
     const lab = useMemo(() => labOf(db), [db]);
     const ov = useMemo(() => overview(lab), [lab]);
+    // TEMPORANEO (da togliere prima della pubblicazione): i dati di esempio (exampleData.js + exampleExtra.js) ci sono sempre, senza premere nulla.
+    // Si inseriscono una volta per apertura se il laboratorio è vuoto.
+    const seeded = useRef(false);
+    useEffect(() => { if (!seeded.current && labIsEmpty(lab)) { seeded.current = true; loadExample(onUpdateDb); } }, []); // eslint-disable-line react-hooks/exhaustive-deps
     const alerts = ov.scaduti.length + ov.scorta.length + ov.scadenza.length;
     const [view, setView] = useState('home');
     const [sel, setSel] = useState(null); // { record, isNew }
     const [vol, setVol] = useState('');
     const section = sectionOf(view);
 
-    const go = (key) => { setView(key); setSel(null); };
-    const open = (key, id) => { setView(key); setSel(id ? { record: lab[key].find((r) => r.id === id) || null, isNew: false } : null); };
-    const create = (key) => { const s = sectionOf(key); setView(key); setSel({ record: { id: newId(s.prefix), ...s.empty() }, isNew: true }); };
-    // il quaderno ha le sue pagine a quadretti (il quaderno completo con indici esce come documento di laboratorio); le altre sezioni escono come documenti di laboratorio
-    const printIds = (ids, extra) => printCenter.open([view === 'quaderno' && !extra ? { type: 'quaderno', ids } : { type: 'lab', kind: view, ids, volume: view === 'reagenti' ? vol : '', ...extra }]);
-    const printBlank = () => printCenter.open([{ type: 'quaderno', view: 'vuote' }]);
+    // postazione (iPad e PC): schede delle voci aperte, una attiva e al massimo una affiancata
+    const split = !phone;
+    const [tabs, setTabs] = useState([]);
+    const [active, setActive] = useState(null);
+    const [second, setSecond] = useState(null);
+    const openTab = (key, rec, isNew = false, kind = 'rec') => {
+        const id = `${kind}:${key}:${rec.id}`;
+        setTabs((t) => (t.some((x) => x.id === id) ? t : [...t, { id, kind, key, recId: rec.id, rec, isNew }]));
+        if (kind === 'print') setSecond(id); else { setActive(id); setSecond((b) => (b === id ? null : b)); }
+    };
+    const closeTab = (id) => {
+        setTabs((t) => t.filter((x) => x.id !== id));
+        if (second === id) setSecond(null);
+        if (active === id) { const rest = tabs.filter((x) => x.id !== id && x.id !== second); setActive(rest.length ? rest[rest.length - 1].id : second); if (rest.length === 0) setSecond(null); }
+    };
+    // trascinando le schede: i due pannelli si scambiano, oppure una scheda prende il posto di un pannello
+    const syncView = (id) => { const t = tabs.find((x) => x.id === id); if (t) { setView(t.key); setSel(t.kind === 'rec' ? { record: t.rec, isNew: false } : null); } };
+    const swapPanes = () => { if (!second) return; setActive(second); setSecond(active); syncView(second); };
+    const placePane = (slot, id) => {
+        if (slot === 'a') { if (id === second) { swapPanes(); return; } setActive(id); syncView(id); } else { if (id === active) { swapPanes(); return; } setSecond(id); }
+    };
+    const show = (key, rec, isNew = false) => { setView(key); setSel({ record: rec, isNew }); if (split) openTab(key, rec, isNew); };
+    // su iPad e PC la calcolatrice è una finestra della scrivania: si va alla Panoramica e la si apre lì
+    const [calcN, setCalcN] = useState(0);
+    const go = (key) => { if (split && (key === 'calcoli' || key === 'calcolatrice')) { setView('home'); setSel(null); setCalcN((n) => n + 1); return; } setView(key); setSel(null); };
+    const open = (key, id) => { const r = id ? lab[key].find((x) => x.id === id) : null; if (r) show(key, r); else { setView(key); setSel(null); } };
+    const create = (key) => { const s = sectionOf(key); show(key, { id: newId(s.prefix), ...s.empty(lab) }, true); };
+    // tutto esce come documento di laboratorio (il vecchio quaderno a quadretti è archiviato in print/, fuori dal flusso)
+    const printIds = (ids, extra) => printCenter.open([{ type: 'lab', kind: view, ids, volume: view === 'reagenti' ? vol : '', ...extra }]);
+    // nuovo esperimento da un protocollo registrato: titolo, stanza, posizioni, materiali e passaggi si copiano (poi si lavora in sola lettura)
+    const startFrom = (proto, stay) => {
+        const sec = sectionOf('quaderno');
+        const rec = { id: newId(sec.prefix), ...sec.empty(lab), titolo: proto.titolo, protocolloId: proto.id, stanza: proto.stanza || '', posizioni: proto.posizioni || '', passaggi: (proto.passaggi || []).map((x) => ({ ...x, fatto: false })), materiali: (proto.materiali || []).map((m) => ({ ...m })) };
+        saveRecord(onUpdateDb, 'quaderno', rec);
+        if (!stay) show('quaderno', rec);
+        return rec;
+    };
+    // pagina libera (appunti, importata da Word o vuota)
+    const startPage = (init = {}, stay) => {
+        const sec = sectionOf('quaderno');
+        const rec = { id: newId(sec.prefix), ...sec.empty(lab), tipo: 'pagina', titolo: init.titolo || '', blocchi: init.blocchi || [{ t: 'testo', html: '' }] };
+        saveRecord(onUpdateDb, 'quaderno', rec);
+        if (!stay) show('quaderno', rec);
+        return rec;
+    };
+    // rifà un esperimento: stessa impostazione, nuova data, spunte e risultati azzerati
+    const repeat = (r) => {
+        const sec = sectionOf('quaderno');
+        const rec = { ...r, id: newId(sec.prefix), data: stamp(), codice: '', osservazioni: '', risultati: '', conclusioni: '', prossimi: '', verificatoDa: '', dataVerifica: '', figure: [], passaggi: (r.passaggi || []).map((x) => ({ ...x, fatto: false })), materiali: (r.materiali || []).map(({ preso, ...m }) => m) };
+        delete rec.scaricato;
+        saveRecord(onUpdateDb, 'quaderno', rec);
+        show('quaderno', rec);
+    };
+    // «Salva» dal lavoro: l'esperimento di oggi diventa un nuovo protocollo (versione successiva); l'originale resta com'è
+    const protoVersion = (r) => { const o = lab.protocolli.find((p) => p.id === r.protocolloId); if (!o) return '1.0'; const m = String(o.versione || '1.0').match(/^(\d+)(?:\.(\d+))?/); return m ? `${m[1]}.${(+m[2] || 0) + 1}` : `${o.versione}.1`; };
+    const saveAsProtocol = (r) => {
+        const sec = sectionOf('protocolli'); const o = lab.protocolli.find((p) => p.id === r.protocolloId) || {};
+        const rec = { ...sec.empty(lab), ...o, id: newId(sec.prefix), origineId: o.id ? (o.origineId || o.id) : undefined, titolo: o.titolo || r.titolo, versione: protoVersion(r), data: stamp(), stanza: r.stanza || '', posizioni: r.posizioni || '', passaggi: (r.passaggi || []).map(({ fatto, ...x }) => x), materiali: (r.materiali || []).map(({ preso, scaricato, ...m }) => m) };
+        saveRecord(onUpdateDb, 'protocolli', rec);
+        saveRecord(onUpdateDb, 'quaderno', { ...r, protocolloId: rec.id });
+    };
+    const saveIn = (key, r, tabId) => { saveRecord(onUpdateDb, key, r); if (tabId) setTabs((t) => t.map((x) => (x.id === tabId && x.isNew ? { ...x, isNew: false, rec: r } : x))); };
+    const deleteIn = (key, id, tabId) => { removeRecord(onUpdateDb, key, id); closeTab(tabId); setSel(null); };
+    const [importing, setImporting] = useState(false);
+    const [settings, setSettings] = useState(false);
+    const [wdEdit, setWdEdit] = useState(false);
+    // i widget del calendario segnano i giorni degli esperimenti (al posto delle visite)
+    const widgetDb = useMemo(() => ({ ...db, labOv: ov, agenda: lab.quaderno.filter((r) => r.data).map((r) => ({ id: r.id, start: String(r.data).slice(0, 10), titolo: r.titolo })) }), [db, lab.quaderno, ov]);
     const excelAll = () => downloadXlsx(`laboratorio-${stamp()}.xlsx`, sheetsFor(lab));
 
-    let main;
-    if (view === 'home') main = <Home ov={ov} empty={labIsEmpty(lab)} onExample={() => loadExample(onUpdateDb)} onOpen={open} onNew={create} />;
-    else if (view === 'calcoli') main = <div className="lab-page"><header className="lab-page-head"><div><h1 className="lab-title">Calcoli</h1></div></header><Calc /></div>;
-    else main = (
-        <SectionView
-            key={view}
-            section={section}
-            lab={lab}
-            db={db}
-            wide={wide}
-            sel={sel && sel.record ? sel : null}
-            onSelect={(r) => setSel(r ? { record: r, isNew: false } : null)}
-            onNew={() => create(view)}
-            onSave={(rec) => saveRecord(onUpdateDb, view, rec)}
+    const rec = sel && sel.record ? { ...sel, record: (lab[view] || []).find((r) => r.id === sel.record.id) || sel.record } : null;
+    const tools = !split ? undefined : [
+        view !== 'home' && view !== 'calcoli' && view !== 'calcolatrice' && { icon: 'table', green: true, label: 'Excel', onClick: () => downloadXlsx(`${view}-${stamp()}.xlsx`, sheetsFor(lab, [view])) },
+        view === 'magazzino' && { icon: 'upload', green: true, label: 'Importa da Excel', onClick: () => setImporting(true) },
+        view === 'quaderno' && { icon: 'notebook', label: 'Quaderno completo', onClick: () => openTab('quaderno', { id: '__book' }, false, 'book') },
+    ].filter(Boolean);
+    const shell = (
+        <Mobile
+            dock={desk ? <WidgetDock reserve={330} mode="lab" db={widgetDb} onUpdateDb={onUpdateDb} editing={wdEdit} onEditingChange={setWdEdit} onOpenAgenda={() => {}} /> : null}
+            lab={lab} ov={ov} alerts={alerts} empty={labIsEmpty(lab)} view={view === 'calcoli' || view === 'calcolatrice' ? (split ? 'home' : 'calcolatrice') : view} sel={rec} section={section}
+            split={split} embed={desk} tools={tools} onRemove={(k, id) => deleteIn(k, id, `rec:${k}:${id}`)} onRestore={(k, r) => saveRecord(onUpdateDb, k, r)} onSaveIn={(k, r) => saveIn(k, r)} calcReq={calcN}
+            onExample={() => loadExample(onUpdateDb)} onGo={go} onOpen={open} onNew={create}
+            onSelect={(r) => { if (r && r.id) show(view, r); else setSel(null); }}
+            right={split ? (
+                <Workspace lab={lab} db={db} desk={desk} dock={desk ? <WidgetDock mode="lab" db={widgetDb} onUpdateDb={onUpdateDb} editing={wdEdit} onEditingChange={setWdEdit} onOpenAgenda={() => {}} /> : null} tabs={tabs} active={active} second={second}
+                    onActive={(id) => { setActive(id); setSecond((b) => (b === id ? null : b)); const t = tabs.find((x) => x.id === id); if (t) { setView(t.key); setSel(t.kind === 'rec' ? { record: t.rec, isNew: false } : null); } }}
+                    onSecond={setSecond} onSwap={swapPanes} onPlace={placePane} onClose={closeTab} onOpenPrint={(t) => openTab(t.key, { id: t.recId }, false, 'print')}
+                    onSave={saveIn} onDelete={deleteIn} onPrint={printIds} onNewFrom={startFrom} onSaveStock={(r) => saveRecord(onUpdateDb, 'magazzino', r)} protoVersion={protoVersion} onSaveProto={saveAsProtocol} />
+            ) : undefined}
+            onSave={(r) => saveRecord(onUpdateDb, view, r)}
             onDelete={() => { removeRecord(onUpdateDb, view, sel.record.id); setSel(null); }}
-            onPrint={printIds}
-            onBlank={view === 'quaderno' ? printBlank : null}
-            onExcel={() => downloadXlsx(`${view}-${stamp()}.xlsx`, sheetsFor(lab, [view]))}
-            vol={vol}
-            setVol={setVol}
+            onNewFrom={startFrom} onNewPage={startPage} protoVersion={protoVersion} onSaveProto={saveAsProtocol} onSaveStock={(r) => saveRecord(onUpdateDb, 'magazzino', r)} onPrint={printIds} onSettings={() => setSettings(true)} onBack={onBack}
         />
     );
-
-    return (
-        <div className={`lab-ws${wide ? '' : ' narrow'}`}>
+    const common = (
+        <>
             <style>{labStyles}</style>
-            {wide ? (
-                <Sidebar lab={lab} view={view} alerts={alerts} onView={go} onOpen={open} onExcel={excelAll} onBack={onBack} />
-            ) : (
-                <header className="lab-top">
-                    <div className="lab-top-row">
-                        <button onClick={onBack} className="lab-iconbtn" aria-label="Cambia area"><Icon name="back" size={20} /></button>
-                        <h1 className="lab-top-title">Laboratorio</h1>
-                        <button className="lab-btn is-secondary is-sm" onClick={excelAll} aria-label="Esporta tutto in Excel"><Icon name="table" size={16} />Excel</button>
-                    </div>
-                    <div className="lab-tabs" role="tablist">
-                        {NAV.map((n) => (
-                            <button key={n.key} role="tab" aria-selected={view === n.key} className={view === n.key ? 'on' : ''} onClick={() => go(n.key)}>
-                                <Icon name={n.icon} size={16} />{n.label}{n.key === 'home' ? (alerts ? <b>{alerts}</b> : null) : lab[n.key] ? <b>{lab[n.key].length}</b> : null}
-                            </button>
-                        ))}
-                    </div>
-                </header>
-            )}
-            <main className="lab-main">{main}</main>
-            {!wide && sel && sel.record && section && (
-                <RecordForm key={sel.record.id} section={section} record={sel.record} isNew={sel.isNew} lab={lab} onClose={() => setSel(null)} onSave={(rec) => saveRecord(onUpdateDb, view, rec)} onDelete={() => { removeRecord(onUpdateDb, view, sel.record.id); setSel(null); }} onPrint={(rec) => printIds([rec.id])} />
-            )}
+            <style>{mobileStyles}</style>
+            {importing && <StockImport lab={lab} onClose={() => setImporting(false)} onApply={(recs) => recs.forEach((r) => saveRecord(onUpdateDb, 'magazzino', r))} />}
+            {settings && <SettingsModal scope="lab" db={db} onUpdateDb={onUpdateDb} onClose={() => setSettings(false)} />}
+        </>
+    );
+
+    // iPhone e iPad: schermata intera con la barra in basso (iPad a due colonne)
+    if (!desk) return <div className={`lab-ws phone${split ? ' is-split' : ''}`}>{common}{shell}</div>;
+
+    // PC: barra laterale delle aree + la stessa interfaccia a due colonne
+    return (
+        <div className="lab-ws">
+            {common}
+            <Sidebar lab={lab} view={view === 'calcolatrice' ? 'calcoli' : view} alerts={alerts} onView={go} onOpen={open} onExcel={excelAll} onSaveDay={saveDay} saveState={note || (!ephemeral && dirty ? 'dirty' : 'clean')} onBack={onBack} onSettings={() => setSettings(true)} />
+            <main className="lab-main"><div className="phone embed is-split">{shell}</div></main>
         </div>
     );
 };

@@ -7,6 +7,7 @@ export const ArchiveStatusChip = () => {
     const [busy, setBusy] = useState(false);
 
     if (ephemeral) {
+        if (import.meta.env.DEV) return null; // in sviluppo la pastiglia demo non serve
         return (
             <div className="archive-chip fixed bottom-3 left-3 z-[900] bg-amber-50 border border-amber-200 text-amber-700 rounded-full px-3 py-1.5 text-[11px] font-bold shadow-sm">
                 Demo · nulla viene salvato
