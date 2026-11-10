@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#EFEAFF" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="URBIOS" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="referrer" content="no-referrer" />
+    <!-- CSP via <meta>: GitHub Pages non permette header personalizzati (frame-ancestors non è applicabile da <meta>).
+         connect-src https: wss: perché l'indirizzo del relay arriva dal QR del professionista. Niente script/stili inline. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https:; media-src 'self' blob:; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'" />
+    <title>URBIOS Paziente</title>
+    <script type="module" crossorigin src="./assets/patient-8a9DoplM.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/patient-BF8hEidw.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
