@@ -4,3 +4,10 @@ dist
 
 # materiale non di sviluppo (video di lancio, file pesanti): fuori da git
 extra/
+
+# costruito da GitHub Actions, non va in git
+dist-patient/
+# prove e backup locali
+dev/
+.claude/
+docs/liquid-glass-apple-hig.md
