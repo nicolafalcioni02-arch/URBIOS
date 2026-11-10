@@ -14,7 +14,7 @@ export default defineConfig({
     outDir: 'dist-patient',
     emptyOutDir: true,
     target: 'es2022',
-    rollupOptions: { input: 'patient.html' },
+    rollupOptions: { input: ['patient.html', 'demo.html'] },
     minify: 'esbuild',
   },
 });

@@ -1,0 +1,16 @@
+{
+  "name": "URBIOS Demo",
+  "short_name": "URBIOS Demo",
+  "description": "Anteprima con dati di prova.",
+  "lang": "it",
+  "start_url": "./demo.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EFEAFF",
+  "theme_color": "#EFEAFF",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

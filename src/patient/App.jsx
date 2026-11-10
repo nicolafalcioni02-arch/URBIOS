@@ -11,7 +11,7 @@ import { Note, Backdrop } from './ui/bits.jsx';
 
 const kv = idbKv('urbios-patient');
 // Anteprima temporanea: con ?prova l'app si apre subito con dati finti (in memoria, nulla viene salvato né inviato)
-const PROVA = typeof location !== 'undefined' && /[?&]prova\b/.test(location.search);
+const PROVA = typeof location !== 'undefined' && (/[?&]prova\b/.test(location.search) || /demo\.html$/.test(location.pathname));
 const IDLE_MS = 5 * 60 * 1000;
 
 // Blocco per inattività: si azzera SOLO con azioni dell'utente (non con sincronizzazioni o timer) e si ricontrolla al ritorno in primo piano.
