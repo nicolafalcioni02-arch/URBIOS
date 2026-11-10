@@ -3,7 +3,7 @@
   "short_name": "URBIOS",
   "description": "Il tuo percorso: allenamento, dieta e progressi.",
   "lang": "it",
-  "start_url": "./",
+  "start_url": "./patient.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
