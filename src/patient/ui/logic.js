@@ -59,11 +59,12 @@ export const suggestLoad = (hist, name, prescribed, today = ymd()) => {
 export const dayStatus = (log, docId, w, d, day) => {
     const tot = daySets(day), pre = `${docId}|${w}|${d}|`;
     let best = null, part = 0, partDate = null;
+    const cut = ymd(Date.now() - 2 * 86400000); // un allenamento iniziato e lasciato lì scade dopo 2 giorni
     for (const k of Object.keys(log.sessions)) {
         if (!k.startsWith(pre)) continue;
         const date = k.slice(pre.length), n = setsDone(log, k);
         if (tot && n >= tot) { if (!best || date > best) best = date; }
-        else if (n > part || (n === part && n > 0 && date > (partDate || ''))) { part = n; partDate = date; }
+        else if (date >= cut && (n > part || (n === part && n > 0 && date > (partDate || '')))) { part = n; partDate = date; }
     }
     if (best) return { state: 'done', date: best, done: tot, tot };
     if (part) return { state: 'part', date: partDate, done: part, tot };

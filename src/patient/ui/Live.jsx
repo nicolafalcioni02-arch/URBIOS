@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './bits.jsx';
 import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
-import { arr, mmss, parseSets, parseRest, sessionKey, suggestLoad, fmtDay, fmtKg, ymd, workoutSummary, HYPE_START, HYPE_BACK, HYPE_END } from './logic.js';
+import { Clamp } from './Clamp.jsx';
+import { arr, mmss, parseSets, parseRest, sessionKey, suggestLoad, fmtDay, fmtKg, ymd, workoutSummary, HYPE_END } from './logic.js';
 
 // Allenamento guidato, un esercizio alla volta. Ogni serie fatta (carico, RPE, nota) si salva SUBITO sul telefono, anche senza rete.
 // Non c'è video né calorie consumate: non fanno parte di ciò che il professionista invia. Il diario resta qui.
@@ -46,7 +47,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     const [rest, setRest] = useState(0), [setSecs, setSetSecs] = useState(0), [elapsed, setElapsed] = useState(start.secs || 0);
     const [paused, setPaused] = useState(false), [listOpen, setListOpen] = useState(false), [fin, setFin] = useState(false), [kg, setKg] = useState(() => kgOf(start.ex));
     const [rpe, setRpe] = useState(null), [note, setNote] = useState(''), [tab, setTab] = useState('oggi');
-    const [hype, setHype] = useState(() => { const a = start.secs ? HYPE_BACK : HYPE_START; return a[Math.floor(Math.random() * a.length)]; });
+    const [hype, setHype] = useState(null);
     useEffect(() => { if (!hype) return undefined; const t = setTimeout(() => setHype(null), 3200); return () => clearTimeout(t); }, [hype]);
     const total = useRef(0), ac = useRef(null);
     useEffect(() => { if (start.fresh) rt.log.update((l) => { delete l.sessions[key]; }); }, []);
@@ -127,7 +128,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
         <div className={'pt-live' + (tempo ? ' has-tempo' : '')}>
             {hype && <div className="pt-hype" role="status" onClick={() => setHype(null)}>{hype}</div>}
             <div className="pt-live-bg">
-                <b className="pt-live-ex">{cur.ss ? cur.ss + ' · ' : ''}{cur.name}</b>
+                <Clamp as="b" lines={3} title="Esercizio" text={(cur.ss ? cur.ss + ' · ' : '') + cur.name} className={'pt-live-ex' + (cur.name && cur.name.length > 44 ? ' is-xl' : cur.name && cur.name.length > 26 ? ' is-long' : '')} />
                 {tempo && phase !== 'rest' && <div className="pt-tp" aria-label="Tempi in secondi">{tempo.map((x, i) => <span key={i}><b>{x}{x !== 'X' ? <i> sec</i> : null}</b><small>{TEMPO[i]}</small></span>)}</div>}
                 {phase === 'rest' && nextCard}
                 {phase !== 'rest' && <div className="pt-live-row"><span className="pt-live-chips">{[`${cur.n} serie × ${cur.reps || '–'} ripetizioni`].map((t) => <u key={t}>{t}</u>)}</span>
@@ -158,8 +159,8 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                             
                         </>
                     )}
-                    {tab === 'storia' && (past.length ? past.map((h) => (
-                        <div className="pt-past" key={h.date}>
+                    {tab === 'storia' && (past.length ? past.map((h, hi) => (
+                        <div className="pt-past" key={h.date + "-" + hi}>
                             <b className="pt-past-d">{String(h.date).split("-").reverse().join("/")}</b>
                             <div className="pt-past-b">
                             <div className="pt-past-s">{groupSets(h.sets).map((g, i) => <u key={i}>{g.n > 1 ? <b>{g.n} serie</b> : null}{fmtKg(g.kg)}<small>kg</small>{g.reps ? <s>× {g.reps} rep</s> : null}{g.rpe ? <i>RPE {g.rpe}</i> : null}</u>)}</div>

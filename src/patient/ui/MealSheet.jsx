@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Icon } from './bits.jsx';
+import { WeightTrend } from './Progress.jsx';
 import { arr, mealKey, ymd } from './logic.js';
 import { findFoods, loadFoods, GENERIC } from './foods.js';
 
@@ -93,12 +94,12 @@ export const WeightSheet = ({ rt, onClose }) => {
             <div className="pt-ov-back" onClick={onClose} />
             <section className="pt-dsheet">
                 <header><b>Registra il peso</b><button type="button" className="pt-round" aria-label="Chiudi" onClick={onClose}><Icon name="close" /></button></header>
+                <div className="pg" style={{ margin: '4px 0 12px' }}><WeightTrend weights={w} /></div>
                 <div className="pt-wt">
                     <button type="button" className="pt-round" aria-label="Meno" onClick={() => setKg((x) => Math.max(20, +(x - 0.1).toFixed(1)))}><Icon name="minus" /></button>
                     <b>{String(kg.toFixed(1)).replace('.', ',')} <small>kg</small></b>
                     <button type="button" className="pt-round" aria-label="Più" onClick={() => setKg((x) => Math.min(300, +(x + 0.1).toFixed(1)))}><Icon name="plus" /></button>
                 </div>
-                {last && <p className="pt-muted" style={{ textAlign: 'center' }}>Ultimo: {String(last.kg).replace('.', ',')} kg ({last.date.split('-').reverse().join('/')})</p>}
                 <button type="button" className="pt-cta" onClick={save}>Salva</button>
                 <button type="button" className="pt-link" onClick={onClose}>Annulla</button>
             </section>

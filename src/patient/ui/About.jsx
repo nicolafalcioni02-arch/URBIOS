@@ -22,6 +22,7 @@ export const About = ({ onClose }) => (
 
             <h3>Il team</h3>
             <div className="pt-ab-team">{TEAM.map(([n, r]) => <div key={n}><i>{initials(n)}</i><span><b>{n}</b><small>{r}</small></span></div>)}</div>
+            <p className="pt-credits is-end">Figure anatomiche: <a href="https://github.com/MichaelMjc/react-body-highlighter" target="_blank" rel="noopener noreferrer">react-body-highlighter</a> (licenza MIT), © Hicham Elabbassi.</p>
         </div>
     </div>
 );

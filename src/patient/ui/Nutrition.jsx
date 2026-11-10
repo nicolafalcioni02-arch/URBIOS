@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Icon } from './bits.jsx';
 import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import { Ring } from './Schede.jsx';
+import { KcalWeek, MealsWeek } from './Progress.jsx';
 import { arr, mealKcal, mealKey, eatenKcal, ymd, fmtDay } from './logic.js';
 
 
@@ -86,6 +87,7 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
                     );
                 })}
                 <Extras rt={rt} date={date} />
+                <div className="pg pg-lt"><MealsWeek log={log} docId={cur} total={meals.length} /></div>
                 <button type="button" className="pt-gr" onClick={() => setHist(true)}><Icon name="calendar" size={20} /><b>Storico e modifica dei giorni</b><Icon name="back" size={18} /></button>
                 {o && <button type="button" className="pt-gr" onClick={() => setInfo(true)}><Icon name="info" size={20} /><b>Alcune info sulla tua alimentazione</b><Icon name="back" size={18} /></button>}
             </div></div>
@@ -119,6 +121,7 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
                             </div>
                             <div className="pt-cd"><MacroDonut c={o.c} p={o.p} f={o.f} /></div>
                             <div className="pt-cd"><MealBars rows={meals.map((m, i) => { const rec = log.meals[mealKey(cur, di, i, date)]; return { n: m.nome, plan: mealKcal(m), eaten: rec ? rec.kcal : 0 }; })} /></div>
+                            <div className="pg pg-lt"><KcalWeek log={log} goal={target} /></div>
                         </div>
                     </div>
                 </div>

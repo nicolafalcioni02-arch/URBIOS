@@ -10,6 +10,8 @@ import { createDemoRuntime } from './demo.js';
 import { Note, Backdrop } from './ui/bits.jsx';
 
 const kv = idbKv('urbios-patient');
+// Anteprima temporanea: con ?prova l'app si apre subito con dati finti (in memoria, nulla viene salvato né inviato)
+const PROVA = typeof location !== 'undefined' && /[?&]prova\b/.test(location.search);
 const IDLE_MS = 5 * 60 * 1000;
 
 // Blocco per inattività: si azzera SOLO con azioni dell'utente (non con sincronizzazioni o timer) e si ricontrolla al ritorno in primo piano.
@@ -36,7 +38,7 @@ export default function App() {
     const [, bump] = useReducer((x) => x + 1, 0);
     const rtRef = useRef(null);
 
-    useEffect(() => { hasVault(kv).then((v) => setStage(v ? 'unlock' : 'welcome')).catch(() => setStage('consent')); }, []);
+    useEffect(() => { if (PROVA) { setRt(createDemoRuntime({ onChange: bump })); setView({ name: 'home' }); setStage('demo'); return; } hasVault(kv).then((v) => setStage(v ? 'unlock' : 'welcome')).catch(() => setStage('consent')); }, []);
     const open = async (master, c) => {
         const r = await startPatient({ master, kv, consent: c, onChange: bump });
         rtRef.current = r; setRt(r); setView({ name: 'home' }); setStage('main');

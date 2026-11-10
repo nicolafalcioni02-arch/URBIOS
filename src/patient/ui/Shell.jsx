@@ -30,10 +30,10 @@ export const Shell = ({ rt, onRefresh, onReconnect, onLock, onForget }) => {
     else if (tab === 'home') body = <Home rt={rt} onNav={nav} onAct={act} onReconnect={onReconnect} />;
     else if (tab === 'train') body = <Schede rt={rt} docs={docs} onOpen={nav} />;
     else if (tab === 'diet') body = <Nutrition rt={rt} id={sub && sub.id} onMeal={(s) => setSheet({ kind: 'meal', ...s })} onExtra={(s) => setSheet({ kind: 'extra', ...s })} />;
-    else body = <Settings rt={rt} onBack={() => go('home')} onLock={onLock} onForget={onForget} onRefresh={onRefresh} />;
+    else body = <Settings rt={rt} onAct={act} onBack={() => go('home')} onLock={onLock} onForget={onForget} onRefresh={onRefresh} />;
     return (
         <>
-            <div className={'pt-main' + (tab === 'home' && !sub ? ' is-fit' : '')}>{body}</div>
+            <div key={tab + '|' + (sub ? sub.name : '')} className={'pt-main pt-enter' + (tab === 'home' && !sub ? ' is-fit' : '')}>{body}</div>
             {!(sub && sub.name === 'train') && (
                 <nav className={'pt-dock' + (tab === 'home' || tab === 'me' ? ' is-glass' : '')} aria-label="Navigazione">
                     {TABS.filter(([k]) => !docs.length || (k === 'diet' ? docs.some((d) => d.kind === 'diet') : k === 'train' ? docs.some((d) => d.kind === 'training') : true)).map(([k, l, ic]) => <button key={k} type="button" aria-label={l} aria-current={tab === k ? 'page' : undefined} className={tab === k ? 'is-on' : ''} onClick={() => go(k)}><Icon name={ic} size={22} /></button>)}

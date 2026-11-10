@@ -3,6 +3,7 @@ import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import { Icon } from './bits.jsx';
 import { BodyMap } from './BodyMap.jsx';
 import { arr, dayStatus, currentWeek, fmtDay, fmtKg } from './logic.js';
+import { Streak, ExProgress, Records, RpeMix } from './Progress.jsx';
 import { setsByMuscle, summary, weekly, strength, MUSCLES } from './muscles.js';
 
 const ACTIVE = { bg: '#D8FD38', ink: '#0B0C0E' };
@@ -57,8 +58,8 @@ const MuscleBars = ({ sets }) => {
     const rows = Object.entries(sets).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 6), max = rows.length ? rows[0][1] : 1;
     if (!rows.length) return null;
     return (
-        <div className="pt-mb">{rows.map(([k, v]) => (
-            <div key={k} className="pt-mb-r"><span>{MUSCLES[k]}</span><i><u style={{ width: Math.max(6, v / max * 100) + '%', animationDelay: '120ms' }} /></i><b>{Math.round(v * 10) / 10}</b></div>
+        <div className="pt-mus">{rows.map(([k, v], i) => (
+            <div key={k} className="pt-mus-r"><span>{MUSCLES[k]}</span><i><u style={{ width: Math.max(6, v / max * 100) + '%', animationDelay: i * 70 + 'ms' }} /></i><b>{Math.round(v)}</b></div>
         ))}</div>
     );
 };
@@ -80,7 +81,7 @@ const Strength = ({ st }) => {
 // Tab Schede. Parte alta FISSA (logo + una voce per scheda: ogni scheda è una visita, es. «Mesociclo 1»; le voci si rimpiccioliscono se
 // sono tante ma non spariscono). Parte bassa bianca che scorre: riepilogo, omino, grafici, archivio. Tutto calcolato dal diario del telefono.
 export const Schede = ({ rt, docs, onOpen }) => {
-    const log = rt.log.get(), [range, setRange] = useState(7), [tab, setTab] = useState('m'), [sheet, setSheet] = useState(null);
+    const log = rt.log.get(), [range, setRange] = useState(7), [tab, setTab] = useState('a'), [sheet, setSheet] = useState(null);
     const active = [], archive = [];
     for (const meta of docs.filter((d) => d.kind === 'training')) {
         const doc = rt.docs.get(meta.docId), weeks = arr(doc && doc.body && doc.body.settimane); if (!weeks.length) continue;
@@ -110,18 +111,18 @@ export const Schede = ({ rt, docs, onOpen }) => {
                 </div>
             </div>
             <div className="pt-sp-bot"><div className="pt-sp-scroll">
-                <div className="pt-seg2" role="tablist">{[7, 30].map((r) => <button key={r} type="button" role="tab" aria-selected={range === r} className={range === r ? 'is-on' : ''} onClick={() => setRange(r)}>{r} giorni</button>)}</div>
-                <div className="pt-tiles">
-                    <div><b><Count n={sm.workouts} /></b><span>Allenamenti</span></div>
-                    <div><b><Count n={sm.sets} /></b><span>Serie</span></div>
-                    <div><b><Count n={lav} /></b><span>Muscoli</span></div>
+                <button type="button" className="pt-rng" aria-label={`Periodo: ultimi ${range} giorni. Tocca per cambiare`} onClick={() => setRange(range === 7 ? 30 : 7)}>Ultimi <b key={range}>{range} giorni</b><Icon name="swap" size={14} /></button>
+                <div className="pt-tiles is-sel" role="tablist">
+                    {[['a', sm.workouts, 'Sedute'], ['s', sm.sets, 'Serie'], ['m', lav, 'Muscoli']].map(([k, n, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? 'is-on' : ''} onClick={() => setTab(k)}><b><Count n={n} /></b><span>{l}</span></button>)}
+                    <button type="button" role="tab" aria-selected={tab === 'f'} className={tab === 'f' ? 'is-on' : ''} onClick={() => setTab('f')}><b>{st.avg != null ? sign(st.avg) + '%' : '–'}</b><span>Forza</span></button>
                 </div>
-                <div className="pt-seg2 is-sub" role="tablist">{[['m', 'Muscoli'], ['s', 'Serie'], ['f', 'Forza']].map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? 'is-on' : ''} onClick={() => setTab(k)}>{l}</button>)}</div>
-                <div className="pt-pane" key={tab + range}>
-                    {tab === 'm' && <><div className="pt-cd"><BodyMap sets={sets} full={range === 7 ? 10 : 40} /></div><div className="pt-cd"><Donut sets={sets} /></div></>}
-                    {tab === 's' && hasData && <div className="pt-cd"><WeekBars data={wk} /></div>}
-                    {tab === 'f' && (st.avg != null ? <><div className="pt-str"><div><b className={st.avg >= 0 ? 'is-up' : ''}>{sign(st.avg)}%</b><span>Forza</span></div><div><b>{st.vol >= 1000 ? Math.round(st.vol / 100) / 10 + ' t' : st.vol + ' kg'}</b><span>Volume</span></div></div><div className="pt-cd"><Strength st={st} /></div></> : <p className="pt-sp-e">Servono due periodi per il confronto</p>)}
+                <div className="pt-stage" key={tab + range}>
+                    {tab === 'a' && <div className="pg pg-lt"><Streak log={log} /></div>}
+                    {tab === 's' && hasData && <><div className="pt-cd"><WeekBars data={wk} /></div><div className="pg pg-lt"><RpeMix hist={log.hist} /></div></>}
+                    {tab === 'm' && <><div className="pt-cd"><BodyMap sets={sets} full={range === 7 ? 10 : 40} /></div><div className="pt-cd"><MuscleBars sets={sets} /></div></>}
+                    {tab === 'f' && <><div className="pg pg-lt"><ExProgress hist={log.hist} /><Records hist={log.hist} /></div>{st.avg == null && <p className="pt-sp-e">Servono due periodi per il confronto</p>}</>}
                 </div>
+                {(() => { const top = Object.entries(sets).sort((x, y) => y[1] - x[1])[0], c = tab === 'a' ? (sm.workouts ? <><em>{sm.workouts}</em> {sm.workouts === 1 ? 'seduta' : 'sedute'} negli ultimi {range} giorni</> : null) : tab === 's' ? (sm.sets ? <><em>{sm.sets}</em> serie negli ultimi {range} giorni</> : null) : tab === 'm' ? (top && top[1] > 0 ? <><em>{MUSCLES[top[0]]}</em> è il muscolo più lavorato</> : null) : (st.avg != null ? <>Forza <em>{sign(st.avg)}%</em> rispetto al periodo prima</> : null); return c ? <p className="pg-cap">{c}</p> : null; })()}
             </div></div>
             {sheet && (
                 <div className="pt-lst-ov" role="dialog" aria-modal="true" onClick={() => setSheet(null)}>
