@@ -27,6 +27,8 @@ const CountUp = ({ n }) => {
 };
 
 export const Live = ({ rt, id, w, d, onExit }) => {
+    // barra di stato del telefono scura come lo schermo (altrimenti resta una fascia lilla in alto)
+    useEffect(() => { const m = document.querySelector('meta[name="theme-color"]'); if (!m) return undefined; const old = m.getAttribute('content'); m.setAttribute('content', '#0B0C0E'); return () => m.setAttribute('content', old); }, []);
     const doc = rt.docs.get(id), wk = arr(doc && doc.body && doc.body.settimane)[w], day = arr(wk && wk.giorni)[d];
     const list = useMemo(() => arr(day && day.esercizi).map((e) => {
         const s = parseSets(e.serie);

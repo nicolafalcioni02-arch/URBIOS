@@ -38,8 +38,11 @@ Riusa `src/connect/` (stessi moduli del medico, `role: 'patient'`) e `storage/cr
 - **Non provata** su dispositivo reale né nel browser (fotocamera, IndexedDB, iOS Safari): solo logica in Node e compilazione con esbuild. Da provare: scansione, riavvio, blocco, installazione come app.
 - Ereditati: ratchet scritto da noi (D-13), Worker del relay mai distribuito, nessuna revisione crittografica esterna.
 
-## Interfaccia (tema scuro, specifica del brief grafico)
-- Colori e forme come da brief (lime, lavanda, rosa, riquadri a 28 px, dock bianco). Tutto in `patient.css`.
+## Interfaccia (tema chiaro viola/lime)
+- Sfondo lilla `#EFEAFF` con gradiente animato, riquadri bianchi, foglio `#F3EEFF`, accento viola `#6B3DFF`, **lime `#D8FD38` = colore principale (azioni e grafici)**, testo `#0B0C0E`, grigio `#6C727F`. Forme a 28–32 px, dock a capsula. Il tema chiaro sta in fondo a `patient.css` (blocchi `body:has(.pt-main)`): le nuove regole si aggiungono in fondo. Restano scuri solo l'allenamento guidato (viola scuro + foglio bianco) e le schermate di accesso.
+- **Testi lunghi:** `ui/Clamp.jsx` taglia su N righe e mostra «Leggi tutto» solo se il testo è davvero tagliato; il riquadro si apre sul `body` con sfondo sfocato.
+- **Installabile:** `public/` (manifest, icone) e tag per iPhone in `patient.html`; il service worker non c'è.
+- **Pubblicazione:** il sito sta nel ramo `gh-pages` (`paziente/` = build di `dist-patient`), il codice su `main`.
 - **Diario locale** (`rt.log`: serie fatte, carichi, pasti, fuori piano): salvato cifrato sul telefono PRIMA di tutto, anche senza rete. **Non viene mai inviato** al professionista (il canale è a senso unico: scrive solo il medico).
 - **Non presenti perché i dati non esistono** nei documenti inviati: foto/nome del paziente (anonimato), video e immagini degli esercizi, calorie bruciate, orari dei pasti, sostituzioni consentite, notifiche. Il tracker mostra serie fatte e tempo; lo sfondo è un gradiente.
 - Non provata su telefono vero (vibrazione e audio dipendono dal dispositivo; iOS richiede un tocco per attivare l'audio).

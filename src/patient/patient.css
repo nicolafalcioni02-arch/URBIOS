@@ -1040,3 +1040,14 @@ body:has(.pt-main) .pt-ab .pt-round { background: #fff; color: #0B0C0E; }
 body:has(.pt-main) .pt-ab .pt-credits, body:has(.pt-main) .pt-ab-f { color: #6C727F; } body:has(.pt-main) .pt-ab a { color: #6B3DFF; }
 
 .pt-dsw button { max-width: 170px; overflow: hidden; text-overflow: ellipsis; }
+
+/* cambio pagina: niente vuoto, entrata breve */
+.pt-enter { animation: pt-scr-in .24s ease-out backwards; }
+@keyframes pt-scr-in { from { opacity: 0; } to { opacity: 1; } }
+.pt-enter:not(.is-fit) > * { animation: pt-scr-item .34s cubic-bezier(.2,.8,.2,1) backwards; }
+.pt-enter:not(.is-fit) > :nth-child(2) { animation-delay: .03s; } .pt-enter:not(.is-fit) > :nth-child(3) { animation-delay: .06s; } .pt-enter:not(.is-fit) > :nth-child(4) { animation-delay: .09s; } .pt-enter:not(.is-fit) > :nth-child(5) { animation-delay: .12s; } .pt-enter:not(.is-fit) > :nth-child(n+6) { animation-delay: .15s; }
+@keyframes pt-scr-item { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+
+/* Home a tutta larghezza: gli anelli non si fermano a 6px dal bordo */
+.pt-main.is-fit:has(.hm2) { margin: 0 -22px; padding: 0 22px 120px; }

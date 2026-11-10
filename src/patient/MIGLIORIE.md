@@ -1,9 +1,8 @@
 # App paziente: da migliorare (grafica, UI, UX)
 
-Note prese passando le schermate. Palette attuale: sfondo rosa chiaro con alone bianco, lime come accento, riquadri bianchi.
+Note prese passando le schermate. Palette attuale: sfondo lilla `#EFEAFF`, accento viola `#6B3DFF`, lime `#D8FD38` per azioni e grafici, riquadri bianchi.
 
 ## Grafica
-- Palette: decidere i ruoli di rosa e lime (oggi il rosa è solo sfondo e anello centrale). Le altre schermate (Dieta, Schede, finestre) usano ancora il lime per gli stati attivi: verificare l'insieme.
 - Anelli della Home: sono decorativi e fissi; valutare se far tornare i dati reali (allenamenti, pasti, kcal) con una legenda minima.
 - Allenamento guidato e schermate di accesso restano scuri: incoerenti con il resto.
 - Scheda "Costanza" e riquadri grigio-azzurro (#F4F5F8) dentro il foglio bianco: non seguono il nuovo tema.
@@ -13,8 +12,8 @@ Note prese passando le schermate. Palette attuale: sfondo rosa chiaro con alone 
 ## UI
 - Impostazioni: il pulsante del riassunto va a capo su due righe; il titolo della pagina è "Impostazioni" ma il tab si chiama "Profilo".
 - Dieta: i due pulsanti grandi in alto ("Oggi" e "Fuori piano") occupano molto spazio; ridurre.
-- Margini e spazi: verificare le finestre pasto, controllo e appunti (non riguardate dopo il tema chiaro).
-- Contrasto: testi grigi (#6C727F) piccoli su rosa chiaro, controllare la leggibilità.
+- Margini e spazi: verificare le finestre pasto, controllo e appunti (da riguardare con il tema viola).
+- Contrasto: testi grigi (#6C727F) piccoli su lilla chiaro, controllare la leggibilità.
 
 ## UX
 - Il riassunto PDF ora sta solo in Impostazioni: potrebbe servire un rimando dalla Home dopo ogni allenamento o a fine settimana.
