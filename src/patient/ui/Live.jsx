@@ -92,7 +92,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
 
     if (!list.length) return null;
     const cur = list[Math.min(ex, list.length - 1)];
-    const sug = sugOf(ex), past = arr(rt.log.get().hist[cur.name]).slice(-4).reverse();
+    const past = arr(rt.log.get().hist[cur.name]).slice(-4).reverse();
     const frontier = () => { for (let i = 0; i < list.length; i++) if (doneOf(i).length < list[i].n) return { ex: i, set: doneOf(i).length }; return null; };
     const retPos = () => (edit ? edit.ret : doneOf(ex).length < cur.n ? { ex, set: setNo } : frontier());   // dove tornare dopo una modifica (null = tutto fatto)
     const goto = (i, s) => {
@@ -214,7 +214,6 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 </> : <>
                     <Clamp as="b" lines={3} title="Esercizio" text={(cur.ss ? cur.ss + ' · ' : '') + cur.name} className={'pt-live-ex' + (cur.name && cur.name.length > 44 ? ' is-xl' : cur.name && cur.name.length > 26 ? ' is-long' : '')} />
                     {tempo && <TempoBar key={ex + '-' + setNo} tempo={tempo} dark run />}
-                    {cur.rpe ? <div className="pt-live-rpe" aria-label={'RPE previsto ' + cur.rpe}><small>RPE</small><b>{cur.rpe}</b></div> : null}
                     <div className="pt-live-row">{dots}</div>
                 </>}
             </div>
@@ -230,7 +229,6 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 {!isRest && !edit && <div className="pt-t2"><b>{mmss(setSecs)}</b></div>}
                 {!isRest && <div className="pt-rk">{cur.reps ? <span className={'pt-reps' + (String(cur.reps).length > 3 ? ' is-s' : '')}><b>{cur.reps}</b><i>×</i></span> : null}{stepKg}</div>}
                 {!isRest && !edit && lastT && <button type="button" className="pt-lastb" onClick={() => setPanel('storia')}><span>{String(lastT.date).split('-').reverse().slice(0, 2).join('/')} · {fmtKg(lastKg)} kg</span><Icon name="chev" size={16} /></button>}
-                {!isRest && sug && sug.kg !== kg && <div className="pt-sug"><div><span>Suggerito</span><b>{fmtKg(sug.kg)} kg</b></div><button type="button" onClick={() => setKg(sug.kg)}>Usa</button></div>}
                 {!isRest && rpeRow}
                 {isRest && nx && <div className="pt-nxt" aria-label={'Prossimo: ' + nx.name}><Icon name="chev" size={18} /><b>{nx.name}</b><span>{Math.min(setNo + 1, nx.n)}/{nx.n}</span></div>}
                 <div className="pt-bt">
