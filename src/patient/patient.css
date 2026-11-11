@@ -1580,3 +1580,7 @@ button.pt-shop-t { width: calc(100% - 8px); border: 0; background: transparent; 
 .pt-by .pt-todo.is-sure { border-radius: 36px; }
 body:has(.pt-main) .pt-pf .pt-input, body:has(.pt-main) .pt-sc2-m .pt-input { border-radius: 999px; padding-left: 22px; padding-right: 22px; }
 .pt-pf-h span { padding: 9px 16px; }
+
+/* spesa: la parte del prodotto sotto «Salva» ha uno sfondo suo */
+.pt-pf-i { margin-top: 20px; padding: 14px; border-radius: 44px; background: var(--u-lilla-2); }
+.pt-pf-h { padding: 4px 6px 0; } .pt-pf-h span { background: #fff; }
