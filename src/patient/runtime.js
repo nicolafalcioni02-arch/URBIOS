@@ -55,7 +55,7 @@ export const startPatient = async ({ master, kv, consent, fetchImpl = globalThis
                 docs.apply(m, from); if (m.ref) await peer.sendAck(m.ref); onChange();
             } });
         // Diario di allenamenti e pasti: SOLO su questo telefono (cifrato come il resto), non viene mai inviato al professionista.
-        const normLog = (x) => ({ sessions: (x && x.sessions) || {}, meals: (x && x.meals) || {}, extras: (x && x.extras) || {}, weights: (x && Array.isArray(x.weights)) ? x.weights : [], hist: (x && x.hist) || {}, last: (x && x.last) || {}, tools: { visit: (x && x.tools && x.tools.visit) || null, notes: (x && x.tools && Array.isArray(x.tools.notes)) ? x.tools.notes : [], shop: (x && x.tools && x.tools.shop) || {}, cfg: (x && x.tools && x.tools.cfg) || { days: 7, people: 1 } } });
+        const normLog = (x) => ({ sessions: (x && x.sessions) || {}, meals: (x && x.meals) || {}, extras: (x && x.extras) || {}, weights: (x && Array.isArray(x.weights)) ? x.weights : [], hist: (x && x.hist) || {}, last: (x && x.last) || {}, tools: { visit: (x && x.tools && x.tools.visit) || null, notes: (x && x.tools && Array.isArray(x.tools.notes)) ? x.tools.notes : [], shop: (x && x.tools && x.tools.shop) || {}, cfg: (x && x.tools && x.tools.cfg) || { days: 7, people: 1 }, dietDay: (x && x.tools && x.tools.dietDay) || null } });
         let logData = normLog(null);
         const parts = {
             meta: { sessionBound: false, snapshot: () => ({ consent: consentRec, relayUrl, unlinkedAt }), restore: (s) => { consentRec = s.consent || consentRec; relayUrl = s.relayUrl || null; unlinkedAt = s.unlinkedAt || null; rc = null; }, reset: () => {} },

@@ -3,7 +3,7 @@ import { Icon } from './bits.jsx';
 import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import { Ring } from './Schede.jsx';
 import { KcalWeek, MealsWeek } from './Progress.jsx';
-import { arr, mealKcal, mealKey, eatenKcal, ymd, fmtDay } from './logic.js';
+import { arr, mealKcal, mealKey, ymd, fmtDay, dietDayToday, toolsOf } from './logic.js';
 
 
 const lastDays = (n) => Array.from({ length: n }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return ymd(d.getTime()); });
@@ -54,11 +54,11 @@ const Extras = ({ rt, date }) => {
 // Dieta del giorno. Il diario dei pasti resta sul telefono: il professionista non lo riceve.
 export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
     const docs = rt.docs.list().filter((d) => d.kind === 'diet');
-    const [cur, setCur] = useState(id || (docs[0] && docs[0].docId)), [di, setDi] = useState(0), [info, setInfo] = useState(false), [hist, setHist] = useState(false), [hd, setHd] = useState(null), [hdi, setHdi] = useState(0), [cm, setCm] = useState(0);
+    const [cur, setCur] = useState(id || (docs[0] && docs[0].docId)), [di0, setDi] = useState(null), [info, setInfo] = useState(false), [hist, setHist] = useState(false), [hd, setHd] = useState(null), [hdi, setHdi] = useState(0), [cm, setCm] = useState(0);
     const doc = cur && rt.docs.get(cur);
     if (!doc || !doc.body) return <><header className="pt-top"><b className="pt-hi">Nutrizione</b></header><div className="pt-empty">Nessuna dieta ricevuta ancora.</div></>;
-    const days = arr(doc.body.giorni), day = days[Math.min(di, days.length - 1)], meals = arr(day.pasti), log = rt.log.get(), date = ymd();
-    const o = doc.body.obiettivo, target = (o && o.kcal) || meals.reduce((t, m) => t + mealKcal(m), 0), eaten = eatenKcal(log, date, cur, di, meals);
+    const days = arr(doc.body.giorni), log = rt.log.get(), date = ymd(), di = di0 ?? dietDayToday(log, cur, days), day = days[Math.min(di, days.length - 1)], meals = arr(day.pasti);
+    const o = doc.body.obiettivo, target = (o && o.kcal) || meals.reduce((t, m) => t + mealKcal(m), 0), eaten = dayKcal(log, date);
     const pct = target ? Math.min(100, Math.round(eaten / target * 100)) : 0;
     return (
         <div className="pt-sp">
@@ -74,8 +74,8 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
                 </div>
             </div>
             <div className="pt-sp-bot"><div className="pt-sp-scroll">
-                {docs.length > 1 && <div className="pt-seg3">{docs.map((x, i) => <button key={x.docId} type="button" className={x.docId === cur ? 'is-on' : ''} onClick={() => { setCur(x.docId); setDi(0); }}>Dieta {i + 1}</button>)}</div>}
-                {days.length > 1 && <div className="pt-seg3">{days.map((x, i) => <button key={i} type="button" className={i === di ? 'is-on' : ''} onClick={() => setDi(i)}>{x.titolo}</button>)}</div>}
+                {docs.length > 1 && <div className="pt-seg3">{docs.map((x, i) => <button key={x.docId} type="button" className={x.docId === cur ? 'is-on' : ''} onClick={() => { setCur(x.docId); setDi(null); }}>Dieta {i + 1}</button>)}</div>}
+                {days.length > 1 && <div className="pt-seg3">{days.map((x, i) => <button key={i} type="button" className={i === di ? 'is-on' : ''} onClick={() => { setDi(i); rt.log.update((l) => { toolsOf(l).dietDay = { date: ymd(), docId: cur, d: i }; }); }}>{x.titolo}</button>)}</div>}
                 {meals.map((m, i) => {
                     const rec = log.meals[mealKey(cur, di, i, date)];
                     return (

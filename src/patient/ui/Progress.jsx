@@ -1,7 +1,7 @@
 import { Icon } from './bits.jsx';
 import { Clamp } from './Clamp.jsx';
 import React, { useState } from 'react';
-import { arr, ymd, fmtKg, mealKey, eatenKcal, dayStatus, currentWeek } from './logic.js';
+import { arr, ymd, fmtKg, mealKey, eatenKcal, dayStatus, currentWeek, dietDayToday } from './logic.js';
 
 // Grafici minimal della pagina Progressi (tab Profilo): peso, kcal della settimana, costanza. Tutto dal diario del telefono, nessun asse.
 const DAY = 86400000;
@@ -113,9 +113,9 @@ export const Rings = ({ rt, big }) => {
     }
     const dt = docs.filter((d) => d.kind === 'diet').map((d) => ({ d, doc: rt.docs.get(d.docId) })).find((x) => x.doc && x.doc.body && arr(x.doc.body.giorni).length);
     if (dt) {
-        const day = arr(dt.doc.body.giorni)[0], pasti = arr(day && day.pasti), n = pasti.filter((_, m) => log.meals[mealKey(dt.d.docId, 0, m, today)]).length, goal = dt.doc.body.obiettivo && dt.doc.body.obiettivo.kcal;
+        const gg = arr(dt.doc.body.giorni), di = dietDayToday(log, dt.d.docId, gg, today), day = gg[di], pasti = arr(day && day.pasti), n = pasti.filter((_, m) => log.meals[mealKey(dt.d.docId, di, m, today)]).length, goal = dt.doc.body.obiettivo && dt.doc.body.obiettivo.kcal;
         if (pasti.length) out.push({ k: 'p', label: 'Pasti', pct: n / pasti.length, val: `${n}/${pasti.length}`, unit: 'pasti', ic: 'fork' });
-        if (goal > 0) { const e = eatenKcal(log, today, dt.d.docId, 0, pasti); out.push({ k: 'k', label: 'Kcal', pct: e / goal, val: Math.round(e).toLocaleString('it-IT') + '/' + Math.round(goal).toLocaleString('it-IT'), unit: 'kcal', ic: 'bolt' }); }
+        if (goal > 0) { const e = eatenKcal(log, today, dt.d.docId, di, pasti); out.push({ k: 'k', label: 'Kcal', pct: e / goal, val: Math.round(e).toLocaleString('it-IT') + '/' + Math.round(goal).toLocaleString('it-IT'), unit: 'kcal', ic: 'bolt' }); }
     }
     if (big) {
         return (

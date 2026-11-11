@@ -16,5 +16,4 @@ Note prese passando le schermate. Palette attuale: sfondo lilla `#EFEAFF`, accen
 - Contrasto: testi grigi (#6C727F) piccoli su lilla chiaro, controllare la leggibilità.
 
 ## UX
-- Pasti e kcal usano sempre il primo giorno della dieta: serve il giorno davvero in corso.
 - Le reps non vengono salvate, quindi non compaiono nel PDF.

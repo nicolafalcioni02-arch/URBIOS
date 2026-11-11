@@ -8,7 +8,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-01 Live: tempi veri, schermo acceso, RPE dopo la serie | fatto (wake lock/audio da provare, vedi blocco) |
 | UX-02 Live: schermata leggibile | fatto |
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
-| UX-04 Dieta: il giorno di oggi | da fare |
+| UX-04 Dieta: il giorno di oggi | fatto |
 | UX-05 Coerenza grafica e Profilo | da fare |
 
 A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così:
@@ -56,3 +56,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare su iPhone: rientro in Live dopo blocco e passphrase (in prova non c'è passphrase: verificato solo per lettura che `Shell` funzioni senza `initial`/`onWhere`); foglio di condivisione dalla schermata finale; allenamento a cavallo della mezzanotte.
 - Scelte fatte: nessuna deviazione dal brief. Limiti accettati: una seduta ripresa e finita risulta «fatta» alla data d'inizio; «Costanza» conta il giorno d'inizio.
 - Attenzione per chi viene dopo: `sessionDate` in `logic.js`; `sDate` in `Live.jsx`; `workoutSummary` 6° argomento = data della seduta; `Shell` prende `initial`/`onWhere`, `App.jsx` ha `resume` (useRef); classe `.pt-win-sum`.
+
+## UX-04 — fatto il 11/11/2026
+- File toccati: `ui/logic.js`, `runtime.js` (solo `normLog`), `ui/Nutrition.jsx`, `ui/Progress.jsx` (solo `Rings`), `README.md`, `MIGLIORIE.md`, `piano-ux/STATO.md`
+- Cosa vede di diverso il paziente: la tab Dieta apre il giorno di oggi (scelto da lui, dedotto dai pasti o dal titolo) e lo ricorda per quella data; Home «Pasti» e «Cosa mangiamo?» usano lo stesso giorno. Il totale kcal «Oggi» non cambia toccando un altro giorno. Nessuna scritta nuova.
+- Verificato in browser: punti 1-8 e 10 del «Fatto quando» (scelta salvata e ricordata dopo Home, Colazione di riposo con Fiocchi d'avena, 312 resta 312 cambiando giorno, regola 2, i quattro casi di `dietDayToday`, `?solo=scheda`, `?vuoto`, storico); `npm run test:connect` 102/102. Console senza errori.
+- Da provare su iPhone: nulla di specifico; con una dieta reale a 7 giorni controllare il giorno dedotto.
+- Scelte fatte: nel punto 3 del brief «Home → Pasti» apre la tab Dieta (non la sheet): la Colazione l'ho aperta dalla tab, sul giorno di riposo. Nessun test automatico nuovo.
+- Attenzione per chi viene dopo: `dietDayToday(log, docId, days, date)` in `logic.js`; campo diario `log.tools.dietDay` (`null` o `{date, docId, d}`), preservato da `normLog`.

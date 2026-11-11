@@ -31,12 +31,27 @@ export const eatenKcal = (log, date, docId, dayIdx, meals) => arr(meals).reduce(
 export const todayLabel = (t = Date.now()) => { const s = new Date(t).toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }); return s.charAt(0).toUpperCase() + s.slice(1); };
 export const lastWeight = (log) => (log.weights.length ? log.weights[log.weights.length - 1] : null);
 export const fmtKg = (x) => String(x).replace('.', ',');
-// Primo pasto di oggi non ancora registrato (prima dieta, primo giorno): serve a «Cosa mangiamo?»
+// I giorni di dieta non hanno il giorno della settimana: l'indice di oggi lo sceglie il paziente (e si ricorda), altrimenti lo si deduce.
+// Ordine: scelta di oggi, giorno con più pasti già registrati, nome del giorno nel titolo, 7 giorni = lunedì…domenica, il primo.
+export const dietDayToday = (log, docId, days, date = ymd()) => {
+    const list = arr(days), c = log && log.tools && log.tools.dietDay;
+    if (c && c.date === date && c.docId === docId && list[c.d]) return c.d;
+    const cnt = {};
+    Object.keys((log && log.meals) || {}).forEach((k) => { const p = k.split('|'); if (p.length === 4 && p[0] === docId && p[3] === date) cnt[p[1]] = (cnt[p[1]] || 0) + 1; });
+    let best = -1, n = 0;
+    list.forEach((_, i) => { if ((cnt[i] || 0) > n) { n = cnt[i]; best = i; } });
+    if (best >= 0) return best;
+    const name = ['domenica', 'lunedi', 'martedi', 'mercoledi', 'giovedi', 'venerdi', 'sabato'][new Date(date + 'T00:00:00').getDay()];
+    const byName = list.findIndex((x) => String((x && x.titolo) || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(name));
+    if (byName >= 0) return byName;
+    return list.length === 7 ? (new Date(date + 'T00:00:00').getDay() + 6) % 7 : 0;
+};
+// Primo pasto di oggi non ancora registrato (prima dieta, giorno di oggi): serve a «Cosa mangiamo?»
 export const nextMeal = (docs, getDoc, log, date = ymd()) => {
     for (const meta of docs.filter((d) => d.kind === 'diet')) {
-        const day = arr(getDoc(meta.docId) && getDoc(meta.docId).body && getDoc(meta.docId).body.giorni)[0];
-        const i = arr(day && day.pasti).findIndex((_, k) => !log.meals[mealKey(meta.docId, 0, k, date)]);
-        if (i >= 0) return { docId: meta.docId, d: 0, m: i };
+        const giorni = arr(getDoc(meta.docId) && getDoc(meta.docId).body && getDoc(meta.docId).body.giorni), d = dietDayToday(log, meta.docId, giorni, date);
+        const i = arr(giorni[d] && giorni[d].pasti).findIndex((_, k) => !log.meals[mealKey(meta.docId, d, k, date)]);
+        if (i >= 0) return { docId: meta.docId, d, m: i };
     }
     return null;
 };
@@ -78,7 +93,7 @@ export const currentWeek = (log, docId, weeks) => {
     return Math.max(0, weeks.length - 1);
 };
 // Strumenti del paziente nel diario (visita, appunti, spesa): crea i campi se mancano (anche nella modalità prova)
-export const toolsOf = (log) => { const x = log.tools || (log.tools = {}); if (!Array.isArray(x.notes)) x.notes = []; if (!x.shop) x.shop = {}; if (x.visit === undefined) x.visit = null; if (!x.cfg) x.cfg = { days: 7, people: 1 }; return x; };
+export const toolsOf = (log) => { const x = log.tools || (log.tools = {}); if (!Array.isArray(x.notes)) x.notes = []; if (!x.shop) x.shop = {}; if (x.visit === undefined) x.visit = null; if (x.dietDay === undefined) x.dietDay = null; if (!x.cfg) x.cfg = { days: 7, people: 1 }; return x; };
 
 // Riepilogo di fine allenamento: kg sollevati (kg × ripetizioni prescritte, 10 se non indicate), confronto con l'ultima volta e nuovi record
 export const repsNum = (s) => { const m = /\d+/.exec(String(s || '')); return m ? +m[0] : 10; };
