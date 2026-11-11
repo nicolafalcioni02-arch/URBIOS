@@ -54,7 +54,7 @@ export const Home = ({ rt, onNav, onAct, onReconnect }) => {
                 <Mark />
                 {hero ? (
                     <div className="hm2-next" role="group" aria-label={(hero.st.state === 'done' ? 'Ultimo allenamento' : hero.st.state === 'part' ? 'Allenamento iniziato' : 'Prossimo allenamento') + ': ' + hero.day.titolo}>
-                        <div className="hm2-t"><span className={'hm2-ic ' + (hero.st.state === 'done' ? 'is-ok' : '')}><Icon name={hero.st.state === 'done' ? 'check' : 'dumbbell'} size={20} /></span>
+                        <div className="hm2-t">{hero.st.state === 'done' && <span className="hm2-ic is-ok"><Icon name="check" size={20} /></span>}
                             <div><Clamp as="b" lines={2} title="Allenamento" text={hero.day.titolo} className={hero.day.titolo.length > 18 ? 'is-long' : ''} /></div></div>
                         {hero.st.state === 'part' && daysTo(hero.st.date) < 0
                             ? <span className="hm2-s">{daysTo(hero.st.date) === -1 ? 'Iniziato ieri · scade domani' : "Iniziato l'altro ieri · scade oggi"}</span>
