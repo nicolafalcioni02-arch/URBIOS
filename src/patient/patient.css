@@ -1134,3 +1134,46 @@ body:has(.pt-sp .pt-lst-ov) .pt-dock { translate: 0 140%; }
     .pt-main button, .pt-dock button, .pt-dsheet button, .pt-lst button, .pt-live button, .pt-auth button, .pt-ab button, .pt-dock { transition: none; }
     .pt-main button:active:not(:disabled), .pt-dock button:active:not(:disabled), .pt-dsheet button:active:not(:disabled), .pt-lst button:active:not(:disabled), .pt-live button:active:not(:disabled), .pt-auth button:active:not(:disabled), .pt-ab button:active:not(:disabled) { scale: 1; }
 }
+
+/* UX-06.2: colore per sezione (viola = selezione/allenamento, corallo = calorie), dock con capsula che scorre, onda */
+/* dock: la capsula scorre sotto l'icona attiva */
+.pt-dock-t { position: absolute; left: 0; top: 10px; width: 48px; height: 48px; border-radius: 50%; background: var(--u-notte); pointer-events: none; transition: translate 280ms var(--u-ease), background 280ms var(--u-ease); }
+.pt-dock[data-tab="diet"] .pt-dock-t { background: var(--u-corallo); }
+.pt-dock[data-tab="train"] .pt-dock-t { background: var(--u-viola); }
+body:has(.pt-main) .pt-dock button, body:has(.pt-main) .pt-dock.is-glass button { position: relative; z-index: 1; }
+body:has(.pt-main) .pt-dock button.is-on, body:has(.pt-main) .pt-dock.is-glass button.is-on, body:has(.hm2) .pt-dock button.is-on { background: transparent; transform: none; color: #fff; }
+.pt-dock[data-tab="diet"] button.is-on, body:has(.pt-main) .pt-dock[data-tab="diet"] button.is-on, body:has(.hm2) .pt-dock[data-tab="diet"] button.is-on { color: var(--u-ink); }
+.pt-dock button.is-on { transform: none; }
+/* selezione = viola */
+body:has(.pt-main) .pt-seg3 button.is-on { background: var(--u-viola); color: #fff; }
+body:has(.pt-main) .pt-tiles.is-sel button.is-on, body:has(.pt-main) .pt-sp .pt-tiles.is-sel button.is-on { background: var(--u-viola); color: #fff; box-shadow: none; }
+body:has(.pt-main) .pt-tiles.is-sel button.is-on b, body:has(.pt-main) .pt-tiles.is-sel button.is-on span { color: #fff; opacity: 1; }
+body:has(.pt-main) .pt-td-sc .pt-wk.is-on { background: var(--u-viola); color: #fff; }
+body:has(.pt-main) .pt-td-sc .pt-dsw-t { background: var(--u-viola); box-shadow: none; }
+body:has(.pt-main) .pt-td-sc .pt-dsw button.is-on { color: #fff; }
+.pt-rpe button.is-on { background: var(--u-viola); border-color: var(--u-viola); color: #fff; }
+.pt-lst-r.is-cur { border-color: var(--u-viola); }
+.pt-lst-r.is-cur .pt-lst-n { background: var(--u-viola); border-color: var(--u-viola); color: #fff; }
+/* dieta = corallo */
+body:has(.pt-main) .pt-sc.is-static { background: var(--u-corallo) !important; color: var(--u-ink); box-shadow: none; }
+/* card del giorno: notte con anello lime */
+.pt-dh { background: var(--u-notte); color: #fff; }
+.pt-dh::after { border-color: rgba(255,255,255,.12); box-shadow: 0 0 0 26px rgba(255,255,255,.05); }
+.pt-dh-n { color: #fff; } .pt-dh .pt-hero-d { color: rgba(255,255,255,.7); }
+/* barre kcal */
+.pt-mb.pt-mb i { background: var(--u-lilla-2); } .pt-mb.pt-mb u { background: var(--u-corallo-l); } .pt-mb.pt-mb s { background: var(--u-corallo); }
+body:has(.pt-main) .pg-lt .pg-bar u:not(.is-over) { background: var(--u-corallo-l); }
+body:has(.pt-main) .pg-lt .pg-bar.is-today u:not(.is-over) { background: var(--u-corallo); }
+body:has(.pt-main) .pg-lt .pg-bar u.is-over { background: var(--u-ink); }
+body:has(.pt-main) .pg-lt .pg-goal { border-top: 1px dashed var(--u-ink); }
+/* niente altri verdi */
+.pt-td-sc .pt-xc-past b, body:has(.pt-main) .pt-td-sc .pt-xc-past b { color: var(--u-viola); }
+.pg-cap em { color: var(--u-viola); }
+.pt-sr b.is-up, .pt-str b.is-up, .pt-sx-r b.is-up { color: var(--u-viola); }
+body:has(.pt-main) .pt-shop small { background: transparent; color: var(--u-ink); font-size: 16px; font-weight: 800; padding: 0; }
+body:has(.pt-main) .pt-shop.is-on small { color: var(--u-grigio); text-decoration: line-through; }
+body:has(.pt-main) .pt-ab-team > div i { background: var(--u-lilla-2); }
+/* peso nel foglio */
+.pt-dsheet .pg-lt .pg-line, .pt-dsheet .pg-line { stroke: var(--u-viola); stroke-width: 2.5; }
+.pt-dsheet .pg-dot.is-on { fill: var(--u-lime); stroke: var(--u-ink); stroke-width: 1.5; }
+body:has(.pt-main) .pt-sp-top:not(.pt-td-top) { padding-bottom: 34px; }

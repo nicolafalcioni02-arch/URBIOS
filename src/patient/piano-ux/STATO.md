@@ -10,7 +10,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
 | UX-04 Dieta: il giorno di oggi | fatto |
 | UX-05 Coerenza grafica e Profilo | fatto |
-| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappa 1 fatta |
+| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-2 fatte |
 
 A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così:
 
@@ -81,3 +81,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare su iPhone: trascinamento col dito (pointer capture), ripetizione col tocco prolungato, dock che scivola (nel pane la transizione non avanzava: il valore finale `translate: 0 140%` è corretto), 360×640 e «riduci animazioni» non provati.
 - Scelte fatte: `Step` mostra la virgola decimale di default. Altri testi chiari su chiaro trovati: solo «Cambia» in `.pt-food-sel` (corretto); i giorni futuri del calendario dello Storico sono disattivati di proposito. `Step` in Live usa icone 16 px (prima 22): da guardare nella tappa 6. `Lst` e `Sheet` sono componenti nuovi che sostituiscono il markup duplicato. Le regole `.pt-food-h` ecc. chiare sono aggiunte, non sostituite.
 - Attenzione per chi viene dopo: `TempoBar` (classi `pt-tb*`, `is-paused` ferma il cursore) non è ancora usata; `Count` ora in `bits.jsx` (500 ms); `Step` accetta `text` per sostituire numero+unità.
+
+## UX-06.2 — fatto il 11/11/2026
+- File toccati: `ui/Shell.jsx` (componente `Dock`), `ui/Nutrition.jsx`, `ui/Schede.jsx`, `ui/TrainDetail.jsx`, `patient.css` (in fondo, `/* UX-06.2 */`), questo file. `Progress.jsx` non toccato (nessun colore inline).
+- Cosa vede di diverso il paziente: dock con capsula che scorre e cambia colore (notte, corallo, viola, notte); selezioni viola con testo bianco (segmenti, tessere, settimane, giorni, RPE, esercizio corrente); card kcal corallo; card scheda viola con anello lime; card del giorno notte con anello lime; macro lime/viola/corallo; barre kcal corallo (sopra obiettivo: nero); torta e barre muscoli senza verdi oliva; «+7,3%» con la virgola; onda sotto Dieta e Schede.
+- Verificato in browser (375×812 e 360×640, `?prova`, `?prova&lungo`): colori computati della capsula nelle 4 tab (notte, corallo, viola, notte), macro, barre kcal, onda senza coprire contenuto, zero errori in console, grep dei verdi fuori sistema in `ui/*.jsx`: zero.
+- Da provare su iPhone: scorrimento della capsula (nel pane le transizioni non avanzavano, ho letto solo i valori finali), `?vuoto` non provato, «riduci animazioni» non provato.
+- Scelte fatte: onda ottenuta aggiungendo `pt-td-bot` a `.pt-sp-bot` (riusa le regole del dettaglio scheda); padding basso dell'intestazione di Dieta/Schede portato a 34 px perché l'onda non toccasse la seconda card. Nel CSS vecchio restano i verdi nelle regole sovrascritte (non cancellate).
+- Attenzione per chi viene dopo: `Ring` di `Schede.jsx` ha la prop `fg`; `Dock` in `Shell.jsx` usa `<i className="pt-dock-t">` con `translate` inline; il logo nelle intestazioni di Dieta/Schede/dettaglio resta (lo tolgono le tappe 4 e 5).

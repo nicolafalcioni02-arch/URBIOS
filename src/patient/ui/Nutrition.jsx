@@ -26,7 +26,7 @@ const Cal = ({ log, off, setOff, onPick }) => {
         </div>
     );
 };
-const SH = ['#B4E600', '#7FA800', '#3F5400'];
+const SH = ['#B4E600', '#6B3DFF', '#FF7A59'];
 // Ripartizione delle calorie tra carboidrati, proteine e grassi (4-4-9 kcal/g)
 const MacroDonut = ({ c, p, f }) => {
     const parts = [['Carboidrati', c * 4], ['Proteine', p * 4], ['Grassi', f * 9]], tot = parts.reduce((s, x) => s + x[1], 0) || 1;
@@ -65,7 +65,7 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
             <div className="pt-sp-top">
                 <div className="pt-sp-brand"><UrbiosLogo size={34} /><b>URBIOS</b></div>
                 <div className="pt-sp-list">
-                    <div className="pt-sc is-static" style={{ background: '#D8FD38', color: '#0B0C0E' }}>
+                    <div className="pt-sc is-static" style={{ background: '#FF7A59', color: '#0B0C0E' }}>
                         <Ring pct={pct / 100} ink="#0B0C0E" /><span className="pt-sc-t"><small>Oggi</small><b>{eaten} / {target} kcal</b></span>
                     </div>
                     <button type="button" className="pt-sc" style={{ background: '#DCD2FF', color: '#0B0C0E' }} onClick={() => onExtra({ names: meals.map((m) => m.nome) })}>
@@ -73,7 +73,7 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
                     </button>
                 </div>
             </div>
-            <div className="pt-sp-bot"><div className="pt-sp-scroll">
+            <div className="pt-sp-bot pt-td-bot"><svg className="pt-td-wave" viewBox="0 0 400 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30V15C40 -3 90 -3 135 13S230 31 275 14 360 -2 400 12V30Z" fill="#fff" /></svg><div className="pt-sp-scroll">
                 {docs.length > 1 && <div className="pt-seg3">{docs.map((x, i) => <button key={x.docId} type="button" className={x.docId === cur ? 'is-on' : ''} onClick={() => { setCur(x.docId); setDi(null); }}>Dieta {i + 1}</button>)}</div>}
                 {days.length > 1 && <div className="pt-seg3">{days.map((x, i) => <button key={i} type="button" className={i === di ? 'is-on' : ''} onClick={() => { setDi(i); rt.log.update((l) => { toolsOf(l).dietDay = { date: ymd(), docId: cur, d: i }; }); }}>{x.titolo}</button>)}</div>}
                 {meals.map((m, i) => {

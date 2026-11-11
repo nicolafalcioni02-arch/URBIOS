@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Icon } from './bits.jsx';
 import { Home } from './Home.jsx';
 import { Schede } from './Schede.jsx';
@@ -12,6 +12,18 @@ import { nextMeal } from './logic.js';
 
 const TABS = [['home', 'Home', 'home'], ['diet', 'Dieta', 'apple'], ['train', 'Schede', 'dumbbell'], ['me', 'Profilo', 'user']];
 
+// Dock: la capsula attiva scorre da una tab all'altra (posizione misurata sui pulsanti) e cambia colore con la tab
+const Dock = ({ tab, tabs, go }) => {
+    const refs = useRef([]), [cap, setCap] = useState(null), i = tabs.findIndex(([k]) => k === tab);
+    useLayoutEffect(() => { const b = refs.current[i]; if (b) setCap(b.offsetLeft + b.offsetWidth / 2 - 24); }, [tab, tabs.length]);
+    return (
+        <nav className={'pt-dock' + (tab === 'home' || tab === 'me' ? ' is-glass' : '')} data-tab={tab} aria-label="Navigazione">
+            <i className="pt-dock-t" style={cap == null ? { display: 'none' } : { translate: cap + 'px 0' }} />
+            {tabs.map(([k, l, ic], n) => <button key={k} ref={(el) => { refs.current[n] = el; }} type="button" aria-label={l} aria-current={tab === k ? 'page' : undefined} className={tab === k ? 'is-on' : ''} onClick={() => go(k)}><Icon name={ic} size={22} /></button>)}
+        </nav>
+    );
+};
+
 // Struttura dell'app paziente: 4 tab con dock a capsula, dettaglio scheda, allenamento guidato, dieta e registro pasto.
 export const Shell = ({ rt, onRefresh, onReconnect, onLock, onForget, initial, onWhere }) => {
     // dopo il blocco si rientra nell'allenamento (se lasciato da meno di 30 minuti e il piano esiste ancora)
@@ -22,6 +34,7 @@ export const Shell = ({ rt, onRefresh, onReconnect, onLock, onForget, initial, o
     useEffect(() => { if (onWhere) onWhere(sub && sub.name === 'live' ? { name: 'live', id: sub.id, w: sub.w, d: sub.d, at: Date.now() } : null); }, [sub]);
     if (sub && sub.name === 'live') return <Live rt={rt} id={sub.id} w={sub.w} d={sub.d} onExit={(done) => { setSub(null); if (done) setTab('home'); }} />;
     const docs = rt.docs.list();
+    const tabs = TABS.filter(([k]) => !docs.length || (k === 'diet' ? docs.some((d) => d.kind === 'diet') : k === 'train' ? docs.some((d) => d.kind === 'training') : true));
     const act = (k) => {
         if (k === 'weight') setSheet({ kind: 'weight' });
         else if (k === 'extra') setSheet({ kind: 'extra' });
@@ -38,9 +51,7 @@ export const Shell = ({ rt, onRefresh, onReconnect, onLock, onForget, initial, o
         <>
             <div key={tab + '|' + (sub ? sub.name : '')} className={'pt-main pt-enter' + (tab === 'home' && !sub ? ' is-fit' : '')}>{body}</div>
             {!(sub && sub.name === 'train') && (
-                <nav className={'pt-dock' + (tab === 'home' || tab === 'me' ? ' is-glass' : '')} aria-label="Navigazione">
-                    {TABS.filter(([k]) => !docs.length || (k === 'diet' ? docs.some((d) => d.kind === 'diet') : k === 'train' ? docs.some((d) => d.kind === 'training') : true)).map(([k, l, ic]) => <button key={k} type="button" aria-label={l} aria-current={tab === k ? 'page' : undefined} className={tab === k ? 'is-on' : ''} onClick={() => go(k)}><Icon name={ic} size={22} /></button>)}
-                </nav>
+                <Dock tab={tab} tabs={tabs} go={go} />
             )}
             {sheet && sheet.kind === 'meal' && <MealSheet rt={rt} docId={sheet.docId} d={sheet.d} m={sheet.m} date={sheet.date} onClose={() => setSheet(null)} />}
             {sheet && sheet.kind === 'weight' && <WeightSheet rt={rt} onClose={() => setSheet(null)} />}

@@ -28,7 +28,7 @@ const WeekTile = ({ i, on, deload, onClick, sts }) => {
 };
 
 const Ring = ({ pct }) => { const R = 22, C = 2 * Math.PI * R; return (
-    <svg className="pt-dh-ring" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r={R} fill="none" stroke="rgba(11,12,14,.15)" strokeWidth="5" /><circle cx="28" cy="28" r={R} fill="none" stroke="#0B0C0E" strokeWidth="5" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - pct)} transform="rotate(-90 28 28)" style={{ transition: 'stroke-dashoffset .6s cubic-bezier(.3,1,.4,1)' }} /></svg>
+    <svg className="pt-dh-ring" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r={R} fill="none" stroke="rgba(255,255,255,.18)" strokeWidth="5" /><circle cx="28" cy="28" r={R} fill="none" stroke="#D8FD38" strokeWidth="5" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - pct)} transform="rotate(-90 28 28)" style={{ transition: 'stroke-dashoffset .6s cubic-bezier(.3,1,.4,1)' }} /></svg>
 ); };
 
 export const TrainDetail = ({ rt, id, w0 = 0, d0 = 0, onBack, onStart }) => {

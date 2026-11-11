@@ -6,12 +6,12 @@ import { arr, dayStatus, currentWeek, fmtDay, fmtKg } from './logic.js';
 import { Streak, ExProgress, Records, RpeMix } from './Progress.jsx';
 import { setsByMuscle, summary, weekly, strength, MUSCLES } from './muscles.js';
 
-const ACTIVE = { bg: '#D8FD38', ink: '#0B0C0E' };
+const ACTIVE = { bg: '#6B3DFF', ink: '#fff' };
 const OLD = { bg: '#DCD2FF', ink: '#0B0C0E' };
-const LIME = '#B4E600', LIME_L = '#E4F99A', INK = '#0B0C0E';
+const LIME = '#B4E600', LIME_L = '#DCD2FF', VIOLA = '#6B3DFF', INK = '#0B0C0E';
 
 // Torta: quota di serie per muscolo (primi 5, il resto «altri»); i segmenti si disegnano in sequenza
-const SHADES = ['#0B0C0E', '#B4E600', '#8FB800', '#D6F46A', '#5E8A00', '#C9CDD4'];
+const SHADES = ['#6B3DFF', '#B4E600', '#FF7A59', '#0B0C0E', '#DCD2FF', '#C9CDD4'];
 const Donut = ({ sets }) => {
     const rows = Object.entries(sets).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]), tot = rows.reduce((t, r) => t + r[1], 0); if (!tot) return null;
     const top = rows.slice(0, 5), rest = rows.slice(5).reduce((t, r) => t + r[1], 0), items = [...top.map(([k, v]) => [MUSCLES[k], v]), ...(rest > 0 ? [['Altri', rest]] : [])];
@@ -29,8 +29,8 @@ const Donut = ({ sets }) => {
     );
 };
 
-export const Ring = ({ pct, ink }) => { const R = 18, C = 2 * Math.PI * R; return (
-    <svg className="pt-sc-r" width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r={R} fill="none" stroke={ink} strokeOpacity=".2" strokeWidth="5" /><circle cx="22" cy="22" r={R} fill="none" stroke={ink} strokeWidth="5" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - pct)} transform="rotate(-90 22 22)" /></svg>
+export const Ring = ({ pct, ink, fg }) => { const R = 18, C = 2 * Math.PI * R; return (
+    <svg className="pt-sc-r" width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r={R} fill="none" stroke={ink} strokeOpacity=".2" strokeWidth="5" /><circle cx="22" cy="22" r={R} fill="none" stroke={fg || ink} strokeWidth="5" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - pct)} transform="rotate(-90 22 22)" /></svg>
 ); };
 
 // Serie per settimana: barre, l'ultima (settimana corrente) in viola
@@ -39,7 +39,7 @@ const WeekBars = ({ data }) => {
     return (
         <svg viewBox={`0 0 ${W} ${H + 38}`} className="pt-chart" role="img" aria-label="Serie per settimana">
             {data.map((d, i) => { const h = Math.max(3, d.sets / max * H), x = i * (bw + gap), cur = i === data.length - 1; return (
-                <g key={i} className="pt-gr" style={{ animationDelay: i * 70 + 'ms' }}><rect x={x} y={H - h + 14} width={bw} height={h} rx="9" fill={cur ? LIME : LIME_L} />
+                <g key={i} className="pt-gr" style={{ animationDelay: i * 70 + 'ms' }}><rect x={x} y={H - h + 14} width={bw} height={h} rx="9" fill={cur ? VIOLA : LIME_L} />
                     <text x={x + bw / 2} y={H - h + 9} textAnchor="middle" className="pt-ct">{d.sets || ''}</text>
                     <text x={x + bw / 2} y={H + 30} textAnchor="middle" className="pt-ct is-m">{d.label}</text></g>
             ); })}
@@ -57,7 +57,7 @@ const MuscleBars = ({ sets }) => {
     );
 };
 
-const sign = (n) => (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(Math.round(n * 10) / 10);
+const sign = (n) => (n > 0 ? '+' : n < 0 ? '−' : '') + String(Math.abs(Math.round(n * 10) / 10)).replace('.', ',');
 // Forza: per ogni esercizio due barre (periodo prima / adesso) e la variazione
 const Strength = ({ st }) => {
     if (!st.rows.length) return null;
@@ -96,14 +96,14 @@ export const Schede = ({ rt, docs, onOpen }) => {
                 <div className="pt-sp-brand"><UrbiosLogo size={34} /><b>URBIOS</b></div>
                 <div className="pt-sp-list">
                     <button type="button" className="pt-sc" style={{ background: ACTIVE.bg, color: ACTIVE.ink }} disabled={!active.length} onClick={() => onOpen(active[0].open)}>
-                        <Ring pct={active.length ? active[0].pct : 0} ink={ACTIVE.ink} /><b>La tua scheda</b><Icon name="back" size={18} />
+                        <Ring pct={active.length ? active[0].pct : 0} ink="#fff" fg="#D8FD38" /><b>La tua scheda</b><Icon name="back" size={18} />
                     </button>
                     <button type="button" className="pt-sc" style={{ background: OLD.bg, color: OLD.ink }} disabled={!archive.length} onClick={() => setSheet('old')}>
                         <span className="pt-sc-i"><Icon name="check" size={20} /></span><b>Le tue vecchie schede</b><Icon name="back" size={18} />
                     </button>
                 </div>
             </div>
-            <div className="pt-sp-bot"><div className="pt-sp-scroll">
+            <div className="pt-sp-bot pt-td-bot"><svg className="pt-td-wave" viewBox="0 0 400 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30V15C40 -3 90 -3 135 13S230 31 275 14 360 -2 400 12V30Z" fill="#fff" /></svg><div className="pt-sp-scroll">
                 <button type="button" className="pt-rng" aria-label={`Periodo: ultimi ${range} giorni. Tocca per cambiare`} onClick={() => setRange(range === 7 ? 30 : 7)}>Ultimi <b key={range}>{range} giorni</b><Icon name="swap" size={14} /></button>
                 <div className="pt-tiles is-sel" role="tablist">
                     {[['a', sm.workouts, 'Sedute'], ['s', sm.sets, 'Serie'], ['m', lav, 'Muscoli']].map(([k, n, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? 'is-on' : ''} onClick={() => setTab(k)}><b><Count n={n} /></b><span>{l}</span></button>)}
