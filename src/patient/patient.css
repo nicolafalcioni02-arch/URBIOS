@@ -1177,3 +1177,41 @@ body:has(.pt-main) .pt-ab-team > div i { background: var(--u-lilla-2); }
 .pt-dsheet .pg-lt .pg-line, .pt-dsheet .pg-line { stroke: var(--u-viola); stroke-width: 2.5; }
 .pt-dsheet .pg-dot.is-on { fill: var(--u-lime); stroke: var(--u-ink); stroke-width: 1.5; }
 body:has(.pt-main) .pt-sp-top:not(.pt-td-top) { padding-bottom: 34px; }
+
+/* UX-06.3: Home — segno del logo al posto degli anelli, data, titolo con icona, pillole, strumenti col dato */
+.hm2-date { position: absolute; top: 4px; right: 2px; z-index: 1; font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--u-grigio-d); font-variant-numeric: tabular-nums; }
+.hm2 > div.hm2-mark { position: absolute; top: 56px; right: -170px; left: auto; width: 440px; height: 440px; z-index: 0; color: var(--u-viola); pointer-events: auto; touch-action: manipulation; }
+.hm2-mark-k { width: 100%; height: 100%; }
+.hm2-mark-k svg { display: block; }
+.hm2 > .hm2-next, .hm2 > .hm2-q { position: relative; z-index: 1; }
+.hm2 > .hm2-next { margin-top: auto; align-items: stretch; gap: 0; }
+.hm2 > .hm2-q { margin-top: auto; top: 0; transform: none !important; padding: 0; gap: 0; justify-content: space-between; }
+.hm2 > .hm2-next + .hm2-q { margin-top: 24px; }
+.hm2-t { display: flex; align-items: flex-start; gap: 10px; }
+.hm2-ic { flex: none; width: 32px; height: 32px; margin-top: 4px; border-radius: 50%; display: grid; place-items: center; background: var(--u-viola); color: #fff; }
+.hm2-ic.is-ok { background: var(--u-lime); color: var(--u-ink); } .hm2-ic.is-eat { background: var(--u-corallo); color: var(--u-ink); }
+.hm2-t > div { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
+.hm2 > .hm2-next .hm2-t b { font-size: 40px; font-weight: 800; line-height: 1.05; margin: 0; }
+.hm2 > .hm2-next .hm2-t b.is-long { font-size: 28px !important; }
+.hm2-pills { display: flex; gap: 8px; margin-top: 12px; }
+.hm2-pill { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: #fff; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.hm2 > .hm2-next .hm2-s { margin-top: 12px; }
+.hm2 > .hm2-next .hm2-go, body:has(.pt-main) .hm2 > .hm2-next .hm2-go { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 56px; padding: 0; margin-top: 16px; background: var(--u-lime) !important; color: var(--u-ink) !important; animation: none; }
+.hm2-q button { gap: 6px; font-size: 13px; }
+.hm2-q button b { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--u-ink); line-height: 18px; }
+.hm2-q button > span { font-size: 12px; font-weight: 600; color: var(--u-grigio-d); line-height: 18px; }
+.hm2-q button > svg { height: 18px; }
+@media (max-height: 700px) { .hm2 > div.hm2-mark { top: 40px; right: -210px; } .hm2 > .hm2-next .hm2-t b { font-size: 32px; } }
+@media (prefers-reduced-motion: no-preference) {
+    .hm2 > div.hm2-mark { animation: hm2-mark-in 500ms var(--u-ease) backwards, hm2-mark-spin 90s linear infinite; }
+    .hm2-mark-k { transition: rotate 600ms cubic-bezier(.2,.9,.3,1.2); }
+    .hm2 > .hm2-next { animation: hm2-up 340ms var(--u-ease) 80ms backwards; }
+    .hm2 > .hm2-q { animation: hm2-up 340ms var(--u-ease) 160ms backwards; }
+    @keyframes hm2-mark-in { from { opacity: 0; scale: .92; } }
+    @keyframes hm2-mark-spin { to { rotate: 360deg; } }
+    @keyframes hm2-up { from { opacity: 0; translate: 0 12px; } }
+}
+@media (prefers-reduced-motion: reduce) { .hm2 > div.hm2-mark, .hm2 > .hm2-next, .hm2 > .hm2-q { animation: none; } .hm2-mark-k { transition: none; } }
+.pt-main.is-fit:has(.hm2) { padding-bottom: 134px; }
+/* il titolo può passare sopra il viola del segno: alone lilla per tenerlo leggibile */
+.hm2 > .hm2-next .hm2-t b { text-shadow: 0 0 6px var(--u-lilla), 0 0 14px var(--u-lilla); }

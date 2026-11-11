@@ -10,7 +10,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
 | UX-04 Dieta: il giorno di oggi | fatto |
 | UX-05 Coerenza grafica e Profilo | fatto |
-| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-2 fatte |
+| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-3 fatte |
 
 A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così:
 
@@ -89,3 +89,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare su iPhone: scorrimento della capsula (nel pane le transizioni non avanzavano, ho letto solo i valori finali), `?vuoto` non provato, «riduci animazioni» non provato.
 - Scelte fatte: onda ottenuta aggiungendo `pt-td-bot` a `.pt-sp-bot` (riusa le regole del dettaglio scheda); padding basso dell'intestazione di Dieta/Schede portato a 34 px perché l'onda non toccasse la seconda card. Nel CSS vecchio restano i verdi nelle regole sovrascritte (non cancellate).
 - Attenzione per chi viene dopo: `Ring` di `Schede.jsx` ha la prop `fg`; `Dock` in `Shell.jsx` usa `<i className="pt-dock-t">` con `translate` inline; il logo nelle intestazioni di Dieta/Schede/dettaglio resta (lo tolgono le tappe 4 e 5).
+
+## UX-06.3 — fatto il 11/11/2026
+- File toccati: `ui/Home.jsx`, `patient.css` (in fondo, `/* UX-06.3 */`), questo file. `Progress.jsx` non toccato (`Rings` non è più usato dalla Home).
+- Cosa vede di diverso il paziente: niente anelli; un grande segno del logo viola, tagliato a destra, ruota lentissimo e al tocco scatta di 45°. In alto «MER 11». Titolo dell'allenamento 40 px con icona in un tondo (viola da fare, lime fatto, corallo per il pasto), due pillole (esercizi, minuti), «Inizia» lime a tutta riga con icona play. Sotto gli strumenti il dato (0/4, 72,4, 13 gg, 17, 2) al posto della parola; senza dato resta la parola.
+- Verificato in browser (375×812 e 360×640): `?prova`, `?prova&lungo` (titolo su 2 righe con «Leggi tutto», tutto sopra il dock), `?prova&vuoto` (parole, nessun undefined/NaN/0/0), `?prova&solo=dieta` (forchetta corallo, «Registra» con freccia a destra, nessuna tessera Pasti); nomi accessibili tipo «Peso 72,4»; scatto al tocco (rotate 90° dopo due tocchi); zero errori in console.
+- Da provare su iPhone: rotazione e scatto con «riduci animazioni» attivo (fermo), caso «Riprendi» con riga «Iniziato ieri · scade domani» (non preparato da `__demoLog`: il ramo è codice invariato, solo spostato), ingresso sfalsato.
+- Scelte fatte: a 360×640 il titolo cade sopra l'anello viola (il segno è alto 440 px, il blocco è ancorato in basso): per leggibilità ho dato al titolo un alone lilla. Il padding basso della Home è 134 px per avere ≥16 px tra strumenti e dock. Tolti dall'uso `bd`, `t`, `s` delle tessere (non più nel codice).
+- Attenzione per chi viene dopo: classi nuove `hm2-mark`, `hm2-mark-k`, `hm2-date`, `hm2-t`, `hm2-ic`, `hm2-pills`, `hm2-pill`; le vecchie `.hm2-ring/.hm2-k/.hm2-leg` restano nel CSS ma non nel JSX (non cancellate).
