@@ -124,6 +124,7 @@ const PriceForm = ({ init, items, stores, onSave, onBack }) => {
     const num = (v) => parseFloat(String(v).replace(',', '.')), ok = name.trim() && num(price) > 0 && (!key || num(g) > 0);   // il peso serve solo per la stima della voce
     if (pick) return (
         <div className="pt-pf">
+            <h3 className="pt-pf-t">Voce della lista</h3>
             <button type="button" className={'pt-shop' + (!key ? ' is-on' : '')} onClick={() => { setKey(''); setPick(false); }}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>Fuori lista</b></button>
             {[...items].sort((a, b) => a.n.localeCompare(b.n, 'it')).map((x) => <button key={x.k} type="button" className={'pt-shop' + (x.k === key ? ' is-on' : '')} onClick={() => { setKey(x.k); setPick(false); }}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b></button>)}
         </div>
