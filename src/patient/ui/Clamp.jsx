@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Icon } from './bits.jsx';
+import { Icon, Sheet } from './bits.jsx';
 
 // Testo su poche righe: se è troppo lungo compare «Leggi tutto» e si apre un box con la scritta completa.
 export const Clamp = ({ text, lines = 3, title = 'Testo completo', className = '', as: Tag = 'span' }) => {
@@ -20,12 +20,8 @@ export const Clamp = ({ text, lines = 3, title = 'Testo completo', className = '
             <Tag ref={ref} className={'pt-clamp ' + className} style={{ WebkitLineClamp: lines }}>{text}</Tag>
             {cut && <button type="button" className="pt-more" onClick={(e) => { e.stopPropagation(); setOpen(true); }}>Leggi tutto <Icon name="back" size={12} /></button>}
             {open && createPortal(
-                <div className="pt-ov" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
-                    <div className="pt-ov-back" onClick={close} />
-                    <section className="pt-dsheet">
-                        <header><b>{title}</b><button type="button" className="pt-round" aria-label="Chiudi" onClick={close}><Icon name="close" /></button></header>
-                        <p className="pt-clamp-full">{text}</p>
-                    </section>
+                <div onClick={(e) => e.stopPropagation()}>
+                    <Sheet title={title} onClose={close}><p className="pt-clamp-full">{text}</p></Sheet>
                 </div>,
                 document.body
             )}

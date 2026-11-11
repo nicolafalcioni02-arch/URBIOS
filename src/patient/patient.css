@@ -1074,3 +1074,63 @@ body:has(.pt-main) .pt-about b { font-size: 16px; }
 
 /* UX-05: testo grigio leggibile sul lilla */
 .hm2-s { color: #3A3F4B; }
+
+/* UX-06.1: fondamenta — variabili del sistema colori, leggibilità dei fogli, disattivato, pressione, maniglia, stepper */
+:root {
+    --u-lime: #D8FD38; --u-lime-ink: #B4E600; --u-viola: #6B3DFF; --u-viola-d: #4E28D9;
+    --u-corallo: #FF7A59; --u-corallo-l: #FFD9CF; --u-corallo-ink: #C8452A;
+    --u-notte: #160C33; --u-notte-2: #241552; --u-lilla: #EFEAFF; --u-lilla-2: #DCD2FF; --u-foglio: #F3EEFF;
+    --u-ink: #0B0C0E; --u-grigio: #6C727F; --u-grigio-d: #3A3F4B; --u-rosso: #D92D20;
+    --u-ease: cubic-bezier(.2,.8,.2,1);
+}
+/* niente sillabazione («olim-pico») */
+.pt-live-ex, .pt-dh-t, .hm2-next b, .pt-xc-b b, .pt-ml-t b, .pt-ml-t small, .pt-sc-t b, .pt-lst-r b, .pt-shop b, .pt-todo span { hyphens: none; }
+/* testo bianco sul tema chiaro: voci di ricerca, «quando», alimento scelto */
+body:has(.pt-main) .pt-food-h { background: #fff; color: var(--u-ink); min-height: 48px; border-radius: 16px; margin-bottom: 6px; }
+body:has(.pt-main) .pt-food-h:active { background: var(--u-lilla-2); }
+body:has(.pt-main) .pt-when-t { color: var(--u-ink); }
+body:has(.pt-main) .pt-when button { background: #fff; color: var(--u-ink); }
+body:has(.pt-main) .pt-when button.is-on { background: var(--u-viola); color: #fff; }
+body:has(.pt-main) .pt-food-no { color: var(--u-grigio-d); }
+body:has(.pt-main) .pt-food-sel { background: #fff; color: var(--u-ink); }
+body:has(.pt-main) .pt-food-sel button { background: var(--u-lilla-2); color: var(--u-ink); min-height: 44px; }
+/* disattivato: mai opacità, colori propri */
+.pt-cta:disabled, .pt-btn:disabled, .pt-done:disabled { opacity: 1; background: rgba(255,255,255,.08); color: rgba(255,255,255,.4); cursor: default; border-color: transparent; }
+body:has(.pt-main) .pt-cta:disabled, body:has(.pt-main) .pt-btn:disabled, body:has(.pt-main) .pt-done:disabled { background: var(--u-lilla-2); color: var(--u-grigio); }
+/* pressione dei pulsanti (proprietà `scale`, non annulla i transform) */
+.pt-main button, .pt-dock button, .pt-dsheet button, .pt-lst button, .pt-live button, .pt-auth button, .pt-ab button { transition: scale 90ms; }
+.pt-main button:active:not(:disabled), .pt-dock button:active:not(:disabled), .pt-dsheet button:active:not(:disabled), .pt-lst button:active:not(:disabled), .pt-live button:active:not(:disabled), .pt-auth button:active:not(:disabled), .pt-ab button:active:not(:disabled) { scale: .97; }
+.hm2-q button:active { scale: 1; }
+/* maniglia dei fogli */
+.pt-grab { display: block; width: 36px; height: 4px; border-radius: 2px; background: var(--u-lilla-2); position: absolute; left: 50%; top: 8px; translate: -50% 0; }
+.pt-dsheet header, .pt-lst-h { position: relative; touch-action: none; }
+.pt-dsheet header { padding-top: 10px; } .pt-lst-h { padding-top: 12px; }
+/* il dock sparisce sotto i fogli a lista */
+.pt-dock { transition: background .25s, box-shadow .25s, translate 220ms var(--u-ease); }
+body:has(.pt-sp .pt-lst-ov) .pt-dock { translate: 0 140%; }
+.pt-sp .pt-lst { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+/* stepper: il numero è un tasto (poi un campo) */
+.pt-step > .pt-step-v.pt-step-v.pt-step-v { flex: 1; width: auto; height: auto; min-height: 44px; border-radius: 0; background: transparent; box-shadow: none; color: inherit; padding: 0 4px; }
+.pt-step > .pt-step-v b { font-variant-numeric: tabular-nums; }
+.pt-step > .pt-step-in { flex: 1; min-width: 0; height: 44px; border: 0; border-radius: 12px; background: var(--u-lilla-2); color: var(--u-ink); text-align: center; font-weight: 800; font-size: 20px !important; }
+.pt-live-act .pt-step > .pt-step-in { background: #fff; }
+/* «Salta (solo prova)» in alto: non copre i pulsanti */
+.pt-skip { bottom: auto; top: calc(8px + env(safe-area-inset-top)); }
+/* barra del tempo (TempoBar, usata da Live nella tappa 6) */
+.pt-tb { width: 100%; --tb-a: var(--u-viola); --tb-b: var(--u-lilla-2); --tb-c: var(--u-lime-ink); --tb-k: var(--u-ink); }
+.pt-tb.is-dark { --tb-a: #BDB2FF; --tb-b: rgba(255,255,255,.22); --tb-c: var(--u-lime); --tb-k: #fff; }
+.pt-tb-bar { position: relative; display: flex; gap: 4px; height: 10px; }
+.pt-tb-s { flex-basis: 0; min-width: 4px; border-radius: 5px; background: var(--tb-b); }
+.pt-tb-s.s0 { background: var(--tb-a); } .pt-tb-s.s2 { background: var(--tb-c); }
+.pt-tb-c { position: absolute; top: -2px; left: 0; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--tb-k); box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.pt-tb-n { display: flex; gap: 4px; margin-top: 6px; }
+.pt-tb-n span { flex-basis: 0; display: flex; align-items: center; justify-content: center; gap: 2px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: visible; }
+@media (prefers-reduced-motion: no-preference) {
+    .pt-tb-c { animation: pt-tb var(--tb) linear infinite; }
+    .pt-tb.is-paused .pt-tb-c { animation-play-state: paused; }
+    @keyframes pt-tb { from { left: 0; } to { left: 100%; } }
+}
+@media (prefers-reduced-motion: reduce) {
+    .pt-main button, .pt-dock button, .pt-dsheet button, .pt-lst button, .pt-live button, .pt-auth button, .pt-ab button, .pt-dock { transition: none; }
+    .pt-main button:active:not(:disabled), .pt-dock button:active:not(:disabled), .pt-dsheet button:active:not(:disabled), .pt-lst button:active:not(:disabled), .pt-live button:active:not(:disabled), .pt-auth button:active:not(:disabled), .pt-ab button:active:not(:disabled) { scale: 1; }
+}

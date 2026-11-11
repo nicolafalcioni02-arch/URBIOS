@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
-import { Icon } from './bits.jsx';
+import { Icon, Count, Lst } from './bits.jsx';
 import { BodyMap } from './BodyMap.jsx';
 import { arr, dayStatus, currentWeek, fmtDay, fmtKg } from './logic.js';
 import { Streak, ExProgress, Records, RpeMix } from './Progress.jsx';
@@ -9,12 +9,6 @@ import { setsByMuscle, summary, weekly, strength, MUSCLES } from './muscles.js';
 const ACTIVE = { bg: '#D8FD38', ink: '#0B0C0E' };
 const OLD = { bg: '#DCD2FF', ink: '#0B0C0E' };
 const LIME = '#B4E600', LIME_L = '#E4F99A', INK = '#0B0C0E';
-
-const Count = ({ n }) => {
-    const [v, setV] = useState(0);
-    useEffect(() => { let raf, t0; const step = (t) => { t0 = t0 || t; const p = Math.min(1, (t - t0) / 700); setV(Math.round(n * (1 - Math.pow(1 - p, 3)))); if (p < 1) raf = requestAnimationFrame(step); }; raf = requestAnimationFrame(step); return () => cancelAnimationFrame(raf); }, [n]);
-    return <>{v}</>;
-};
 
 // Torta: quota di serie per muscolo (primi 5, il resto «altri»); i segmenti si disegnano in sequenza
 const SHADES = ['#0B0C0E', '#B4E600', '#8FB800', '#D6F46A', '#5E8A00', '#C9CDD4'];
@@ -124,16 +118,13 @@ export const Schede = ({ rt, docs, onOpen }) => {
                 {(() => { const top = Object.entries(sets).sort((x, y) => y[1] - x[1])[0], c = tab === 'a' ? (sm.workouts ? <><em>{sm.workouts}</em> {sm.workouts === 1 ? 'seduta' : 'sedute'} negli ultimi {range} giorni</> : null) : tab === 's' ? (sm.sets ? <><em>{sm.sets}</em> serie negli ultimi {range} giorni</> : null) : tab === 'm' ? (top && top[1] > 0 ? <><em>{MUSCLES[top[0]]}</em> è il muscolo più lavorato</> : null) : (st.avg != null ? <>Forza <em>{sign(st.avg)}%</em> rispetto al periodo prima</> : null); return c ? <p className="pg-cap">{c}</p> : null; })()}
             </div></div>
             {sheet && (
-                <div className="pt-lst-ov" role="dialog" aria-modal="true" onClick={() => setSheet(null)}>
-                    <div className="pt-lst" onClick={(e) => e.stopPropagation()}>
-                        <div className="pt-lst-h"><b>Le tue vecchie schede</b><button type="button" className="pt-lst-x" aria-label="Chiudi" onClick={() => setSheet(null)}><Icon name="close" size={18} /></button></div>
-                        <div className="pt-lst-b">{archive.map((a) => ({ key: a.meta.docId, title: a.meta.title, sub: a.last ? fmtDay(a.last) : Math.round((a.pct || 0) * 100) + '%', open: a.open || { name: 'train', id: a.meta.docId, w: 0, d: 0 } })).map((r, i) => (
+                <Lst title="Le tue vecchie schede" onClose={() => setSheet(null)}>
+                        {archive.map((a) => ({ key: a.meta.docId, title: a.meta.title, sub: a.last ? fmtDay(a.last) : Math.round((a.pct || 0) * 100) + '%', open: a.open || { name: 'train', id: a.meta.docId, w: 0, d: 0 } })).map((r, i) => (
                             <button key={r.key} type="button" className="pt-lst-r" onClick={() => { setSheet(null); onOpen(r.open); }}>
                                 <span className="pt-lst-n">{i + 1}</span><span className="pt-lst-t"><b>{r.title || 'Scheda'}</b></span><span className="pt-lst-s">{r.sub}</span>
                             </button>
-                        ))}</div>
-                    </div>
-                </div>
+                        ))}
+                </Lst>
             )}
         </div>
     );

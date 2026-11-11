@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
-import { Icon } from './bits.jsx';
+import { Icon, Sheet, Step } from './bits.jsx';
 import { arr, ymd, toolsOf } from './logic.js';
 
 // Strumenti del paziente: tutto resta sul telefono (nel diario cifrato), il professionista non lo riceve.
-const Shell = ({ title, onClose, children }) => (
-    <div className="pt-ov" role="dialog" aria-modal="true" aria-label={title}>
-        <div className="pt-ov-back" onClick={onClose} />
-        <section className="pt-dsheet">
-            <header><b>{title}</b><button type="button" className="pt-round" aria-label="Chiudi" onClick={onClose}><Icon name="close" /></button></header>
-            {children}
-        </section>
-    </div>
-);
+const Shell = Sheet;
 const addDays = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return ymd(d.getTime()); };
 export const daysTo = (date) => { if (!date) return null; const a = new Date(ymd() + 'T00:00:00'), b = new Date(date + 'T00:00:00'); return Math.round((b - a) / 86400000); };
 export const fmtLong = (date) => new Date(date + 'T00:00:00').toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -27,7 +19,6 @@ export const VisitSheet = ({ rt, onClose }) => {
             <label className="pt-label">Oppure scegli la data<input className="pt-input" type="date" min={ymd()} value={d} onChange={(e) => setD(e.target.value)} /></label>
             <button type="button" className="pt-cta" disabled={!d} onClick={() => save(d)}>Salva</button>
             {cur && <button type="button" className="pt-link" onClick={() => save(null)}>Togli la data</button>}
-            {!cur && <button type="button" className="pt-link" onClick={onClose}>Annulla</button>}
         </Shell>
     );
 };
@@ -43,7 +34,6 @@ export const NotesSheet = ({ rt, onClose }) => {
             {notes.map((n, i) => <div className="pt-todo" key={n.at + '-' + i}><span>{n.t}</span><button type="button" onClick={() => del(i)}>Togli</button></div>)}
             <textarea className="pt-input pt-todo-in" rows={3} maxLength={300} placeholder="Scrivi qui…" value={t} onChange={(e) => setT(e.target.value)} />
             <button type="button" className="pt-cta" disabled={!t.trim()} onClick={add}>Aggiungi</button>
-            <button type="button" className="pt-link" onClick={onClose}>Chiudi</button>
         </Shell>
     );
 };
@@ -62,7 +52,7 @@ export const shopItems = (docs, get, days = 7, people = 1) => {
 const qty = (g) => (g >= 1000 ? String(Math.round(g / 100) / 10).replace('.', ',') + ' kg' : g + ' g');
 const Stepper = ({ label, value, set, min, max, unit }) => (
     <div className="pt-shop-s"><span>{label}</span>
-        <div className="pt-step dark"><button type="button" aria-label="Meno" onClick={() => set(Math.max(min, value - 1))}><Icon name="minus" size={16} /></button><b>{value} {unit(value)}</b><button type="button" aria-label="Più" onClick={() => set(Math.min(max, value + 1))}><Icon name="plus" size={16} /></button></div>
+        <Step dark value={value} onChange={set} step={1} min={min} max={max} text={`${value} ${unit(value)}`} label={label} />
     </div>
 );
 export const ShopSheet = ({ rt, docs, onClose }) => {
@@ -82,7 +72,6 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
                     {left > 0 && <div>{items.filter((x) => !shop[x.k]).map((x) => <button key={x.k} type="button" onClick={() => tog(x.k)}>{x.n}</button>)}</div>}
                 </div>
             </>}
-            <button type="button" className="pt-link" onClick={onClose}>Chiudi</button>
         </Shell>
     );
 };

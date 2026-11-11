@@ -10,7 +10,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
 | UX-04 Dieta: il giorno di oggi | fatto |
 | UX-05 Coerenza grafica e Profilo | fatto |
-| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | da fare |
+| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappa 1 fatta |
 
 A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così:
 
@@ -73,3 +73,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare su iPhone: foglio di condivisione con esito «Riassunto inviato».
 - Scelte fatte: `.pg-lt .pg-card` resta bianco (regola esistente `.pt-sp .pg-lt > *`, scelta di disposizione); `.hm2-day span` era già `#0B0C0E`, non l'ho schiarito; cerchietto `.pt-sc-i` reso bianco sul fondo lilla.
 - Attenzione per chi viene dopo: nessun nome nuovo; blocco `/* UX-05 */` in fondo a `patient.css`.
+
+## UX-06.1 — fatto il 11/11/2026
+- File toccati: `ui/bits.jsx`, `ui/Tempo.jsx` (nuovo), `ui/Tools.jsx`, `ui/MealSheet.jsx`, `ui/Clamp.jsx`, `ui/Nutrition.jsx`, `ui/Schede.jsx`, `ui/Live.jsx`, `patient.css` (in fondo, `/* UX-06.1 */`), `README.md`, questo file.
+- Cosa vede di diverso il paziente: fogli con maniglia e chiusura trascinando giù; testi leggibili in «Sostituisci», «Fuori piano» (chip viola quando scelti) e alimento scelto; pulsanti disattivati grigi, non sbiaditi; «+/−» ripetono se tenuti premuti e il numero si può scrivere; dock nascosto sotto i fogli a lista; niente «Annulla»/«Chiudi» in fondo ai fogli; nessuna sillabazione; leggera pressione sui pulsanti.
+- Verificato in browser (375×812, `?prova` e `?prova&lungo`): «pane» leggibile; chip Fuori piano; disattivato in accesso; hold/digita «abc»/«130,5»; maniglia e trascinamento (40 px torna, 120 px chiude); nessun «Annulla»; `test:connect` 102/102. Console senza errori.
+- Da provare su iPhone: trascinamento col dito (pointer capture), ripetizione col tocco prolungato, dock che scivola (nel pane la transizione non avanzava: il valore finale `translate: 0 140%` è corretto), 360×640 e «riduci animazioni» non provati.
+- Scelte fatte: `Step` mostra la virgola decimale di default. Altri testi chiari su chiaro trovati: solo «Cambia» in `.pt-food-sel` (corretto); i giorni futuri del calendario dello Storico sono disattivati di proposito. `Step` in Live usa icone 16 px (prima 22): da guardare nella tappa 6. `Lst` e `Sheet` sono componenti nuovi che sostituiscono il markup duplicato. Le regole `.pt-food-h` ecc. chiare sono aggiunte, non sostituite.
+- Attenzione per chi viene dopo: `TempoBar` (classi `pt-tb*`, `is-paused` ferma il cursore) non è ancora usata; `Count` ora in `bits.jsx` (500 ms); `Step` accetta `text` per sostituire numero+unità.

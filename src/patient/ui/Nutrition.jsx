@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Icon } from './bits.jsx';
+import { Icon, Lst } from './bits.jsx';
 import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import { Ring } from './Schede.jsx';
 import { KcalWeek, MealsWeek } from './Progress.jsx';
@@ -92,10 +92,7 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
                 {o && <button type="button" className="pt-gr" onClick={() => setInfo(true)}><Icon name="info" size={20} /><b>Alcune info sulla tua alimentazione</b><Icon name="back" size={18} /></button>}
             </div></div>
             {hist && (
-                <div className="pt-lst-ov" role="dialog" aria-modal="true" onClick={() => { setHist(false); setHd(null); }}>
-                    <div className="pt-lst" onClick={(e) => e.stopPropagation()}>
-                        <div className="pt-lst-h"><b>{hd ? dayLabel(hd) : 'Storico'}</b><button type="button" className="pt-lst-x" aria-label={hd ? 'Indietro' : 'Chiudi'} onClick={() => (hd ? setHd(null) : setHist(false))}><Icon name={hd ? 'back' : 'close'} size={18} /></button></div>
-                        <div className="pt-lst-b">
+                <Lst title={hd ? dayLabel(hd) : 'Storico'} onClose={() => { setHist(false); setHd(null); }} xLabel={hd ? 'Indietro' : 'Chiudi'} xIcon={hd ? 'back' : 'close'} onX={() => (hd ? setHd(null) : setHist(false))}>
                             {!hd && <Cal log={log} off={cm} setOff={setCm} onPick={(dt) => { setHd(dt); setHdi(di); }} />}
                             {hd && <>
                                 {days.length > 1 && <div className="pt-seg3 is-l">{days.map((x, i) => <button key={i} type="button" className={i === hdi ? 'is-on' : ''} onClick={() => setHdi(i)}>{x.titolo}</button>)}</div>}
@@ -105,15 +102,10 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
                                     </button>); })}
                                 <Extras rt={rt} date={hd} />
                             </>}
-                        </div>
-                    </div>
-                </div>
+                </Lst>
             )}
             {info && o && (
-                <div className="pt-lst-ov" role="dialog" aria-modal="true" onClick={() => setInfo(false)}>
-                    <div className="pt-lst" onClick={(e) => e.stopPropagation()}>
-                        <div className="pt-lst-h"><b>La tua alimentazione</b><button type="button" className="pt-lst-x" aria-label="Chiudi" onClick={() => setInfo(false)}><Icon name="close" size={18} /></button></div>
-                        <div className="pt-lst-b">
+                <Lst title="La tua alimentazione" onClose={() => setInfo(false)}>
                             <div className="pt-tiles">
                                 <div><b>{o.c} g</b><span>Carboidrati</span></div>
                                 <div><b>{o.p} g</b><span>Proteine</span></div>
@@ -122,9 +114,7 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
                             <div className="pt-cd"><MacroDonut c={o.c} p={o.p} f={o.f} /></div>
                             <div className="pt-cd"><MealBars rows={meals.map((m, i) => { const rec = log.meals[mealKey(cur, di, i, date)]; return { n: m.nome, plan: mealKcal(m), eaten: rec ? rec.kcal : 0 }; })} /></div>
                             <div className="pg pg-lt"><KcalWeek log={log} goal={target} /></div>
-                        </div>
-                    </div>
-                </div>
+                </Lst>
             )}
         </div>
     );

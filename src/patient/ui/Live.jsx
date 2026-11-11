@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Icon } from './bits.jsx';
+import { Icon, Step, Lst } from './bits.jsx';
+import { parseTempo } from './Tempo.jsx';
 import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import { Clamp } from './Clamp.jsx';
 import { arr, mmss, parseSets, parseRest, sessionKey, suggestLoad, fmtDay, fmtKg, ymd, workoutSummary, sessionDate, HYPE_END } from './logic.js';
@@ -10,12 +11,6 @@ const buzz = (ms) => { try { if (navigator.vibrate) navigator.vibrate(ms); } cat
 const RPES = [6, 7, 8, 9, 10];
 // sfumatura graduale ai bordi della lista che scorre: cresce con lo scorrimento (alto) e con ciò che resta da vedere (basso)
 const fadeSet = (el) => { if (!el) return; const top = Math.min(48, el.scrollTop * 1.6), bot = Math.min(48, Math.max(0, el.scrollHeight - el.clientHeight - el.scrollTop) * 1.6); el.style.setProperty('--ft', top + 'px'); el.style.setProperty('--fb', bot + 'px'); };
-// «3-1-2-1», «3010», «3/1/X/0» → quattro tempi (giù, fermo, su, fermo); non riconosciuto → null
-const parseTempo = (s) => {
-    const v = String(s || '').trim(); if (!v) return null;
-    const a = /[^0-9xX]/.test(v) ? v.split(/[^0-9xX]+/).filter(Boolean) : v.split('');
-    return a.length === 4 ? a.map((x) => x.toUpperCase()) : null;
-};
 const TEMPO = ['Giù', 'Fermo', 'Su', 'Fermo'];
 // serie consecutive con stesso carico e stesso RPE → una voce sola («3 × 50 kg · RPE 8»)
 const groupSets = (sets) => sets.reduce((o, x) => { const l = o[o.length - 1]; if (l && l.kg === x.kg && (l.rpe || 0) === (x.rpe || 0) && (l.reps || 0) === (x.reps || 0)) l.n += 1; else o.push({ n: 1, kg: x.kg, rpe: x.rpe, reps: x.reps }); return o; }, []);
@@ -210,11 +205,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                     </>}
                 </div>
                 <div className="pt-live-act">
-                    {tab === 'oggi' && <div className="pt-step" aria-label="Carico">
-                        <button type="button" aria-label="Meno carico" onClick={() => setKg((x) => Math.max(0, +(x - 2.5).toFixed(1)))}><Icon name="minus" size={22} /></button>
-                        <b>{cur.kg0 === 0 && kg === 0 ? 'Corpo libero' : `${fmtKg(kg)} kg`}</b>
-                        <button type="button" aria-label="Più carico" onClick={() => setKg((x) => +(x + 2.5).toFixed(1))}><Icon name="plus" size={22} /></button>
-                    </div>}
+                    {tab === 'oggi' && <Step value={kg} onChange={setKg} step={2.5} min={0} max={1000} fmt={fmtKg} unit="kg" text={cur.kg0 === 0 && kg === 0 ? 'Corpo libero' : undefined} label="Carico" />}
                     {phase === 'rest' ? <button type="button" className="pt-done is-sec" onClick={skipRest}>SALTA RIPOSO</button> : <button type="button" className="pt-done" onClick={complete}>SERIE COMPLETATA</button>}
                 </div>
                 <div className="pt-nav2">
@@ -231,18 +222,15 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 </div>
             )}
             {listOpen && (
-                <div className="pt-lst-ov" role="dialog" aria-modal="true" aria-label="Esercizi" onClick={() => setListOpen(false)}>
-                    <div className="pt-lst" onClick={(e) => e.stopPropagation()}>
-                        <div className="pt-lst-h"><b>Esercizi</b><button type="button" className="pt-lst-x" aria-label="Chiudi" onClick={() => setListOpen(false)}><Icon name="close" size={18} /></button></div>
-                        <div className="pt-lst-b">{list.map((e, i) => { const got = doneOf(i).length, full = got >= e.n; return (
+                <Lst title="Esercizi" label="Esercizi" onClose={() => setListOpen(false)}>
+                        {list.map((e, i) => { const got = doneOf(i).length, full = got >= e.n; return (
                             <button key={i} type="button" className={'pt-lst-r' + (i === ex ? ' is-cur' : '') + (full ? ' is-done' : '')} onClick={() => { goto(i, Math.min(got, e.n - 1)); setListOpen(false); }}>
                                 <span className="pt-lst-n">{full ? <Icon name="check" size={16} /> : i + 1}</span>
                                 <span className="pt-lst-t"><b>{e.name}</b><small>{e.n} serie × {e.reps || '–'}</small></span>
                                 <span className="pt-lst-s">{got}<i>/{e.n}</i></span>
                             </button>
-                        ); })}</div>
-                    </div>
-                </div>
+                        ); })}
+                </Lst>
             )}
             {paused && (
                 <div className="pt-pause-ov" role="dialog" aria-modal="true" aria-label="Pausa">

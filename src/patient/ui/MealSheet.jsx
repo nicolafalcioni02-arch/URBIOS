@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Icon } from './bits.jsx';
+import { Icon, Sheet, Step, useHold } from './bits.jsx';
 import { WeightTrend } from './Progress.jsx';
 import { arr, mealKey, ymd } from './logic.js';
 import { findFoods, loadFoods, GENERIC } from './foods.js';
@@ -22,7 +22,7 @@ const FoodForm = ({ title, onDone, onCancel, target }) => {
                 : <input className="pt-input" placeholder="Cerca alimento" value={q} maxLength={40} autoFocus onChange={(e) => setQ(e.target.value)} />}
             {!f && hits.map((h) => <button key={h.n} type="button" className="pt-food-h" onClick={() => pick(h)}>{h.n}</button>)}
             {!f && q.trim() && all && !hits.length && <><span className="pt-food-no">Non lo trovo: scegli il più simile</span>{GENERIC.map((h) => <button key={h.n} type="button" className="pt-food-h" onClick={() => pick(h)}>{h.n}</button>)}</>}
-            {f && <><span className="pt-food-no">{target ? 'Quantità con le stesse calorie di prima: puoi cambiarla' : 'Quanti grammi'}</span><div className="pt-step dark"><button type="button" aria-label="Meno" onClick={() => setG((x) => Math.max(10, x - 10))}><Icon name="minus" size={16} /></button><b>{g} g</b><button type="button" aria-label="Più" onClick={() => setG((x) => Math.min(2000, x + 10))}><Icon name="plus" size={16} /></button></div></>}
+            {f && <><span className="pt-food-no">{target ? 'Quantità con le stesse calorie di prima: puoi cambiarla' : 'Quanti grammi'}</span><Step dark value={g} onChange={setG} step={10} min={10} max={2000} unit="g" label="Grammi" /></>}
             <div><button type="button" className="pt-btn ghost" onClick={onCancel}>Annulla</button><button type="button" className="pt-btn" disabled={!ok} onClick={() => onDone({ n: f.n, g, kcal: Math.round(f.k * g / 100) })}>Conferma</button></div>
         </div>
     );
@@ -44,26 +44,17 @@ export const MealSheet = ({ rt, docId, d, m, date, onClose }) => {
     };
     const FORM = <FoodForm target={typeof form === 'number' && list[form] ? kc(list[form]) : 0} title={form === 'add' ? 'Aggiungi un alimento' : 'Sostituisci con'} onDone={apply} onCancel={() => setForm(null)} />;
     return (
-        <div className="pt-ov" role="dialog" aria-modal="true" aria-label={meal.nome}>
-            <div className="pt-ov-back" onClick={onClose} />
-            <section className="pt-dsheet">
-                <header><b>{meal.nome}</b><button type="button" className="pt-round" aria-label="Chiudi" onClick={onClose}><Icon name="close" /></button></header>
+        <Sheet title={meal.nome} onClose={onClose}>
                 {list.map((v, i) => (
                     form === i ? <React.Fragment key={i}>{FORM}</React.Fragment> : <div className="pt-food" key={i}>
                         <div><b>{v.n}</b><span>{v.was ? `Al posto di ${v.was}` : v.p ? `Prescritti ${v.p} g` : 'Aggiunto da te'}</span>
                             <span className="pt-food-a"><button type="button" onClick={() => setForm(i)}>Sostituisci</button>{v.p === null && !v.was && <button type="button" onClick={() => setList((a) => a.filter((_, j) => j !== i))}>Togli</button>}</span></div>
-                        <div className="pt-step dark">
-                            <button type="button" aria-label="Meno" onClick={() => set(i, v.g - 5)}><Icon name="minus" size={16} /></button>
-                            <b>{v.g} g</b>
-                            <button type="button" aria-label="Più" onClick={() => set(i, v.g + 5)}><Icon name="plus" size={16} /></button>
-                        </div>
+                        <Step dark value={v.g} onChange={(x) => set(i, x)} step={5} min={0} max={2000} unit="g" label="Grammi" />
                     </div>
                 ))}
                 {form === null ? <button type="button" className="pt-btn ghost wide" onClick={() => setForm('add')}>Aggiungi un alimento</button> : form === 'add' && FORM}
                 <button type="button" className="pt-cta" onClick={() => save(list)}>Conferma e salva nel diario</button>
-                <button type="button" className="pt-link" onClick={onClose}>Annulla</button>
-            </section>
-        </div>
+        </Sheet>
     );
 };
 
@@ -73,36 +64,28 @@ export const ExtraSheet = ({ rt, names, date, onClose }) => {
     const [when, setWhen] = useState(opts.find((x) => re.test(x)) || 'Fuori pasto');
     const save = async (x) => { const dt = date || ymd(); await rt.log.update((l) => { (l.extras[dt] = l.extras[dt] || []).push({ n: x.n, g: x.g, kcal: Math.min(5000, x.kcal), when, at: Date.now() }); }); onClose(); };
     return (
-        <div className="pt-ov" role="dialog" aria-modal="true" aria-label="Fuori piano">
-            <div className="pt-ov-back" onClick={onClose} />
-            <section className="pt-dsheet">
-                <header><b>Fuori piano</b><button type="button" className="pt-round" aria-label="Chiudi" onClick={onClose}><Icon name="close" /></button></header>
+        <Sheet title="Fuori piano" onClose={onClose}>
                 <b className="pt-when-t">Quando l'hai mangiato</b>
                 <div className="pt-when">{opts.map((o) => <button key={o} type="button" className={o === when ? 'is-on' : ''} onClick={() => setWhen(o)}>{o}</button>)}</div>
                 <FoodForm title="Che cosa hai mangiato" onDone={save} onCancel={onClose} />
-            </section>
-        </div>
+        </Sheet>
     );
 };
 
 export const WeightSheet = ({ rt, onClose }) => {
     const w = rt.log.get().weights, last = w.length ? w[w.length - 1] : null;
     const [kg, setKg] = useState(last ? last.kg : 70);
+    const hm = useHold((k) => setKg((x) => Math.max(20, +(x - 0.1 * k).toFixed(1)))), hp = useHold((k) => setKg((x) => Math.min(300, +(x + 0.1 * k).toFixed(1))));
     const save = async () => { const date = ymd(); await rt.log.update((l) => { const i = l.weights.findIndex((x) => x.date === date); const r = { date, kg, at: Date.now() }; if (i >= 0) l.weights[i] = r; else l.weights.push(r); l.weights = l.weights.slice(-400); }); onClose(); };
     return (
-        <div className="pt-ov" role="dialog" aria-modal="true" aria-label="Peso">
-            <div className="pt-ov-back" onClick={onClose} />
-            <section className="pt-dsheet">
-                <header><b>Registra il peso</b><button type="button" className="pt-round" aria-label="Chiudi" onClick={onClose}><Icon name="close" /></button></header>
+        <Sheet title="Registra il peso" label="Peso" onClose={onClose}>
                 <div className="pg" style={{ margin: '4px 0 12px' }}><WeightTrend weights={w} /></div>
                 <div className="pt-wt">
-                    <button type="button" className="pt-round" aria-label="Meno" onClick={() => setKg((x) => Math.max(20, +(x - 0.1).toFixed(1)))}><Icon name="minus" /></button>
+                    <button type="button" className="pt-round" aria-label="Meno" {...hm}><Icon name="minus" /></button>
                     <b>{String(kg.toFixed(1)).replace('.', ',')} <small>kg</small></b>
-                    <button type="button" className="pt-round" aria-label="Più" onClick={() => setKg((x) => Math.min(300, +(x + 0.1).toFixed(1)))}><Icon name="plus" /></button>
+                    <button type="button" className="pt-round" aria-label="Più" {...hp}><Icon name="plus" /></button>
                 </div>
                 <button type="button" className="pt-cta" onClick={save}>Salva</button>
-                <button type="button" className="pt-link" onClick={onClose}>Annulla</button>
-            </section>
-        </div>
+        </Sheet>
     );
 };
