@@ -16,9 +16,9 @@ const initials = (n) => n.replace(/^Dott\.(ssa)?\s/, '').split(' ').map((w) => w
 
 export const About = ({ onClose }) => (
     <div className="pt-ab" role="dialog" aria-modal="true" aria-label="Chi è URBIOS">
-        <header className="pt-ab-h"><button type="button" className="pt-round" aria-label="Chiudi" onClick={onClose}><Icon name="back" /></button><b>URBIOS</b></header>
+        <header className="pt-ab-h"><button type="button" className="pt-round" aria-label="Chiudi" onClick={onClose}><Icon name="back" /></button></header>
         <div className="pt-ab-s">
-            <div className="pt-ab-hero"><UrbiosLogo size={64} /><b>URBIOS</b><span>La piattaforma per professionisti della salute</span></div>
+            <div className="pt-ab-hero"><UrbiosLogo size={64} /><b>URBIOS</b></div>
 
             <h3>Il team</h3>
             <div className="pt-ab-team">{TEAM.map(([n, r]) => <div key={n}><i>{initials(n)}</i><span><b>{n}</b><small>{r}</small></span></div>)}</div>

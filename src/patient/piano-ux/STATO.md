@@ -10,7 +10,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
 | UX-04 Dieta: il giorno di oggi | fatto |
 | UX-05 Coerenza grafica e Profilo | fatto |
-| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-7 fatte |
+| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-8 fatte |
 
 A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così:
 
@@ -129,3 +129,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare su iPhone: trascinamento del righello col dito e aggancio alla tacca (inerzia di Safari, `scrollend` assente nelle versioni vecchie: c'è il ritardo di 120 ms), vibrazione a ogni tacca (iOS Safari non la supporta: è prevista), tenuta di ± sul peso, riordino della spesa, tastiera sopra il campo appunti.
 - Scelte fatte: il titolo del foglio peso resta «Registra il peso» (il brief non lo cambia); con `bare` durante la selezione sul grafico compare solo la data; il righello ha ±15 kg intorno al valore iniziale e non si ricentra se si esce dall'intervallo con ±; classe del riquadro appunti `pt-ns` (`pt-note-in` esisteva già).
 - Attenzione per chi viene dopo: classi nuove `pt-ruler*`, `pt-vd`, `pt-vdate`, `pt-quick-4`, `pt-shop-r`, `pt-ns`, `pt-note-send`, `pt-todo-x`; le vecchie `.pt-miss`, `.pt-shop-s` restano nel CSS ma non nel JSX.
+
+## UX-06.8 — fatto il 11/11/2026
+- File toccati: `ui/Settings.jsx`, `ui/About.jsx`, `patient.css` (in fondo, `/* UX-06.8 */`), questo file.
+- Cosa vede il paziente: Profilo con una sola card a cinque righe da 56 px (Collegato con pallino, Riassunto PDF, Aggiorna, Blocca, URBIOS), esito del PDF e consenso in piccolo sotto, «Elimina tutto» rosso staccato di 32 px con la stessa conferma di prima. Pagina URBIOS senza il nome nell'intestazione e senza la frase per i professionisti.
+- Verificato in browser (375×812 `?prova`): righe tutte 56 px, 9 parole visibili (prima ≈ 45), «PDF salvato nei file» resta sotto la card, conferma e «Annulla» funzionano, «Sì, elimina tutto» rosso con testo bianco (serviva più specificità contro `.pt-btn.danger`), 296 px tra l'ultima riga e il dock, iniziali su lilla-2 già dalla tappa 2. Rotazione dell'icona verificata forzando la classe (in demo il PDF finisce subito). Console senza errori dell'app.
+- Da provare su iPhone: rotazione dell'icona durante il PDF vero, giro di «Aggiorna», riga del consenso con un consenso reale, «Blocca» (non l'ho premuto: esce dalla prova), 360×640.
+- Scelte fatte: la riga «Aggiorna» scompare se manca `onRefresh`; le variabili `rows` inutilizzate di `Settings.jsx` sono rimaste; il vecchio blocco `.pt-about` resta nel CSS ma non nel JSX.
+- Attenzione per chi viene dopo: classi `pt-prof`, `pt-set*`, `pt-set-del*`, `pt-set-yes`.

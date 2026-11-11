@@ -12,34 +12,23 @@ export const Settings = ({ rt, onBack, onLock, onForget, onRefresh, onAct }) => 
     const rows = [['visit', 'calendar', 'Prossimo controllo', dv === null ? 'Imposta la data' : dv < 0 ? 'Data passata' : dv === 0 ? 'Oggi' : dv === 1 ? 'Domani' : `Tra ${dv} giorni`], ...(hasDiet ? [['shop', 'cart', 'Lista della spesa', 'Dalla tua dieta']] : []), ['notes', 'note', 'Da dire al professionista', nn ? `${nn} appunt${nn === 1 ? 'o' : 'i'}` : 'Scrivi un promemoria']];
     const [busy, setBusy] = useState(false), [msg, setMsg] = useState('');
     const send = async () => { if (busy) return; setBusy(true); setMsg(''); try { const r = await shareSummary(rt); if (r === 'saved') setMsg('PDF salvato nei file'); else if (r === 'shared') setMsg('Riassunto inviato'); } catch (e) { setMsg('Non sono riuscito a creare il PDF'); } setBusy(false); };
-    const [sure, setSure] = useState(false), [about, setAbout] = useState(false);
+    const [sure, setSure] = useState(false), [about, setAbout] = useState(false), [spin, setSpin] = useState(false);
+    const refresh = () => { setSpin(true); setTimeout(() => setSpin(false), 600); onRefresh(); };
     return (
-        <>
+        <div className="pt-prof">
             <Head title="Profilo" />
-            <div className="pt-card is-round">
-                <h2>Collegamento</h2>
-                <p className="pt-sub" style={{ margin: 0 }}>{st.linked ? 'Collegato al tuo professionista.' : 'Nessun professionista collegato.'}</p>
-                                {st.consent && <p className="pt-muted">Consenso dato il {new Date(st.consent.at).toLocaleDateString('it-IT')} (informativa {st.consent.version}).</p>}
+            <div className="pt-set">
+                <div className="pt-set-r"><Icon name="link" size={22} /><b>{st.linked ? 'Collegato' : 'Non collegato'}</b><i className={'pt-set-dot' + (st.linked ? '' : ' is-off')} aria-hidden="true" /></div>
+                <button type="button" className={'pt-set-r' + (busy ? ' is-busy' : '')} onClick={send} disabled={busy}><Icon name="doc" size={22} /><b>Riassunto PDF</b><span className="pt-set-e"><Icon name="share" size={20} /></span></button>
+                {onRefresh && <button type="button" className={'pt-set-r' + (spin ? ' is-spin' : '')} onClick={refresh}><Icon name="refresh" size={22} /><b>Aggiorna</b></button>}
+                <button type="button" className="pt-set-r" onClick={onLock}><Icon name="lock" size={22} /><b>Blocca</b></button>
+                <button type="button" className="pt-set-r" onClick={() => setAbout(true)}><UrbiosLogo size={22} /><b>URBIOS</b><span className="pt-set-e"><Icon name="chev" size={18} /></span></button>
             </div>
-            <div className="pt-card is-round" style={{ marginTop: 16 }}>
-                <h2>Il tuo riassunto</h2>
-                <p className="pt-sub">Un PDF con tutto il tuo percorso, da inviare al professionista.</p>
-                <button type="button" className="pt-btn" onClick={send} disabled={busy}>{busy ? 'Creo il PDF…' : 'Invia il riassunto'}</button>
-                {msg && <p className="pt-muted">{msg}</p>}
-            </div>
-            <div className="pt-btns pt-btns2">{onRefresh && <button type="button" className="pt-btn ghost" onClick={onRefresh}>Aggiorna piani</button>}<button type="button" className="pt-btn ghost" onClick={onLock}>Esci</button></div>
-            <div className="pt-card is-round" style={{ marginTop: 16 }}>
-                <h2>Revoca ed elimina</h2>
-                <p className="pt-sub">Elimina da questo telefono documenti, chiavi e collegamento.</p>
-                {!sure ? <button type="button" className="pt-btn danger" onClick={() => setSure(true)}>Elimina tutto</button>
-                    : <><Note tone="bad">Operazione definitiva. Confermi?</Note><div className="pt-btns"><button type="button" className="pt-btn danger" onClick={onForget}>Sì, elimina tutto</button><button type="button" className="pt-btn ghost" onClick={() => setSure(false)}>Annulla</button></div></>}
-            </div>
-            <button type="button" className="pt-about" style={{ marginTop: 16 }} onClick={() => setAbout(true)}>
-                <UrbiosLogo size={28} />
-                <span><b>URBIOS</b></span>
-                <Icon name="back" size={18} />
-            </button>
+            {msg && <p className="pt-set-n">{msg}</p>}
+            {st.consent && <p className="pt-set-n">Consenso dato il {new Date(st.consent.at).toLocaleDateString('it-IT')} (informativa {st.consent.version}).</p>}
+            {!sure ? <button type="button" className="pt-set-del" onClick={() => setSure(true)}><Icon name="trash" size={22} /><b>Elimina tutto</b></button>
+                : <div className="pt-set-del-c"><Note tone="bad">Operazione definitiva. Confermi?</Note><div className="pt-btns"><button type="button" className="pt-btn danger pt-set-yes" onClick={onForget}>Sì, elimina tutto</button><button type="button" className="pt-btn ghost" onClick={() => setSure(false)}>Annulla</button></div></div>}
             {about && <About onClose={() => setAbout(false)} />}
-        </>
+        </div>
     );
 };

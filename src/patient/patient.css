@@ -1378,3 +1378,25 @@ body:has(.pt-main) .pt-quick-4 button { background: var(--u-lilla); box-shadow: 
 .pt-note-send { position: absolute; right: 8px; bottom: 8px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--u-lime); color: #0B0C0E; display: grid; place-items: center; cursor: pointer; transition: background .2s ease; }
 .pt-note-send:disabled { background: var(--u-lilla-2); color: var(--u-grigio); cursor: default; }
 @media (prefers-reduced-motion: reduce) { .pt-shop, .pt-note-send { transition: none; } }
+
+/* UX-06.8: Profilo a righe, pagina URBIOS */
+.pt-prof .pt-head { padding-top: calc(16px + env(safe-area-inset-top)); }
+.pt-prof .pt-set { display: flex; flex-direction: column; border-radius: 32px; background: #fff; box-shadow: 0 3px 14px rgba(11,12,14,.05); overflow: hidden; }
+.pt-prof .pt-set-r { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 56px; padding: 0 20px; border: 0; background: transparent; color: var(--u-ink); font: inherit; text-align: left; cursor: pointer; }
+.pt-prof .pt-set-r + .pt-set-r { border-top: 1px solid var(--u-lilla); }
+.pt-prof div.pt-set-r { cursor: default; }
+.pt-prof .pt-set-r > svg { flex: none; color: var(--u-viola); }
+.pt-prof .pt-set-r > b { flex: 1; min-width: 0; font-size: 16px; font-weight: 700; }
+.pt-prof button.pt-set-r:active { background: var(--u-lilla); }
+.pt-prof .pt-set-r:disabled { opacity: 1; cursor: default; }
+.pt-prof .pt-set-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--u-lime-ink); } .pt-prof .pt-set-dot.is-off { background: var(--u-rosso); }
+.pt-prof .pt-set-e { flex: none; display: grid; place-items: center; color: var(--u-grigio); } .pt-prof .pt-set-e svg { display: block; }
+.pt-prof .pt-set-r.is-busy .pt-set-e { animation: pt-spin 1s linear infinite; pointer-events: none; }
+.pt-prof .pt-set-r.is-spin > svg { animation: pt-spin 600ms ease-in-out 1; }
+@keyframes pt-spin { to { rotate: 360deg; } }
+.pt-prof .pt-set-n { margin: 8px 4px 0; font-size: 13px; font-weight: 600; color: var(--u-grigio-d); }
+.pt-prof .pt-set-del { display: flex; align-items: center; gap: 12px; margin-top: 32px; min-height: 56px; padding: 0 20px; border: 0; background: transparent; color: var(--u-rosso); font: inherit; cursor: pointer; } .pt-prof .pt-set-del b { font-size: 16px; font-weight: 700; }
+.pt-prof .pt-set-del-c { margin-top: 32px; }
+body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-rosso); color: #fff; border-color: transparent; }
+.pt-prof { padding-bottom: 24px; }
+@media (prefers-reduced-motion: reduce) { .pt-prof .pt-set-r.is-busy .pt-set-e, .pt-prof .pt-set-r.is-spin > svg { animation: none; } }
