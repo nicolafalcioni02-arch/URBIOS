@@ -1438,3 +1438,18 @@ body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-ross
 .hm2 > .hm2-next .hm2-t b { text-shadow: none; }
 /* segno grande della Home bianco */
 .hm2 > div.hm2-mark { color: #fff; }
+
+/* tempo a grafico: linea del movimento con il pallino che la percorre */
+.pt-tg .pt-tg-in { position: relative; height: 56px; margin: 8px 7px 0; }
+.pt-tg-in > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.pt-tg-in > svg line { vector-effect: non-scaling-stroke; stroke-linecap: round; fill: none; }
+.pt-tg-in > svg .g { stroke: var(--tb-b); stroke-width: 1; stroke-dasharray: 2 4; }
+.pt-tg-in > svg .l { stroke-width: 4; stroke: var(--tb-b); } .pt-tg-in > svg .l0 { stroke: var(--tb-a); } .pt-tg-in > svg .l2 { stroke: var(--tb-c); }
+.pt-tg-c { position: absolute; left: 0; top: 0; width: 16px; height: 16px; translate: -50% -50%; border-radius: 50%; background: var(--tb-k); box-shadow: 0 0 0 4px rgba(255,255,255,.18), 0 1px 4px rgba(0,0,0,.3); animation-duration: var(--tb); animation-timing-function: linear; animation-iteration-count: infinite; }
+.pt-tg:not(.is-dark) .pt-tg-c { box-shadow: 0 0 0 4px rgba(107,61,255,.15), 0 1px 4px rgba(0,0,0,.25); }
+.pt-tg .pt-tb-n { margin: 8px 7px 0; }
+.pt-tb.is-paused .pt-tg-c, .pt-lv2.is-paused .pt-tg-c { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .pt-tg-c { animation: none; left: 0; top: 0; } }
+.pt-tg .pt-tg-in { height: 84px; margin-top: 12px; }
+.pt-tg.is-dark { --tb-b: rgba(255,255,255,.38); }
+.pt-xc-x .pt-tg .pt-tg-in { height: 56px; }
