@@ -82,14 +82,24 @@ const Scan = ({ onCode, onBack }) => {
 };
 
 // Tutto quello che il catalogo sa del prodotto, sotto la parte compilata dal cliente (solo lettura)
+const NS = { A: 'Qualità nutrizionale ottima', B: 'Qualità nutrizionale buona', C: 'Qualità nutrizionale media', D: 'Qualità nutrizionale scarsa', E: 'Qualità nutrizionale ridotta' };
+const GS = { A: 'Impatto ambientale molto basso', B: 'Impatto ambientale basso', C: 'Impatto ambientale moderato', D: 'Impatto ambientale elevato', E: 'Impatto ambientale molto elevato' };
 const Facts = ({ i }) => {
     const f = i.info, v = (x, u) => (x == null ? null : String(x).replace('.', ',') + (u || ''));
     const rows = [['Grassi', v(f.fat, ' g')], ['di cui saturi', v(f.sat, ' g')], ['Carboidrati', v(f.carb, ' g')], ['di cui zuccheri', v(f.sug, ' g')], ['Fibre', v(f.fib, ' g')], ['Proteine', v(f.pro, ' g')], ['Sale', v(f.salt, ' g')]].filter((r) => r[1]);
     const top = [i.brand, f.qty, f.cat].filter(Boolean);
     return (
         <div className="pt-pf-i">
-            {(top.length > 0 || f.ns || f.nova > 0) && <div className="pt-pf-h">{top.map((x) => <span key={x}>{x}</span>)}{f.ns && <span className={'pt-ns-' + f.ns.toLowerCase()}>Nutri-Score {f.ns}</span>}{f.nova > 0 && <span>NOVA {f.nova}</span>}</div>}
+            {(top.length > 0 || f.nova > 0) && <div className="pt-pf-h">{top.map((x) => <span key={x}>{x}</span>)}{f.nova > 0 && <span>NOVA {f.nova}</span>}</div>}
+            {f.ns && <div className={'pt-gs pt-gs-' + f.ns.toLowerCase()}><i>{f.ns}</i><span>Nutri-Score {f.ns}</span><small>{NS[f.ns]}</small></div>}
             {(i.kcal != null || rows.length > 0) && <dl><div className="is-k"><dt>Energia · 100 g</dt><dd>{i.kcal != null ? i.kcal + ' kcal' : '—'}</dd></div>{rows.map((r) => <div key={r[0]} className={r[0].startsWith('di cui') ? 'is-s' : ''}><dt>{r[0]}</dt><dd>{r[1]}</dd></div>)}</dl>}
+            {(f.green || f.co2 != null || f.palm || f.forest || f.pack.length > 0) && <div className="pt-pf-e">
+                {f.green && <div className={'pt-gs pt-gs-' + f.green.toLowerCase()}><i>{f.green}</i><span>Green-Score {f.green}</span><small>{GS[f.green]}</small></div>}
+                {f.co2 != null && <div className="pt-pf-e1"><Icon name="cloud" size={20} /><span>{String(f.co2).replace('.', ',')} g CO₂ ogni 100 g<small>≈ {(f.co2 / 190).toFixed(1).replace('.', ',')} km in auto a benzina</small></span></div>}
+                {f.palm && <div className="pt-pf-e1"><Icon name="drop" size={20} /><span>Contiene olio di palma</span></div>}
+                {f.forest && <div className="pt-pf-e1"><Icon name="leaf" size={20} /><span>Impronta forestale {f.forest}</span></div>}
+                {f.pack.length > 0 && <div className="pt-pf-e1"><Icon name="box" size={20} /><span>Imballaggio<small>{f.pack.join(' — ')}</small></span></div>}
+            </div>}
             {f.ing && <section><h4>Ingredienti</h4><p>{f.ing}</p></section>}
             {f.all.length > 0 && <section><h4>Allergeni</h4><p>{f.all.join(', ')}</p></section>}
             {f.orig && <section><h4>Origine</h4><p>{f.orig}</p></section>}
