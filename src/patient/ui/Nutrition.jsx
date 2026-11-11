@@ -68,6 +68,7 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
                         {(() => { const inner = <><Ring pct={pct / 100} ink="#0B0C0E" /><span className="pt-sc-t"><b><Count n={eaten} /> / {target}</b> <small>kcal</small></span></>; return o ? <button type="button" className="pt-nh-l" aria-label="La tua alimentazione" onClick={() => setInfo(true)}>{inner}</button> : <div className="pt-nh-l">{inner}</div>; })()}
                         <span className="pt-nh-r">
                             <button type="button" aria-label="Storico" onClick={() => setHist(true)}><Icon name="calendar" size={20} /></button>
+                            {o && <button type="button" aria-label="La tua alimentazione" onClick={() => setInfo(true)}><Icon name="chart" size={20} /></button>}
                             <button type="button" aria-label="Fuori piano" onClick={() => onExtra({ names: meals.map((m) => m.nome) })}><Icon name="plus" size={20} /></button>
                         </span>
                     </div>

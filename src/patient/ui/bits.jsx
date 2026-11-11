@@ -24,6 +24,7 @@ const PATHS = {
     arrow: <path d="M7 17 17 7M9 7h8v8" />,
     info: (<><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>),
     calendar: (<><rect x="4" y="5" width="16" height="15" rx="3" /><path d="M4 10h16M9 3v4M15 3v4" /></>),
+    chart: (<><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></>),
     drop: (<path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z" />),
     leaf: (<><path d="M5 19c0-9 5-14 14-14 0 9-5 14-14 14z" /><path d="M5 19l8-8" /></>),
     box: (<><path d="M4 8l8-4 8 4v8l-8 4-8-4z" /><path d="M4 8l8 4 8-4M12 12v8" /></>),
