@@ -72,7 +72,6 @@ const Scan = ({ onCode, onBack }) => {
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
     return (
         <div className="pt-sc2">
-            <button type="button" className="pt-round pt-sc2-b" aria-label="Indietro" onClick={onBack}><Icon name="back" /></button>
             <div className="pt-sc2-v"><video ref={video} muted playsInline /><i /></div>
             {err && <p className="pt-muted">{err}</p>}
             {!man ? <button type="button" className="pt-link" onClick={() => setMan(true)}>Scrivi il numero</button>
@@ -124,7 +123,6 @@ const PriceForm = ({ init, items, stores, onSave, onBack }) => {
     const num = (v) => parseFloat(String(v).replace(',', '.')), ok = name.trim() && num(price) > 0 && (!key || num(g) > 0);   // il peso serve solo per la stima della voce
     return (
         <div className="pt-pf">
-            <button type="button" className="pt-round pt-sc2-b" aria-label="Indietro" onClick={onBack}><Icon name="back" /></button>
             {init.miss && <p className="pt-muted">Non lo trovo: compila a mano.</p>}
             <input className="pt-input" aria-label="Prodotto" placeholder="Prodotto" maxLength={80} value={name} onChange={(e) => setName(e.target.value)} />
             <div className="pt-pf-r">
@@ -146,7 +144,6 @@ const Buys = ({ buys, est, cover, onDel, onBack }) => {
     const day = (at) => new Date(at).toLocaleDateString('it-IT', { day: 'numeric', month: 'numeric' });
     return (
         <div className="pt-by">
-            <button type="button" className="pt-round pt-sc2-b" aria-label="Indietro" onClick={onBack}><Icon name="back" /></button>
             <div className="pt-shop-t is-static"><b>{eur(spent)}</b><span>{buys.length}</span></div>
             {est > 0 && <p className="pt-by-e"><Icon name="cart" size={16} />{eur(est)}<span>{cover}</span></p>}
             {buys.map((b) => sure === b.id
@@ -185,7 +182,7 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
     const priced = items.filter((x) => cost(x) !== null), total = priced.reduce((t, x) => t + cost(x), 0);
     const extra = items.length ? (all ? <em className="pt-sh-k is-all"><Icon name="check" size={14} />{taken}/{items.length}</em> : <em className="pt-sh-k is-n">{taken}/{items.length}</em>) : null;
     return (
-        <Shell title="Spesa" extra={view ? null : extra} onClose={onClose}>
+        <Shell title="Spesa" extra={view ? null : extra} onClose={onClose} onBack={view && view !== 'load' ? () => setView(null) : undefined}>
             {view === 'scan' ? <Scan onCode={found} onBack={() => setView(null)} />
                 : view === 'load' ? <p className="pt-muted pt-sc2-l" role="status">Cerco il prodotto…</p>
                 : view === 'buys' ? <Buys buys={buys} est={total} cover={priced.length + '/' + items.length} onDel={delBuy} onBack={() => setView(null)} />

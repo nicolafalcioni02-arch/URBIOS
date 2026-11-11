@@ -141,13 +141,13 @@ export const useDragClose = (onClose) => {
 };
 
 // Foglio dal basso con maniglia: stesso markup di sempre, più il trascinamento per chiudere.
-export const Sheet = ({ title, extra, label, onClose, children }) => {
+export const Sheet = ({ title, extra, label, onClose, onBack, children }) => {
     const { ref, grab } = useDragClose(onClose);
     return (
         <div className="pt-ov" role="dialog" aria-modal="true" aria-label={label || title}>
             <div className="pt-ov-back" onClick={onClose} />
             <section className="pt-dsheet" ref={ref}>
-                <header {...grab}><i className="pt-grab" /><b>{title}</b>{extra}<button type="button" className="pt-round" aria-label="Chiudi" onClick={onClose}><Icon name="close" /></button></header>
+                <header {...grab}><i className="pt-grab" /><b>{title}</b>{extra}{onBack ? <button type="button" className="pt-round" aria-label="Indietro" onClick={onBack}><Icon name="back" /></button> : <button type="button" className="pt-round" aria-label="Chiudi" onClick={onClose}><Icon name="close" /></button>}</header>
                 {children}
             </section>
         </div>
