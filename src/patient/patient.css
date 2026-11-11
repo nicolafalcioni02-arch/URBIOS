@@ -1431,3 +1431,6 @@ body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-ross
 /* Ritocchi dopo UX-06.9: logo fermo; tessera Peso solo con la scritta */
 .pt-auth:has(.pt-feat) .pt-auth-logo svg { animation: none; }
 .hm2-q i.is-txt { font-style: normal; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--u-ink); }
+/* logo della Home fermo: niente rotazione continua né scatto al tocco */
+@media (prefers-reduced-motion: no-preference) { .hm2 > div.hm2-mark { animation: hm2-mark-in 500ms var(--u-ease) backwards; } }
+.hm2-mark-k { transition: none; rotate: 0deg !important; }

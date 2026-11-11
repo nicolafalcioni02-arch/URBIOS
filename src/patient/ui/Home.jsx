@@ -6,10 +6,9 @@ import { Clamp } from './Clamp.jsx';
 import { arr, estMinutes, lastWeight, fmtKg, dayStatus, nextMeal, toolsOf, dietDayToday, mealKey, ymd } from './logic.js';
 
 
-// Segno del logo: decorazione grande, ruota lentissimo; al tocco fa uno scatto di 45°
+// Segno del logo: decorazione grande, ferma
 const Mark = () => {
-    const [kick, setKick] = useState(0);
-    return <div className="hm2-mark" aria-hidden="true" onPointerDown={() => setKick((k) => k + 1)}><div className="hm2-mark-k" style={{ rotate: kick * 45 + 'deg' }}><UrbiosLogo size={440} /></div></div>;
+    return <div className="hm2-mark" aria-hidden="true"><div className="hm2-mark-k"><UrbiosLogo size={440} /></div></div>;
 };
 const dayTag = (() => { const d = new Date(); return d.toLocaleDateString('it-IT', { weekday: 'short' }).replace('.', '').toUpperCase() + ' ' + d.getDate(); });
 
