@@ -1436,3 +1436,5 @@ body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-ross
 .hm2-mark-k { transition: none; rotate: 0deg !important; }
 /* Home: niente alone dietro il titolo */
 .hm2 > .hm2-next .hm2-t b { text-shadow: none; }
+/* segno grande della Home bianco */
+.hm2 > div.hm2-mark { color: #fff; }
