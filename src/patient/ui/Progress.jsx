@@ -75,9 +75,9 @@ export const Streak = ({ log, now = Date.now() }) => {
     if (!n) return null;
     return (
         <div className="pg-card">
-            <span className="pg-k">Costanza</span>
-            <div className="pg-big"><b>{n}</b><small>allenamenti in 4 settimane</small></div>
-            <div className="pg-grid" role="img" aria-label="Giorni di allenamento">{cells.map((c) => <i key={c.d} className={(c.on ? 'is-on ' : '') + (c.fut ? 'is-fut ' : '') + (c.today ? 'is-today' : '')} />)}</div>
+            <div className="pg-big"><Icon name="dumbbell" size={18} /><b>{n}</b></div>
+            <div className="pg-wd" aria-hidden="true">{['L', 'M', 'M', 'G', 'V', 'S', 'D'].map((x, i) => <span key={i}>{x}</span>)}</div>
+            <div className="pg-grid" role="img" aria-label={`Giorni di allenamento: ${n} in 4 settimane`}>{cells.map((c) => <i key={c.d} className={(c.on ? 'is-on ' : '') + (c.fut ? 'is-fut ' : '') + (c.today ? 'is-today' : '')} />)}</div>
             {run >= 2 && <p className="pg-note">{run} settimane di fila</p>}
         </div>
     );

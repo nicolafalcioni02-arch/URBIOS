@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import { Icon, Count, Lst } from './bits.jsx';
 import { BodyMap } from './BodyMap.jsx';
 import { arr, dayStatus, currentWeek, fmtDay, fmtKg } from './logic.js';
@@ -93,18 +92,17 @@ export const Schede = ({ rt, docs, onOpen }) => {
     return (
         <div className="pt-sp">
             <div className="pt-sp-top">
-                <div className="pt-sp-brand"><UrbiosLogo size={34} /><b>URBIOS</b></div>
                 <div className="pt-sp-list">
-                    <button type="button" className="pt-sc" style={{ background: ACTIVE.bg, color: ACTIVE.ink }} disabled={!active.length} onClick={() => onOpen(active[0].open)}>
-                        <Ring pct={active.length ? active[0].pct : 0} ink="#fff" fg="#D8FD38" /><b>La tua scheda</b><Icon name="back" size={18} />
-                    </button>
-                    <button type="button" className="pt-sc" style={{ background: OLD.bg, color: OLD.ink }} disabled={!archive.length} onClick={() => setSheet('old')}>
-                        <span className="pt-sc-i"><Icon name="check" size={20} /></span><b>Le tue vecchie schede</b><Icon name="back" size={18} />
-                    </button>
+                    <div className="pt-sh-row">
+                        <button type="button" className="pt-sc" style={{ background: ACTIVE.bg, color: ACTIVE.ink }} disabled={!active.length} onClick={() => onOpen(active[0].open)}>
+                            <Ring pct={active.length ? active[0].pct : 0} ink="#fff" fg="#D8FD38" /><b>{(active.length && active[0].meta.title) || 'Scheda'}</b><Icon name="chev" size={18} />
+                        </button>
+                        {archive.length > 0 && <button type="button" className="pt-sh-arc" aria-label="Vecchie schede" onClick={() => setSheet('old')}><Icon name="archive" size={22} /></button>}
+                    </div>
                 </div>
             </div>
             <div className="pt-sp-bot pt-td-bot"><svg className="pt-td-wave" viewBox="0 0 400 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30V15C40 -3 90 -3 135 13S230 31 275 14 360 -2 400 12V30Z" fill="#fff" /></svg><div className="pt-sp-scroll">
-                <button type="button" className="pt-rng" aria-label={`Periodo: ultimi ${range} giorni. Tocca per cambiare`} onClick={() => setRange(range === 7 ? 30 : 7)}>Ultimi <b key={range}>{range} giorni</b><Icon name="swap" size={14} /></button>
+                <button type="button" className="pt-rng" aria-label={`Periodo: ultimi ${range} giorni. Tocca per cambiare`} onClick={() => setRange(range === 7 ? 30 : 7)}><b key={range}>{range} giorni</b><Icon name="swap" size={14} /></button>
                 <div className="pt-tiles is-sel" role="tablist">
                     {[['a', sm.workouts, 'Sedute'], ['s', sm.sets, 'Serie'], ['m', lav, 'Muscoli']].map(([k, n, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? 'is-on' : ''} onClick={() => setTab(k)}><b><Count n={n} /></b><span>{l}</span></button>)}
                     <button type="button" role="tab" aria-selected={tab === 'f'} className={tab === 'f' ? 'is-on' : ''} onClick={() => setTab('f')}><b>{st.avg != null ? sign(st.avg) + '%' : '–'}</b><span>Forza</span></button>
@@ -115,10 +113,10 @@ export const Schede = ({ rt, docs, onOpen }) => {
                     {tab === 'm' && <><div className="pt-cd"><BodyMap sets={sets} full={range === 7 ? 10 : 40} /></div><div className="pt-cd"><MuscleBars sets={sets} /></div></>}
                     {tab === 'f' && <><div className="pg pg-lt"><ExProgress hist={log.hist} /><Records hist={log.hist} /></div>{st.avg == null && <p className="pt-sp-e">Servono due periodi per il confronto</p>}</>}
                 </div>
-                {(() => { const top = Object.entries(sets).sort((x, y) => y[1] - x[1])[0], c = tab === 'a' ? (sm.workouts ? <><em>{sm.workouts}</em> {sm.workouts === 1 ? 'seduta' : 'sedute'} negli ultimi {range} giorni</> : null) : tab === 's' ? (sm.sets ? <><em>{sm.sets}</em> serie negli ultimi {range} giorni</> : null) : tab === 'm' ? (top && top[1] > 0 ? <><em>{MUSCLES[top[0]]}</em> è il muscolo più lavorato</> : null) : (st.avg != null ? <>Forza <em>{sign(st.avg)}%</em> rispetto al periodo prima</> : null); return c ? <p className="pg-cap">{c}</p> : null; })()}
+                {tab === 'm' && (() => { const top = Object.entries(sets).sort((x, y) => y[1] - x[1])[0]; return top && top[1] > 0 ? <p className="pg-cap"><em>{MUSCLES[top[0]]}</em> è il muscolo più lavorato</p> : null; })()}
             </div></div>
             {sheet && (
-                <Lst title="Le tue vecchie schede" onClose={() => setSheet(null)}>
+                <Lst title="Vecchie schede" onClose={() => setSheet(null)}>
                         {archive.map((a) => ({ key: a.meta.docId, title: a.meta.title, sub: a.last ? fmtDay(a.last) : Math.round((a.pct || 0) * 100) + '%', open: a.open || { name: 'train', id: a.meta.docId, w: 0, d: 0 } })).map((r, i) => (
                             <button key={r.key} type="button" className="pt-lst-r" onClick={() => { setSheet(null); onOpen(r.open); }}>
                                 <span className="pt-lst-n">{i + 1}</span><span className="pt-lst-t"><b>{r.title || 'Scheda'}</b></span><span className="pt-lst-s">{r.sub}</span>

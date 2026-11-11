@@ -10,7 +10,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
 | UX-04 Dieta: il giorno di oggi | fatto |
 | UX-05 Coerenza grafica e Profilo | fatto |
-| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-4 fatte |
+| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-5 fatte |
 
 A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così:
 
@@ -105,3 +105,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare su iPhone: trascinamento/chiusura dei fogli col dito; gli screenshot del pane erano fermi, quindi l'aspetto l'ho verificato da DOM e misure, non a occhio; «riduci animazioni»; Count delle kcal.
 - Scelte fatte: l'azione «Sostituisci» ha aria-label dell'icona; il prezzo del passo da 5 g resta `set` con limite 0–2000; le righe `.pt-gr` in fondo alla Dieta sono state tolte dal JSX (CSS non cancellato).
 - Attenzione per chi viene dopo: `FoodForm` ha la prop `instant`; `Cal` riceve `docId` e `total`; classi nuove `pt-nh*`, `pt-food-x`, `pt-food-n`, `pt-add`, `pt-food-q`, `pt-sh-k`; `Step` ha la prop `hot`.
+
+## UX-06.5 — fatto il 11/11/2026
+- File toccati: `ui/Schede.jsx`, `ui/TrainDetail.jsx`, `ui/Progress.jsx` (solo `Streak`), `patient.css` (in fondo, `/* UX-06.5 */`), questo file.
+- Cosa vede di diverso il paziente: Schede senza marchio; intestazione su una riga con la card viola col nome vero della scheda e, solo se ci sono schede vecchie, il tondo archivio; periodo «7 giorni» come chip; didascalia solo per Muscoli; «Costanza» col numero grande, lettere dei giorni e celle future tratteggiate. Dettaglio senza logo; card del giorno con sole pillole (esercizi, minuti, data se fatto) e titolo solo se c'è un giorno; pillole esercizio «4 × 10», «35″»; tempo come barra (3:1:2:1); pulsante «Inizia»/«Riprendi»/«Rifai» con play.
+- Verificato in browser (375×812, `?prova`, `?prova&solo=scheda&lungo`): nome scheda, tondo archivio, assenza marchio, chip periodo 36 px, didascalia solo in Muscoli, 7 lettere e 4 celle future, «Lower body» una volta nel dettaglio, barra tempo con segmenti 122/41/81/41 px e numeri 3,1,2,1, nome scheda lungo con puntini, nessun trattino, nessuno scorrimento laterale, zero errori in console.
+- Da provare: il caso senza schede vecchie (il tondo è condizionato a `archive.length > 0`, non l'ho forzato), tempo non riconosciuto (resta il testo, ramo semplice, non provato), 360×640, aspetto a occhio (screenshot del pane fermi), «riduci animazioni».
+- Scelte fatte: l'etichetta del chip periodo `aria-label` invariata; la barra del tempo è statica (senza `run`).
+- Attenzione per chi viene dopo: `.pt-sh-row`, `.pt-sh-arc`, `.pt-dh-p`, `.pg-wd` nuove; `Schede.jsx` non importa più `UrbiosLogo`.

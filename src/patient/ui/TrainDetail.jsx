@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { Icon } from './bits.jsx';
-import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
+import { TempoBar, parseTempo } from './Tempo.jsx';
 import { arr, estMinutes, parseSets, parseRest, sessionKey, daySets, suggestLoad, fmtKg, fmtDay, ymd, dayStatus, sessionDate } from './logic.js';
 
 
@@ -44,7 +44,6 @@ export const TrainDetail = ({ rt, id, w0 = 0, d0 = 0, onBack, onStart }) => {
             <div className="pt-sp pt-td">
             <div className="pt-sp-top pt-td-top">
                 <button type="button" className="pt-round pt-td-back" aria-label="Indietro" onClick={onBack}><Icon name="back" /></button>
-                <UrbiosLogo size={34} className="pt-sp-logo" />
                 <b className="pt-td-t">{doc.title || 'Scheda'}</b>
             </div>
             <div className="pt-sp-bot pt-td-bot"><svg className="pt-td-wave" viewBox="0 0 400 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30V15C40 -3 90 -3 135 13S230 31 275 14 360 -2 400 12V30Z" fill="#fff" /></svg><div className="pt-sp-scroll pt-td-sc">
@@ -57,8 +56,8 @@ export const TrainDetail = ({ rt, id, w0 = 0, d0 = 0, onBack, onStart }) => {
 
             <div className="pt-exl" style={{ '--fade': Math.min(64, sc * 1.6) + 'px' }} key={`l${w}-${d}`} onScroll={(e) => setSc(e.currentTarget.scrollTop)}>
             <div className="pt-dh" key={`h${w}-${d}`}>
-                <div><b className="pt-dh-t">{day.titolo}</b>
-                    <span className="pt-hero-d">{exs.length} esercizi · ~{estMinutes(day)} min{st.state === 'done' ? ` · fatto il ${fmtDay(st.date)}` : ''}</span></div>
+                <div>{days.length <= 1 && <b className="pt-dh-t">{day.titolo}</b>}
+                    <span className="pt-dh-p"><span><Icon name="dumbbell" size={14} />{exs.length}</span><span><Icon name="clock" size={14} />{estMinutes(day)}′</span>{st.state === 'done' && <span><Icon name="check" size={14} />{fmtDay(st.date)}</span>}</span></div>
                 <Ring pct={pct} /><span className="pt-dh-n">{done}/{tot}</span>
             </div>
                 {exs.map((e, i) => {
@@ -72,9 +71,9 @@ export const TrainDetail = ({ rt, id, w0 = 0, d0 = 0, onBack, onStart }) => {
                                 <span className="pt-xc-b">
                                     <b>{e.ss ? <em>{e.ss}</em> : null}{e.nome}</b>
                                     <span className="pt-chp">
-                                        <i>{e.serie || `${n} serie`}</i>
+                                        <i>{e.serie ? e.serie.replace(/\s*[xX]\s*/, ' × ') : `${n} serie`}</i>
                                         {e.carico ? <i>{e.carico} kg</i> : null}
-                                        <i>{parseRest(e.rec)}s riposo</i>
+                                        <i><Icon name="clock" size={12} />{parseRest(e.rec)}″</i>
                                     </span>
                                     <span className="pt-dots" aria-label={`${got} di ${n} serie fatte`}>{Array.from({ length: Math.min(n, 10) }, (_, k) => <u key={k} className={k < got ? 'on' : ''} style={k < got ? { background: '#B4E600' } : undefined} />)}</span>
                                 </span>
@@ -84,10 +83,11 @@ export const TrainDetail = ({ rt, id, w0 = 0, d0 = 0, onBack, onStart }) => {
                                 {e.note && <p className="pt-xc-note"><Icon name="info" size={16} />{e.note}</p>}
                                 <div className="pt-kv">
                                     {e.rpe ? <span><small>RPE</small><b>{e.rpe}</b></span> : null}
-                                    {e.tempo ? <span><small>Tempo</small><b>{e.tempo}</b></span> : null}
+                                    {e.tempo && !parseTempo(e.tempo) ? <span><small>Tempo</small><b>{e.tempo}</b></span> : null}
                                     {e.pct ? <span><small>% 1RM</small><b>{e.pct}</b></span> : null}
                                     {sug ? <span><small>Suggerito</small><b>{fmtKg(sug.kg)} kg</b></span> : null}
                                 </div>
+                                {e.tempo && parseTempo(e.tempo) ? <TempoBar tempo={parseTempo(e.tempo)} /> : null}
                                 {past && <p className="pt-xc-past"><b>{fmtDay(past.date)}:</b> {past.sets.map((x) => fmtKg(x.kg) + ' kg' + (x.rpe ? ' (RPE ' + x.rpe + ')' : '')).join(', ')}</p>}
                                 
                             </div></div>
@@ -96,7 +96,7 @@ export const TrainDetail = ({ rt, id, w0 = 0, d0 = 0, onBack, onStart }) => {
                 })}
             </div>
             </div></div></div>
-            <div className="pt-cta-w is-light"><button type="button" className="pt-cta" onClick={() => onStart({ id, w, d })}>{done && done < tot ? 'RIPRENDI ALLENAMENTO' : st.state === 'done' ? 'RIFAI L\'ALLENAMENTO' : 'INIZIA ALLENAMENTO GUIDATO'}</button></div>
+            <div className="pt-cta-w is-light"><button type="button" className="pt-cta" onClick={() => onStart({ id, w, d })}><Icon name="play" size={18} />{done && done < tot ? 'Riprendi' : st.state === 'done' ? 'Rifai' : 'Inizia'}</button></div>
         </>
     );
 };

@@ -1260,3 +1260,26 @@ body:has(.pt-main) .pt-ml { margin-top: 12px; padding: 14px 16px; }
 .pt-food-q { position: relative; display: block !important; } .pt-food-q input { width: 100%; padding-right: 52px; }
 .pt-food-q button { position: absolute; right: 6px; top: 50%; translate: 0 -50%; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--u-lilla-2); color: var(--u-ink); display: grid; place-items: center; cursor: pointer; }
 .pt-food-f { background: none; padding: 0; margin: 4px 0 8px; }
+
+/* UX-06.5: Schede e dettaglio scheda */
+.pt-sh-row { display: flex; align-items: center; gap: 10px; }
+.pt-sh-row .pt-sc { flex: 1; min-width: 0; height: 68px; }
+.pt-sh-row .pt-sc b { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pt-sh-arc { flex: none; width: 56px; height: 56px; border: 0; border-radius: 50%; background: var(--u-lilla-2); color: var(--u-ink); display: grid; place-items: center; cursor: pointer; }
+body:has(.pt-main) .pt-rng { height: 36px; padding: 0 14px; margin: 4px 0 16px; border-radius: 999px; background: #fff; box-shadow: 0 2px 8px rgba(11,12,14,.06); }
+.pg-big svg { align-self: center; }
+.pg-wd { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-bottom: 6px; }
+.pg-wd span { text-align: center; font-size: 11px; font-weight: 700; color: var(--u-grigio); }
+body:has(.pt-main) .pg-lt .pg-grid i { background: var(--u-lilla); border-color: transparent; }
+body:has(.pt-main) .pg-lt .pg-grid i.is-on { background: var(--u-lime); border-color: transparent; }
+body:has(.pt-main) .pg-lt .pg-grid i.is-fut { background: transparent; border: 1.5px dashed var(--u-lilla-2); opacity: 1; }
+body:has(.pt-main) .pg-lt .pg-grid i.is-today { border: 2px solid var(--u-ink); }
+/* dettaglio: senza logo, titolo allineato al tasto indietro */
+body:has(.pt-main) .pt-sp-top.pt-td-top { padding-top: calc(14px + env(safe-area-inset-top)); }
+.pt-td-t { line-height: 44px; }
+.pt-wk .pt-wk-p u { width: 8px; height: 8px; }
+.pt-dh-p { display: flex; flex-wrap: wrap; gap: 8px; }
+.pt-dh-p > span { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,.12); color: #fff; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pt-chp i { display: inline-flex; align-items: center; gap: 4px; }
+.pt-xc-x .pt-tb { margin: 12px 0 4px; }
+.pt-cta-w .pt-cta { display: flex; align-items: center; justify-content: center; gap: 8px; }
