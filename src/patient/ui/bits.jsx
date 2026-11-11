@@ -6,6 +6,7 @@ const PATHS = {
     back: <path d="M15 5 8 12l7 7" />,
     lock: (<><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>),
     refresh: <path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6" />,
+    balance: <path d="M12 4v16M8 20h8M5 7h14M5 7l-2.8 7a3.2 3.2 0 0 0 5.6 0L5 7zM19 7l-2.8 7a3.2 3.2 0 0 0 5.6 0L19 7z" />,
     scale: (<><circle cx="12" cy="12" r="8.5" /><path d="M8.5 10.5a4.5 4.5 0 0 1 7 0M12 12.5l2-2.5" /></>),
     fork: <path d="M7 4v7a2 2 0 0 0 2 2v7M11 4v7a2 2 0 0 1-2 2M9 4v6M17 4c-2 1.5-3 4-3 7h3v9" />,
     swap: <path d="M7 7h11l-3-3M17 17H6l3 3" />,

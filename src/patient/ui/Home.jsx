@@ -36,7 +36,7 @@ export const Home = ({ rt, onNav, onAct, onReconnect }) => {
     // Strumenti: sotto l'icona il dato, se c'è; altrimenti la parola
     const tiles = [
         ...(hasDiet && hero ? [{ k: 'eat', ic: 'fork', q: 'Pasti', v: eatV }] : []),
-        { k: 'weight', ic: 'scale', q: 'Peso', v: w ? fmtKg(w.kg) : '' },
+        { k: 'weight', ic: 'balance', q: 'Peso', v: w ? fmtKg(w.kg) : '' },
         { k: 'visit', ic: 'calendar', q: 'Controllo', v: dv === null || dv < 0 ? '' : dv === 0 ? 'Oggi' : dv === 1 ? '1 g' : dv + ' gg' },
         ...(hasDiet ? [{ k: 'shop', ic: 'cart', q: 'Spesa', v: shopLeft ? String(shopLeft) : '', ok: shopAll.length > 0 && !shopLeft }] : []),
         { k: 'notes', ic: 'note', q: 'Appunti', v: notes ? String(notes) : '' },
