@@ -11,3 +11,4 @@ dist-patient/
 dev/
 .claude/
 docs/liquid-glass-apple-hig.md
+_site/

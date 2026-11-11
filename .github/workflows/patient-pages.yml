@@ -1,4 +1,4 @@
-name: App paziente su GitHub Pages
+name: Sito URBIOS su GitHub Pages
 on:
   push:
     branches: [main]
@@ -24,10 +24,20 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:patient
-      - run: cp dist-patient/patient.html dist-patient/index.html
+      - run: npx vite build
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+      # Sito: pagina di scelta alla radice, app paziente in paziente/, programma del medico in professionista/
+      - run: |
+          mkdir -p _site/paziente _site/professionista
+          cp site/index.html _site/index.html
+          cp -r dist-patient/. _site/paziente/
+          cp _site/paziente/patient.html _site/paziente/index.html
+          cp dist/index.html _site/professionista/index.html
+          touch _site/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist-patient
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
