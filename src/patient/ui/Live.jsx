@@ -42,7 +42,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     const [paused, setPaused] = useState(false), [listOpen, setListOpen] = useState(false), [fin, setFin] = useState(false), [kg, setKg] = useState(() => kgOf(start.ex));
     const [note, setNote] = useState(''), [panel, setPanel] = useState(null), [hit, setHit] = useState(0);
     const [hype, setHype] = useState(null);
-    const [edit, setEdit] = useState(null), bak = useRef(null);      // modifica di una serie già fatta: { ret } = dove tornare
+    const [edit, setEdit] = useState(null), bak = useRef(undefined);      // modifica di una serie già fatta: { ret } = dove tornare
     useEffect(() => { if (!hype) return undefined; const t = setTimeout(() => setHype(null), 3200); return () => clearTimeout(t); }, [hype]);
     const [lastRpe, setLastRpe] = useState(null);                 // RPE della serie appena fatta (si cambia durante il riposo)
     const total = useRef(0), ac = useRef(null), lastSet = useRef(null);
@@ -92,13 +92,21 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     if (!list.length) return null;
     const cur = list[Math.min(ex, list.length - 1)];
     const sug = sugOf(ex), past = arr(rt.log.get().hist[cur.name]).slice(-4).reverse();
-    const goto = (i, s) => { if (edit) { setEdit(null); setLastRpe(null); lastSet.current = bak.current; bak.current = null; } rt.log.update((l) => { const q = l.sessions[key] || (l.sessions[key] = { sets: {}, started: Date.now() }); q.pos = { ex: i }; q.secs = elapsed; }); setEx(i); setSetNo(s); setKg(kgOf(i)); setNote(''); setPhase('work'); setSetSecs(0); setRest(0); T.current.restEnd = 0; T.current.setAt = Date.now(); T.current.lastBeep = null; };
+    const frontier = () => { for (let i = 0; i < list.length; i++) if (doneOf(i).length < list[i].n) return { ex: i, set: doneOf(i).length }; return null; };
+    const retPos = () => (edit ? edit.ret : doneOf(ex).length < cur.n ? { ex, set: setNo } : frontier());   // dove tornare dopo una modifica (null = tutto fatto)
+    const goto = (i, s) => {
+        if (edit) { setEdit(null); setLastRpe(null); lastSet.current = bak.current === undefined ? null : bak.current; bak.current = undefined; }
+        const f = list[i] && doneOf(i).length >= list[i].n;   // esercizio già finito: si riapre con quello che hai fatto, non da zero
+        if (f) { openEdit(i, Math.max(0, Math.min(s, list[i].n - 1)), retPos()); return; }
+        go(i, s);
+    };
+    const go = (i, s) => { rt.log.update((l) => { const q = l.sessions[key] || (l.sessions[key] = { sets: {}, started: Date.now() }); q.pos = { ex: i }; q.secs = elapsed; }); setEx(i); setSetNo(s); setKg(kgOf(i)); setNote(''); setPhase('work'); setSetSecs(0); setRest(0); T.current.restEnd = 0; T.current.setAt = Date.now(); T.current.lastBeep = null; };
     // serie precedente già fatta (nello stesso esercizio o nell'ultimo esercizio che ne ha)
     const prevTarget = () => { if (setNo > 0 && doneOf(ex)[setNo - 1]) return [ex, setNo - 1]; for (let i = ex - 1; i >= 0; i--) { const n = doneOf(i).length; if (n) return [i, n - 1]; } return null; };
     const nextTarget = () => { if (doneOf(ex)[setNo + 1]) return [ex, setNo + 1]; for (let j = ex + 1; j < list.length; j++) if (doneOf(j).length) return [j, 0]; return null; };
     const openEdit = (exI, idx, ret) => {
         const rec = doneOf(exI)[idx]; if (!rec) return;
-        if (!edit) bak.current = lastSet.current;
+        if (bak.current === undefined) bak.current = lastSet.current;
         setEdit({ ret }); setEx(exI); setSetNo(idx); setKg(rec.kg); setNote(rec.note || ''); setLastRpe(rec.rpe || null);
         setPhase('work'); setRest(0); setSetSecs(0); T.current.restEnd = 0; T.current.setAt = Date.now(); T.current.lastBeep = null;
         lastSet.current = { exI, name: list[exI].name, date: ymd(), idx };
@@ -113,14 +121,15 @@ export const Live = ({ rt, id, w, d, onExit }) => {
             if (a && idx === a.length - 1) l.last[name] = k;
         });
     };
-    const saveEdit = () => { commitEdit(); buzz(30); goto(edit.ret.ex, edit.ret.set); };
-    const stepEdit = (t) => { commitEdit(); if (t) openEdit(t[0], t[1], edit.ret); else goto(edit.ret.ex, edit.ret.set); };
+    const leaveEdit = () => { const r = edit.ret; if (r && doneOf(r.ex).length < list[r.ex].n) { goto(r.ex, r.set); return; } const f = frontier(); if (f) goto(f.ex, f.set); else { setEdit(null); lastSet.current = bak.current === undefined ? null : bak.current; bak.current = undefined; setFin(true); } };
+    const saveEdit = () => { commitEdit(); buzz(30); leaveEdit(); };
+    const stepEdit = (t) => { commitEdit(); if (t) openEdit(t[0], t[1], edit.ret); else leaveEdit(); };
     const prev = () => {
         const t = prevTarget();
-        if (t) { if (edit) commitEdit(); openEdit(t[0], t[1], edit ? edit.ret : { ex, set: setNo }); return; }
+        if (t) { if (edit) commitEdit(); openEdit(t[0], t[1], retPos()); return; }
         if (!edit && ex > 0) goto(ex - 1, Math.min(doneOf(ex - 1).length, list[ex - 1].n - 1));
     };
-    const nextEx = (i) => { if (i + 1 < list.length) { goto(i + 1, Math.min(doneOf(i + 1).length, list[i + 1].n - 1)); return true; } return false; };
+    const nextEx = (i) => { if (i + 1 < list.length) { go(i + 1, Math.min(doneOf(i + 1).length, list[i + 1].n - 1)); return true; } return false; };
     const complete = () => {
         if (edit) { saveEdit(); return; }
         if (!ac.current) beep(1, 1);                      // il primo tocco sblocca l'audio
@@ -149,7 +158,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
         rt.log.update((l) => { const a = ((l.sessions[key] || {}).sets || {})[L.exI], i = L.idx === undefined && a ? a.length - 1 : L.idx; put(a && a[i]); const h = arr(l.hist[L.name]).find((x) => x.date === L.date); put(h && a && h.sets[h.sets.length - a.length + i]); });
         setLastRpe(v);
     };
-    const skipEx = () => { setPaused(false); if (!nextEx(ex)) setFin(true); };
+    const skipEx = () => { setPaused(false); if (ex + 1 < list.length) goto(ex + 1, Math.min(doneOf(ex + 1).length, list[ex + 1].n - 1)); else setFin(true); };
 
     if (fin) {
         const sm = workoutSummary(rt.log.get(), id, w, d, list, sDate), diff = sm.prevVol != null ? sm.vol - sm.prevVol : null;
