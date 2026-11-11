@@ -119,7 +119,12 @@ export const Live = ({ rt, id, w, d, onExit }) => {
         });
     };
     const leaveEdit = () => { const r = edit.ret; if (r && doneOf(r.ex).length < list[r.ex].n) { goto(r.ex, r.set); return; } const f = frontier(); if (f) goto(f.ex, f.set); else { setEdit(null); lastSet.current = bak.current === undefined ? null : bak.current; bak.current = undefined; setFin(true); } };
-    const saveEdit = () => { commitEdit(); buzz(30); leaveEdit(); };
+    const saveEdit = () => {     // «Salva» passa alla serie dopo nello stesso esercizio (già fatta = si modifica, altrimenti è quella da fare); solo dopo l'ultima si torna dove eri
+        commitEdit(); buzz(30);
+        const n = list[ex].n;
+        if (setNo + 1 < n) { if (doneOf(ex)[setNo + 1]) openEdit(ex, setNo + 1, edit.ret); else goto(ex, setNo + 1); return; }
+        leaveEdit();
+    };
     const hasPrevSet = setNo > 0 && !!doneOf(ex)[setNo - 1], hasNextSet = !!doneOf(ex)[setNo + 1];
     // frecce: nello stesso esercizio vanno alla serie accanto, altrimenti all'esercizio accanto (anche se non ha serie fatte)
     const prev = () => {
