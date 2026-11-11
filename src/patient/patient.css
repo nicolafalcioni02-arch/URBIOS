@@ -1486,3 +1486,8 @@ body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-ross
 .pt-ruler-t { position: relative; background-position: -.75px 100%, -.75px 100%; }
 .pt-ruler-t span { position: absolute; top: 10px; translate: -50% 0; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--u-grigio); pointer-events: none; }
 .pt-ruler-i { height: 38px; }
+/* righello, versione 2: tacche in alto (corta = 0,1 · media = 0,5 · lunga = 1 kg), segno viola sopra le tacche, numeri alla base */
+.pt-ruler { height: 74px; }
+.pt-ruler-t { background-image: repeating-linear-gradient(90deg, var(--u-ink) 0 1.5px, transparent 1.5px 80px), repeating-linear-gradient(90deg, var(--u-grigio) 0 1.5px, transparent 1.5px 40px), repeating-linear-gradient(90deg, var(--u-lilla-2) 0 1.5px, transparent 1.5px 8px); background-size: 100% 28px, 100% 20px, 100% 13px; background-position: -.75px 10px, -.75px 10px, -.75px 10px; background-repeat: repeat-x; }
+.pt-ruler-t span { top: 46px; }
+.pt-ruler-i { top: 6px; bottom: auto; height: 36px; z-index: 1; }
