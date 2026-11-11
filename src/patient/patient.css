@@ -1685,4 +1685,6 @@ body:has(.pt-main) .pt-sp-top:has(.pt-nh) .pt-nh-l { color: #fff; cursor: defaul
 body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) { background: var(--u-viola); }
 body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc { background: transparent !important; box-shadow: none; border-radius: 0; padding-left: 0; padding-right: 0; color: #fff !important; }
 body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) .pt-sh-arc { background: #fff; color: var(--u-ink); }
-body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc svg:last-child { color: #fff; opacity: .8; }
+body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc > svg:last-child { color: #fff; opacity: .8; }
+.pt-sc-i { flex: none; width: 40px; height: 40px; border-radius: 50%; background: #fff; color: var(--u-viola); display: grid; place-items: center; }
+body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc .pt-sc-i { color: var(--u-viola); }
