@@ -1481,3 +1481,8 @@ body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-ross
 .pt-tg.is-paused .pt-tg-b i, .pt-lv2.is-paused .pt-tg-b i { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .pt-tg .pt-tg-b i { animation: none !important; opacity: 1; } }
 .pt-tg .pt-tb-n { margin-top: 8px; }
+/* righello: tacca lunga esattamente su ogni chilo, con il numero sopra */
+.pt-ruler { height: 72px; }
+.pt-ruler-t { position: relative; background-position: -.75px 100%, -.75px 100%; }
+.pt-ruler-t span { position: absolute; top: 10px; translate: -50% 0; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--u-grigio); pointer-events: none; }
+.pt-ruler-i { height: 38px; }

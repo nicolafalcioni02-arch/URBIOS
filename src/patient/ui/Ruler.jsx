@@ -4,9 +4,9 @@ import React, { useEffect, useLayoutEffect, useRef } from 'react';
 const TICK = 8;
 export const Ruler = ({ value, onChange, min = 20, max = 300 }) => {
     const ref = useRef(null), st = useRef({ lo: 0, n: 0, v: value, raf: 0, snap: 0, mine: false });
-    if (!st.current.n) {
-        const lo = Math.max(min, Math.round((value - 15) * 10) / 10), hi = Math.min(max, Math.round((value + 15) * 10) / 10);
-        st.current.lo = lo; st.current.n = Math.round((hi - lo) * 10) + 1;
+    if (!st.current.n) {   // estremi sempre a chili interi: la tacca lunga cade esattamente su ogni chilo
+        const lo = Math.max(Math.ceil(min), Math.floor(value) - 15), hi = Math.min(Math.floor(max), Math.ceil(value) + 15);
+        st.current.lo = lo; st.current.n = (hi - lo) * 10 + 1;
     }
     const s = st.current, hi = s.lo + (s.n - 1) / 10;
     const pos = (v) => Math.round((Math.min(hi, Math.max(s.lo, v)) - s.lo) * 10) * TICK;
@@ -31,7 +31,7 @@ export const Ruler = ({ value, onChange, min = 20, max = 300 }) => {
     return (
         <div className="pt-ruler">
             <div className="pt-ruler-s" ref={ref} role="slider" tabIndex={0} aria-label="Peso" aria-valuenow={value} aria-valuemin={s.lo} aria-valuemax={hi} onScroll={onScroll} onKeyDown={key}>
-                <div className="pt-ruler-t" style={{ width: s.n * TICK }} />
+                <div className="pt-ruler-t" style={{ width: s.n * TICK }}>{Array.from({ length: Math.floor(hi) - s.lo + 1 }, (_, k) => <span key={k} style={{ left: k * 10 * TICK }}>{s.lo + k}</span>)}</div>
             </div>
             <i className="pt-ruler-i" aria-hidden="true" />
         </div>
