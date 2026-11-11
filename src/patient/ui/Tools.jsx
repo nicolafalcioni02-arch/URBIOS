@@ -131,15 +131,16 @@ const PriceForm = ({ init, items, stores, pick, setPick, onSave, onScan }) => {
     return (
         <div className="pt-pf">
             {init.miss && <p className="pt-muted">Non lo trovo: compila a mano.</p>}
-            <input className="pt-input" aria-label="Prodotto" placeholder="Prodotto" maxLength={80} value={name} onChange={(e) => setName(e.target.value)} />
+            <label className="pt-pf-f"><small>Prodotto</small><input className="pt-input" aria-label="Prodotto" placeholder="Prodotto" maxLength={80} value={name} onChange={(e) => setName(e.target.value)} /></label>
             {!init.ean && <button type="button" className="pt-pf-k" onClick={() => onScan(key)}><Icon name="barcode" size={20} /><b>Leggi il codice a barre</b></button>}
             <div className="pt-pf-r">
-                <input className="pt-input" inputMode="decimal" aria-label="Prezzo in euro" placeholder="Prezzo €" value={price} onChange={(e) => setPrice(e.target.value)} />
-                <input className="pt-input" inputMode="decimal" aria-label="Peso della confezione in grammi" placeholder="Confezione g" value={g} onChange={(e) => setG(e.target.value)} />
+                <label className="pt-pf-f"><small>Prezzo €</small><input className="pt-input" inputMode="decimal" aria-label="Prezzo in euro" placeholder="0,00" value={price} onChange={(e) => setPrice(e.target.value)} /></label>
+                <label className="pt-pf-f"><small>Peso g</small><input className="pt-input" inputMode="decimal" aria-label="Peso della confezione in grammi" placeholder="0" value={g} onChange={(e) => setG(e.target.value)} /></label>
             </div>
             {num(price) > 0 && num(g) > 0 && <p className="pt-pf-kg"><b>{eur(num(price) / num(g) * 1000)}</b> / kg</p>}
-            <input className="pt-input" aria-label="Negozio" placeholder="Negozio" maxLength={40} value={store} onChange={(e) => setStore(e.target.value)} />
+            <label className="pt-pf-f"><small>Negozio</small><input className="pt-input" aria-label="Negozio" placeholder="Negozio" maxLength={40} value={store} onChange={(e) => setStore(e.target.value)} /></label>
             {stores.length > 1 && <div className="pt-pf-s">{stores.map((x) => <button key={x} type="button" className={x === store ? 'is-on' : ''} onClick={() => setStore(x)}>{x}</button>)}</div>}
+            <small className="pt-pf-c">Voce della lista</small>
             <button type="button" className="pt-pf-k" aria-label="Voce della lista" onClick={() => setPick(true)}><Icon name="cart" size={20} /><b>{(items.find((x) => x.k === key) || {}).n || 'Fuori lista'}</b><Icon name="chev" size={18} /></button>
             <button type="button" className="pt-cta" disabled={!ok} onClick={() => onSave(key, { ean: init.ean || '', name: name.trim(), store: store.trim(), price: Math.round(num(price) * 100) / 100, g: Math.round(num(g) || 0), prod: init.ean && init.kcal != null ? { ean: init.ean, n: name.trim().slice(0, 80), br: init.brand || '', kcal: init.kcal, p: (init.info && init.info.pro) || 0, c: (init.info && init.info.carb) || 0, f: (init.info && init.info.fat) || 0 } : null })}>Salva</button>
             {init.info && <Facts i={init} />}

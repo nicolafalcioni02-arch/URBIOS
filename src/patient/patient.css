@@ -1627,3 +1627,8 @@ body:has(.pt-main) .pt-pf .pt-input, body:has(.pt-main) .pt-sc2-m .pt-input { bo
 .pt-shop-ask { margin-bottom: 12px; border-radius: 36px; }
 .pt-shop-ask span b { font-weight: 800; }
 .pt-pf-kg { margin: -2px 0 0 18px; font-size: 14px; font-weight: 600; color: var(--u-grigio); } .pt-pf-kg b { font-size: 18px; font-weight: 800; color: var(--u-viola); font-variant-numeric: tabular-nums; }
+
+/* spesa: ogni campo del modulo ha la sua etichetta sempre visibile */
+.pt-pf-f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.pt-pf-f small, .pt-pf-c { margin-left: 18px; font-size: 12px; font-weight: 700; color: var(--u-grigio); }
+.pt-pf-c { margin-bottom: -6px; }
