@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Icon, Lst, Count } from './bits.jsx';
-import { Ring } from './Schede.jsx';
+import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import { KcalWeek, MealsWeek } from './Progress.jsx';
 import { arr, mealKcal, mealKey, ymd, fmtDay, dietDayToday, toolsOf, dayMacros } from './logic.js';
 
@@ -28,12 +28,13 @@ const Cal = ({ log, off, setOff, onPick, docId, total }) => {
 const SH = ['#B4E600', '#6B3DFF', '#FF7A59'];
 const share = (c, p, f) => { const a = [c * 4, p * 4, f * 9], t = a.reduce((x, y) => x + y, 0) || 1; return a.map((v) => Math.round(v / t * 100)); };
 // Ripartizione delle calorie tra carboidrati, proteine e grassi (4-4-9 kcal/g)
-const MacroDonut = ({ c, p, f }) => {
+const MacroDonut = ({ c, p, f, kcal }) => {
     const parts = [['Carboidrati', c * 4], ['Proteine', p * 4], ['Grassi', f * 9]], tot = parts.reduce((s, x) => s + x[1], 0) || 1;
     let acc = 0;
     return (
         <div className="pt-dn">
             <svg viewBox="0 0 120 120" aria-hidden="true"><g>{parts.map(([n, v], i) => { const len = v / tot * 100, off = -acc; acc += len; return <circle key={n} cx="60" cy="60" r="42" fill="none" stroke={SH[i]} strokeWidth="24" pathLength="100" strokeDasharray={`${Math.max(0, len - 1)} ${100 - Math.max(0, len - 1)}`} strokeDashoffset={off} transform="rotate(-90 60 60)" />; })}</g></svg>
+            {kcal > 0 && <span className="pt-dn-c"><b>{kcal}</b><small>kcal</small></span>}
         </div>
     );
 };
@@ -59,13 +60,12 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
     const days = arr(doc.body.giorni), log = rt.log.get(), date = ymd(), di = di0 ?? dietDayToday(log, cur, days), day = days[Math.min(di, days.length - 1)], meals = arr(day.pasti);
     const o = doc.body.obiettivo, target = (o && o.kcal) || meals.reduce((t, m) => t + mealKcal(m), 0), eaten = dayKcal(log, date);
     const tl = toolsOf(log), dm = dayMacros(log, date);
-    const pct = target ? Math.min(100, Math.round(eaten / target * 100)) : 0;
     return (
         <div className="pt-sp">
             <div className="pt-sp-top">
                 <div className="pt-sp-list">
                     <div className="pt-sc is-static pt-nh" style={{ background: '#FF7A59', color: '#0B0C0E' }}>
-                        {(() => { const inner = <><Ring pct={pct / 100} ink="#0B0C0E" /><span className="pt-sc-t"><b><Count n={eaten} /> / {target}</b> <small>kcal</small></span></>; return o ? <button type="button" className="pt-nh-l" aria-label="La tua alimentazione" onClick={() => setInfo(true)}>{inner}</button> : <div className="pt-nh-l">{inner}</div>; })()}
+                        <div className="pt-nh-l"><UrbiosLogo size={40} /><span className="pt-sc-t"><b><Count n={eaten} /> / {target}</b> <small>kcal</small></span></div>
                         <span className="pt-nh-r">
                             <button type="button" aria-label="Storico" onClick={() => setHist(true)}><Icon name="calendar" size={20} /></button>
                             {o && <button type="button" aria-label="La tua alimentazione" onClick={() => setInfo(true)}><Icon name="chart" size={20} /></button>}
@@ -109,7 +109,7 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
                             <div className="pt-tiles">
                                 {(() => { const sh = share(o.c, o.p, o.f); return [['Carboidrati', o.c], ['Proteine', o.p], ['Grassi', o.f]].map(([n, g], i) => <div key={n}><b>{g} g <small>{sh[i]}%</small></b><span><u style={{ background: SH[i] }} />{n}</span></div>); })()}
                             </div>
-                            <div className="pt-cd"><MacroDonut c={o.c} p={o.p} f={o.f} /></div>
+                            <div className="pt-cd"><MacroDonut c={o.c} p={o.p} f={o.f} kcal={target} /></div>
                             <div className="pt-cd"><MealBars rows={meals.map((m, i) => { const rec = log.meals[mealKey(cur, di, i, date)]; return { n: m.nome, plan: mealKcal(m), eaten: rec ? rec.kcal : 0 }; })} /></div>
                             <div className="pg pg-lt"><KcalWeek log={log} goal={target} /></div>
                 </Lst>

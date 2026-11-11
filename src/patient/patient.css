@@ -1668,3 +1668,15 @@ body:has(.pt-main) .pt-food-h, body:has(.pt-main) .pt-food-sel { border-radius: 
 body:has(.pt-main) .pt-sp-top:has(.pt-nh) { background: var(--u-corallo); }
 body:has(.pt-main) .pt-sp-top:has(.pt-nh) .pt-nh { background: transparent !important; box-shadow: none; border-radius: 0; padding-left: 0; padding-right: 0; }
 body:has(.pt-main) .pt-sp-top:has(.pt-nh) .pt-nh-r { gap: 6px; } body:has(.pt-main) .pt-sp-top:has(.pt-nh) .pt-nh-r button { width: 40px; height: 40px; }
+
+/* dieta: il logo al posto dell'anello, bianco e fermo; schermata dei macro ordinata */
+body:has(.pt-main) .pt-sp-top:has(.pt-nh) .pt-nh-l { color: #fff; cursor: default; } body:has(.pt-main) .pt-sp-top:has(.pt-nh) .pt-nh-l .pt-sc-t { color: #0B0C0E; }
+.pt-lst-b .pt-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.pt-lst-b .pt-tiles div { min-width: 0; padding: 12px 12px 10px; border-radius: 22px; }
+.pt-lst-b .pt-tiles b { display: flex; flex-direction: column; align-items: flex-start; gap: 0; font-size: 22px; line-height: 1.1; }
+.pt-lst-b .pt-tiles b small { margin: 2px 0 0; font-size: 12px; }
+.pt-lst-b .pt-tiles span { margin-top: 4px; font-size: 12px; }
+.pt-lst .pt-cd { border-radius: 36px; padding: 20px; }
+.pt-lst .pt-cd .pt-dn { position: relative; justify-content: center; }
+.pt-lst .pt-cd .pt-dn svg { width: 168px; height: 168px; }
+.pt-dn-c { position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: flex; flex-direction: column; align-items: center; line-height: 1.05; } .pt-dn-c b { font-size: 26px; font-weight: 900; color: var(--u-ink); font-variant-numeric: tabular-nums; } .pt-dn-c small { font-size: 12px; font-weight: 700; color: var(--u-grigio); }
