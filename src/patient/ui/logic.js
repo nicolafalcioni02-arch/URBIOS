@@ -121,3 +121,6 @@ export const dayMacros = (log, date) => {
     const l = []; Object.entries(log.meals || {}).forEach(([k, r]) => { if (k.endsWith('|' + date)) l.push(...arr(r.list)); });
     l.push(...arr((log.extras || {})[date])); return macrosOf(l);
 };
+
+// Un prodotto letto dal codice entra tra gli alimenti dell'app (al massimo 200, i più vecchi escono)
+export const addProd = (log, prod) => { const t = toolsOf(log); t.prods[prod.ean] = prod; const k = Object.keys(t.prods); if (k.length > 200) delete t.prods[k[0]]; };

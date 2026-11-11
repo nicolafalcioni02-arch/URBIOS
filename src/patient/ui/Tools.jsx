@@ -63,7 +63,7 @@ const words = (t) => String(t || '').toLowerCase().split(/[^a-zàèéìòù]+/).
 const guess = (name, items) => { const w = words(name); let b = null, bs = 0; items.forEach((x) => { const sc = words(x.n).filter((y) => w.some((z) => z.startsWith(y.slice(0, 4)) || y.startsWith(z.slice(0, 4)))).length; if (sc > bs) { bs = sc; b = x.k; } }); return b; };
 
 // Lettura del codice: fotocamera, oppure il numero scritto a mano
-const Scan = ({ onCode, onBack }) => {
+export const Scan = ({ onCode, onBack }) => {
     const video = useRef(null), stop = useRef(null), [err, setErr] = useState(''), [man, setMan] = useState(false), [txt, setTxt] = useState('');
     useEffect(() => {
         let dead = false;

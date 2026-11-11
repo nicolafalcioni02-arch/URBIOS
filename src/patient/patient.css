@@ -1652,3 +1652,7 @@ body:has(.pt-main) .pt-shop-r .pt-step button { width: 34px; height: 34px; }
 body:has(.pt-main) .pt-shop-r .pt-step > .pt-step-v.pt-step-v.pt-step-v { min-width: 24px; height: 34px; min-height: 34px; }
 body:has(.pt-main) .pt-shop-r .pt-step { height: 40px; box-sizing: border-box; }
 body:has(.pt-main) .pt-shop-r .pt-shop-bc { width: 40px; height: 40px; }
+
+/* alimenti: lettura del codice a barre dentro la ricerca */
+.pt-food-q button:first-of-type { right: 48px; } .pt-food-q button + button { right: 6px; } .pt-food-q input { padding-right: 96px; }
+.pt-food-f .pt-sc2 { margin-top: 10px; }

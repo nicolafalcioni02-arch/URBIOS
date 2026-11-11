@@ -2,25 +2,39 @@ import React, { useEffect, useState } from 'react';
 import { Icon, Sheet, Step, useHold } from './bits.jsx';
 import { Ruler } from './Ruler.jsx';
 import { WeightTrend } from './Progress.jsx';
-import { arr, mealKey, ymd, macrosOf, toolsOf } from './logic.js';
+import { arr, mealKey, ymd, macrosOf, toolsOf, addProd } from './logic.js';
+import { Scan } from './Tools.jsx';
+import { lookupEan } from '../foodlookup.js';
 import { findFoods, loadFoods, GENERIC, prodFoods } from './foods.js';
 
 // Registra un pasto: grammatura corretta, alimento sostituito o aggiunto. Salvato solo sul telefono.
 const kc = (e) => (e.b ? Math.round(e.kcal * e.g / e.b) : 0);
 // Scelta dell'alimento: cerca nel prontuario. Con `instant` toccare un risultato lo sceglie subito (i grammi si correggono nella riga);
 // senza, dopo la scelta resta il passo grammi e «Salva». Le kcal le calcola l'app.
-const FoodForm = ({ title, onDone, onCancel, target, instant, prods }) => {
+const FoodForm = ({ title, onDone, onCancel, target, instant, prods, onProd }) => {
     const [q, setQ] = useState(''), [f, setF] = useState(null), [g, setG] = useState(100);
-    const [all, setAll] = useState(null);
+    const [all, setAll] = useState(null), [scan, setScan] = useState(''), [miss, setMiss] = useState(false);
     useEffect(() => { let on = true; loadFoods().then((l) => on && setAll([...prodFoods(prods), ...l])); return () => { on = false; }; }, []); // eslint-disable-line react-hooks/exhaustive-deps
     const hits = f ? [] : findFoods(all, q);
     // Sostituzione: i grammi di partenza danno le stesse kcal dell'alimento tolto; altrimenti 100 g
     const grams = (h) => (target && h.k ? Math.max(10, Math.min(1000, Math.round(target / h.k * 100 / 10) * 10)) : 100);
     const pick = (h) => { if (instant) { const gg = grams(h); onDone({ n: h.n, g: gg, kcal: Math.round(h.k * gg / 100), mm: h.mm }); return; } setF(h); setQ(''); setG(grams(h)); };
+    // Codice a barre: il prodotto diventa un alimento (kcal e macro per 100 g) e si sceglie come gli altri
+    const code = async (c) => {
+        setScan('load'); const p = await lookupEan(c);
+        if (!p || p.kcal == null) { setMiss(true); setScan(''); return; }
+        const i = p.info || {}, prod = { ean: c, n: p.name, br: p.brand || '', kcal: p.kcal, p: i.pro || 0, c: i.carb || 0, f: i.fat || 0 };
+        if (onProd) onProd(prod);
+        const h = { n: prod.br ? prod.n + ' · ' + prod.br : prod.n, k: prod.kcal, f: true, mm: { p: prod.p, c: prod.c, f: prod.f }, prod: true };
+        setScan(''); setMiss(false); pick(h);
+    };
+    if (scan === 'load') return <p className="pt-muted pt-sc2-l" role="status">Cerco il prodotto…</p>;
+    if (scan) return <div className="pt-food-f"><button type="button" className="pt-round" aria-label="Indietro" onClick={() => setScan('')}><Icon name="back" /></button><Scan onCode={code} /></div>;
     return (
         <div className="pt-food-f">
             {f ? <div className="pt-food-sel"><span>{f.n}</span><button type="button" onClick={() => setF(null)}>Cambia</button></div>
-                : <div className="pt-food-q"><input className="pt-input" placeholder="Cerca alimento" aria-label={title} value={q} maxLength={40} autoFocus onChange={(e) => setQ(e.target.value)} />{onCancel && <button type="button" aria-label="Annulla" onClick={onCancel}><Icon name="close" size={18} /></button>}</div>}
+                : <div className="pt-food-q"><input className="pt-input" placeholder="Cerca alimento" aria-label={title} value={q} maxLength={40} autoFocus onChange={(e) => setQ(e.target.value)} /><button type="button" aria-label="Leggi il codice a barre" onClick={() => { setMiss(false); setScan('on'); }}><Icon name="barcode" size={18} /></button>{onCancel && <button type="button" aria-label="Annulla" onClick={onCancel}><Icon name="close" size={18} /></button>}</div>}
+            {miss && !f && <span className="pt-food-no">Prodotto non trovato</span>}
             {!f && hits.map((h) => <button key={h.n} type="button" className="pt-food-h" onClick={() => pick(h)}>{h.n}</button>)}
             {!f && q.trim() && all && !hits.length && <><span className="pt-food-no">Non lo trovo: scegli il più simile</span>{GENERIC.map((h) => <button key={h.n} type="button" className="pt-food-h" onClick={() => pick(h)}>{h.n}</button>)}</>}
             {f && <><Step dark value={g} onChange={setG} step={10} min={10} max={2000} unit="g" label="Grammi" /><button type="button" className="pt-cta" onClick={() => onDone({ n: f.n, g, kcal: Math.round(f.k * g / 100), mm: f.mm })}>Salva</button></>}
@@ -44,7 +58,7 @@ export const MealSheet = ({ rt, docId, d, m, date, onClose }) => {
         setList((a) => (form === 'add' ? [...a, e] : a.map((y, j) => (j === form ? { ...e, p: y.p, was: y.was || y.n } : y))));
         setForm(null);
     };
-    const FORM = <FoodForm instant prods={prods} target={typeof form === 'number' && list[form] ? kc(list[form]) : 0} title={form === 'add' ? 'Aggiungi un alimento' : 'Sostituisci con'} onDone={apply} onCancel={() => setForm(null)} />;
+    const FORM = <FoodForm instant prods={prods} onProd={(pr) => rt.log.update((l) => { addProd(l, pr); })} target={typeof form === 'number' && list[form] ? kc(list[form]) : 0} title={form === 'add' ? 'Aggiungi un alimento' : 'Sostituisci con'} onDone={apply} onCancel={() => setForm(null)} />;
     return (
         <Sheet title={meal.nome} extra={<em className="pt-sh-k">{list.reduce((t, e) => t + kc(e), 0)} kcal</em>} onClose={onClose}>
                 {list.map((v, i) => (
@@ -71,7 +85,7 @@ export const ExtraSheet = ({ rt, names, date, onClose }) => {
     return (
         <Sheet title="Fuori piano" onClose={onClose}>
                 <div className="pt-when" role="group" aria-label="Quando l'hai mangiato">{opts.map((o) => <button key={o} type="button" className={o === when ? 'is-on' : ''} onClick={() => setWhen(o)}>{o}</button>)}</div>
-                <FoodForm title="Che cosa hai mangiato" prods={toolsOf(rt.log.get()).prods} onDone={save} onCancel={onClose} />
+                <FoodForm title="Che cosa hai mangiato" prods={toolsOf(rt.log.get()).prods} onProd={(pr) => rt.log.update((l) => { addProd(l, pr); })} onDone={save} onCancel={onClose} />
         </Sheet>
     );
 };
