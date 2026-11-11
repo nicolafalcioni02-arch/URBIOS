@@ -1468,3 +1468,7 @@ body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-ross
 .pt-tg.is-dark .pt-tb-n span { color: rgba(255,255,255,.6); } .pt-tg .pt-tb-n .n0, .pt-tg .pt-tb-n .n2 { color: var(--tb-k); }
 .pt-tg.is-dark .pt-tb-n .n0 { color: #C9BEFF; } .pt-tg.is-dark .pt-tb-n .n2 { color: var(--u-lime); }
 .pt-xc-x .pt-tg .pt-tg-in { height: 64px; }
+/* asse del tempo: una tacca per secondo, così le durate si confrontano a colpo d'occhio; numeri centrati sotto ogni tratto */
+.pt-tg .pt-tg-t { position: relative; height: 8px; margin: 14px 8px 0; border-right: 1.5px solid var(--tb-b); background-image: linear-gradient(90deg, var(--tb-b) 1.5px, transparent 1.5px); background-size: calc(100% / var(--w)) 100%; background-repeat: repeat-x; }
+.pt-tg .pt-tg-t::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1.5px; background: var(--tb-b); }
+.pt-tg .pt-tb-n { gap: 0; margin-top: 6px; } .pt-tg .pt-tb-n span { flex-basis: 0; font-size: 15px; font-weight: 800; }

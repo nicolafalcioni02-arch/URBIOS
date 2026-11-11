@@ -42,6 +42,7 @@ export const TempoBar = ({ tempo, run, dark }) => {
                 </svg>
                 {run && <><style>{`@keyframes ${name} { ${steps.join(' ')} }`}</style><i className="pt-tg-c" style={{ animationName: name, '--tb': total + 's' }} /></>}
             </div>
+            <div className="pt-tg-t" style={{ '--w': W }} aria-hidden="true" />
             <div className="pt-tb-n">
                 {tempo.map((x, i) => <span key={i} className={'n' + i} style={{ flexGrow: w[i] }}>{i === 0 && <Icon name="down" size={12} />}{i === 2 && <Icon name="send" size={12} />}{x}</span>)}
             </div>
