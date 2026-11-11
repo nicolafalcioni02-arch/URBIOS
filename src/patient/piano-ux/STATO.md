@@ -10,7 +10,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
 | UX-04 Dieta: il giorno di oggi | fatto |
 | UX-05 Coerenza grafica e Profilo | fatto |
-| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-6 fatte |
+| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-7 fatte |
 
 A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così:
 
@@ -121,3 +121,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare su iPhone: fluidità dell'onda del riposo con schermo sempre acceso (se scatta: onda ferma, solo il livello scende, decisione del proprietario); schermo bloccato 60 s (la logica dei tempi non è toccata, solo `restTot` aggiunto a `T`); bip/vibrazione; cursore del metronomo e ultimi 3 s lime (le animazioni non avanzavano nel pane); «riduci animazioni».
 - Scelte fatte: il layout è a colonna (testata che riempie, foglio alto quanto il contenuto) invece di altezze fisse: così il livello viola ha l'altezza esatta dell'area visibile; le vecchie regole `.pt-grid`, `.pt-seg`, `.pt-rf`, `.pt-tp`, `.pt-nav2` restano nel CSS ma non nel JSX. Nel foglio Storico la riga di oggi compare come prima.
 - Attenzione per chi viene dopo: classi `pt-lv2`, `pt-lb2`, `pt-sh2`, `pt-rest-w`, `pt-veil`, `pt-nx2`, `pt-bt`, `pt-rnd`; stati `panel` e `hit`; tolti `rpe` e `tab`; `T.current.restTot`.
+
+## UX-06.7 — fatto il 11/11/2026
+- File toccati: `ui/Ruler.jsx` (nuovo), `ui/Tools.jsx`, `ui/MealSheet.jsx` (solo `WeightSheet`), `ui/Progress.jsx` (solo `WeightTrend`, prop `bare`), `patient.css` (in fondo, `/* UX-06.7 */`), `README.md`, questo file.
+- Cosa vede di diverso il paziente: Peso con grafico (solo variazione e linea), numero unico grande tra − e +, righello da trascinare a scatti di 0,1, poi «Salva». Controllo con i giorni mancanti grandi, quattro chip su una riga, data con cestino e «Salva» solo se la data cambia. Spesa con contatore «n/N» (pillola lime a lista completa), giorni e persone su una riga con icona, voci spuntate barrate che scendono in fondo dopo 250 ms, senza il blocco «Ti manca…». Appunti con campo e freccia lime dentro, «Togli» tondo.
+- Verificato in browser (375×812 `?prova`, 360×640 `?vuoto`): scorrimento 1243→72,9; ± e frecce spostano di 0,1 e il righello segue; `__demoLog.weights` registra 72,9 e la tessera Home diventa «Peso 72,9»; `?vuoto` senza grafico, righello a 70,0; «1 mese» salva e chiude, riaperto «30 giorni», «Salva» compare solo cambiando data; spesa «1/17», riga in fondo con opacità .45 e barrata, nessun `.pt-miss`; appunto aggiunto, campo vuoto, tolto con la X; tessere Home aggiornate. Console senza errori dell'app (solo l'avviso del browser su `vibrate` senza tocco).
+- Da provare su iPhone: trascinamento del righello col dito e aggancio alla tacca (inerzia di Safari, `scrollend` assente nelle versioni vecchie: c'è il ritardo di 120 ms), vibrazione a ogni tacca (iOS Safari non la supporta: è prevista), tenuta di ± sul peso, riordino della spesa, tastiera sopra il campo appunti.
+- Scelte fatte: il titolo del foglio peso resta «Registra il peso» (il brief non lo cambia); con `bare` durante la selezione sul grafico compare solo la data; il righello ha ±15 kg intorno al valore iniziale e non si ricentra se si esce dall'intervallo con ±; classe del riquadro appunti `pt-ns` (`pt-note-in` esisteva già).
+- Attenzione per chi viene dopo: classi nuove `pt-ruler*`, `pt-vd`, `pt-vdate`, `pt-quick-4`, `pt-shop-r`, `pt-ns`, `pt-note-send`, `pt-todo-x`; le vecchie `.pt-miss`, `.pt-shop-s` restano nel CSS ma non nel JSX.

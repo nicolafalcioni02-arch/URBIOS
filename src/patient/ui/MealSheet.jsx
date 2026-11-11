@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Icon, Sheet, Step, useHold } from './bits.jsx';
+import { Ruler } from './Ruler.jsx';
 import { WeightTrend } from './Progress.jsx';
 import { arr, mealKey, ymd } from './logic.js';
 import { findFoods, loadFoods, GENERIC } from './foods.js';
@@ -79,12 +80,13 @@ export const WeightSheet = ({ rt, onClose }) => {
     const save = async () => { const date = ymd(); await rt.log.update((l) => { const i = l.weights.findIndex((x) => x.date === date); const r = { date, kg, at: Date.now() }; if (i >= 0) l.weights[i] = r; else l.weights.push(r); l.weights = l.weights.slice(-400); }); onClose(); };
     return (
         <Sheet title="Registra il peso" label="Peso" onClose={onClose}>
-                <div className="pg" style={{ margin: '4px 0 12px' }}><WeightTrend weights={w} /></div>
+                <div className="pg pt-wt-g"><WeightTrend weights={w} bare /></div>
                 <div className="pt-wt">
                     <button type="button" className="pt-round" aria-label="Meno" {...hm}><Icon name="minus" /></button>
                     <b>{String(kg.toFixed(1)).replace('.', ',')} <small>kg</small></b>
                     <button type="button" className="pt-round" aria-label="Più" {...hp}><Icon name="plus" /></button>
                 </div>
+                <Ruler value={kg} onChange={setKg} min={20} max={300} />
                 <button type="button" className="pt-cta" onClick={save}>Salva</button>
         </Sheet>
     );

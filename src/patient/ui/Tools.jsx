@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Icon, Sheet, Step } from './bits.jsx';
 import { arr, ymd, toolsOf } from './logic.js';
 
@@ -12,13 +12,16 @@ export const fmtLong = (date) => new Date(date + 'T00:00:00').toLocaleDateString
 export const VisitSheet = ({ rt, onClose }) => {
     const cur = toolsOf(rt.log.get()).visit, [d, setD] = useState(cur || '');
     const save = async (v) => { await rt.log.update((l) => { toolsOf(l).visit = v || null; }); onClose(); };
+    const n = cur ? daysTo(cur) : null;
     return (
         <Shell title="Prossimo controllo" onClose={onClose}>
-            <p className="pt-muted">Quando devi rivedere il professionista? Ti ricordo quanti giorni mancano.</p>
-            <div className="pt-quick">{[['2 settimane', 14], ['1 mese', 30], ['2 mesi', 60], ['3 mesi', 90]].map(([l, n]) => <button key={l} type="button" onClick={() => save(addDays(n))}>Tra {l}</button>)}</div>
-            <label className="pt-label">Oppure scegli la data<input className="pt-input" type="date" min={ymd()} value={d} onChange={(e) => setD(e.target.value)} /></label>
-            <button type="button" className="pt-cta" disabled={!d} onClick={() => save(d)}>Salva</button>
-            {cur && <button type="button" className="pt-link" onClick={() => save(null)}>Togli la data</button>}
+            {n !== null && n >= 0 && <p className="pt-vd">{n === 0 ? <b>Oggi</b> : <><b>{n}</b><small>{n === 1 ? 'giorno' : 'giorni'}</small></>}</p>}
+            <div className="pt-quick pt-quick-4">{[['2 sett', 14], ['1 mese', 30], ['2 mesi', 60], ['3 mesi', 90]].map(([l, k]) => <button key={l} type="button" onClick={() => save(addDays(k))}>{l}</button>)}</div>
+            <div className="pt-vdate">
+                <input className="pt-input" type="date" aria-label="Data" min={ymd()} value={d} onChange={(e) => setD(e.target.value)} />
+                {cur && <button type="button" className="pt-round" aria-label="Togli la data" onClick={() => save(null)}><Icon name="trash" size={20} /></button>}
+            </div>
+            {d && d !== cur && <button type="button" className="pt-cta" onClick={() => save(d)}>Salva</button>}
         </Shell>
     );
 };
@@ -29,11 +32,12 @@ export const NotesSheet = ({ rt, onClose }) => {
     const add = async () => { const x = t.trim().slice(0, 300); if (!x) return; await rt.log.update((l) => { toolsOf(l).notes.push({ t: x, at: Date.now() }); }); setT(''); };
     const del = async (i) => { await rt.log.update((l) => { toolsOf(l).notes.splice(i, 1); }); };
     return (
-        <Shell title="Da dire al professionista" onClose={onClose}>
-            <p className="pt-muted">Scrivi qui domande e cose da ricordare: restano solo sul tuo telefono, così le hai sotto mano alla prossima visita.</p>
-            {notes.map((n, i) => <div className="pt-todo" key={n.at + '-' + i}><span>{n.t}</span><button type="button" onClick={() => del(i)}>Togli</button></div>)}
-            <textarea className="pt-input pt-todo-in" rows={3} maxLength={300} placeholder="Scrivi qui…" value={t} onChange={(e) => setT(e.target.value)} />
-            <button type="button" className="pt-cta" disabled={!t.trim()} onClick={add}>Aggiungi</button>
+        <Shell title="Appunti" onClose={onClose}>
+            {notes.map((n, i) => <div className="pt-todo" key={n.at + '-' + i}><span>{n.t}</span><button type="button" className="pt-todo-x" aria-label="Togli" onClick={() => del(i)}><Icon name="close" size={16} /></button></div>)}
+            <div className="pt-ns">
+                <textarea className="pt-input pt-todo-in" rows={2} maxLength={300} placeholder="Per la prossima visita…" aria-label="Appunto" value={t} onChange={(e) => setT(e.target.value)} />
+                <button type="button" className="pt-note-send" aria-label="Aggiungi" disabled={!t.trim()} onClick={add}><Icon name="send" size={20} /></button>
+            </div>
         </Shell>
     );
 };
@@ -50,27 +54,29 @@ export const shopItems = (docs, get, days = 7, people = 1) => {
     return out;
 };
 const qty = (g) => (g >= 1000 ? String(Math.round(g / 100) / 10).replace('.', ',') + ' kg' : g + ' g');
-const Stepper = ({ label, value, set, min, max, unit }) => (
-    <div className="pt-shop-s"><span>{label}</span>
-        <Step dark value={value} onChange={set} step={1} min={min} max={max} text={`${value} ${unit(value)}`} label={label} />
-    </div>
-);
 export const ShopSheet = ({ rt, docs, onClose }) => {
     const tl = toolsOf(rt.log.get()), cfg = tl.cfg, shop = tl.shop;
     const items = shopItems(docs, rt.docs.get, cfg.days, cfg.people);
+    // Riordino ritardato: la riga spuntata resta dov'è per 250 ms, poi scende in fondo con una dissolvenza
+    const [lag, setLag] = useState(null), tm = useRef(0);
+    useEffect(() => () => clearTimeout(tm.current), []);
     const setCfg = async (patch) => { await rt.log.update((l) => { Object.assign(toolsOf(l).cfg, patch); }); };
-    const tog = async (k) => { await rt.log.update((l) => { const s = toolsOf(l).shop; if (s[k]) delete s[k]; else s[k] = 1; }); };
-    const left = items.filter((x) => !shop[x.k]).length;
+    const tog = async (k) => {
+        setLag(k); clearTimeout(tm.current); tm.current = setTimeout(() => setLag(null), 250);
+        await rt.log.update((l) => { const s = toolsOf(l).shop; if (s[k]) delete s[k]; else s[k] = 1; });
+    };
+    const taken = items.filter((x) => shop[x.k]).length, all = taken === items.length && items.length > 0;
+    const on = (x) => (lag === x.k ? !shop[x.k] : !!shop[x.k]);
+    const rows = [...items].sort((a, b) => (on(a) - on(b)) || a.n.localeCompare(b.n, 'it'));
+    const extra = items.length ? (all ? <em className="pt-sh-k is-all"><Icon name="check" size={14} />{taken}/{items.length}</em> : <em className="pt-sh-k">{taken}/{items.length}</em>) : null;
     return (
-        <Shell title="Lista della spesa" onClose={onClose}>
+        <Shell title="Spesa" extra={extra} onClose={onClose}>
             {items.length === 0 ? <p className="pt-muted">Quando riceverai la dieta, qui troverai gli alimenti da comprare.</p> : <>
-                <Stepper label="Per quanti giorni" value={cfg.days} set={(v) => setCfg({ days: v })} min={1} max={30} unit={(v) => (v === 1 ? 'giorno' : 'giorni')} />
-                <Stepper label="Per quante persone" value={cfg.people} set={(v) => setCfg({ people: v })} min={1} max={8} unit={(v) => (v === 1 ? 'persona' : 'persone')} />
-                {items.map((x) => <button key={x.k} type="button" className={'pt-shop' + (shop[x.k] ? ' is-on' : '')} onClick={() => tog(x.k)}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b><small>{qty(x.g)}</small></button>)}
-                <div className={'pt-miss' + (left ? '' : ' is-ok')}>
-                    <b>{left ? `Ti manca ancora ${left === 1 ? '1 cosa' : left + ' cose'}` : 'Hai preso tutto'}</b>
-                    {left > 0 && <div>{items.filter((x) => !shop[x.k]).map((x) => <button key={x.k} type="button" onClick={() => tog(x.k)}>{x.n}</button>)}</div>}
+                <div className="pt-shop-r">
+                    <span><Icon name="calendar" size={18} /><Step dark value={cfg.days} onChange={(v) => setCfg({ days: v })} step={1} min={1} max={30} label="Per quanti giorni" /></span>
+                    <span><Icon name="user" size={18} /><Step dark value={cfg.people} onChange={(v) => setCfg({ people: v })} step={1} min={1} max={8} label="Per quante persone" /></span>
                 </div>
+                {rows.map((x) => <button key={x.k} type="button" className={'pt-shop' + (shop[x.k] ? ' is-on' : '') + (lag === x.k ? ' is-lag' : '')} onClick={() => tog(x.k)}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b><small>{qty(x.g)}</small></button>)}
             </>}
         </Shell>
     );

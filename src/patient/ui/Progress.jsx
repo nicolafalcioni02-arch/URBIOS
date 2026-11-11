@@ -15,8 +15,9 @@ const smooth = (p) => p.reduce((s, [x, y], i) => {
     return `${s} C${x1 + (x - x0) / 6},${y1 + (y - y0) / 6} ${x - (x3 - x1) / 6},${y - (y3 - y1) / 6} ${x},${y}`;
 }, '');
 
-export const WeightTrend = ({ weights }) => {
+export const WeightTrend = ({ weights, bare }) => {
     const w = arr(weights).filter((x) => Number.isFinite(x.kg)), [sel, setSel] = useState(null);
+    if (bare && w.length < 3) return null;
     if (!w.length) return <div className="pg-card"><span className="pg-k">Peso</span><p className="pg-empty">Registra il primo peso dalla Home.</p></div>;
     const last = w[w.length - 1], cur = sel !== null && w[sel] ? w[sel] : last;
     let delta = null;
@@ -26,9 +27,10 @@ export const WeightTrend = ({ weights }) => {
     const pts = w.map((x) => [pad + ((+new Date(x.date) - t0) / sp) * (W - pad * 2), H - pad - ((x.kg - lo) / rng) * (H - pad * 2)]);
     const pick = (e) => { const r = e.currentTarget.getBoundingClientRect(), x = ((e.clientX - r.left) / r.width) * W; let b = 0; pts.forEach((p, i) => { if (Math.abs(p[0] - x) < Math.abs(pts[b][0] - x)) b = i; }); setSel(b); };
     return (
-        <div className="pg-card">
-            <span className="pg-k">Peso</span>
-            <div className="pg-big"><b>{fmtKg(cur.kg)}</b><small>kg</small>{sel === null && delta !== null && <em className={delta <= 0 ? 'is-dn' : 'is-up'}>{delta > 0 ? '+' : '−'}{fmtKg(Math.abs(Math.round(delta * 10) / 10))} / sett.</em>}{sel !== null && <em>{cur.date.split('-').reverse().slice(0, 2).join('/')}</em>}</div>
+        <div className={'pg-card' + (bare ? ' is-bare' : '')}>
+            {!bare && <span className="pg-k">Peso</span>}
+            {bare ? <div className="pg-bare">{sel === null && delta !== null && <em className={delta <= 0 ? 'is-dn' : 'is-up'}>{delta > 0 ? '+' : '−'}{fmtKg(Math.abs(Math.round(delta * 10) / 10))} / sett.</em>}{sel !== null && <em>{cur.date.split('-').reverse().slice(0, 2).join('/')}</em>}</div>
+            : <div className="pg-big"><b>{fmtKg(cur.kg)}</b><small>kg</small>{sel === null && delta !== null && <em className={delta <= 0 ? 'is-dn' : 'is-up'}>{delta > 0 ? '+' : '−'}{fmtKg(Math.abs(Math.round(delta * 10) / 10))} / sett.</em>}{sel !== null && <em>{cur.date.split('-').reverse().slice(0, 2).join('/')}</em>}</div>}
             {w.length >= 3 ? (
                 <svg viewBox={`0 0 ${W} ${H}`} className="pg-svg" role="img" aria-label="Andamento del peso" onPointerMove={(e) => e.buttons || e.pointerType === 'mouse' ? pick(e) : null} onPointerDown={pick} onPointerLeave={() => setSel(null)}>
                     <path d={smooth(pts)} className="pg-line" pathLength="100" />

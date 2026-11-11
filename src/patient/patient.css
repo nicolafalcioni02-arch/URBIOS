@@ -1352,3 +1352,29 @@ body:has(.pt-main) .pt-sp-top.pt-td-top { padding-top: calc(14px + env(safe-area
     @keyframes pt-pop2 { 0%, 100% { scale: 1; } 40% { scale: 1.5; } }
 }
 @media (prefers-reduced-motion: reduce) { .pt-rest-w { transition: none; } .pt-rest-w svg, .pt-rest-t, .pt-veil, .pt-lv2 .pt-live-dots i { animation: none !important; } }
+
+/* UX-06.7: peso con righello, controllo, spesa, appunti */
+.pt-dsheet .pt-wt-g { margin: 0 0 4px; } .pt-dsheet .pt-wt-g:empty { display: none; }
+.pg-card.is-bare { padding: 0; background: transparent; box-shadow: none; border: 0; }
+.pg-bare { display: flex; justify-content: flex-end; min-height: 18px; } .pg-bare em { font-style: normal; font-size: 13px; font-weight: 700; color: var(--u-grigio-d); font-variant-numeric: tabular-nums; } .pg-bare em.is-dn { color: var(--u-ink); }
+.pt-dsheet .pt-wt { margin: 10px 0 8px; } .pt-dsheet .pt-wt b { font-size: 56px; font-weight: 800; line-height: 1; min-width: 190px; color: var(--u-ink); } .pt-dsheet .pt-wt small { font-size: 18px; font-weight: 600; color: var(--u-grigio); }
+.pt-ruler { position: relative; margin: 0 -4px 18px; height: 64px; border-radius: 20px; background: var(--u-foglio); overflow: hidden; }
+.pt-ruler-s { height: 100%; overflow-x: auto; overflow-y: hidden; padding-inline: 50%; box-sizing: border-box; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; touch-action: pan-x; outline: none; }
+.pt-ruler-s::-webkit-scrollbar { display: none; }
+.pt-ruler-s:focus-visible { box-shadow: inset 0 0 0 2px var(--u-viola); border-radius: 20px; }
+.pt-ruler-t { height: 100%; background-image: repeating-linear-gradient(90deg, var(--u-ink) 0 1.5px, transparent 1.5px 80px), repeating-linear-gradient(90deg, var(--u-lilla-2) 0 1.5px, transparent 1.5px 8px); background-size: 100% 26px, 100% 14px; background-position: 0 100%, 0 100%; background-repeat: repeat-x; }
+.pt-ruler-i { position: absolute; left: 50%; bottom: 8px; width: 3px; height: 34px; margin-left: -1.5px; border-radius: 2px; background: var(--u-viola); pointer-events: none; }
+.pt-vd { display: flex; align-items: baseline; gap: 8px; margin: 2px 0 14px; } .pt-vd b { font-size: 56px; font-weight: 800; line-height: 1; color: var(--u-ink); font-variant-numeric: tabular-nums; } .pt-vd small { font-size: 15px; font-weight: 600; color: var(--u-grigio); }
+.pt-dsheet .pt-quick.pt-quick-4 { grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; } .pt-quick-4 button { min-height: 48px; padding: 0 4px; border-radius: 999px; font-size: 14px; }
+body:has(.pt-main) .pt-quick-4 button { background: var(--u-lilla); box-shadow: none; } body:has(.pt-main) .pt-quick-4 button:active { background: var(--u-lilla-2); }
+.pt-vdate { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; } .pt-vdate .pt-input { flex: 1; min-width: 0; margin-top: 0; } .pt-vdate .pt-round { flex: none; width: 44px; height: 44px; }
+.pt-sh-k.is-all { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; background: var(--u-lime); color: #0B0C0E; }
+.pt-shop-r { display: flex; gap: 10px; margin-bottom: 14px; } .pt-shop-r > span { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; color: var(--u-grigio-d); }
+.pt-shop-r > span > svg { flex: none; }
+.pt-shop-r .pt-step { flex: 1; min-width: 0; padding: 3px; } .pt-shop-r .pt-step button { width: 36px; height: 36px; flex: none; } .pt-shop-r .pt-step > .pt-step-v.pt-step-v.pt-step-v { min-height: 36px; padding: 0; } .pt-shop-r .pt-step b { font-size: 17px; font-weight: 800; min-width: 0; }
+.pt-shop { transition: opacity .25s ease; } .pt-shop.is-on { opacity: .45; } body:has(.pt-main) .pt-shop.is-on { opacity: .45; } .pt-shop.is-on b { text-decoration: line-through; }
+.pt-todo .pt-todo-x { flex: none; width: 36px; height: 36px; min-height: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; }
+.pt-ns { position: relative; margin-top: 4px; } body .pt-ns textarea.pt-input.pt-todo-in { display: block; box-sizing: border-box; width: 100%; height: 88px; min-height: 0; margin: 0; padding: 12px 60px 12px 16px; resize: none; }
+.pt-note-send { position: absolute; right: 8px; bottom: 8px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--u-lime); color: #0B0C0E; display: grid; place-items: center; cursor: pointer; transition: background .2s ease; }
+.pt-note-send:disabled { background: var(--u-lilla-2); color: var(--u-grigio); cursor: default; }
+@media (prefers-reduced-motion: reduce) { .pt-shop, .pt-note-send { transition: none; } }
