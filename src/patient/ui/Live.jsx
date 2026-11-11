@@ -101,9 +101,6 @@ export const Live = ({ rt, id, w, d, onExit }) => {
         go(i, s);
     };
     const go = (i, s) => { rt.log.update((l) => { const q = l.sessions[key] || (l.sessions[key] = { sets: {}, started: Date.now() }); q.pos = { ex: i }; q.secs = elapsed; }); setEx(i); setSetNo(s); setKg(kgOf(i)); setNote(''); setPhase('work'); setSetSecs(0); setRest(0); T.current.restEnd = 0; T.current.setAt = Date.now(); T.current.lastBeep = null; };
-    // serie precedente già fatta (nello stesso esercizio o nell'ultimo esercizio che ne ha)
-    const prevTarget = () => { if (setNo > 0 && doneOf(ex)[setNo - 1]) return [ex, setNo - 1]; for (let i = ex - 1; i >= 0; i--) { const n = doneOf(i).length; if (n) return [i, n - 1]; } return null; };
-    const nextTarget = () => { if (doneOf(ex)[setNo + 1]) return [ex, setNo + 1]; for (let j = ex + 1; j < list.length; j++) if (doneOf(j).length) return [j, 0]; return null; };
     const openEdit = (exI, idx, ret) => {
         const rec = doneOf(exI)[idx]; if (!rec) return;
         if (bak.current === undefined) bak.current = lastSet.current;
@@ -123,11 +120,18 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     };
     const leaveEdit = () => { const r = edit.ret; if (r && doneOf(r.ex).length < list[r.ex].n) { goto(r.ex, r.set); return; } const f = frontier(); if (f) goto(f.ex, f.set); else { setEdit(null); lastSet.current = bak.current === undefined ? null : bak.current; bak.current = undefined; setFin(true); } };
     const saveEdit = () => { commitEdit(); buzz(30); leaveEdit(); };
-    const stepEdit = (t) => { commitEdit(); if (t) openEdit(t[0], t[1], edit.ret); else leaveEdit(); };
+    const hasPrevSet = setNo > 0 && !!doneOf(ex)[setNo - 1], hasNextSet = !!doneOf(ex)[setNo + 1];
+    // frecce: nello stesso esercizio vanno alla serie accanto, altrimenti all'esercizio accanto (anche se non ha serie fatte)
     const prev = () => {
-        const t = prevTarget();
-        if (t) { if (edit) commitEdit(); openEdit(t[0], t[1], retPos()); return; }
-        if (!edit && ex > 0) goto(ex - 1, Math.min(doneOf(ex - 1).length, list[ex - 1].n - 1));
+        if (edit) commitEdit();
+        if (hasPrevSet) { openEdit(ex, setNo - 1, retPos()); return; }
+        if (ex > 0) { const dn = doneOf(ex - 1).length; if (dn) openEdit(ex - 1, Math.min(dn, list[ex - 1].n) - 1, retPos()); else goto(ex - 1, 0); }
+    };
+    const nextEdit = () => {
+        commitEdit();
+        if (hasNextSet) { openEdit(ex, setNo + 1, edit.ret); return; }
+        if (ex + 1 < list.length) { if (doneOf(ex + 1).length) openEdit(ex + 1, 0, edit.ret); else goto(ex + 1, 0); return; }
+        leaveEdit();
     };
     const nextEx = (i) => { if (i + 1 < list.length) { go(i + 1, Math.min(doneOf(i + 1).length, list[i + 1].n - 1)); return true; } return false; };
     const complete = () => {
@@ -222,10 +226,10 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 {isRest && <div className="pt-rk is-rest">{stepKg}</div>}
                 <div className="pt-bt">
                     {isRest ? <button type="button" className="pt-rnd pt-rnd-t" aria-label="Quindici secondi in meno" onClick={() => adjRest(-15000)}>−15</button>
-                        : <button type="button" className="pt-rnd" aria-label={prevTarget() ? 'Serie precedente' : 'Esercizio precedente'} disabled={!prevTarget() && (edit || ex === 0)} onClick={prev}><Icon name="back" size={22} /></button>}
+                        : <button type="button" className="pt-rnd" aria-label={hasPrevSet ? 'Serie precedente' : 'Esercizio precedente'} disabled={!hasPrevSet && ex === 0} onClick={prev}><Icon name="back" size={22} /></button>}
                     {isRest ? <button type="button" className="pt-done is-sec" onClick={skipRest}>Salta</button> : <button type="button" className="pt-done" onClick={complete}><Icon name="check" size={20} />{edit ? 'Salva' : 'Fatta'}</button>}
                     {isRest ? <button type="button" className="pt-rnd pt-rnd-t" aria-label="Quindici secondi in più" onClick={() => adjRest(15000)}>+15</button>
-                        : <button type="button" className="pt-rnd" aria-label={edit ? 'Serie successiva' : 'Salta esercizio'} onClick={edit ? () => stepEdit(nextTarget()) : skipEx}><Icon name="chev" size={22} /></button>}
+                        : <button type="button" className="pt-rnd" aria-label={edit ? (hasNextSet ? 'Serie successiva' : 'Esercizio successivo') : 'Salta esercizio'} onClick={edit ? nextEdit : skipEx}><Icon name="chev" size={22} /></button>}
                 </div>
             </section>
             {panel === 'storia' && (
