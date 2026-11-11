@@ -1720,3 +1720,9 @@ body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc { margin-right: 4px; 
 /* live: RPE previsto dal professionista, sotto il grafico del tempo */
 .pt-live-rpe { align-self: flex-start; display: inline-flex; align-items: baseline; gap: 8px; margin-top: 12px; padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,.12); color: #fff; }
 .pt-live-rpe small { font-size: 12px; font-weight: 700; letter-spacing: .08em; opacity: .7; } .pt-live-rpe b { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* live, riposo: al posto del peso, l'esercizio che viene dopo */
+.pt-nxt { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 0 12px 0 20px; border-radius: 999px; background: #F1F2F5; color: var(--u-ink); }
+.pt-nxt svg { flex: none; color: var(--u-viola); }
+.pt-nxt b { flex: 1; min-width: 0; font-size: 16px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-nxt span { flex: none; min-width: 40px; height: 36px; padding: 0 12px; border-radius: 999px; background: #fff; display: grid; place-items: center; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }

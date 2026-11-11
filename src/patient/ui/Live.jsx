@@ -45,7 +45,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     const [hype, setHype] = useState(null);
     const [edit, setEdit] = useState(null), bak = useRef(undefined);      // modifica di una serie già fatta: { ret } = dove tornare
     useEffect(() => { if (!hype) return undefined; const t = setTimeout(() => setHype(null), 3200); return () => clearTimeout(t); }, [hype]);
-    const [lastRpe, setLastRpe] = useState(null);                 // RPE della serie appena fatta (si cambia durante il riposo)
+    const [lastRpe, setLastRpe] = useState(null), [preRpe, setPreRpe] = useState(null);                 // RPE della serie appena fatta (si cambia durante il riposo)
     const total = useRef(0), ac = useRef(null), lastSet = useRef(null);
     // tempi dall'orologio (non da incrementi: con lo schermo spento il timer non si ferma). run = secondi accumulati prima di runAt; restEnd 0 = non in riposo
     const T = useRef({ run: start.secs || 0, runAt: Date.now(), setAt: Date.now(), restEnd: 0, restTot: 0, lastBeep: null, pausedAt: 0 });
@@ -143,7 +143,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     const complete = () => {
         if (edit) { saveEdit(); return; }
         if (!ac.current) beep(1, 1);                      // il primo tocco sblocca l'audio
-        const exI = ex, rec = { kg, ...(note.trim() ? { note: note.trim().slice(0, 200) } : {}) }, secs = elapsed, date = ymd();
+        const exI = ex, rec = { kg, ...(preRpe ? { rpe: preRpe } : {}), ...(note.trim() ? { note: note.trim().slice(0, 200) } : {}) }, secs = elapsed, date = ymd();
         rt.log.update((l) => {
             const s = l.sessions[key] || (l.sessions[key] = { sets: {}, started: Date.now() });
             (s.sets[exI] = s.sets[exI] || []).push(rec); s.secs = secs; l.last[cur.name] = kg;
@@ -151,7 +151,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
             t.sets.push(rec); if (h.length > 12) h.splice(0, h.length - 12);
         });
         total.current += 1; buzz(30); beep(740, 90);
-        setNote(''); setLastRpe(null); lastSet.current = { exI, name: cur.name, date }; setHit((x) => x + 1);
+        setNote(''); setLastRpe(preRpe); setPreRpe(null); lastSet.current = { exI, name: cur.name, date }; setHit((x) => x + 1);
         let more = true;
         if (setNo + 1 < cur.n) setSetNo(setNo + 1); else more = nextEx(ex);
         if (!more) { setFin(true); buzz([80, 50, 80, 50, 200]); return; }
@@ -187,7 +187,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
             </div>
         );
     }
-    const logged = doneOf(ex).length, shownRpe = lastRpe;
+    const logged = doneOf(ex).length;
     const pro = [wk && wk.nota && ['Settimana', wk.nota], day && day.nota && ['Giornata', day.nota], cur.note && ['Esercizio', cur.note]].filter(Boolean);
     const mine = arr(rt.log.get().hist[cur.name]).flatMap((h) => arr(h.sets).filter((x) => x.note).map((x) => ({ date: h.date, text: x.note }))).reverse().slice(0, 8);
     const tempo = parseTempo(cur.tempo), isRest = phase === 'rest';
@@ -196,7 +196,8 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     const nx = list[ex], showNext = isRest && nx && lastSet.current && nx.name !== lastSet.current.name;
     const lvl = isRest ? Math.max(0, Math.min(100, rest / Math.max(1, T.current.restTot) * 100)) : 0;
     const dots = <span className="pt-live-dots" aria-label={`Serie ${Math.min(setNo + 1, cur.n)} di ${cur.n}`}>{Array.from({ length: Math.min(cur.n, 12) }, (_, i) => <i key={i + '-' + (i === logged - 1 ? hit : 0)} className={edit && i === setNo ? 'cur' : i < logged ? 'done' + (i === logged - 1 && hit ? ' pop' : '') : i === Math.min(setNo, cur.n - 1) ? 'cur' : ''} />)}</span>;
-    const rpeRow = <><span className="pt-fl">RPE</span><div className="pt-rpe">{RPES.map((r) => <button key={r} type="button" className={shownRpe === r ? 'is-on' : ''} aria-pressed={shownRpe === r} onClick={() => pickRpe(r)}>{r}</button>)}</div></>;
+    const shownRpe = isRest || edit ? lastRpe : preRpe;
+    const rpeRow = <><span className="pt-fl">RPE</span><div className="pt-rpe">{RPES.map((r) => <button key={r} type="button" className={shownRpe === r ? 'is-on' : ''} aria-pressed={shownRpe === r} onClick={() => (isRest || edit ? pickRpe(r) : setPreRpe(preRpe === r ? null : r))}>{r}</button>)}</div></>;
     const stepKg = <Step value={kg} onChange={setKg} step={2.5} min={0} max={1000} fmt={fmtKg} unit="kg" text={cur.kg0 === 0 && kg === 0 ? 'Corpo libero' : undefined} label="Carico" />;
     return (
         <div className={'pt-live pt-lv2' + (paused ? ' is-paused' : '') + (isRest ? ' is-rest' : '')}>
@@ -230,8 +231,8 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 {!isRest && <div className="pt-rk">{cur.reps ? <span className={'pt-reps' + (String(cur.reps).length > 3 ? ' is-s' : '')}><b>{cur.reps}</b><i>×</i></span> : null}{stepKg}</div>}
                 {!isRest && !edit && lastT && <button type="button" className="pt-lastb" onClick={() => setPanel('storia')}><span>{String(lastT.date).split('-').reverse().slice(0, 2).join('/')} · {fmtKg(lastKg)} kg</span><Icon name="chev" size={16} /></button>}
                 {!isRest && sug && sug.kg !== kg && <div className="pt-sug"><div><span>Suggerito</span><b>{fmtKg(sug.kg)} kg</b></div><button type="button" onClick={() => setKg(sug.kg)}>Usa</button></div>}
-                {(isRest || edit) && rpeRow}
-                {isRest && <div className="pt-rk is-rest">{stepKg}</div>}
+                {rpeRow}
+                {isRest && nx && <div className="pt-nxt" aria-label={'Prossimo: ' + nx.name}><Icon name="chev" size={18} /><b>{nx.name}</b><span>{Math.min(setNo + 1, nx.n)}/{nx.n}</span></div>}
                 <div className="pt-bt">
                     {isRest ? <button type="button" className="pt-rnd pt-rnd-t" aria-label="Quindici secondi in meno" onClick={() => adjRest(-15000)}>−15</button>
                         : <button type="button" className="pt-rnd" aria-label={hasPrevSet ? 'Serie precedente' : 'Esercizio precedente'} disabled={!hasPrevSet && ex === 0} onClick={prev}><Icon name="back" size={22} /></button>}
