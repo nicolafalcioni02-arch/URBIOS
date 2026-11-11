@@ -27,6 +27,7 @@ const PATHS = {
     cart: (<><path d="M4 5h2l2 10h9l2-7H7" /><circle cx="10" cy="19" r="1" /><circle cx="16" cy="19" r="1" /></>),
     note: (<><path d="M5 20h4L19 10l-4-4L5 16z" /><path d="m13.5 7.5 3 3" /></>),
     close: <path d="m6 6 12 12M18 6 6 18" />,
+    barcode: <path d="M4 6v12M7 6v12M11 6v12M14 6v12M17 6v12M20 6v12M3 4h18M3 20h18" />,
     clock: (<><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></>),
     archive: (<><rect x="4" y="5" width="16" height="4" rx="1.5" /><path d="M6 9v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9M10 13h4" /></>),
     trash: <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12M10 11v5M14 11v5" />,

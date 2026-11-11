@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Icon, Sheet, Step } from './bits.jsx';
 import { arr, ymd, toolsOf } from './logic.js';
+import { startBarcode, validEan } from '../barcode.js';
+import { lookupEan } from '../foodlookup.js';
 
 // Strumenti del paziente: tutto resta sul telefono (nel diario cifrato), il professionista non lo riceve.
 const Shell = Sheet;
@@ -56,30 +58,86 @@ export const shopItems = (docs, get, days = 7, people = 1) => {
     return out;
 };
 const qty = (g) => (g >= 1000 ? String(Math.round(g / 100) / 10).replace('.', ',') + ' kg' : g + ' g');
+const eur = (n) => '€ ' + n.toFixed(2).replace('.', ',');
+const words = (t) => String(t || '').toLowerCase().split(/[^a-zàèéìòù]+/).filter((w) => w.length >= 3);
+const guess = (name, items) => { const w = words(name); let b = null, bs = 0; items.forEach((x) => { const sc = words(x.n).filter((y) => w.some((z) => z.startsWith(y.slice(0, 4)) || y.startsWith(z.slice(0, 4)))).length; if (sc > bs) { bs = sc; b = x.k; } }); return b; };
+
+// Lettura del codice: fotocamera, oppure il numero scritto a mano
+const Scan = ({ onCode, onBack }) => {
+    const video = useRef(null), stop = useRef(null), [err, setErr] = useState(''), [man, setMan] = useState(false), [txt, setTxt] = useState('');
+    useEffect(() => {
+        let dead = false;
+        startBarcode(video.current, onCode).then((f) => { if (dead) f(); else stop.current = f; }).catch(() => { if (!dead) { setErr('Non riesco ad aprire la fotocamera.'); setMan(true); } });
+        return () => { dead = true; if (stop.current) stop.current(); };
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    return (
+        <div className="pt-sc2">
+            <button type="button" className="pt-round pt-sc2-b" aria-label="Indietro" onClick={onBack}><Icon name="back" /></button>
+            <div className="pt-sc2-v"><video ref={video} muted playsInline /><i /></div>
+            {err && <p className="pt-muted">{err}</p>}
+            {!man ? <button type="button" className="pt-link" onClick={() => setMan(true)}>Scrivi il numero</button>
+                : <div className="pt-sc2-m"><input className="pt-input" inputMode="numeric" aria-label="Codice a barre" placeholder="Codice a barre" maxLength={14} value={txt} onChange={(e) => setTxt(e.target.value.replace(/\D/g, ''))} /><button type="button" className="pt-cta" disabled={!validEan(txt)} onClick={() => onCode(txt)}>Cerca</button></div>}
+        </div>
+    );
+};
+
+// Prodotto trovato (o da compilare a mano): prezzo e negozio li scrive il cliente; il prezzo vale per la confezione
+const PriceForm = ({ init, items, stores, onSave, onBack }) => {
+    const [name, setName] = useState(init.name), [g, setG] = useState(init.g ? String(init.g) : ''), [price, setPrice] = useState(''), [store, setStore] = useState(stores[0] || ''), [key, setKey] = useState(() => guess(init.name, items) || '');
+    const num = (v) => parseFloat(String(v).replace(',', '.')), ok = name.trim() && num(price) > 0 && num(g) > 0 && key;
+    return (
+        <div className="pt-pf">
+            <button type="button" className="pt-round pt-sc2-b" aria-label="Indietro" onClick={onBack}><Icon name="back" /></button>
+            {init.miss && <p className="pt-muted">Non lo trovo: compila a mano.</p>}
+            <input className="pt-input" aria-label="Prodotto" placeholder="Prodotto" maxLength={80} value={name} onChange={(e) => setName(e.target.value)} />
+            <div className="pt-pf-r">
+                <input className="pt-input" inputMode="decimal" aria-label="Prezzo in euro" placeholder="Prezzo €" value={price} onChange={(e) => setPrice(e.target.value)} />
+                <input className="pt-input" inputMode="decimal" aria-label="Peso della confezione in grammi" placeholder="Confezione g" value={g} onChange={(e) => setG(e.target.value)} />
+            </div>
+            <input className="pt-input" aria-label="Negozio" placeholder="Negozio" maxLength={40} value={store} onChange={(e) => setStore(e.target.value)} />
+            {stores.length > 1 && <div className="pt-pf-s">{stores.map((x) => <button key={x} type="button" className={x === store ? 'is-on' : ''} onClick={() => setStore(x)}>{x}</button>)}</div>}
+            <select className="pt-input" aria-label="Voce della lista" value={key} onChange={(e) => setKey(e.target.value)}><option value="">Voce della lista</option>{items.map((x) => <option key={x.k} value={x.k}>{x.n}</option>)}</select>
+            <button type="button" className="pt-cta" disabled={!ok} onClick={() => onSave(key, { ean: init.ean || '', name: name.trim(), store: store.trim(), price: Math.round(num(price) * 100) / 100, g: Math.round(num(g)) })}>Salva</button>
+        </div>
+    );
+};
+
 export const ShopSheet = ({ rt, docs, onClose }) => {
-    const tl = toolsOf(rt.log.get()), cfg = tl.cfg, shop = tl.shop;
+    const tl = toolsOf(rt.log.get()), cfg = tl.cfg, shop = tl.shop, prices = tl.prices || {}, stores = arr(tl.stores);
     const items = shopItems(docs, rt.docs.get, cfg.days, cfg.people);
     // Riordino ritardato: la riga spuntata resta dov'è per 250 ms, poi scende in fondo con una dissolvenza
-    const [lag, setLag] = useState(null), tm = useRef(0);
+    const [lag, setLag] = useState(null), tm = useRef(0), [view, setView] = useState(null);   // view: null | 'scan' | 'load' | { form }
     useEffect(() => () => clearTimeout(tm.current), []);
     const setCfg = async (patch) => { await rt.log.update((l) => { Object.assign(toolsOf(l).cfg, patch); }); };
     const tog = async (k) => {
         setLag(k); clearTimeout(tm.current); tm.current = setTimeout(() => setLag(null), 250);
         await rt.log.update((l) => { const s = toolsOf(l).shop; if (s[k]) delete s[k]; else s[k] = 1; });
     };
+    const found = async (code) => { setView('load'); const p = await lookupEan(code); setView({ form: p || { ean: code, name: '', g: 0, miss: true } }); };
+    const savePrice = async (k, rec) => {
+        await rt.log.update((l) => { const t = toolsOf(l); (t.prices = t.prices || {})[k] = { ...rec, at: Date.now() }; if (rec.store) t.stores = [rec.store, ...arr(t.stores).filter((x) => x !== rec.store)].slice(0, 5); });
+        setView(null);
+    };
     const taken = items.filter((x) => shop[x.k]).length, all = taken === items.length && items.length > 0;
     const on = (x) => (lag === x.k ? !shop[x.k] : !!shop[x.k]);
     const rows = [...items].sort((a, b) => (on(a) - on(b)) || a.n.localeCompare(b.n, 'it'));
+    const cost = (x) => { const p = prices[x.k]; return p && p.g > 0 ? (x.g * p.price) / p.g : null; };
+    const priced = items.filter((x) => cost(x) !== null), total = priced.reduce((t, x) => t + cost(x), 0);
     const extra = items.length ? (all ? <em className="pt-sh-k is-all"><Icon name="check" size={14} />{taken}/{items.length}</em> : <em className="pt-sh-k is-n">{taken}/{items.length}</em>) : null;
     return (
-        <Shell title="Spesa" extra={extra} onClose={onClose}>
-            {items.length === 0 ? <p className="pt-muted">Quando riceverai la dieta, qui troverai gli alimenti da comprare.</p> : <>
-                <div className="pt-shop-r">
-                    <span><Icon name="calendar" size={18} /><Step dark value={cfg.days} onChange={(v) => setCfg({ days: v })} step={1} min={1} max={30} label="Per quanti giorni" /></span>
-                    <span><Icon name="user" size={18} /><Step dark value={cfg.people} onChange={(v) => setCfg({ people: v })} step={1} min={1} max={8} label="Per quante persone" /></span>
-                </div>
-                {rows.map((x) => <button key={x.k} type="button" className={'pt-shop' + (shop[x.k] ? ' is-on' : '') + (lag === x.k ? ' is-lag' : '')} onClick={() => tog(x.k)}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b><small>{qty(x.g)}</small></button>)}
-            </>}
+        <Shell title="Spesa" extra={view ? null : extra} onClose={onClose}>
+            {view === 'scan' ? <Scan onCode={found} onBack={() => setView(null)} />
+                : view === 'load' ? <p className="pt-muted pt-sc2-l" role="status">Cerco il prodotto…</p>
+                : view && view.form ? <PriceForm init={view.form} items={items} stores={stores} onSave={savePrice} onBack={() => setView(null)} />
+                : items.length === 0 ? <p className="pt-muted">Quando riceverai la dieta, qui troverai gli alimenti da comprare.</p> : <>
+                    <div className="pt-shop-r">
+                        <span><Icon name="calendar" size={18} /><Step dark value={cfg.days} onChange={(v) => setCfg({ days: v })} step={1} min={1} max={30} label="Per quanti giorni" /></span>
+                        <span><Icon name="user" size={18} /><Step dark value={cfg.people} onChange={(v) => setCfg({ people: v })} step={1} min={1} max={8} label="Per quante persone" /></span>
+                        <button type="button" className="pt-round pt-shop-bc" aria-label="Leggi il codice a barre" onClick={() => setView('scan')}><Icon name="barcode" size={22} /></button>
+                    </div>
+                    {priced.length > 0 && <div className="pt-shop-t" role="status"><b>{eur(total)}</b><span>{priced.length}/{items.length}</span></div>}
+                    {rows.map((x) => { const c = cost(x); return <button key={x.k} type="button" className={'pt-shop' + (shop[x.k] ? ' is-on' : '') + (lag === x.k ? ' is-lag' : '')} onClick={() => tog(x.k)}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b><span className="pt-shop-q"><small>{qty(x.g)}</small>{c !== null && <em>{eur(c)}</em>}</span></button>; })}
+                </>}
         </Shell>
     );
 };
