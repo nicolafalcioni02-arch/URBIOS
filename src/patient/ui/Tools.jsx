@@ -119,14 +119,13 @@ const Facts = ({ i }) => {
 };
 
 // Prodotto trovato (o da compilare a mano): prezzo e negozio li scrive il cliente; il prezzo vale per la confezione
-const PriceForm = ({ init, items, stores, onSave, onBack }) => {
-    const [pick, setPick] = useState(false), [name, setName] = useState(init.name), [g, setG] = useState(init.g ? String(init.g) : ''), [price, setPrice] = useState(''), [store, setStore] = useState(stores[0] || ''), [key, setKey] = useState(() => guess(init.name, items) || '');
+const PriceForm = ({ init, items, stores, pick, setPick, onSave }) => {
+    const [name, setName] = useState(init.name), [g, setG] = useState(init.g ? String(init.g) : ''), [price, setPrice] = useState(''), [store, setStore] = useState(stores[0] || ''), [key, setKey] = useState(() => guess(init.name, items) || '');
     const num = (v) => parseFloat(String(v).replace(',', '.')), ok = name.trim() && num(price) > 0 && (!key || num(g) > 0);   // il peso serve solo per la stima della voce
     if (pick) return (
         <div className="pt-pf">
-            <h3 className="pt-pf-t">Voce della lista</h3>
-            <button type="button" className={'pt-shop' + (!key ? ' is-on' : '')} onClick={() => { setKey(''); setPick(false); }}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>Fuori lista</b></button>
-            {[...items].sort((a, b) => a.n.localeCompare(b.n, 'it')).map((x) => <button key={x.k} type="button" className={'pt-shop' + (x.k === key ? ' is-on' : '')} onClick={() => { setKey(x.k); setPick(false); }}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b></button>)}
+            <button type="button" className={'pt-pf-o' + (!key ? ' is-on' : '')} onClick={() => { setKey(''); setPick(false); }}><span><Icon name="check" size={18} /></span><b>Fuori lista</b></button>
+            {[...items].sort((a, b) => a.n.localeCompare(b.n, 'it')).map((x) => <button key={x.k} type="button" className={'pt-pf-o' + (x.k === key ? ' is-on' : '')} onClick={() => { setKey(x.k); setPick(false); }}><span><Icon name="check" size={18} /></span><b>{x.n}</b></button>)}
         </div>
     );
     return (
@@ -165,7 +164,7 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
     const tl = toolsOf(rt.log.get()), cfg = tl.cfg, shop = tl.shop, buys = arr(tl.buys), stores = arr(tl.stores);
     const items = shopItems(docs, rt.docs.get, cfg.days, cfg.people);
     // Riordino ritardato: la riga spuntata resta dov'è per 250 ms, poi scende in fondo con una dissolvenza
-    const [lag, setLag] = useState(null), tm = useRef(0), [view, setView] = useState(null);   // view: null | 'scan' | 'load' | { form }
+    const [pick, setPick] = useState(false), [lag, setLag] = useState(null), tm = useRef(0), [view, setView] = useState(null);   // view: null | 'scan' | 'load' | { form }
     useEffect(() => () => clearTimeout(tm.current), []);
     const setCfg = async (patch) => { await rt.log.update((l) => { Object.assign(toolsOf(l).cfg, patch); }); };
     const tog = async (k) => {
@@ -180,7 +179,7 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
             if (k) t.shop[k] = 1;
             if (rec.store) t.stores = [rec.store, ...arr(t.stores).filter((x) => x !== rec.store)].slice(0, 5);
         });
-        setView(null);
+        setView(null); setPick(false);
     };
     const delBuy = async (id) => { await rt.log.update((l) => { const t = toolsOf(l); t.buys = arr(t.buys).filter((b) => b.id !== id); }); };
     const taken = items.filter((x) => shop[x.k]).length, all = taken === items.length && items.length > 0;
@@ -190,11 +189,11 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
     const priced = items.filter((x) => cost(x) !== null), total = priced.reduce((t, x) => t + cost(x), 0);
     const extra = items.length ? (all ? <em className="pt-sh-k is-all"><Icon name="check" size={14} />{taken}/{items.length}</em> : <em className="pt-sh-k is-n">{taken}/{items.length}</em>) : null;
     return (
-        <Shell title="Spesa" extra={view ? null : extra} onClose={onClose} onBack={view && view !== 'load' ? () => setView(null) : undefined}>
+        <Shell title={pick ? 'Voce della lista' : 'Spesa'} extra={view ? null : extra} onClose={onClose} onBack={pick ? () => setPick(false) : view && view !== 'load' ? () => setView(null) : undefined}>
             {view === 'scan' ? <Scan onCode={found} onBack={() => setView(null)} />
                 : view === 'load' ? <p className="pt-muted pt-sc2-l" role="status">Cerco il prodotto…</p>
                 : view === 'buys' ? <Buys buys={buys} est={total} cover={priced.length + '/' + items.length} onDel={delBuy} onBack={() => setView(null)} />
-                : view && view.form ? <PriceForm init={view.form} items={items} stores={stores} onSave={savePrice} onBack={() => setView(null)} />
+                : view && view.form ? <PriceForm init={view.form} items={items} stores={stores} pick={pick} setPick={setPick} onSave={savePrice} />
                 : items.length === 0 ? <p className="pt-muted">Quando riceverai la dieta, qui troverai gli alimenti da comprare.</p> : <>
                     <div className="pt-shop-r">
                         <span><Icon name="calendar" size={18} /><Step dark value={cfg.days} onChange={(v) => setCfg({ days: v })} step={1} min={1} max={30} label="Per quanti giorni" /></span>
@@ -202,7 +201,7 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
                         <button type="button" className="pt-round pt-shop-bc" aria-label="Leggi il codice a barre" onClick={() => setView('scan')}><Icon name="barcode" size={22} /></button>
                     </div>
                     {buys.length > 0 && <button type="button" className="pt-shop-t" aria-label="Acquisti" onClick={() => setView('buys')}><b>{eur(buys.reduce((t, b) => t + (b.price || 0), 0))}</b><span>{buys.length}</span><Icon name="chev" size={18} /></button>}
-                    {rows.map((x) => { const c = cost(x); return <button key={x.k} type="button" className={'pt-shop' + (shop[x.k] ? ' is-on' : '') + (lag === x.k ? ' is-lag' : '')} onClick={() => tog(x.k)}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b><span className="pt-shop-q"><small>{qty(x.g)}</small>{c !== null && <em>{eur(c)}</em>}</span></button>; })}
+                    {rows.map((x) => { const c = cost(x); return <button key={x.k} type="button" className={'pt-shop' + (shop[x.k] ? ' is-on' : '') + (lag === x.k ? ' is-lag' : '')} onClick={() => tog(x.k)}><span><Icon name="check" size={18} /></span><b>{x.n}</b><span className="pt-shop-q"><small>{qty(x.g)}</small>{c !== null && <em>{eur(c)}</em>}</span></button>; })}
                 </>}
         </Shell>
     );
