@@ -68,7 +68,7 @@ export const Home = ({ rt, onNav, onAct, onReconnect }) => {
                     </div>
                 ) : null}
                 <nav className="hm2-q" aria-label="Azioni rapide">
-                    {tiles.map((x) => x.k === 'weight' ? <button key={x.k} type="button" aria-label={x.q + (x.v ? ' ' + x.v : '')} onClick={() => onAct(x.k)}><i className="is-txt">{x.v || x.q}</i></button> : <button key={x.k} type="button" aria-label={x.q + (x.v ? ' ' + x.v : '')} onClick={() => onAct(x.k)}><i><Icon name={x.ic} size={22} /></i></button>)}
+                    {tiles.map((x) => <button key={x.k} type="button" aria-label={x.q + (x.v ? ' ' + x.v : '')} onClick={() => onAct(x.k)}><i><Icon name={x.ic} size={22} /></i></button>)}
                 </nav>
             </div>
         </>
