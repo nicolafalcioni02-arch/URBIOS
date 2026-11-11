@@ -38,7 +38,6 @@ export const Home = ({ rt, onNav, onAct, onReconnect }) => {
             <header className="pt-top" aria-hidden="true" />
             {!st.linked && <Note tone="warn">Il professionista ha chiuso il collegamento: i piani già ricevuti restano qui, ma non arriveranno aggiornamenti.
                 <div className="pt-btns"><button type="button" className="pt-btn" onClick={onReconnect}>Collega di nuovo</button></div></Note>}
-            {st.lastError && <Note tone="warn">Non riesco a collegarmi per ricevere nuovi piani. Riproverò da solo.</Note>}
             {conflicts > 0 && <Note tone="warn">Due versioni dello stesso piano non coincidono. Mostro quella ricevuta per prima: chiedi conferma al professionista.</Note>}
             {docs.length === 0 && <div className="pt-empty">Quando il professionista ti invia un piano comparirà qui.</div>}
             <div className="hm2">

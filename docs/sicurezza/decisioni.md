@@ -2,6 +2,7 @@
 
 ## Chiuse
 - **D-01 (2026-11-06) App paziente = app separata, altro HTML/build.** Il professionista resta URBIOS offline-first; l'app paziente è online (PWA ospitata, con header CSP reali). In URBIOS, **Impostazioni → Connettività** ha un interruttore: *Offline* (default, nessuna rete, nessun modulo `connect/` attivo) / *Online* (app paziente + multidispositivo). Spento = nessuna connessione aperta, nessun dato esce; le chiavi restano nell'archivio.
+  - 2026-11-11: il proprietario ha stabilito che l'app paziente deve funzionare senza rete salvo la ricezione dei piani; resta valido «cache solo di shell, mai dati clinici in chiaro» (SEC-110, SEC-122).
   Conseguenze: due build (`src/connect/` condiviso via import, niente duplicazione di crypto); il codice di rete non deve nemmeno essere eseguito a interruttore spento; ogni attivazione/disattivazione va in `audit/`; la disattivazione chiude sessioni e svuota le code in uscita; l'app paziente non è offline-first (cache solo di shell, mai dati clinici in chiaro, SEC-110).
 
 - **D-06 (2026-11-06) Canale medico→paziente = consegna di documenti** (diete, schede). Ipotesi di lavoro: unidirezionale, il paziente legge. Resta **dato sanitario (art. 9 GDPR)** perché riferito a persona identificabile: E2EE e consenso restano, ma si semplifica: niente CRDT né conflitti su questo canale, documento versionato firmato + cifrato per il paziente, revisioni sostitutive. Il ratchet può essere rimandato (basta KEM ibrido per messaggio + firma). Se in futuro il paziente scrive (misure, diari) si riapre.

@@ -13,3 +13,6 @@ Spuntare nel messaggio di lavoro (sì / n.a. / rischio annotato in `decisioni.md
 - [ ] Test: vettori standard + casi negativi (replay, riordino, busta alterata, duplicato)
 - [ ] Nuove dipendenze: versione esatta, licenza, manutenzione, impatto bundle, motivazione
 - [ ] Limiti di risorse (memoria, dimensione, tempo) per ogni parser
+
+## Registro lavori
+- 2026-11-11 UX-00 — SEC-110, SEC-122 (`src/patient/sw.js`, plugin in `vite.patient.config.js`). Sì: nessun innerHTML, nessuna dipendenza, CSP invariata; la cache contiene solo i file statici della build (mai `cache.put` a runtime); richieste di altre origini/non-GET non intercettate; niente `skipWaiting`/`clients.claim`; nessun dato clinico in cache. Non verificato in browser: registrazione e uso offline (il browser integrato non registra service worker) → da provare, vedi `piano-ux/STATO.md`.

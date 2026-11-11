@@ -4,7 +4,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 
 | Compito | Stato |
 |---|---|
-| UX-00 Base: l'app funziona senza rete | da fare |
+| UX-00 Base: l'app funziona senza rete | fatto (runtime da provare, vedi blocco) |
 | UX-01 Live: tempi veri, schermo acceso, RPE dopo la serie | da fare |
 | UX-02 Live: schermata leggibile | da fare |
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | da fare |
@@ -22,3 +22,12 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Scelte fatte: … (dubbi risolti da solo e perché)
 - Attenzione per chi viene dopo: … (nomi nuovi di funzioni, classi, campi del diario)
 ```
+
+## UX-00 — fatto il 11/11/2026
+- File toccati: `vite.patient.config.js`, `src/patient/main.jsx`, `src/patient/sw.js` (nuovo), `src/patient/ui/Home.jsx`, `src/patient/README.md`, `docs/sicurezza/{audit,requisiti,decisioni}.md`, questo file.
+- Cosa vede di diverso il paziente: l'app, una volta caricata, si apre anche senza rete (shell in cache). Senza rete non compare più l'avviso giallo «Non riesco a collegarmi…».
+- Verificato: la build in cartella temporanea scrive `sw.js` con versione ed elenco compilati (patient.html, demo.html, manifest, icone, tutti gli `assets/` incluso il prontuario; senza sw.js); sintassi valida; nessun segnaposto rimasto; `npm run test:connect` 102/102; `git status` solo file in lista. Corretto un bug mio: il segnaposto veniva sostituito prima nel commento.
+- NON verificato (il browser integrato rifiuta ogni registrazione di service worker, anche senza CSP; Chrome non era collegato): «Fatto quando» 2, 3, 4, 5, 6, 7. Il resto del giro offline va provato a mano.
+- Da provare su iPhone: app installata dalla Home in modalità aereo (si apre, sblocca, mostra i piani); primo avvio richiede rete una volta; iPhone può cancellare cache di siti non installati dopo settimane; dopo una nuova pubblicazione la versione nuova arriva alla riapertura successiva.
+- Scelte fatte: la cache include anche `demo.html`/`manifest-demo` perché la build li produce; l'elenco è nel formato `./percorso`.
+- Attenzione per chi viene dopo: `sw.js` ha due segnaposto (`'__VERSION__'`, `'__FILES__'`) sostituiti dal plugin `patient-sw`; non scrivere quelle stringhe altrove nel file. In sviluppo il service worker non esiste.

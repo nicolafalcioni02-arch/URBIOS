@@ -67,10 +67,10 @@ Stato: ☐ da fare · ◐ in corso · ☑ fatto+testato. Sezioni = numeri della 
 | SEC-101 | Backup cifrato con chiave dedicata, anti-rollback | 21 | storage | ◐ |
 | SEC-102 | Export solo con auth recente + conferma | 21 | dataExchange | ☐ |
 | SEC-103 | Cancellazione/cryptographic erasure con ricevuta tecnica | 22 | storage | ☐ |
-| SEC-110 | Web: no innerHTML, CSP, SRI, dipendenze minime, service worker sicuro | 19 | app/build | ◐ |
+| SEC-110 | Web: no innerHTML, CSP, SRI, dipendenze minime, service worker sicuro (`src/patient/sw.js`: solo stessa origine, solo shell, no skipWaiting) | 19 | app/build | ◐ (SW scritto, prova su dispositivo da fare) |
 | SEC-120 | Interruttore Impostazioni: Offline (default) / Online (app paziente + multidispositivo); spento ⇒ nessuna connessione né uscita dati | D-01 | config/settings | ◐ |
 | SEC-121 | Cambio modalità richiede auth locale recente e finisce in audit; la disattivazione chiude sessioni e code | D-01 | connect/audit | ◐ |
-| SEC-122 | App paziente = build/HTML separato che riusa `src/connect/`; shell in cache, dati clinici mai in cache in chiaro | D-01 | build | ◐ |
+| SEC-122 | App paziente = build/HTML separato che riusa `src/connect/`; shell in cache (`sw.js`), dati clinici mai in cache in chiaro | D-01 | build | ◐ (SW scritto, prova su dispositivo da fare) |
 | SEC-130 | Costo zero: solo GitHub Pages + servizi gratuiti non fidati, nessun segreto lato server | D-08 | transport/build | ◐ |
 | SEC-131 | Contenuti verso il paziente senza nome: solo id opaco + piano cifrato | D-09 | sync/identity | ◐ |
 | SEC-132 | App paziente senza dati identificativi: nessun nome, solo id opaco; controllo di invio contro nomi in titoli/note | D-11 | sync/consent | ◐ |

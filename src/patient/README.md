@@ -31,7 +31,9 @@ Riusa `src/connect/` (stessi moduli del medico, `role: 'patient'`) e `storage/cr
 ## Sicurezza: cosa c'è e cosa NO
 - CSP via `<meta>` (`script-src 'self'`, niente inline); `connect-src https:` perché il relay arriva dal QR. **`frame-ancestors` non è applicabile da `<meta>`** (GitHub Pages non permette header): clickjacking non mitigato dalla CSP.
 - Nessun `innerHTML` nel codice dell'app (solo nodi React). Nessun font/script esterno.
-- **Non c'è service worker:** l'app non funziona offline (decisione D-01: è l'app online; la cache della shell si può aggiungere dopo, con attenzione).
+- **Service worker (`sw.js`, scritto dalla build con versione ed elenco file):** in cache solo i file statici della build (HTML, `assets/`, manifest, icone), messi all'installazione. Senza rete l'app si apre e funziona; la rete serve solo a ricevere i piani.
+  Una versione nuova subentra solo alla chiusura e riapertura dell'app (niente `skipWaiting`/`claim`); pagine prima dalla rete, il resto prima dalla cache.
+  Mai in cache: risposte del relay, altre origini, dati clinici (restano in IndexedDB cifrato). Non esiste in sviluppo (solo `import.meta.env.PROD`).
 - **Testo dell'informativa e consensi da far revisionare** a un consulente privacy/DPO (SEC-97: DPIA, titolare/responsabile, conservazione).
 - Passphrase persa = dati persi (il medico può rinviare). Nessun recupero per scelta.
 - Documenti: dieta (giorni → pasti → voci) e scheda (settimane → giorni → esercizi) hanno una vista dedicata con schede a tab; qualunque altra forma ricade nella vista generica.
@@ -41,7 +43,7 @@ Riusa `src/connect/` (stessi moduli del medico, `role: 'patient'`) e `storage/cr
 ## Interfaccia (tema chiaro viola/lime)
 - Sfondo lilla `#EFEAFF` con gradiente animato, riquadri bianchi, foglio `#F3EEFF`, accento viola `#6B3DFF`, **lime `#D8FD38` = colore principale (azioni e grafici)**, testo `#0B0C0E`, grigio `#6C727F`. Forme a 28–32 px, dock a capsula. Il tema chiaro sta in fondo a `patient.css` (blocchi `body:has(.pt-main)`): le nuove regole si aggiungono in fondo. Restano scuri solo l'allenamento guidato (viola scuro + foglio bianco) e le schermate di accesso.
 - **Testi lunghi:** `ui/Clamp.jsx` taglia su N righe e mostra «Leggi tutto» solo se il testo è davvero tagliato; il riquadro si apre sul `body` con sfondo sfocato.
-- **Installabile:** `public/` (manifest, icone) e tag per iPhone in `patient.html`; il service worker non c'è.
+- **Installabile:** `public/` (manifest, icone) e tag per iPhone in `patient.html`; il service worker (`sw.js`) tiene in cache la shell.
 - **Pubblicazione:** il sito sta nel ramo `gh-pages` (`paziente/` = build di `dist-patient`), il codice su `main`.
 - **Diario locale** (`rt.log`: serie fatte, carichi, pasti, fuori piano): salvato cifrato sul telefono PRIMA di tutto, anche senza rete. **Non viene mai inviato** al professionista (il canale è a senso unico: scrive solo il medico).
 - **Non presenti perché i dati non esistono** nei documenti inviati: foto/nome del paziente (anonimato), video e immagini degli esercizi, calorie bruciate, orari dei pasti, sostituzioni consentite, notifiche. Il tracker mostra serie fatte e tempo; lo sfondo è un gradiente.
