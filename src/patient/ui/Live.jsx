@@ -147,10 +147,12 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     }
     const bars = Math.min(cur.n, 8), logged = doneOf(ex).length;
     const shownRpe = phase === 'rest' ? lastRpe : rpe;
-    const shown = phase === 'rest' ? `RIPOSO ${mmss(rest)}` : mmss(setSecs);
+    const shown = phase === 'rest' ? mmss(rest) : mmss(setSecs);
     const pro = [wk && wk.nota && ['Settimana', wk.nota], day && day.nota && ['Giornata', day.nota], cur.note && ['Esercizio', cur.note]].filter(Boolean);
     const mine = arr(rt.log.get().hist[cur.name]).flatMap((h) => arr(h.sets).filter((x) => x.note).map((x) => ({ date: h.date, text: x.note }))).reverse().slice(0, 8);
     const tempo = parseTempo(cur.tempo);
+    const lastT = arr(rt.log.get().hist[cur.name]).filter((h) => h.date !== ymd() && arr(h.sets).length).slice(-1)[0];   // ultima seduta passata: la data fa da etichetta
+    const lastG = lastT ? groupSets(lastT.sets) : [];
     const nx = list[ex], nextCard = nx ? (
         <div className="pt-nx"><span className="pt-nx-i"><Icon name="arrow" size={20} /></span><span className="pt-nx-t"><small>Dopo</small><b>{nx.name}</b></span><span className="pt-nx-s">{Math.min(setNo + 1, nx.n)}<i>/{nx.n}</i></span></div>
     ) : null;
@@ -183,7 +185,8 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 <div className={'pt-sheet-body' + (tab !== 'oggi' ? ' is-under' : '')} key={tab} ref={fadeSet} onScroll={(e) => fadeSet(e.currentTarget)}>
                     {tab === 'oggi' && (
                         <>
-                            {sug && <div className="pt-sug"><div><span>Suggerito</span><b>{fmtKg(sug.kg)} kg</b></div><button type="button" onClick={() => setKg(sug.kg)}>Usa</button></div>}
+                            {lastT && <p className="pt-lastrow"><span>{String(lastT.date).split('-').reverse().slice(0, 2).join('/')}</span>{lastG.slice(0, 2).map((g, i) => <b key={i}> · {g.n} × {fmtKg(g.kg)} kg{g.rpe ? ` · RPE ${g.rpe}` : ''}</b>)}{lastG.length > 2 ? ' …' : ''}</p>}
+                            {sug && sug.kg !== kg && <div className="pt-sug"><div><span>Suggerito</span><b>{fmtKg(sug.kg)} kg</b></div><button type="button" onClick={() => setKg(sug.kg)}>Usa</button></div>}
                             <span className="pt-fl">RPE</span>
                             <div className="pt-rpe">{RPES.map((r) => <button key={r} type="button" className={shownRpe === r ? 'is-on' : ''} aria-pressed={shownRpe === r} onClick={() => pickRpe(r)}>{r}</button>)}</div>
                             
@@ -208,7 +211,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 <div className="pt-live-act">
                     {tab === 'oggi' && <div className="pt-step" aria-label="Carico">
                         <button type="button" aria-label="Meno carico" onClick={() => setKg((x) => Math.max(0, +(x - 2.5).toFixed(1)))}><Icon name="minus" size={22} /></button>
-                        <b>{fmtKg(kg)} kg</b>
+                        <b>{cur.kg0 === 0 && kg === 0 ? 'Corpo libero' : `${fmtKg(kg)} kg`}</b>
                         <button type="button" aria-label="Più carico" onClick={() => setKg((x) => +(x + 2.5).toFixed(1))}><Icon name="plus" size={22} /></button>
                     </div>}
                     {phase === 'rest' ? <button type="button" className="pt-done is-sec" onClick={skipRest}>SALTA RIPOSO</button> : <button type="button" className="pt-done" onClick={complete}>SERIE COMPLETATA</button>}
@@ -245,7 +248,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                     <div className="pt-pause-c">
                         <h2>In pausa</h2>
                         <button type="button" className="pt-cta" onClick={() => setPaused(false)}>Riprendi</button>
-                        <button type="button" className="pt-btn danger" onClick={() => onExit(false)}>Abbandona sessione</button>
+                        <button type="button" className="pt-btn ghost" onClick={() => onExit(false)}>Esci</button>
                     </div>
                 </div>
             )}

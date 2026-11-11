@@ -1051,3 +1051,8 @@ body:has(.pt-main) .pt-ab .pt-credits, body:has(.pt-main) .pt-ab-f { color: #6C7
 
 /* Home a tutta larghezza: gli anelli non si fermano a 6px dal bordo */
 .pt-main.is-fit:has(.hm2) { margin: 0 -22px; padding: 0 22px 120px; }
+
+/* UX-02: Live più chiaro con meno scritte */
+.pt-lastrow { margin: 0 0 12px; font-size: 15px; line-height: 1.4; color: #0B0C0E; overflow-wrap: anywhere; } .pt-lastrow span { color: #6C727F; } .pt-lastrow b { font-weight: 700; }
+.pt-grid .pt-big.is-rest b { white-space: nowrap; }
+.pt-pause-c .pt-btn.ghost { color: #fff; border-color: rgba(255,255,255,.28); }
