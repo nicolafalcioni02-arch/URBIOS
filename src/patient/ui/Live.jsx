@@ -51,36 +51,55 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     const [rpe, setRpe] = useState(null), [note, setNote] = useState(''), [tab, setTab] = useState('oggi');
     const [hype, setHype] = useState(null);
     useEffect(() => { if (!hype) return undefined; const t = setTimeout(() => setHype(null), 3200); return () => clearTimeout(t); }, [hype]);
-    const total = useRef(0), ac = useRef(null);
+    const [lastRpe, setLastRpe] = useState(null);                 // RPE della serie appena fatta (si cambia durante il riposo)
+    const total = useRef(0), ac = useRef(null), lastSet = useRef(null);
+    // tempi dall'orologio (non da incrementi: con lo schermo spento il timer non si ferma). run = secondi accumulati prima di runAt; restEnd 0 = non in riposo
+    const T = useRef({ run: start.secs || 0, runAt: Date.now(), setAt: Date.now(), restEnd: 0, lastBeep: null, pausedAt: 0 });
     useEffect(() => { if (start.fresh) rt.log.update((l) => { delete l.sessions[key]; }); }, []);
 
     const beep = (f = 880, ms = 120) => {
         try {
             const A = window.AudioContext || window.webkitAudioContext; if (!A) return;
-            const c = ac.current || (ac.current = new A()), o = c.createOscillator(), g = c.createGain();
+            const c = ac.current || (ac.current = new A()); if (c.state === 'suspended') c.resume();
+            const o = c.createOscillator(), g = c.createGain();
             o.frequency.value = f; g.gain.value = 0.15; o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime + ms / 1000);
         } catch { /* audio non disponibile */ }
     };
     useEffect(() => {
         if (paused || fin) return undefined;
-        const t = setInterval(() => {
-            setElapsed((x) => x + 1);
-            if (phase === 'work') setSetSecs((x) => x + 1);
-            else setRest((r) => {
-                const n = r - 1;
-                if (n > 0 && n <= 3) { beep(660); buzz(40); }
-                if (n <= 0) { beep(1040, 260); buzz([120, 60, 120]); setPhase('work'); setSetSecs(0); return 0; }
-                return n;
-            });
-        }, 1000);
-        return () => clearInterval(t);
-    }, [paused, fin, phase]);
+        const t = T.current;
+        if (t.pausedAt) { const d = Date.now() - t.pausedAt; t.runAt += d; t.setAt += d; if (t.restEnd) t.restEnd += d; t.pausedAt = 0; }   // il tempo in pausa non conta
+        const tick = () => {
+            const now = Date.now();
+            setElapsed(t.run + Math.floor((now - t.runAt) / 1000));
+            if (t.restEnd) {
+                const r = Math.ceil((t.restEnd - now) / 1000);
+                if (r <= 0) {                                   // la serie successiva parte da quando il riposo è finito
+                    const end = t.restEnd; t.restEnd = 0; t.setAt = end; t.lastBeep = null;
+                    if (now - end < 2000) { beep(1040, 260); buzz([120, 60, 120]); }
+                    setPhase('work'); setRest(0); setRpe(null); setSetSecs(Math.floor((now - end) / 1000));
+                } else { setRest(r); if (r <= 3 && t.lastBeep !== r) { t.lastBeep = r; beep(660); buzz(40); } }
+            } else setSetSecs(Math.floor((now - t.setAt) / 1000));
+        };
+        const iv = setInterval(tick, 250), vis = () => { if (document.visibilityState === 'visible') tick(); };
+        document.addEventListener('visibilitychange', vis);
+        return () => { clearInterval(iv); document.removeEventListener('visibilitychange', vis); t.pausedAt = Date.now(); };
+    }, [paused, fin]);
+    // schermo acceso durante l'allenamento (se il telefono non lo permette non succede nulla); il sistema lo rilascia in secondo piano, lo richiedo al ritorno
+    useEffect(() => {
+        if (paused || fin) return undefined;
+        let lock = null, dead = false;
+        const get = async () => { try { if (!navigator.wakeLock || document.visibilityState !== 'visible') return; const l = await navigator.wakeLock.request('screen'); if (dead) { l.release().catch(() => {}); return; } lock = l; } catch { /* non disponibile */ } };
+        const vis = () => { if (document.visibilityState === 'visible' && (!lock || lock.released)) get(); };
+        get(); document.addEventListener('visibilitychange', vis);
+        return () => { dead = true; document.removeEventListener('visibilitychange', vis); try { lock && lock.release().catch(() => {}); } catch { /* ok */ } };
+    }, [paused, fin]);
     useEffect(() => () => { try { ac.current && ac.current.close(); } catch { /* ok */ } }, []);
 
     if (!list.length) return null;
     const cur = list[Math.min(ex, list.length - 1)];
     const sug = sugOf(ex), past = arr(rt.log.get().hist[cur.name]).slice(-4).reverse();
-    const goto = (i, s) => { rt.log.update((l) => { const q = l.sessions[key] || (l.sessions[key] = { sets: {}, started: Date.now() }); q.pos = { ex: i }; q.secs = elapsed; }); setEx(i); setSetNo(s); setKg(kgOf(i)); setRpe(null); setNote(''); setPhase('work'); setSetSecs(0); setRest(0); setTab('oggi'); };
+    const goto = (i, s) => { rt.log.update((l) => { const q = l.sessions[key] || (l.sessions[key] = { sets: {}, started: Date.now() }); q.pos = { ex: i }; q.secs = elapsed; }); setEx(i); setSetNo(s); setKg(kgOf(i)); setRpe(null); setNote(''); setPhase('work'); setSetSecs(0); setRest(0); setTab('oggi'); T.current.restEnd = 0; T.current.setAt = Date.now(); T.current.lastBeep = null; };
     const prev = () => { if (ex > 0) goto(ex - 1, Math.min(doneOf(ex - 1).length, list[ex - 1].n - 1)); };
     const nextEx = (i) => { if (i + 1 < list.length) { goto(i + 1, Math.min(doneOf(i + 1).length, list[i + 1].n - 1)); return true; } return false; };
     const complete = () => {
@@ -93,13 +112,21 @@ export const Live = ({ rt, id, w, d, onExit }) => {
             t.sets.push(rec); if (h.length > 12) h.splice(0, h.length - 12);
         });
         total.current += 1; buzz(30); beep(740, 90);
-        setRpe(null); setNote('');
+        setNote(''); setLastRpe(rec.rpe || null); lastSet.current = { exI, name: cur.name, date }; setTab('oggi');
         let more = true;
         if (setNo + 1 < cur.n) setSetNo(setNo + 1); else more = nextEx(ex);
         if (!more) { setFin(true); buzz([80, 50, 80, 50, 200]); return; }
-        setPhase('rest'); setRest(cur.rest);
+        setPhase('rest'); setRest(cur.rest); T.current.restEnd = Date.now() + cur.rest * 1000; T.current.lastBeep = null;
     };
-    const skipRest = () => { setPhase('work'); setRest(0); setSetSecs(0); };
+    const skipRest = () => { setPhase('work'); setRest(0); setSetSecs(0); setRpe(null); T.current.restEnd = 0; T.current.setAt = Date.now(); T.current.lastBeep = null; };
+    // in riposo l'RPE riguarda la serie appena fatta: si scrive subito nel diario (voce di sessione e voce di storico, che nell'app vera sono oggetti diversi)
+    const pickRpe = (r) => {
+        const L = lastSet.current;
+        if (phase !== 'rest' || !L) { setRpe(rpe === r ? null : r); return; }
+        const v = lastRpe === r ? null : r, put = (x) => { if (x) { if (v) x.rpe = v; else delete x.rpe; } };
+        rt.log.update((l) => { const a = ((l.sessions[key] || {}).sets || {})[L.exI]; put(a && a[a.length - 1]); const h = arr(l.hist[L.name]).find((x) => x.date === L.date); put(h && h.sets[h.sets.length - 1]); });
+        setLastRpe(v);
+    };
     const skipEx = () => { setPaused(false); if (!nextEx(ex)) setFin(true); };
 
     if (fin) {
@@ -119,6 +146,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
         );
     }
     const bars = Math.min(cur.n, 8), logged = doneOf(ex).length;
+    const shownRpe = phase === 'rest' ? lastRpe : rpe;
     const shown = phase === 'rest' ? `RIPOSO ${mmss(rest)}` : mmss(setSecs);
     const pro = [wk && wk.nota && ['Settimana', wk.nota], day && day.nota && ['Giornata', day.nota], cur.note && ['Esercizio', cur.note]].filter(Boolean);
     const mine = arr(rt.log.get().hist[cur.name]).flatMap((h) => arr(h.sets).filter((x) => x.note).map((x) => ({ date: h.date, text: x.note }))).reverse().slice(0, 8);
@@ -157,7 +185,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                         <>
                             {sug && <div className="pt-sug"><div><span>Suggerito</span><b>{fmtKg(sug.kg)} kg</b></div><button type="button" onClick={() => setKg(sug.kg)}>Usa</button></div>}
                             <span className="pt-fl">RPE</span>
-                            <div className="pt-rpe">{RPES.map((r) => <button key={r} type="button" className={rpe === r ? 'is-on' : ''} aria-pressed={rpe === r} onClick={() => setRpe(rpe === r ? null : r)}>{r}</button>)}</div>
+                            <div className="pt-rpe">{RPES.map((r) => <button key={r} type="button" className={shownRpe === r ? 'is-on' : ''} aria-pressed={shownRpe === r} onClick={() => pickRpe(r)}>{r}</button>)}</div>
                             
                         </>
                     )}
@@ -190,7 +218,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                     <button type="button" onClick={skipEx}>Salta</button>
                 </div>
             </section>
-            {phase === 'rest' && rest > 0 && rest <= 30 && !paused && (
+            {phase === 'rest' && rest > 0 && rest <= 10 && !paused && (
                 <div className="pt-rf" role="timer" aria-label="Fine riposo">
                     <UrbiosLogo size={40} className="pt-rf-logo" />
                     <b className="pt-rf-t">{mmss(rest)}</b>

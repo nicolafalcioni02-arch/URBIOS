@@ -16,7 +16,7 @@ npm run test:connect    # include i test di src/patient/test
 | `runtime.js` | logica senza UI: cassaforte (passphrase), consenso, collegamento da QR, sync, documenti. Testata in Node |
 | `App.jsx` | macchina a stati: consenso → passphrase → (collega) → home; blocco per inattività 5 min |
 | `ui/Welcome.jsx` `bits.jsx` (AuthShell) | prima schermata con logo, cornice comune di Informativa / Passphrase («Accedi») / Collegamento, con i 3 passi |
-| `ui/Shell.jsx` | dopo il collegamento: 4 tab (Home, Dieta, Schede, Profilo) con dock a capsula; `Home.jsx` (riquadro del giorno + elenco), `TrainDetail.jsx` (esercizi), `Live.jsx` (allenamento guidato, timer di riposo, bip/vibrazione), `Nutrition.jsx` + `MealSheet.jsx` (dieta e registro pasto), `logic.js` (lettura «4x10», «90s», chiavi del diario) |
+| `ui/Shell.jsx` | dopo il collegamento: 4 tab (Home, Dieta, Schede, Profilo) con dock a capsula; `Home.jsx` (riquadro del giorno + elenco), `TrainDetail.jsx` (esercizi), `Live.jsx` (allenamento guidato: tempi calcolati dall'orologio, schermo acceso con wake lock, RPE della serie appena fatta modificabile durante il riposo, bip/vibrazione), `Nutrition.jsx` + `MealSheet.jsx` (dieta e registro pasto), `logic.js` (lettura «4x10», «90s», chiavi del diario) |
 | `ui/Consent.jsx` `Passphrase.jsx` `Pair.jsx` `Home.jsx` `DocView.jsx` `Settings.jsx` `bits.jsx` | schermate (classi `pt-*` in `patient.css`) |
 | `scan.js` | lettura QR con fotocamera (jsQR, tutto sul dispositivo) |
 
