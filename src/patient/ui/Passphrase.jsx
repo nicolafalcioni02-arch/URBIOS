@@ -15,7 +15,7 @@ export const Passphrase = ({ mode, onSubmit, onForgot }) => {
     const eye = <button type="button" className="pt-pw-e" aria-label={show ? 'Nascondi' : 'Mostra'} onClick={() => setShow(!show)}><Icon name={show ? 'eyeoff' : 'eye'} size={22} /></button>;
     const ty = show ? 'text' : 'password', bad = !setup && err === 'Passphrase non corretta.';
     return (
-        <AuthShell big={!setup} step={setup ? 2 : 0} title={setup ? 'Scegli la tua passphrase' : ''} sub={setup ? <span className="pt-warn-s"><Icon name="warn" size={18} />Se la perdi non si può recuperare.</span> : null}>
+        <AuthShell big={!setup} step={setup ? 2 : 0} title={setup ? 'Scegli la tua passphrase' : ''} sub={setup ? <span className="pt-warn-s">Se la perdi non si può recuperare.</span> : null}>
         <form onSubmit={submit} className="pt-auth-f">
             {setup && <label className="pt-label" htmlFor="p1">Passphrase</label>}
             <div className={'pt-pw' + (bad ? ' is-bad' : '')}>

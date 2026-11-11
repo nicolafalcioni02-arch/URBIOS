@@ -1758,3 +1758,4 @@ body:has(.pt-auth) .pt-feat li, body:has(.pt-auth) .pt-feat b, body:has(.pt-auth
 body:has(.pt-auth) .pt-auth, body:has(.pt-auth) .pt-auth h1, body:has(.pt-auth) .pt-auth h2, body:has(.pt-auth) .pt-auth label { color: #0B0C0E; } body:has(.pt-auth) .pt-auth-s, body:has(.pt-auth) .pt-auth .pt-link { color: #6C727F; }
 body:has(.pt-auth) .pt-auth .pt-card p, body:has(.pt-auth) .pt-auth .pt-card li, body:has(.pt-auth) .pt-auth .pt-card h2, body:has(.pt-auth) .pt-auth .pt-card h3, body:has(.pt-auth) .pt-auth .pt-card b, body:has(.pt-auth) .pt-auth .pt-card strong { color: #0B0C0E; }
 body:has(.pt-auth) .pt-feat li { background: transparent; box-shadow: none; }
+body:has(.pt-auth) .pt-auth .pt-warn-s, body:has(.pt-auth) .pt-auth .pt-auth-s .pt-warn-s { color: #0B0C0E; background: none; padding: 0; border: 0; }
