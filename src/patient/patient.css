@@ -1541,3 +1541,17 @@ button.pt-shop-t { width: calc(100% - 8px); border: 0; background: transparent; 
 .pt-by-r > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; } .pt-by-r b { font-size: 15px; font-weight: 700; color: var(--u-ink); overflow-wrap: anywhere; } .pt-by-r small { font-size: 13px; font-weight: 600; color: var(--u-grigio); }
 .pt-by-r em { flex: none; font-style: normal; font-size: 16px; font-weight: 800; color: var(--u-ink); font-variant-numeric: tabular-nums; }
 .pt-by-r .pt-todo-x { flex: none; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(11,12,14,.07); color: var(--u-ink); display: grid; place-items: center; cursor: pointer; }
+
+/* spesa: scheda prodotto con le informazioni del catalogo, sotto la parte compilata */
+.pt-pf-i { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--u-lilla); }
+.pt-pf-h { display: flex; flex-wrap: wrap; gap: 6px; }
+.pt-pf-h span { padding: 6px 12px; border-radius: 999px; background: var(--u-lilla); color: var(--u-ink); font-size: 13px; font-weight: 600; }
+.pt-pf-h .pt-ns-a, .pt-pf-h .pt-ns-b { background: var(--u-viola); color: #fff; }
+.pt-pf-i dl { margin: 0; background: #fff; border-radius: 16px; padding: 4px 14px; }
+.pt-pf-i dl div { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--u-lilla); font-size: 15px; }
+.pt-pf-i dl div:first-child { border-top: 0; }
+.pt-pf-i dt { color: var(--u-grigio-d); } .pt-pf-i dd { margin: 0; font-weight: 700; color: var(--u-ink); font-variant-numeric: tabular-nums; }
+.pt-pf-i dl .is-k dt, .pt-pf-i dl .is-k dd { color: var(--u-ink); font-weight: 800; }
+.pt-pf-i dl .is-s { padding-left: 14px; font-size: 14px; }
+.pt-pf-i section h4 { margin: 0 0 4px; font-size: 13px; font-weight: 700; color: var(--u-grigio-d); }
+.pt-pf-i section p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--u-ink); overflow-wrap: anywhere; }

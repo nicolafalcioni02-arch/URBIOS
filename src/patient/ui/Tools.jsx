@@ -81,6 +81,22 @@ const Scan = ({ onCode, onBack }) => {
     );
 };
 
+// Tutto quello che il catalogo sa del prodotto, sotto la parte compilata dal cliente (solo lettura)
+const Facts = ({ i }) => {
+    const f = i.info, v = (x, u) => (x == null ? null : String(x).replace('.', ',') + (u || ''));
+    const rows = [['Grassi', v(f.fat, ' g')], ['di cui saturi', v(f.sat, ' g')], ['Carboidrati', v(f.carb, ' g')], ['di cui zuccheri', v(f.sug, ' g')], ['Fibre', v(f.fib, ' g')], ['Proteine', v(f.pro, ' g')], ['Sale', v(f.salt, ' g')]].filter((r) => r[1]);
+    const top = [i.brand, f.qty, f.cat].filter(Boolean);
+    return (
+        <div className="pt-pf-i">
+            {(top.length > 0 || f.ns || f.nova > 0) && <div className="pt-pf-h">{top.map((x) => <span key={x}>{x}</span>)}{f.ns && <span className={'pt-ns-' + f.ns.toLowerCase()}>Nutri-Score {f.ns}</span>}{f.nova > 0 && <span>NOVA {f.nova}</span>}</div>}
+            {(i.kcal != null || rows.length > 0) && <dl><div className="is-k"><dt>Energia · 100 g</dt><dd>{i.kcal != null ? i.kcal + ' kcal' : '—'}</dd></div>{rows.map((r) => <div key={r[0]} className={r[0].startsWith('di cui') ? 'is-s' : ''}><dt>{r[0]}</dt><dd>{r[1]}</dd></div>)}</dl>}
+            {f.ing && <section><h4>Ingredienti</h4><p>{f.ing}</p></section>}
+            {f.all.length > 0 && <section><h4>Allergeni</h4><p>{f.all.join(', ')}</p></section>}
+            {f.orig && <section><h4>Origine</h4><p>{f.orig}</p></section>}
+        </div>
+    );
+};
+
 // Prodotto trovato (o da compilare a mano): prezzo e negozio li scrive il cliente; il prezzo vale per la confezione
 const PriceForm = ({ init, items, stores, onSave, onBack }) => {
     const [name, setName] = useState(init.name), [g, setG] = useState(init.g ? String(init.g) : ''), [price, setPrice] = useState(''), [store, setStore] = useState(stores[0] || ''), [key, setKey] = useState(() => guess(init.name, items) || '');
@@ -98,6 +114,7 @@ const PriceForm = ({ init, items, stores, onSave, onBack }) => {
             {stores.length > 1 && <div className="pt-pf-s">{stores.map((x) => <button key={x} type="button" className={x === store ? 'is-on' : ''} onClick={() => setStore(x)}>{x}</button>)}</div>}
             <select className="pt-input" aria-label="Voce della lista" value={key} onChange={(e) => setKey(e.target.value)}><option value="">Fuori lista</option>{items.map((x) => <option key={x.k} value={x.k}>{x.n}</option>)}</select>
             <button type="button" className="pt-cta" disabled={!ok} onClick={() => onSave(key, { ean: init.ean || '', name: name.trim(), store: store.trim(), price: Math.round(num(price) * 100) / 100, g: Math.round(num(g) || 0) })}>Salva</button>
+            {init.info && <Facts i={init} />}
         </div>
     );
 };
