@@ -1737,5 +1737,4 @@ body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc { margin-right: 4px; 
 /* Sfondo fino ai bordi dello schermo (anche sotto le barre di Safari): stesso colore dell'onda, chiaro nelle schermate chiare */
 html { background: #160C33; }
 html:has(.pt-main), html:has(.hm2) { background: #EFEAFF; }
-body { min-height: 100lvh; }
 .pt-bg { top: 0; left: 0; right: 0; bottom: auto; height: 100lvh; min-height: 100%; }
