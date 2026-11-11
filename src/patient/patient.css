@@ -1632,3 +1632,4 @@ body:has(.pt-main) .pt-pf .pt-input, body:has(.pt-main) .pt-sc2-m .pt-input { bo
 .pt-pf-f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .pt-pf-f small, .pt-pf-c { margin-left: 18px; font-size: 12px; font-weight: 700; color: var(--u-grigio); }
 .pt-pf-c { margin-bottom: -6px; }
+.pt-dsheet .pt-shop ~ .pt-add { height: 56px; border-radius: 999px; margin-top: 4px; }
