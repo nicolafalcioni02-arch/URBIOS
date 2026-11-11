@@ -1680,3 +1680,9 @@ body:has(.pt-main) .pt-sp-top:has(.pt-nh) .pt-nh-l { color: #fff; cursor: defaul
 .pt-lst .pt-cd .pt-dn { position: relative; justify-content: center; }
 .pt-lst .pt-cd .pt-dn svg { width: 168px; height: 168px; }
 .pt-dn-c { position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: flex; flex-direction: column; align-items: center; line-height: 1.05; } .pt-dn-c b { font-size: 26px; font-weight: 900; color: var(--u-ink); font-variant-numeric: tabular-nums; } .pt-dn-c small { font-size: 12px; font-weight: 700; color: var(--u-grigio); }
+
+/* allenamento: fascia in alto tutta viola, il riquadro della scheda si fonde con lo sfondo (come la dieta) */
+body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) { background: var(--u-viola); }
+body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc { background: transparent !important; box-shadow: none; border-radius: 0; padding-left: 0; padding-right: 0; color: #fff !important; }
+body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) .pt-sh-arc { background: #fff; color: var(--u-ink); }
+body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc svg:last-child { color: #fff; opacity: .8; }

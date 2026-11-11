@@ -1,3 +1,4 @@
+import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import React, { useState } from 'react';
 import { Icon, Count, Lst } from './bits.jsx';
 import { BodyMap } from './BodyMap.jsx';
@@ -95,7 +96,7 @@ export const Schede = ({ rt, docs, onOpen }) => {
                 <div className="pt-sp-list">
                     <div className="pt-sh-row">
                         <button type="button" className="pt-sc" style={{ background: ACTIVE.bg, color: ACTIVE.ink }} disabled={!active.length} onClick={() => onOpen(active[0].open)}>
-                            <Ring pct={active.length ? active[0].pct : 0} ink="#fff" fg="#D8FD38" /><b>{(active.length && active[0].meta.title) || 'Scheda'}</b><Icon name="chev" size={18} />
+                            <UrbiosLogo size={40} /><b>{(active.length && active[0].meta.title) || 'Scheda'}</b><Icon name="chev" size={18} />
                         </button>
                         {archive.length > 0 && <button type="button" className="pt-sh-arc" aria-label="Vecchie schede" onClick={() => setSheet('old')}><Icon name="archive" size={22} /></button>}
                     </div>
