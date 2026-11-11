@@ -1728,4 +1728,4 @@ body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc { margin-right: 4px; 
 .pt-nxt span { flex: none; min-width: 40px; height: 36px; padding: 0 12px; border-radius: 999px; background: #fff; display: grid; place-items: center; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
 
 /* Live: secondi un po' più in alto, lontani dal selettore del peso */
-.pt-live.pt-lv2 .pt-sh2 .pt-t2 { position: relative; top: -10px; }
+.pt-live.pt-lv2 .pt-sh2 .pt-t2 { position: relative; top: -18px; }
