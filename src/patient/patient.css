@@ -1593,3 +1593,4 @@ body:has(.pt-main) .pt-pf .pt-input, body:has(.pt-main) .pt-sc2-m .pt-input { bo
 .pt-lg-l { background: #fff; }
 .pt-pf-i { margin: 28px -22px -28px; padding: 22px 22px calc(34px + env(safe-area-inset-bottom, 0px)); border-radius: 40px 40px 0 0; }
 .pt-pf-i > h3 { margin: 0 0 4px 6px; font-size: 20px; font-weight: 800; color: var(--u-ink); }
+.pt-lg { align-items: center; text-align: center; } .pt-lg-l { align-self: center; }
