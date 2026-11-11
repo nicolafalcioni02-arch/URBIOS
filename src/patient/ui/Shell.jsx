@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Icon } from './bits.jsx';
+import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import { Home } from './Home.jsx';
 import { Schede } from './Schede.jsx';
 import { TrainDetail } from './TrainDetail.jsx';
@@ -28,10 +29,14 @@ const Dock = ({ tab, tabs, go }) => {
 export const Shell = ({ rt, onRefresh, onReconnect, onLock, onForget, initial, onWhere }) => {
     // dopo il blocco si rientra nell'allenamento (se lasciato da meno di 30 minuti e il piano esiste ancora)
     const [tab, setTab] = useState('home'), [sub, setSub] = useState(() => (initial && initial.name === 'live' && Date.now() - initial.at < 30 * 60000 && rt.docs.get(initial.id) ? initial : null)), [sheet, setSheet] = useState(null);
+    // «Inizia»: schermata viola a tutto schermo con il saluto, poi parte l'allenamento
+    const [hi, setHi] = useState(false);
+    useEffect(() => { if (!hi) return undefined; const t = setTimeout(() => setHi(false), 1700); return () => clearTimeout(t); }, [hi]);
     const go = (t) => { setTab(t); setSub(null); };
     const nav = (n) => { if (n.name === 'diet') { setTab('diet'); setSub({ name: 'diet', id: n.id }); } else setSub(n); };
     // il puntatore sta solo in memoria (useRef in App): mai salvato; niente pulizia, così sopravvive al blocco
     useEffect(() => { if (onWhere) onWhere(sub && sub.name === 'live' ? { name: 'live', id: sub.id, w: sub.w, d: sub.d, at: Date.now() } : null); }, [sub]);
+    if (sub && sub.name === 'live' && hi) return <div className="pt-hi" role="status"><UrbiosLogo size={84} /><b>Buon allenamento</b></div>;
     if (sub && sub.name === 'live') return <Live rt={rt} id={sub.id} w={sub.w} d={sub.d} onExit={(done) => { setSub(null); if (done) setTab('home'); }} />;
     const docs = rt.docs.list();
     const tabs = TABS.filter(([k]) => !docs.length || (k === 'diet' ? docs.some((d) => d.kind === 'diet') : k === 'train' ? docs.some((d) => d.kind === 'training') : true));
@@ -42,7 +47,7 @@ export const Shell = ({ rt, onRefresh, onReconnect, onLock, onForget, initial, o
         else if (k === 'eat') { const m = nextMeal(docs, rt.docs.get, rt.log.get()); setTab('diet'); setSub(m ? { name: 'diet', id: m.docId } : null); if (m) setSheet({ kind: 'meal', ...m }); }
     };
     let body;
-    if (sub && sub.name === 'train') body = <TrainDetail rt={rt} id={sub.id} w0={sub.w} d0={sub.d} onBack={() => setSub(null)} onStart={(s) => setSub({ name: 'live', ...s })} />;
+    if (sub && sub.name === 'train') body = <TrainDetail rt={rt} id={sub.id} w0={sub.w} d0={sub.d} onBack={() => setSub(null)} onStart={(s) => { setHi(true); setSub({ name: 'live', ...s }); }} />;
     else if (tab === 'home') body = <Home rt={rt} onNav={nav} onAct={act} onReconnect={onReconnect} />;
     else if (tab === 'train') body = <Schede rt={rt} docs={docs} onOpen={nav} />;
     else if (tab === 'diet') body = <Nutrition rt={rt} id={sub && sub.id} onMeal={(s) => setSheet({ kind: 'meal', ...s })} onExtra={(s) => setSheet({ kind: 'extra', ...s })} />;

@@ -1,3 +1,4 @@
+import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon, Step, Lst } from './bits.jsx';
 import { TempoBar, parseTempo } from './Tempo.jsx';
@@ -201,6 +202,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
         <div className={'pt-live pt-lv2' + (paused ? ' is-paused' : '') + (isRest ? ' is-rest' : '')}>
             {hype && <div className="pt-hype" role="status" onClick={() => setHype(null)}>{hype}</div>}
             <div className="pt-live-bg pt-lb2">
+                <div className="pt-lv-mark" aria-hidden="true"><UrbiosLogo size={440} /></div>
                 {isRest && <div className="pt-rest-w" style={{ height: lvl + '%' }}><svg viewBox="0 0 800 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 15Q100 0 200 15T400 15T600 15T800 15V30H0Z" /></svg></div>}
                 {hit > 0 && <i className="pt-veil" key={hit} aria-hidden="true" />}
                 {isRest ? <>
