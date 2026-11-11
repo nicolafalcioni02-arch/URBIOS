@@ -213,6 +213,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 </> : <>
                     <Clamp as="b" lines={3} title="Esercizio" text={(cur.ss ? cur.ss + ' · ' : '') + cur.name} className={'pt-live-ex' + (cur.name && cur.name.length > 44 ? ' is-xl' : cur.name && cur.name.length > 26 ? ' is-long' : '')} />
                     {tempo && <TempoBar key={ex + '-' + setNo} tempo={tempo} dark run />}
+                    {cur.rpe ? <div className="pt-live-rpe" aria-label={'RPE previsto ' + cur.rpe}><small>RPE</small><b>{cur.rpe}</b></div> : null}
                     <div className="pt-live-row">{dots}</div>
                 </>}
             </div>
