@@ -1663,3 +1663,7 @@ body:has(.pt-main) .pt-food-q input.pt-input { margin: 0; height: 52px; box-sizi
 body:has(.pt-main) .pt-food-q button { top: 50%; width: 36px; height: 36px; padding: 0; }
 body:has(.pt-main) .pt-food-q button:first-of-type { right: 50px; } body:has(.pt-main) .pt-food-q button + button { right: 8px; }
 body:has(.pt-main) .pt-food-h, body:has(.pt-main) .pt-food-sel { border-radius: 999px; }
+
+/* dieta: la fascia in alto è tutta corallo, il riquadro delle kcal si fonde con lo sfondo e resta solo l'ondulato */
+body:has(.pt-main) .pt-sp-top:has(.pt-nh) { background: var(--u-corallo); }
+body:has(.pt-main) .pt-sp-top:has(.pt-nh) .pt-nh { background: transparent !important; box-shadow: none; border-radius: 0; padding-left: 0; padding-right: 0; }
