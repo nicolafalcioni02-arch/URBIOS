@@ -68,7 +68,7 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
                     <div className="pt-sc is-static" style={{ background: '#D8FD38', color: '#0B0C0E' }}>
                         <Ring pct={pct / 100} ink="#0B0C0E" /><span className="pt-sc-t"><small>Oggi</small><b>{eaten} / {target} kcal</b></span>
                     </div>
-                    <button type="button" className="pt-sc" style={{ background: '#DADDE5', color: '#0B0C0E' }} onClick={() => onExtra({ names: meals.map((m) => m.nome) })}>
+                    <button type="button" className="pt-sc" style={{ background: '#DCD2FF', color: '#0B0C0E' }} onClick={() => onExtra({ names: meals.map((m) => m.nome) })}>
                         <span className="pt-sc-i"><Icon name="plus" size={20} /></span><span className="pt-sc-t"><b>Fuori piano</b></span><Icon name="back" size={18} />
                     </button>
                 </div>

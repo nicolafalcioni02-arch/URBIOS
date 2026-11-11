@@ -7,8 +7,7 @@ import { Streak, ExProgress, Records, RpeMix } from './Progress.jsx';
 import { setsByMuscle, summary, weekly, strength, MUSCLES } from './muscles.js';
 
 const ACTIVE = { bg: '#D8FD38', ink: '#0B0C0E' };
-const OLD = { bg: '#DADDE5', ink: '#0B0C0E' };
-const TONES = [{ bg: '#BDB2FF', ink: '#1D1738' }, { bg: '#F8A8D8', ink: '#3B132C' }, { bg: '#A0E7E5', ink: '#0B2F2E' }, { bg: '#FFF3B0', ink: '#3A3210' }];
+const OLD = { bg: '#DCD2FF', ink: '#0B0C0E' };
 const LIME = '#B4E600', LIME_L = '#E4F99A', INK = '#0B0C0E';
 
 const Count = ({ n }) => {

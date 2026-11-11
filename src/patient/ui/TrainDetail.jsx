@@ -3,7 +3,6 @@ import { Icon } from './bits.jsx';
 import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import { arr, estMinutes, parseSets, parseRest, sessionKey, daySets, suggestLoad, fmtKg, fmtDay, ymd, dayStatus, sessionDate } from './logic.js';
 
-const TONES = ['#BDB2FF', '#F8A8D8', '#A0E7E5', '#FFF3B0', '#C5E1A5'];
 
 // Pillola con "pallino" che scivola sotto il giorno scelto
 const DaySwitch = ({ days, cur, set, sts }) => {
@@ -66,11 +65,10 @@ export const TrainDetail = ({ rt, id, w0 = 0, d0 = 0, onBack, onStart }) => {
                     const s = parseSets(e.serie), n = s.n, got = arr(sess[i]).length, isOpen = open === i;
                     const kg0 = parseFloat(String(e.carico).replace(',', '.')) || 0, sug = suggestLoad(log.hist, e.nome, kg0);
                     const past = arr(log.hist[e.nome]).filter((h) => h.date !== ymd()).slice(-1)[0];
-                    const tone = TONES[i % TONES.length];
                     return (
                         <div key={i} className={'pt-xc' + (isOpen ? ' is-open' : '')} style={{ animationDelay: i * 55 + 'ms' }}>
                             <button type="button" className="pt-xc-h" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : i)}>
-                                <span className="pt-xc-n" style={{ background: tone }}>{i + 1}</span>
+                                <span className="pt-xc-n" style={{ background: '#DCD2FF', color: '#0B0C0E' }}>{i + 1}</span>
                                 <span className="pt-xc-b">
                                     <b>{e.ss ? <em>{e.ss}</em> : null}{e.nome}</b>
                                     <span className="pt-chp">
@@ -78,7 +76,7 @@ export const TrainDetail = ({ rt, id, w0 = 0, d0 = 0, onBack, onStart }) => {
                                         {e.carico ? <i>{e.carico} kg</i> : null}
                                         <i>{parseRest(e.rec)}s riposo</i>
                                     </span>
-                                    <span className="pt-dots" aria-label={`${got} di ${n} serie fatte`}>{Array.from({ length: Math.min(n, 10) }, (_, k) => <u key={k} className={k < got ? 'on' : ''} style={k < got ? { background: tone } : undefined} />)}</span>
+                                    <span className="pt-dots" aria-label={`${got} di ${n} serie fatte`}>{Array.from({ length: Math.min(n, 10) }, (_, k) => <u key={k} className={k < got ? 'on' : ''} style={k < got ? { background: '#B4E600' } : undefined} />)}</span>
                                 </span>
                                 <span className="pt-xc-c" aria-hidden="true"><Icon name="back" size={18} /></span>
                             </button>

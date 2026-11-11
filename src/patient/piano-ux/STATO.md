@@ -9,7 +9,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-02 Live: schermata leggibile | fatto |
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
 | UX-04 Dieta: il giorno di oggi | fatto |
-| UX-05 Coerenza grafica e Profilo | da fare |
+| UX-05 Coerenza grafica e Profilo | fatto |
 
 A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così:
 
@@ -64,3 +64,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare su iPhone: nulla di specifico; con una dieta reale a 7 giorni controllare il giorno dedotto.
 - Scelte fatte: nel punto 3 del brief «Home → Pasti» apre la tab Dieta (non la sheet): la Colazione l'ho aperta dalla tab, sul giorno di riposo. Nessun test automatico nuovo.
 - Attenzione per chi viene dopo: `dietDayToday(log, docId, days, date)` in `logic.js`; campo diario `log.tools.dietDay` (`null` o `{date, docId, d}`), preservato da `normLog`.
+
+## UX-05 — fatto il 11/11/2026
+- File toccati: `ui/TrainDetail.jsx`, `ui/Schede.jsx`, `ui/Nutrition.jsx`, `ui/Settings.jsx`, `ui/bits.jsx` (icona `scale`), `patient.css` (in fondo), `README.md`, `MIGLIORIE.md`, `piano-ux/STATO.md`
+- Cosa vede di diverso il paziente: esercizi tutti con lo stesso numero lilla e pallini lime; niente grigio-azzurro nei riquadri della Dieta e di Schede; un solo lime nel Profilo e nel registro pasto; Profilo con titolo senza freccia, pulsante «Invia il riassunto» su una riga ed esito che resta sotto; blocco URBIOS bianco; icona Peso a bilancia tonda.
+- Verificato in browser (375×812, `?prova`, `?lungo`): punti 1, 2, 3, 4, 5, 6, 7 (riga «PDF salvato nei file» ancora presente dopo 5 s; 98 px tra blocco URBIOS e menu in fondo), 8; Live senza `.pt-main`, quindi non toccato. Console senza errori propri (solo `vibrate` bloccato dai clic sintetici). Non eseguito `test:connect`: nessun cambio a `logic.js`/`runtime.js`.
+- Da provare su iPhone: foglio di condivisione con esito «Riassunto inviato».
+- Scelte fatte: `.pg-lt .pg-card` resta bianco (regola esistente `.pt-sp .pg-lt > *`, scelta di disposizione); `.hm2-day span` era già `#0B0C0E`, non l'ho schiarito; cerchietto `.pt-sc-i` reso bianco sul fondo lilla.
+- Attenzione per chi viene dopo: nessun nome nuovo; blocco `/* UX-05 */` in fondo a `patient.css`.
