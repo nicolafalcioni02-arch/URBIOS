@@ -124,7 +124,7 @@ const PriceForm = ({ init, items, stores, onSave, onBack }) => {
     const num = (v) => parseFloat(String(v).replace(',', '.')), ok = name.trim() && num(price) > 0 && (!key || num(g) > 0);   // il peso serve solo per la stima della voce
     if (pick) return (
         <div className="pt-pf">
-            <button type="button" className={'pt-shop' + (!key ? ' is-on' : '')} onClick={() => { setKey(''); setPick(false); }}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>—</b></button>
+            <button type="button" className={'pt-shop' + (!key ? ' is-on' : '')} onClick={() => { setKey(''); setPick(false); }}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>Fuori lista</b></button>
             {[...items].sort((a, b) => a.n.localeCompare(b.n, 'it')).map((x) => <button key={x.k} type="button" className={'pt-shop' + (x.k === key ? ' is-on' : '')} onClick={() => { setKey(x.k); setPick(false); }}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b></button>)}
         </div>
     );
@@ -138,7 +138,7 @@ const PriceForm = ({ init, items, stores, onSave, onBack }) => {
             </div>
             <input className="pt-input" aria-label="Negozio" placeholder="Negozio" maxLength={40} value={store} onChange={(e) => setStore(e.target.value)} />
             {stores.length > 1 && <div className="pt-pf-s">{stores.map((x) => <button key={x} type="button" className={x === store ? 'is-on' : ''} onClick={() => setStore(x)}>{x}</button>)}</div>}
-            <button type="button" className="pt-pf-k" aria-label="Voce della lista" onClick={() => setPick(true)}><Icon name="cart" size={20} /><b>{(items.find((x) => x.k === key) || {}).n || '—'}</b><Icon name="chev" size={18} /></button>
+            <button type="button" className="pt-pf-k" aria-label="Voce della lista" onClick={() => setPick(true)}><Icon name="cart" size={20} /><b>{(items.find((x) => x.k === key) || {}).n || 'Fuori lista'}</b><Icon name="chev" size={18} /></button>
             <button type="button" className="pt-cta" disabled={!ok} onClick={() => onSave(key, { ean: init.ean || '', name: name.trim(), store: store.trim(), price: Math.round(num(price) * 100) / 100, g: Math.round(num(g) || 0) })}>Salva</button>
             {init.info && <Facts i={init} />}
         </div>
