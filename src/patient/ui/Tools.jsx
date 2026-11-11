@@ -84,7 +84,7 @@ const Scan = ({ onCode, onBack }) => {
 // Prodotto trovato (o da compilare a mano): prezzo e negozio li scrive il cliente; il prezzo vale per la confezione
 const PriceForm = ({ init, items, stores, onSave, onBack }) => {
     const [name, setName] = useState(init.name), [g, setG] = useState(init.g ? String(init.g) : ''), [price, setPrice] = useState(''), [store, setStore] = useState(stores[0] || ''), [key, setKey] = useState(() => guess(init.name, items) || '');
-    const num = (v) => parseFloat(String(v).replace(',', '.')), ok = name.trim() && num(price) > 0 && num(g) > 0 && key;
+    const num = (v) => parseFloat(String(v).replace(',', '.')), ok = name.trim() && num(price) > 0 && (!key || num(g) > 0);   // il peso serve solo per la stima della voce
     return (
         <div className="pt-pf">
             <button type="button" className="pt-round pt-sc2-b" aria-label="Indietro" onClick={onBack}><Icon name="back" /></button>
@@ -96,14 +96,30 @@ const PriceForm = ({ init, items, stores, onSave, onBack }) => {
             </div>
             <input className="pt-input" aria-label="Negozio" placeholder="Negozio" maxLength={40} value={store} onChange={(e) => setStore(e.target.value)} />
             {stores.length > 1 && <div className="pt-pf-s">{stores.map((x) => <button key={x} type="button" className={x === store ? 'is-on' : ''} onClick={() => setStore(x)}>{x}</button>)}</div>}
-            <select className="pt-input" aria-label="Voce della lista" value={key} onChange={(e) => setKey(e.target.value)}><option value="">Voce della lista</option>{items.map((x) => <option key={x.k} value={x.k}>{x.n}</option>)}</select>
-            <button type="button" className="pt-cta" disabled={!ok} onClick={() => onSave(key, { ean: init.ean || '', name: name.trim(), store: store.trim(), price: Math.round(num(price) * 100) / 100, g: Math.round(num(g)) })}>Salva</button>
+            <select className="pt-input" aria-label="Voce della lista" value={key} onChange={(e) => setKey(e.target.value)}><option value="">Fuori lista</option>{items.map((x) => <option key={x.k} value={x.k}>{x.n}</option>)}</select>
+            <button type="button" className="pt-cta" disabled={!ok} onClick={() => onSave(key, { ean: init.ean || '', name: name.trim(), store: store.trim(), price: Math.round(num(price) * 100) / 100, g: Math.round(num(g) || 0) })}>Salva</button>
+        </div>
+    );
+};
+
+// Registro degli acquisti: cosa hai comprato, dove e quanto hai speso (anche fuori lista); la stima del piano è solo sulle voci con prezzo
+const Buys = ({ buys, est, cover, onDel, onBack }) => {
+    const [sure, setSure] = useState(null), spent = buys.reduce((t, b) => t + (b.price || 0), 0);
+    const day = (at) => new Date(at).toLocaleDateString('it-IT', { day: 'numeric', month: 'numeric' });
+    return (
+        <div className="pt-by">
+            <button type="button" className="pt-round pt-sc2-b" aria-label="Indietro" onClick={onBack}><Icon name="back" /></button>
+            <div className="pt-shop-t is-static"><b>{eur(spent)}</b><span>{buys.length}</span></div>
+            {est > 0 && <p className="pt-by-e"><Icon name="cart" size={16} />{eur(est)}<span>{cover}</span></p>}
+            {buys.map((b) => sure === b.id
+                ? <div className="pt-todo is-sure" key={b.id} role="alertdialog" aria-label="Elimina acquisto"><span>Eliminare l'acquisto? Non si può annullare.</span><div className="pt-todo-c"><button type="button" className="pt-todo-y" onClick={() => { setSure(null); onDel(b.id); }}>Elimina</button><button type="button" className="pt-todo-n" onClick={() => setSure(null)}>Annulla</button></div></div>
+                : <div className="pt-by-r" key={b.id}><div><b>{b.name}</b><small>{[b.store, day(b.at)].filter(Boolean).join(' · ')}</small></div><em>{eur(b.price)}</em><button type="button" className="pt-todo-x" aria-label="Togli" onClick={() => setSure(b.id)}><Icon name="close" size={16} /></button></div>)}
         </div>
     );
 };
 
 export const ShopSheet = ({ rt, docs, onClose }) => {
-    const tl = toolsOf(rt.log.get()), cfg = tl.cfg, shop = tl.shop, prices = tl.prices || {}, stores = arr(tl.stores);
+    const tl = toolsOf(rt.log.get()), cfg = tl.cfg, shop = tl.shop, buys = arr(tl.buys), stores = arr(tl.stores);
     const items = shopItems(docs, rt.docs.get, cfg.days, cfg.people);
     // Riordino ritardato: la riga spuntata resta dov'è per 250 ms, poi scende in fondo con una dissolvenza
     const [lag, setLag] = useState(null), tm = useRef(0), [view, setView] = useState(null);   // view: null | 'scan' | 'load' | { form }
@@ -114,20 +130,27 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
         await rt.log.update((l) => { const s = toolsOf(l).shop; if (s[k]) delete s[k]; else s[k] = 1; });
     };
     const found = async (code) => { setView('load'); const p = await lookupEan(code); setView({ form: p || { ean: code, name: '', g: 0, miss: true } }); };
+    // ogni acquisto va nel registro; se corrisponde a una voce della lista, quella risulta anche presa
     const savePrice = async (k, rec) => {
-        await rt.log.update((l) => { const t = toolsOf(l); (t.prices = t.prices || {})[k] = { ...rec, at: Date.now() }; if (rec.store) t.stores = [rec.store, ...arr(t.stores).filter((x) => x !== rec.store)].slice(0, 5); });
+        await rt.log.update((l) => {
+            const t = toolsOf(l); t.buys = [{ id: Date.now(), k, ...rec, at: Date.now() }, ...arr(t.buys)].slice(0, 300);
+            if (k) t.shop[k] = 1;
+            if (rec.store) t.stores = [rec.store, ...arr(t.stores).filter((x) => x !== rec.store)].slice(0, 5);
+        });
         setView(null);
     };
+    const delBuy = async (id) => { await rt.log.update((l) => { const t = toolsOf(l); t.buys = arr(t.buys).filter((b) => b.id !== id); }); };
     const taken = items.filter((x) => shop[x.k]).length, all = taken === items.length && items.length > 0;
     const on = (x) => (lag === x.k ? !shop[x.k] : !!shop[x.k]);
     const rows = [...items].sort((a, b) => (on(a) - on(b)) || a.n.localeCompare(b.n, 'it'));
-    const cost = (x) => { const p = prices[x.k]; return p && p.g > 0 ? (x.g * p.price) / p.g : null; };
+    const cost = (x) => { const p = buys.find((b) => b.k === x.k && b.g > 0); return p ? (x.g * p.price) / p.g : null; };   // ultimo prezzo registrato per la voce
     const priced = items.filter((x) => cost(x) !== null), total = priced.reduce((t, x) => t + cost(x), 0);
     const extra = items.length ? (all ? <em className="pt-sh-k is-all"><Icon name="check" size={14} />{taken}/{items.length}</em> : <em className="pt-sh-k is-n">{taken}/{items.length}</em>) : null;
     return (
         <Shell title="Spesa" extra={view ? null : extra} onClose={onClose}>
             {view === 'scan' ? <Scan onCode={found} onBack={() => setView(null)} />
                 : view === 'load' ? <p className="pt-muted pt-sc2-l" role="status">Cerco il prodotto…</p>
+                : view === 'buys' ? <Buys buys={buys} est={total} cover={priced.length + '/' + items.length} onDel={delBuy} onBack={() => setView(null)} />
                 : view && view.form ? <PriceForm init={view.form} items={items} stores={stores} onSave={savePrice} onBack={() => setView(null)} />
                 : items.length === 0 ? <p className="pt-muted">Quando riceverai la dieta, qui troverai gli alimenti da comprare.</p> : <>
                     <div className="pt-shop-r">
@@ -135,7 +158,7 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
                         <span><Icon name="user" size={18} /><Step dark value={cfg.people} onChange={(v) => setCfg({ people: v })} step={1} min={1} max={8} label="Per quante persone" /></span>
                         <button type="button" className="pt-round pt-shop-bc" aria-label="Leggi il codice a barre" onClick={() => setView('scan')}><Icon name="barcode" size={22} /></button>
                     </div>
-                    {priced.length > 0 && <div className="pt-shop-t" role="status"><b>{eur(total)}</b><span>{priced.length}/{items.length}</span></div>}
+                    {buys.length > 0 && <button type="button" className="pt-shop-t" aria-label="Acquisti" onClick={() => setView('buys')}><b>{eur(buys.reduce((t, b) => t + (b.price || 0), 0))}</b><span>{buys.length}</span><Icon name="chev" size={18} /></button>}
                     {rows.map((x) => { const c = cost(x); return <button key={x.k} type="button" className={'pt-shop' + (shop[x.k] ? ' is-on' : '') + (lag === x.k ? ' is-lag' : '')} onClick={() => tog(x.k)}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b><span className="pt-shop-q"><small>{qty(x.g)}</small>{c !== null && <em>{eur(c)}</em>}</span></button>; })}
                 </>}
         </Shell>
