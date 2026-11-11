@@ -1731,5 +1731,5 @@ body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc { margin-right: 4px; 
 .pt-live.pt-lv2 .pt-sh2 .pt-t2 { position: relative; top: -18px; }
 
 /* Live: timer di recupero a centro schermo */
-.pt-live.pt-lv2 .pt-lb2 > .pt-rest-t { position: fixed; left: 0; right: 0; top: 50%; margin: 0; transform: translateY(-50%); z-index: 2; }
+.pt-live.pt-lv2 .pt-lb2 > .pt-rest-t { position: fixed; left: 0; right: 0; top: 50%; margin: 0; transform: translateY(calc(-50% - 5px)); z-index: 2; }
 .pt-live.pt-lv2.is-rest .pt-lb2 > .pt-live-row { position: fixed; left: 0; right: 0; top: calc(50% + 52px); margin: 0; justify-content: center; }
