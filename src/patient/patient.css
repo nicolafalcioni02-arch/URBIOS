@@ -1599,3 +1599,7 @@ body:has(.pt-main) .pt-pf .pt-input, body:has(.pt-main) .pt-sc2-m .pt-input { bo
 .pt-pf-l { display: flex; gap: 8px; overflow-x: auto; margin: 0 -22px; padding: 2px 22px; scrollbar-width: none; } .pt-pf-l::-webkit-scrollbar { display: none; }
 .pt-pf-l button { flex: none; min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: #fff; box-shadow: 0 3px 14px rgba(11,12,14,.05); color: var(--u-ink); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .pt-pf-l button.is-on { background: var(--u-viola); color: #fff; }
+
+/* spesa: voce collegata in una riga, tocco per cambiarla */
+.pt-pf-k { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 0 18px; border: 0; border-radius: 999px; background: #fff; box-shadow: 0 3px 14px rgba(11,12,14,.05); color: var(--u-ink); font: inherit; cursor: pointer; text-align: left; }
+.pt-pf-k svg { flex: none; color: var(--u-viola); } .pt-pf-k b { flex: 1; min-width: 0; font-size: 16px; font-weight: 700; } .pt-pf-k svg:last-child { color: var(--u-grigio); }

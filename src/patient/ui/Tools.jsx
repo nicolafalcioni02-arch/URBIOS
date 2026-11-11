@@ -120,8 +120,14 @@ const Facts = ({ i }) => {
 
 // Prodotto trovato (o da compilare a mano): prezzo e negozio li scrive il cliente; il prezzo vale per la confezione
 const PriceForm = ({ init, items, stores, onSave, onBack }) => {
-    const [name, setName] = useState(init.name), [g, setG] = useState(init.g ? String(init.g) : ''), [price, setPrice] = useState(''), [store, setStore] = useState(stores[0] || ''), [key, setKey] = useState(() => guess(init.name, items) || '');
+    const [pick, setPick] = useState(false), [name, setName] = useState(init.name), [g, setG] = useState(init.g ? String(init.g) : ''), [price, setPrice] = useState(''), [store, setStore] = useState(stores[0] || ''), [key, setKey] = useState(() => guess(init.name, items) || '');
     const num = (v) => parseFloat(String(v).replace(',', '.')), ok = name.trim() && num(price) > 0 && (!key || num(g) > 0);   // il peso serve solo per la stima della voce
+    if (pick) return (
+        <div className="pt-pf">
+            <button type="button" className={'pt-shop' + (!key ? ' is-on' : '')} onClick={() => { setKey(''); setPick(false); }}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>—</b></button>
+            {[...items].sort((a, b) => a.n.localeCompare(b.n, 'it')).map((x) => <button key={x.k} type="button" className={'pt-shop' + (x.k === key ? ' is-on' : '')} onClick={() => { setKey(x.k); setPick(false); }}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b></button>)}
+        </div>
+    );
     return (
         <div className="pt-pf">
             {init.miss && <p className="pt-muted">Non lo trovo: compila a mano.</p>}
@@ -132,7 +138,7 @@ const PriceForm = ({ init, items, stores, onSave, onBack }) => {
             </div>
             <input className="pt-input" aria-label="Negozio" placeholder="Negozio" maxLength={40} value={store} onChange={(e) => setStore(e.target.value)} />
             {stores.length > 1 && <div className="pt-pf-s">{stores.map((x) => <button key={x} type="button" className={x === store ? 'is-on' : ''} onClick={() => setStore(x)}>{x}</button>)}</div>}
-            <div className="pt-pf-l" role="group" aria-label="Voce della lista">{[...items].sort((a, b) => (b.k === key) - (a.k === key)).map((x) => <button key={x.k} type="button" aria-pressed={x.k === key} className={x.k === key ? 'is-on' : ''} onClick={() => setKey(x.k === key ? '' : x.k)}>{x.n}</button>)}</div>
+            <button type="button" className="pt-pf-k" aria-label="Voce della lista" onClick={() => setPick(true)}><Icon name="cart" size={20} /><b>{(items.find((x) => x.k === key) || {}).n || '—'}</b><Icon name="chev" size={18} /></button>
             <button type="button" className="pt-cta" disabled={!ok} onClick={() => onSave(key, { ean: init.ean || '', name: name.trim(), store: store.trim(), price: Math.round(num(price) * 100) / 100, g: Math.round(num(g) || 0) })}>Salva</button>
             {init.info && <Facts i={init} />}
         </div>
