@@ -119,7 +119,7 @@ const Facts = ({ i }) => {
 };
 
 // Prodotto trovato (o da compilare a mano): prezzo e negozio li scrive il cliente; il prezzo vale per la confezione
-const PriceForm = ({ init, items, stores, pick, setPick, onSave }) => {
+const PriceForm = ({ init, items, stores, pick, setPick, onSave, onScan }) => {
     const [name, setName] = useState(init.name), [g, setG] = useState(init.g ? String(init.g) : ''), [price, setPrice] = useState(''), [store, setStore] = useState(stores[0] || ''), [key, setKey] = useState(() => init.k || guess(init.name, items) || '');
     const num = (v) => parseFloat(String(v).replace(',', '.')), ok = name.trim() && num(price) > 0 && (!key || num(g) > 0);   // il peso serve solo per la stima della voce
     if (pick) return (
@@ -132,10 +132,12 @@ const PriceForm = ({ init, items, stores, pick, setPick, onSave }) => {
         <div className="pt-pf">
             {init.miss && <p className="pt-muted">Non lo trovo: compila a mano.</p>}
             <input className="pt-input" aria-label="Prodotto" placeholder="Prodotto" maxLength={80} value={name} onChange={(e) => setName(e.target.value)} />
+            {!init.ean && <button type="button" className="pt-pf-k" onClick={() => onScan(key)}><Icon name="barcode" size={20} /><b>Leggi il codice a barre</b></button>}
             <div className="pt-pf-r">
                 <input className="pt-input" inputMode="decimal" aria-label="Prezzo in euro" placeholder="Prezzo €" value={price} onChange={(e) => setPrice(e.target.value)} />
                 <input className="pt-input" inputMode="decimal" aria-label="Peso della confezione in grammi" placeholder="Confezione g" value={g} onChange={(e) => setG(e.target.value)} />
             </div>
+            {num(price) > 0 && num(g) > 0 && <p className="pt-pf-kg"><b>{eur(num(price) / num(g) * 1000)}</b> / kg</p>}
             <input className="pt-input" aria-label="Negozio" placeholder="Negozio" maxLength={40} value={store} onChange={(e) => setStore(e.target.value)} />
             {stores.length > 1 && <div className="pt-pf-s">{stores.map((x) => <button key={x} type="button" className={x === store ? 'is-on' : ''} onClick={() => setStore(x)}>{x}</button>)}</div>}
             <button type="button" className="pt-pf-k" aria-label="Voce della lista" onClick={() => setPick(true)}><Icon name="cart" size={20} /><b>{(items.find((x) => x.k === key) || {}).n || 'Fuori lista'}</b><Icon name="chev" size={18} /></button>
@@ -164,10 +166,11 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
     const tl = toolsOf(rt.log.get()), cfg = tl.cfg, shop = tl.shop, buys = arr(tl.buys), stores = arr(tl.stores);
     const items = shopItems(docs, rt.docs.get, cfg.days, cfg.people);
     // Riordino ritardato: la riga spuntata resta dov'è per 250 ms, poi scende in fondo con una dissolvenza
-    const [pick, setPick] = useState(false), [want, setWant] = useState(''), [lag, setLag] = useState(null), tm = useRef(0), [view, setView] = useState(null);   // view: null | 'scan' | 'load' | { form }
+    const [pick, setPick] = useState(false), [want, setWant] = useState(''), [ask, setAsk] = useState(null), [lag, setLag] = useState(null), tm = useRef(0), [view, setView] = useState(null);   // view: null | 'scan' | 'load' | { form }
     useEffect(() => () => clearTimeout(tm.current), []);
     const setCfg = async (patch) => { await rt.log.update((l) => { Object.assign(toolsOf(l).cfg, patch); }); };
     const tog = async (k) => {
+        setAsk(shop[k] ? null : items.find((x) => x.k === k) || null);
         setLag(k); clearTimeout(tm.current); tm.current = setTimeout(() => setLag(null), 250);
         await rt.log.update((l) => { const s = toolsOf(l).shop; if (s[k]) delete s[k]; else s[k] = 1; });
     };
@@ -196,7 +199,7 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
             {view === 'scan' ? <Scan onCode={found} onBack={() => setView(null)} />
                 : view === 'load' ? <p className="pt-muted pt-sc2-l" role="status">Cerco il prodotto…</p>
                 : view === 'buys' ? <Buys buys={buys} est={total} cover={priced.length + '/' + items.length} onDel={delBuy} onBack={() => setView(null)} />
-                : view && view.form ? <PriceForm init={view.form} items={items} stores={stores} pick={pick} setPick={setPick} onSave={savePrice} />
+                : view && view.form ? <PriceForm init={view.form} items={items} stores={stores} pick={pick} setPick={setPick} onSave={savePrice} onScan={(k) => { setWant(k); setView('scan'); }} />
                 : items.length === 0 ? <p className="pt-muted">Quando riceverai la dieta, qui troverai gli alimenti da comprare.</p> : <>
                     <div className="pt-shop-r">
                         <span><Icon name="calendar" size={18} /><Step dark value={cfg.days} onChange={(v) => setCfg({ days: v })} step={1} min={1} max={30} label="Per quanti giorni" /></span>
@@ -204,6 +207,7 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
                         <button type="button" className="pt-round pt-shop-bc" aria-label="Leggi il codice a barre" onClick={() => { setWant(''); setView('scan'); }}><Icon name="barcode" size={22} /></button>
                     </div>
                     {buys.length > 0 && <button type="button" className="pt-shop-t" aria-label="Acquisti" onClick={() => setView('buys')}><b>{eur(buys.reduce((t, b) => t + (b.price || 0), 0))}</b><span>{buys.length}</span><Icon name="chev" size={18} /></button>}
+                    {ask && <div className="pt-todo is-sure pt-shop-ask" role="alertdialog" aria-label="Registra l'acquisto"><span><b>{ask.n}</b> Registrare peso e prezzo?</span><div className="pt-todo-c"><button type="button" className="pt-todo-y" onClick={() => { setView({ form: { ean: '', name: ask.n, g: ask.g, k: ask.k } }); setAsk(null); }}>Sì</button><button type="button" className="pt-todo-n" onClick={() => setAsk(null)}>No</button></div></div>}
                     {rows.map((x) => { const c = cost(x); return <div key={x.k} className={'pt-shop' + (shop[x.k] ? ' is-on' : '') + (lag === x.k ? ' is-lag' : '')}><button type="button" className="pt-shop-m" onClick={() => tog(x.k)}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b><span className="pt-shop-q"><small>{qty(x.g)}</small>{c !== null && <em>{eur(c)}</em>}</span></button><button type="button" className="pt-shop-sc" aria-label={'Leggi il codice a barre: ' + x.n} onClick={() => { setWant(x.k); setView('scan'); }}><Icon name="barcode" size={20} /></button></div>; })}
                 </>}
         </Shell>

@@ -1622,3 +1622,8 @@ body:has(.pt-main) .pt-pf .pt-input, body:has(.pt-main) .pt-sc2-m .pt-input { bo
 /* macro dei prodotti scansionati */
 .pt-mm { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
 .pt-mm span { padding: 8px 14px; border-radius: 999px; background: #fff; box-shadow: 0 3px 14px rgba(11,12,14,.05); font-size: 13px; font-weight: 600; color: var(--u-grigio); } .pt-mm b { font-size: 16px; font-weight: 800; color: var(--u-ink); }
+
+/* spesa: avviso dopo la spunta e prezzo al chilo */
+.pt-shop-ask { margin-bottom: 12px; border-radius: 36px; }
+.pt-shop-ask span b { font-weight: 800; }
+.pt-pf-kg { margin: -2px 0 0 18px; font-size: 14px; font-weight: 600; color: var(--u-grigio); } .pt-pf-kg b { font-size: 18px; font-weight: 800; color: var(--u-viola); font-variant-numeric: tabular-nums; }
