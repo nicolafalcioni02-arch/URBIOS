@@ -1711,3 +1711,8 @@ body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc { margin-right: 4px; 
 .pt-lv-mark { position: absolute; z-index: -1; top: 70px; right: -170px; width: 440px; height: 440px; color: var(--u-viola); opacity: .5; pointer-events: none; }
 .pt-lv-mark svg { display: block; }
 .pt-live.pt-lv2 .pt-lb2 > .pt-lv-mark { position: absolute; inset: auto; top: 70px; right: -170px; z-index: -1; }
+
+/* live: titolo dell'esercizio un po' più grande */
+.pt-live.pt-lv2 .pt-live-ex.is-xl { font-size: 24px !important; line-height: 1.16; }
+.pt-live.pt-lv2 .pt-live-ex.is-long { font-size: 28px !important; line-height: 1.14; }
+.pt-live.pt-lv2 .pt-live-ex:not(.is-long):not(.is-xl) { font-size: 36px !important; }
