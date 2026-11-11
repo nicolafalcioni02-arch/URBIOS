@@ -10,7 +10,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
 | UX-04 Dieta: il giorno di oggi | fatto |
 | UX-05 Coerenza grafica e Profilo | fatto |
-| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-5 fatte |
+| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-6 fatte |
 
 A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così:
 
@@ -113,3 +113,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare: il caso senza schede vecchie (il tondo è condizionato a `archive.length > 0`, non l'ho forzato), tempo non riconosciuto (resta il testo, ramo semplice, non provato), 360×640, aspetto a occhio (screenshot del pane fermi), «riduci animazioni».
 - Scelte fatte: l'etichetta del chip periodo `aria-label` invariata; la barra del tempo è statica (senza `run`).
 - Attenzione per chi viene dopo: `.pt-sh-row`, `.pt-sh-arc`, `.pt-dh-p`, `.pg-wd` nuove; `Schede.jsx` non importa più `UrbiosLogo`.
+
+## UX-06.6 — fatto il 11/11/2026
+- File toccati: `ui/Live.jsx`, `patient.css` (in fondo, `/* UX-06.6 */`), `README.md`, questo file. `ui/Tempo.jsx` invariato (la `TempoBar` della tappa 1 è ora usata).
+- Cosa vede di diverso il paziente: in lavoro un solo cronometro (quello della serie, 40 px), il totale piccolo in alto accanto a note/elenco/pausa; barra del tempo con cursore; ripetizioni «10 ×» e carico sulla stessa riga; «ultima volta» (data · carico massimo) apre il foglio Storico; note in un foglio; pulsanti ‹ Fatta ›. In riposo il numero da 88 px su un livello viola che scende (onda che scorre), RPE della serie appena fatta, −15 / Salta / +15, «Dopo» solo se cambia esercizio, ultimi 3 s in lime con impulso. Velo lime e pallino che scatta a ogni serie. Niente più schermata intera degli ultimi 10 s né tab. A fine seduta l'RPE dell'ultima serie si dà nella schermata finale.
+- Verificato in browser (375×812 e 360×640 `?lungo`): foglio senza scorrimento e Fatta a 24 px dal fondo; Fatta → riposo con livello 100%; +15 / −15 (minimo 1 s); RPE 8 scritto in sessione, secondo tocco lo toglie (e a fine seduta RPE 9 sull'ultima serie); Salta riposo; Storico e Note con nota salvata sulla serie successiva; ‹ disattivato al primo esercizio, › cambia esercizio; Pausa con «Esci» bianco e bordo; zero errori in console (solo vibrate dei click sintetici); `test:connect` 102/102.
+- Da provare su iPhone: fluidità dell'onda del riposo con schermo sempre acceso (se scatta: onda ferma, solo il livello scende, decisione del proprietario); schermo bloccato 60 s (la logica dei tempi non è toccata, solo `restTot` aggiunto a `T`); bip/vibrazione; cursore del metronomo e ultimi 3 s lime (le animazioni non avanzavano nel pane); «riduci animazioni».
+- Scelte fatte: il layout è a colonna (testata che riempie, foglio alto quanto il contenuto) invece di altezze fisse: così il livello viola ha l'altezza esatta dell'area visibile; le vecchie regole `.pt-grid`, `.pt-seg`, `.pt-rf`, `.pt-tp`, `.pt-nav2` restano nel CSS ma non nel JSX. Nel foglio Storico la riga di oggi compare come prima.
+- Attenzione per chi viene dopo: classi `pt-lv2`, `pt-lb2`, `pt-sh2`, `pt-rest-w`, `pt-veil`, `pt-nx2`, `pt-bt`, `pt-rnd`; stati `panel` e `hit`; tolti `rpe` e `tab`; `T.current.restTot`.

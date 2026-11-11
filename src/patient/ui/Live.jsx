@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon, Step, Lst } from './bits.jsx';
-import { parseTempo } from './Tempo.jsx';
-import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
+import { TempoBar, parseTempo } from './Tempo.jsx';
 import { Clamp } from './Clamp.jsx';
 import { arr, mmss, parseSets, parseRest, sessionKey, suggestLoad, fmtDay, fmtKg, ymd, workoutSummary, sessionDate, HYPE_END } from './logic.js';
 
@@ -9,9 +8,6 @@ import { arr, mmss, parseSets, parseRest, sessionKey, suggestLoad, fmtDay, fmtKg
 // Non c'è video né calorie consumate: non fanno parte di ciò che il professionista invia. Il diario resta qui.
 const buzz = (ms) => { try { if (navigator.vibrate) navigator.vibrate(ms); } catch { /* non disponibile */ } };
 const RPES = [6, 7, 8, 9, 10];
-// sfumatura graduale ai bordi della lista che scorre: cresce con lo scorrimento (alto) e con ciò che resta da vedere (basso)
-const fadeSet = (el) => { if (!el) return; const top = Math.min(48, el.scrollTop * 1.6), bot = Math.min(48, Math.max(0, el.scrollHeight - el.clientHeight - el.scrollTop) * 1.6); el.style.setProperty('--ft', top + 'px'); el.style.setProperty('--fb', bot + 'px'); };
-const TEMPO = ['Giù', 'Fermo', 'Su', 'Fermo'];
 // serie consecutive con stesso carico e stesso RPE → una voce sola («3 × 50 kg · RPE 8»)
 const groupSets = (sets) => sets.reduce((o, x) => { const l = o[o.length - 1]; if (l && l.kg === x.kg && (l.rpe || 0) === (x.rpe || 0) && (l.reps || 0) === (x.reps || 0)) l.n += 1; else o.push({ n: 1, kg: x.kg, rpe: x.rpe, reps: x.reps }); return o; }, []);
 
@@ -23,7 +19,7 @@ const CountUp = ({ n }) => {
 
 export const Live = ({ rt, id, w, d, onExit }) => {
     // barra di stato del telefono scura come lo schermo (altrimenti resta una fascia lilla in alto)
-    useEffect(() => { const m = document.querySelector('meta[name="theme-color"]'); if (!m) return undefined; const old = m.getAttribute('content'); m.setAttribute('content', '#0B0C0E'); return () => m.setAttribute('content', old); }, []);
+    useEffect(() => { const m = document.querySelector('meta[name="theme-color"]'); if (!m) return undefined; const old = m.getAttribute('content'); m.setAttribute('content', '#160C33'); return () => m.setAttribute('content', old); }, []);
     const doc = rt.docs.get(id), wk = arr(doc && doc.body && doc.body.settimane)[w], day = arr(wk && wk.giorni)[d];
     const list = useMemo(() => arr(day && day.esercizi).map((e) => {
         const s = parseSets(e.serie);
@@ -44,13 +40,13 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     const [ex, setEx] = useState(start.ex), [setNo, setSetNo] = useState(start.set), [phase, setPhase] = useState('work');
     const [rest, setRest] = useState(0), [setSecs, setSetSecs] = useState(0), [elapsed, setElapsed] = useState(start.secs || 0);
     const [paused, setPaused] = useState(false), [listOpen, setListOpen] = useState(false), [fin, setFin] = useState(false), [kg, setKg] = useState(() => kgOf(start.ex));
-    const [rpe, setRpe] = useState(null), [note, setNote] = useState(''), [tab, setTab] = useState('oggi');
+    const [note, setNote] = useState(''), [panel, setPanel] = useState(null), [hit, setHit] = useState(0);
     const [hype, setHype] = useState(null);
     useEffect(() => { if (!hype) return undefined; const t = setTimeout(() => setHype(null), 3200); return () => clearTimeout(t); }, [hype]);
     const [lastRpe, setLastRpe] = useState(null);                 // RPE della serie appena fatta (si cambia durante il riposo)
     const total = useRef(0), ac = useRef(null), lastSet = useRef(null);
     // tempi dall'orologio (non da incrementi: con lo schermo spento il timer non si ferma). run = secondi accumulati prima di runAt; restEnd 0 = non in riposo
-    const T = useRef({ run: start.secs || 0, runAt: Date.now(), setAt: Date.now(), restEnd: 0, lastBeep: null, pausedAt: 0 });
+    const T = useRef({ run: start.secs || 0, runAt: Date.now(), setAt: Date.now(), restEnd: 0, restTot: 0, lastBeep: null, pausedAt: 0 });
     useEffect(() => { if (start.fresh) rt.log.update((l) => { delete l.sessions[key]; }); }, []);
 
     const beep = (f = 880, ms = 120) => {
@@ -73,7 +69,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 if (r <= 0) {                                   // la serie successiva parte da quando il riposo è finito
                     const end = t.restEnd; t.restEnd = 0; t.setAt = end; t.lastBeep = null;
                     if (now - end < 2000) { beep(1040, 260); buzz([120, 60, 120]); }
-                    setPhase('work'); setRest(0); setRpe(null); setSetSecs(Math.floor((now - end) / 1000));
+                    setPhase('work'); setRest(0); setSetSecs(Math.floor((now - end) / 1000));
                 } else { setRest(r); if (r <= 3 && t.lastBeep !== r) { t.lastBeep = r; beep(660); buzz(40); } }
             } else setSetSecs(Math.floor((now - t.setAt) / 1000));
         };
@@ -95,12 +91,12 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     if (!list.length) return null;
     const cur = list[Math.min(ex, list.length - 1)];
     const sug = sugOf(ex), past = arr(rt.log.get().hist[cur.name]).slice(-4).reverse();
-    const goto = (i, s) => { rt.log.update((l) => { const q = l.sessions[key] || (l.sessions[key] = { sets: {}, started: Date.now() }); q.pos = { ex: i }; q.secs = elapsed; }); setEx(i); setSetNo(s); setKg(kgOf(i)); setRpe(null); setNote(''); setPhase('work'); setSetSecs(0); setRest(0); setTab('oggi'); T.current.restEnd = 0; T.current.setAt = Date.now(); T.current.lastBeep = null; };
+    const goto = (i, s) => { rt.log.update((l) => { const q = l.sessions[key] || (l.sessions[key] = { sets: {}, started: Date.now() }); q.pos = { ex: i }; q.secs = elapsed; }); setEx(i); setSetNo(s); setKg(kgOf(i)); setNote(''); setPhase('work'); setSetSecs(0); setRest(0); T.current.restEnd = 0; T.current.setAt = Date.now(); T.current.lastBeep = null; };
     const prev = () => { if (ex > 0) goto(ex - 1, Math.min(doneOf(ex - 1).length, list[ex - 1].n - 1)); };
     const nextEx = (i) => { if (i + 1 < list.length) { goto(i + 1, Math.min(doneOf(i + 1).length, list[i + 1].n - 1)); return true; } return false; };
     const complete = () => {
         if (!ac.current) beep(1, 1);                      // il primo tocco sblocca l'audio
-        const exI = ex, rec = { kg, ...(rpe ? { rpe } : {}), ...(note.trim() ? { note: note.trim().slice(0, 200) } : {}) }, secs = elapsed, date = ymd();
+        const exI = ex, rec = { kg, ...(note.trim() ? { note: note.trim().slice(0, 200) } : {}) }, secs = elapsed, date = ymd();
         rt.log.update((l) => {
             const s = l.sessions[key] || (l.sessions[key] = { sets: {}, started: Date.now() });
             (s.sets[exI] = s.sets[exI] || []).push(rec); s.secs = secs; l.last[cur.name] = kg;
@@ -108,17 +104,19 @@ export const Live = ({ rt, id, w, d, onExit }) => {
             t.sets.push(rec); if (h.length > 12) h.splice(0, h.length - 12);
         });
         total.current += 1; buzz(30); beep(740, 90);
-        setNote(''); setLastRpe(rec.rpe || null); lastSet.current = { exI, name: cur.name, date }; setTab('oggi');
+        setNote(''); setLastRpe(null); lastSet.current = { exI, name: cur.name, date }; setHit((x) => x + 1);
         let more = true;
         if (setNo + 1 < cur.n) setSetNo(setNo + 1); else more = nextEx(ex);
         if (!more) { setFin(true); buzz([80, 50, 80, 50, 200]); return; }
-        setPhase('rest'); setRest(cur.rest); T.current.restEnd = Date.now() + cur.rest * 1000; T.current.lastBeep = null;
+        setPhase('rest'); setRest(cur.rest); T.current.restEnd = Date.now() + cur.rest * 1000; T.current.restTot = cur.rest; T.current.lastBeep = null;
     };
-    const skipRest = () => { setPhase('work'); setRest(0); setSetSecs(0); setRpe(null); T.current.restEnd = 0; T.current.setAt = Date.now(); T.current.lastBeep = null; };
-    // in riposo l'RPE riguarda la serie appena fatta: si scrive subito nel diario (voce di sessione e voce di storico, che nell'app vera sono oggetti diversi)
+    const skipRest = () => { setPhase('work'); setRest(0); setSetSecs(0); T.current.restEnd = 0; T.current.setAt = Date.now(); T.current.lastBeep = null; };
+    // ±15 secondi di riposo (il livello si adegua: restTot cresce col «+»)
+    const adjRest = (ms) => { const t = T.current; if (!t.restEnd) return; const now = Date.now(); t.restEnd = ms < 0 ? Math.max(now + 1000, t.restEnd + ms) : t.restEnd + ms; if (ms > 0) t.restTot += ms / 1000; setRest(Math.ceil((t.restEnd - now) / 1000)); };
+    // l'RPE riguarda la serie appena fatta (in riposo, o nella schermata finale): si scrive subito nel diario (voce di sessione e voce di storico, che nell'app vera sono oggetti diversi)
     const pickRpe = (r) => {
         const L = lastSet.current;
-        if (phase !== 'rest' || !L) { setRpe(rpe === r ? null : r); return; }
+        if (!L) return;
         const v = lastRpe === r ? null : r, put = (x) => { if (x) { if (v) x.rpe = v; else delete x.rpe; } };
         rt.log.update((l) => { const a = ((l.sessions[key] || {}).sets || {})[L.exI]; put(a && a[a.length - 1]); const h = arr(l.hist[L.name]).find((x) => x.date === L.date); put(h && h.sets[h.sets.length - 1]); });
         setLastRpe(v);
@@ -137,89 +135,78 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 <div className="pt-win-g"><div><b>{sm.sets}</b><span>serie</span></div><div><b>{Math.max(1, Math.round(elapsed / 60))}</b><span>minuti</span></div><div><b>{list.length}</b><span>esercizi</span></div></div>
                 {sm.records.slice(0, 2).map((r) => <span key={r.name} className="pt-win-r">Nuovo record: {r.name}, {r.kg} kg</span>)}
                 <p>{msg}</p>
+                {lastSet.current && <div className="pt-win-rpe"><span className="pt-fl">RPE</span><div className="pt-rpe">{RPES.map((r) => <button key={r} type="button" className={lastRpe === r ? 'is-on' : ''} aria-pressed={lastRpe === r} onClick={() => pickRpe(r)}>{r}</button>)}</div></div>}
                 <button type="button" className="pt-cta" onClick={() => onExit(true)}>Torna alla dashboard</button>
             </div>
         );
     }
-    const bars = Math.min(cur.n, 8), logged = doneOf(ex).length;
-    const shownRpe = phase === 'rest' ? lastRpe : rpe;
-    const shown = phase === 'rest' ? mmss(rest) : mmss(setSecs);
+    const logged = doneOf(ex).length, shownRpe = lastRpe;
     const pro = [wk && wk.nota && ['Settimana', wk.nota], day && day.nota && ['Giornata', day.nota], cur.note && ['Esercizio', cur.note]].filter(Boolean);
     const mine = arr(rt.log.get().hist[cur.name]).flatMap((h) => arr(h.sets).filter((x) => x.note).map((x) => ({ date: h.date, text: x.note }))).reverse().slice(0, 8);
-    const tempo = parseTempo(cur.tempo);
-    const lastT = arr(rt.log.get().hist[cur.name]).filter((h) => h.date !== ymd() && arr(h.sets).length).slice(-1)[0];   // ultima seduta passata: la data fa da etichetta
-    const lastG = lastT ? groupSets(lastT.sets) : [];
-    const nx = list[ex], nextCard = nx ? (
-        <div className="pt-nx"><span className="pt-nx-i"><Icon name="arrow" size={20} /></span><span className="pt-nx-t"><small>Dopo</small><b>{nx.name}</b></span><span className="pt-nx-s">{Math.min(setNo + 1, nx.n)}<i>/{nx.n}</i></span></div>
-    ) : null;
+    const tempo = parseTempo(cur.tempo), isRest = phase === 'rest';
+    const lastT = arr(rt.log.get().hist[cur.name]).filter((h) => h.date !== ymd() && arr(h.sets).length).slice(-1)[0];   // ultima seduta passata
+    const lastKg = lastT ? Math.max(...lastT.sets.map((x) => +x.kg || 0)) : 0;
+    const nx = list[ex], showNext = isRest && nx && lastSet.current && nx.name !== lastSet.current.name;
+    const lvl = isRest ? Math.max(0, Math.min(100, rest / Math.max(1, T.current.restTot) * 100)) : 0;
+    const dots = <span className="pt-live-dots" aria-label={`Serie ${Math.min(setNo + 1, cur.n)} di ${cur.n}`}>{Array.from({ length: Math.min(cur.n, 12) }, (_, i) => <i key={i + '-' + (i === logged - 1 ? hit : 0)} className={i < logged ? 'done' + (i === logged - 1 && hit ? ' pop' : '') : i === Math.min(setNo, cur.n - 1) ? 'cur' : ''} />)}</span>;
+    const rpeRow = <><span className="pt-fl">RPE</span><div className="pt-rpe">{RPES.map((r) => <button key={r} type="button" className={shownRpe === r ? 'is-on' : ''} aria-pressed={shownRpe === r} onClick={() => pickRpe(r)}>{r}</button>)}</div></>;
+    const stepKg = <Step value={kg} onChange={setKg} step={2.5} min={0} max={1000} fmt={fmtKg} unit="kg" text={cur.kg0 === 0 && kg === 0 ? 'Corpo libero' : undefined} label="Carico" />;
     return (
-        <div className={'pt-live' + (tempo ? ' has-tempo' : '')}>
+        <div className={'pt-live pt-lv2' + (paused ? ' is-paused' : '') + (isRest ? ' is-rest' : '')}>
             {hype && <div className="pt-hype" role="status" onClick={() => setHype(null)}>{hype}</div>}
-            <div className="pt-live-bg">
-                <Clamp as="b" lines={3} title="Esercizio" text={(cur.ss ? cur.ss + ' · ' : '') + cur.name} className={'pt-live-ex' + (cur.name && cur.name.length > 44 ? ' is-xl' : cur.name && cur.name.length > 26 ? ' is-long' : '')} />
-                {tempo && phase !== 'rest' && <div className="pt-tp" aria-label="Tempi in secondi">{tempo.map((x, i) => <span key={i}><b>{x}{x !== 'X' ? <i> sec</i> : null}</b><small>{TEMPO[i]}</small></span>)}</div>}
-                {phase === 'rest' && nextCard}
-                {phase !== 'rest' && <div className="pt-live-row"><span className="pt-live-chips">{[`${cur.n} serie × ${cur.reps || '–'} ripetizioni`].map((t) => <u key={t}>{t}</u>)}</span>
-                <span className="pt-live-dots" aria-label={`Serie ${Math.min(setNo + 1, cur.n)} di ${cur.n}`}>{Array.from({ length: Math.min(cur.n, 12) }, (_, i) => <i key={i} className={i < logged ? 'done' : i === Math.min(setNo, cur.n - 1) ? 'cur' : ''} />)}</span></div>}
-                
+            <div className="pt-live-bg pt-lb2">
+                {isRest && <div className="pt-rest-w" style={{ height: lvl + '%' }}><svg viewBox="0 0 800 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 15Q100 0 200 15T400 15T600 15T800 15V30H0Z" /></svg></div>}
+                {hit > 0 && <i className="pt-veil" key={hit} aria-hidden="true" />}
+                {isRest ? <>
+                    <b className="pt-rest-ex">{cur.name}</b>
+                    <b className={'pt-rest-t' + (rest <= 3 ? ' is-end' : '')} key={rest <= 3 ? rest : 'n'} role="timer" aria-label="Riposo">{mmss(rest)}</b>
+                    <div className="pt-live-row">{dots}</div>
+                    {showNext && <div className="pt-nx2" aria-label={'Dopo: ' + nx.name}><Icon name="chev" size={16} /><b>{nx.name}</b><span>{Math.min(setNo + 1, nx.n)}/{nx.n}</span></div>}
+                </> : <>
+                    <Clamp as="b" lines={3} title="Esercizio" text={(cur.ss ? cur.ss + ' · ' : '') + cur.name} className={'pt-live-ex' + (cur.name && cur.name.length > 44 ? ' is-xl' : cur.name && cur.name.length > 26 ? ' is-long' : '')} />
+                    {tempo && <TempoBar key={ex + '-' + setNo} tempo={tempo} dark run />}
+                    <div className="pt-live-row">{dots}</div>
+                </>}
             </div>
-            <div className="pt-live-top">
+            <div className="pt-live-top pt-lt2">
                 <div className="pt-lp" aria-label={`Esercizio ${ex + 1} di ${list.length}`}>{list.map((_, i) => <i key={i} className={i < ex ? 'done' : i === ex ? 'cur' : ''} />)}</div>
+                <span className="pt-el">{mmss(elapsed)}</span>
+                <button type="button" className="pt-pause pt-note-b" aria-label="Note" onClick={() => setPanel('note')}><Icon name="note" size={22} />{pro.length > 0 && <u />}</button>
                 <button type="button" className="pt-pause" aria-label="Esercizi" onClick={() => setListOpen(true)}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" /></svg></button>
                 <button type="button" className="pt-pause" aria-label="Pausa" onClick={() => setPaused(true)}><Icon name="pause" size={22} /></button>
             </div>
-            <section className="pt-sheet is-tall">
+            <section className="pt-sheet pt-sh2">
                 <svg className="pt-sw" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40V36Q0 26 18 26H62C118 26 132 12 200 12S282 26 338 26H382Q400 26 400 36V40Z" fill="#fff" /></svg>
-                <div className="pt-grid">
-                    <div><b>{mmss(elapsed)}</b></div>
-                    <div className={'pt-big' + (phase === 'rest' ? ' is-rest' : '')}><b>{shown}</b></div>
-                    <div><b>{Math.min(setNo + 1, cur.n)}/{cur.n}</b></div>
-                </div>
-                <div className="pt-seg" role="tablist">
-                    {[['oggi', 'Oggi'], ['storia', 'Storico'], ['note', pro.length ? 'Note ●' : 'Note']].map(([k, l]) => <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? 'is-on' : ''} onClick={() => setTab(k)}>{l}</button>)}
-                </div>
-                <div className={'pt-sheet-body' + (tab !== 'oggi' ? ' is-under' : '')} key={tab} ref={fadeSet} onScroll={(e) => fadeSet(e.currentTarget)}>
-                    {tab === 'oggi' && (
-                        <>
-                            {lastT && <p className="pt-lastrow"><span>{String(lastT.date).split('-').reverse().slice(0, 2).join('/')}</span>{lastG.slice(0, 2).map((g, i) => <b key={i}> · {g.n} × {fmtKg(g.kg)} kg{g.rpe ? ` · RPE ${g.rpe}` : ''}</b>)}{lastG.length > 2 ? ' …' : ''}</p>}
-                            {sug && sug.kg !== kg && <div className="pt-sug"><div><span>Suggerito</span><b>{fmtKg(sug.kg)} kg</b></div><button type="button" onClick={() => setKg(sug.kg)}>Usa</button></div>}
-                            <span className="pt-fl">RPE</span>
-                            <div className="pt-rpe">{RPES.map((r) => <button key={r} type="button" className={shownRpe === r ? 'is-on' : ''} aria-pressed={shownRpe === r} onClick={() => pickRpe(r)}>{r}</button>)}</div>
-                            
-                        </>
-                    )}
-                    {tab === 'storia' && (past.length ? past.map((h, hi) => (
-                        <div className="pt-past" key={h.date + "-" + hi}>
-                            <b className="pt-past-d">{String(h.date).split("-").reverse().join("/")}</b>
-                            <div className="pt-past-b">
-                            <div className="pt-past-s">{groupSets(h.sets).map((g, i) => <u key={i}>{g.n > 1 ? <b>{g.n} serie</b> : null}{fmtKg(g.kg)}<small>kg</small>{g.reps ? <s>× {g.reps} rep</s> : null}{g.rpe ? <i>RPE {g.rpe}</i> : null}</u>)}</div>
-                            </div>
-                        </div>
-                    )) : <p className="pt-muted">–</p>)}
-                    {tab === 'note' && <>
-                        {pro.map(([, t], i) => <div className="pt-pn" key={i}>{t}</div>)}
-                        <label className="pt-nw"><span className="pt-nw-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg></span><textarea rows="2" value={note} maxLength={200} placeholder="Scrivi una nota" onChange={(e) => setNote(e.target.value)} /></label>
-                        
-                        <div style={{ height: 12 }} />
-                        {mine.map((n, i) => <div className="pt-past" key={'m' + i}><b className="pt-past-d">{String(n.date).split('-').reverse().join('/')}</b><span>{n.text}</span></div>)}
-                    </>}
-                </div>
-                <div className="pt-live-act">
-                    {tab === 'oggi' && <Step value={kg} onChange={setKg} step={2.5} min={0} max={1000} fmt={fmtKg} unit="kg" text={cur.kg0 === 0 && kg === 0 ? 'Corpo libero' : undefined} label="Carico" />}
-                    {phase === 'rest' ? <button type="button" className="pt-done is-sec" onClick={skipRest}>SALTA RIPOSO</button> : <button type="button" className="pt-done" onClick={complete}>SERIE COMPLETATA</button>}
-                </div>
-                <div className="pt-nav2">
-                    <button type="button" disabled={ex === 0} onClick={prev}>Indietro</button>
-                    <button type="button" onClick={skipEx}>Salta</button>
+                {!isRest && <div className="pt-t2"><b>{mmss(setSecs)}</b></div>}
+                {!isRest && <div className="pt-rk">{cur.reps ? <span className={'pt-reps' + (String(cur.reps).length > 3 ? ' is-s' : '')}><b>{cur.reps}</b><i>×</i></span> : null}{stepKg}</div>}
+                {!isRest && lastT && <button type="button" className="pt-lastb" onClick={() => setPanel('storia')}><span>{String(lastT.date).split('-').reverse().slice(0, 2).join('/')} · {fmtKg(lastKg)} kg</span><Icon name="chev" size={16} /></button>}
+                {!isRest && sug && sug.kg !== kg && <div className="pt-sug"><div><span>Suggerito</span><b>{fmtKg(sug.kg)} kg</b></div><button type="button" onClick={() => setKg(sug.kg)}>Usa</button></div>}
+                {isRest && rpeRow}
+                {isRest && <div className="pt-rk is-rest">{stepKg}</div>}
+                <div className="pt-bt">
+                    {isRest ? <button type="button" className="pt-rnd pt-rnd-t" aria-label="Quindici secondi in meno" onClick={() => adjRest(-15000)}>−15</button>
+                        : <button type="button" className="pt-rnd" aria-label="Esercizio precedente" disabled={ex === 0} onClick={prev}><Icon name="back" size={22} /></button>}
+                    {isRest ? <button type="button" className="pt-done is-sec" onClick={skipRest}>Salta</button> : <button type="button" className="pt-done" onClick={complete}><Icon name="check" size={20} />Fatta</button>}
+                    {isRest ? <button type="button" className="pt-rnd pt-rnd-t" aria-label="Quindici secondi in più" onClick={() => adjRest(15000)}>+15</button>
+                        : <button type="button" className="pt-rnd" aria-label="Salta esercizio" onClick={skipEx}><Icon name="chev" size={22} /></button>}
                 </div>
             </section>
-            {phase === 'rest' && rest > 0 && rest <= 10 && !paused && (
-                <div className="pt-rf" role="timer" aria-label="Fine riposo">
-                    <UrbiosLogo size={40} className="pt-rf-logo" />
-                    <b className="pt-rf-t">{mmss(rest)}</b>
-                    {nextCard}
-                    <button type="button" className="pt-rf-b" onClick={skipRest}>SALTA RIPOSO</button>
-                </div>
+            {panel === 'storia' && (
+                <Lst title="Storico" onClose={() => setPanel(null)}>
+                    {past.length ? past.map((h, hi) => (
+                        <div className="pt-past" key={h.date + '-' + hi}>
+                            <b className="pt-past-d">{String(h.date).split('-').reverse().join('/')}</b>
+                            <div className="pt-past-b"><div className="pt-past-s">{groupSets(h.sets).map((g, i) => <u key={i}>{g.n > 1 ? <b>{g.n} serie</b> : null}{fmtKg(g.kg)}<small>kg</small>{g.reps ? <s>× {g.reps} rep</s> : null}{g.rpe ? <i>RPE {g.rpe}</i> : null}</u>)}</div></div>
+                        </div>
+                    )) : <p className="pt-muted">–</p>}
+                </Lst>
+            )}
+            {panel === 'note' && (
+                <Lst title="Note" onClose={() => setPanel(null)}>
+                    {pro.map(([, t], i) => <div className="pt-pn" key={i}>{t}</div>)}
+                    <label className="pt-nw"><span className="pt-nw-i"><Icon name="note" size={18} /></span><textarea rows="2" value={note} maxLength={200} placeholder="Scrivi una nota" onChange={(e) => setNote(e.target.value)} /></label>
+                    {mine.map((n, i) => <div className="pt-past" key={'m' + i}><b className="pt-past-d">{String(n.date).split('-').reverse().join('/')}</b><span>{n.text}</span></div>)}
+                </Lst>
             )}
             {listOpen && (
                 <Lst title="Esercizi" label="Esercizi" onClose={() => setListOpen(false)}>
