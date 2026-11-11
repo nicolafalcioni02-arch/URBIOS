@@ -1584,3 +1584,11 @@ body:has(.pt-main) .pt-pf .pt-input, body:has(.pt-main) .pt-sc2-m .pt-input { bo
 /* spesa: la parte del prodotto sotto «Salva» ha uno sfondo suo */
 .pt-pf-i { margin-top: 20px; padding: 14px; border-radius: 44px; background: var(--u-lilla-2); }
 .pt-pf-h { padding: 4px 6px 0; } .pt-pf-h span { background: #fff; }
+
+/* spesa: la parte del prodotto è un blocco bianco separato dal modulo */
+.pt-pf-i { background: #fff; margin-top: 24px; }
+.pt-pf-i dl, .pt-pf-i section, .pt-pf-e, .pt-lg { background: var(--u-foglio); box-shadow: none; }
+.pt-pf-h span { background: var(--u-lilla); }
+.pt-pf-i dl div, .pt-pf-e1 { border-top-color: var(--u-lilla-2); }
+.pt-lg-l { background: #fff; }
+.pt-pf-i { margin: 28px -22px -28px; padding: 22px 22px calc(34px + env(safe-area-inset-bottom, 0px)); border-radius: 40px 40px 0 0; }
