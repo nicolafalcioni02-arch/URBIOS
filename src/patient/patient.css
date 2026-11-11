@@ -1215,3 +1215,48 @@ body:has(.pt-main) .pt-sp-top:not(.pt-td-top) { padding-bottom: 34px; }
 .pt-main.is-fit:has(.hm2) { padding-bottom: 134px; }
 /* il titolo può passare sopra il viola del segno: alone lilla per tenerlo leggibile */
 .hm2 > .hm2-next .hm2-t b { text-shadow: 0 0 6px var(--u-lilla), 0 0 14px var(--u-lilla); }
+
+/* UX-06.4: Dieta e registro pasto */
+/* intestazione: una sola card corallo */
+.pt-nh { padding: 0 12px 0 16px; height: 68px; flex: none; justify-content: space-between; gap: 10px; }
+.pt-nh-l { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+div.pt-nh-l { cursor: default; }
+.pt-nh .pt-sc-t { flex: 1; min-width: 0; flex-direction: row; align-items: baseline; gap: 6px; }
+.pt-nh .pt-sc-t b { flex: none; font-size: 20px; font-variant-numeric: tabular-nums; } .pt-nh .pt-sc-t small { font-size: 12px; font-weight: 600; opacity: .75; }
+.pt-nh-r { flex: none; display: flex; gap: 8px; }
+.pt-nh-r button { width: 44px; height: 44px; border: 0; border-radius: 50%; background: #fff; color: var(--u-ink); display: grid; place-items: center; cursor: pointer; }
+/* selettore giorni su una riga */
+.pt-sp-scroll > .pt-seg3 button { height: 44px; }
+/* card pasto */
+.pt-ml-t small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.pt-ml-k { padding: 0; background: none; display: flex; align-items: baseline; gap: 3px; }
+.pt-ml-k b { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; } .pt-ml-k small { font-size: 12px; font-weight: 600; color: var(--u-grigio); }
+.pt-ml.is-done .pt-ml-t { opacity: .6; }
+body:has(.pt-main) .pt-sp .pt-sp-scroll { padding-bottom: calc(68px + 24px + 24px + env(safe-area-inset-bottom)); }
+body:has(.pt-main) .pt-ml { margin-top: 12px; padding: 14px 16px; }
+/* calendario: anello per i giorni a metà */
+.pt-cal-g button.part { position: relative; font-weight: 800; }
+.pt-cal-g button.part::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(var(--u-lime-ink) calc(var(--p) * 360deg), var(--u-lilla-2) 0); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px)); mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px)); }
+/* foglio macro: tessere = legenda */
+.pt-tiles b small { font-size: 13px; font-weight: 700; color: var(--u-grigio-d); margin-left: 2px; }
+.pt-tiles span { display: flex; align-items: center; gap: 6px; }
+.pt-tiles span u { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.pt-lst .pt-dn { justify-content: center; } .pt-lst .pt-dn svg { width: 150px; height: 150px; }
+.pt-mb span { display: flex; justify-content: space-between; gap: 8px; } .pt-mb span em { font-style: normal; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* registro pasto: riga alimento su una riga */
+.pt-sh-k { margin-left: auto; margin-right: 12px; font-style: normal; font-size: 15px; font-weight: 700; color: var(--u-corallo-ink); font-variant-numeric: tabular-nums; }
+.pt-dsheet header { gap: 0; }
+.pt-dsheet .pt-food { display: flex; flex-direction: row; align-items: center; gap: 10px; margin: 0 0 8px; padding: 6px 0; border: 0; background: none; border-radius: 0; min-height: 60px; }
+.pt-food-x { flex: none; width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--u-lilla-2); color: var(--u-ink); display: grid; place-items: center; cursor: pointer; }
+.pt-food-n { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.pt-dsheet .pt-food-n b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 16px; font-weight: 700; line-height: 1.2; }
+.pt-food-n s { font-size: 12px; font-weight: 600; color: var(--u-grigio); }
+.pt-dsheet .pt-food .pt-step { flex: none; order: 0; width: 144px; margin: 0; padding: 4px; gap: 0; justify-content: space-between; }
+.pt-dsheet .pt-food .pt-step button { width: 36px; height: 36px; }
+.pt-dsheet .pt-food .pt-step > .pt-step-v.pt-step-v.pt-step-v { min-height: 36px; padding: 0; } .pt-dsheet .pt-food .pt-step b { min-width: 0; font-size: 17px; font-weight: 800; }
+.pt-dsheet .pt-food .pt-step.is-hot b { color: var(--u-corallo-ink); }
+.pt-dsheet .pt-food .pt-step > .pt-step-in { height: 36px; width: 60px; font-size: 17px !important; }
+.pt-add { display: flex; align-items: center; justify-content: center; width: 100%; height: 52px; margin-top: 6px; border: 1.5px dashed var(--u-lilla-2); border-radius: 20px; background: transparent; color: var(--u-ink); cursor: pointer; }
+.pt-food-q { position: relative; display: block !important; } .pt-food-q input { width: 100%; padding-right: 52px; }
+.pt-food-q button { position: absolute; right: 6px; top: 50%; translate: 0 -50%; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--u-lilla-2); color: var(--u-ink); display: grid; place-items: center; cursor: pointer; }
+.pt-food-f { background: none; padding: 0; margin: 4px 0 8px; }

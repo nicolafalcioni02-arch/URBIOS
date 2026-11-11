@@ -161,13 +161,13 @@ export const useHold = (fn) => {
 };
 
 // Stepper «− valore +»: il valore è toccabile e si può scrivere (virgola o punto).
-export const Step = ({ value, onChange, step = 1, min = 0, max = 1e9, fmt = (x) => String(x).replace('.', ','), unit = '', text, dark, label }) => {
+export const Step = ({ value, onChange, step = 1, min = 0, max = 1e9, fmt = (x) => String(x).replace('.', ','), unit = '', text, dark, hot, label }) => {
     const [ed, setEd] = useState(false), [raw, setRaw] = useState('');
     const clamp = (x) => Math.min(max, Math.max(min, Math.round(x * 10) / 10));
     const hm = useHold((k) => onChange(clamp(value - step * k))), hp = useHold((k) => onChange(clamp(value + step * k)));
     const done = () => { setEd(false); const n = parseFloat(raw.replace(',', '.')); if (Number.isFinite(n)) onChange(clamp(n)); };
     return (
-        <div className={'pt-step' + (dark ? ' dark' : '')}>
+        <div className={'pt-step' + (dark ? ' dark' : '') + (hot ? ' is-hot' : '')}>
             <button type="button" aria-label="Meno" {...hm}><Icon name="minus" size={16} /></button>
             {ed ? <input className="pt-step-in" type="text" inputMode="decimal" autoFocus aria-label={label} value={raw} onFocus={(e) => e.target.select()} onChange={(e) => setRaw(e.target.value)} onBlur={done} onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
                 : <button type="button" className="pt-step-v" aria-label={label} onClick={() => { setRaw(fmt(value)); setEd(true); }}><b>{text || (fmt(value) + (unit ? ' ' + unit : ''))}</b></button>}

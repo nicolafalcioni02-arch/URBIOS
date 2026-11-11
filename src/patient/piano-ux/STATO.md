@@ -10,7 +10,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
 | UX-04 Dieta: il giorno di oggi | fatto |
 | UX-05 Coerenza grafica e Profilo | fatto |
-| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-3 fatte |
+| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-4 fatte |
 
 A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così:
 
@@ -97,3 +97,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare su iPhone: rotazione e scatto con «riduci animazioni» attivo (fermo), caso «Riprendi» con riga «Iniziato ieri · scade domani» (non preparato da `__demoLog`: il ramo è codice invariato, solo spostato), ingresso sfalsato.
 - Scelte fatte: a 360×640 il titolo cade sopra l'anello viola (il segno è alto 440 px, il blocco è ancorato in basso): per leggibilità ho dato al titolo un alone lilla. Il padding basso della Home è 134 px per avere ≥16 px tra strumenti e dock. Tolti dall'uso `bd`, `t`, `s` delle tessere (non più nel codice).
 - Attenzione per chi viene dopo: classi nuove `hm2-mark`, `hm2-mark-k`, `hm2-date`, `hm2-t`, `hm2-ic`, `hm2-pills`, `hm2-pill`; le vecchie `.hm2-ring/.hm2-k/.hm2-leg` restano nel CSS ma non nel JSX (non cancellate).
+
+## UX-06.4 — fatto il 11/11/2026
+- File toccati: `ui/Nutrition.jsx`, `ui/MealSheet.jsx`, `ui/Progress.jsx` (solo `MealsWeek`, `KcalWeek`), `ui/bits.jsx` (prop `hot` di `Step`), `patient.css` (in fondo, `/* UX-06.4 */`), questo file.
+- Cosa vede di diverso il paziente: Dieta senza marchio, con una sola card corallo (anello + kcal che contano; calendario e «+» a destra); giorni senza «Giorno »; card pasto con soli nomi degli alimenti su una riga e kcal senza pillola, attenuata se registrata. Storico con anelli per i giorni a metà e senza legenda; foglio «Macro» con tessere-legenda. Registro pasto: totale kcal vivo nel titolo, una riga per alimento (icona scambio o X, nome, stepper), nome/grammi del piano barrati se cambiati, riga «+» tratteggiata, «Salva»; la ricerca sceglie con un tocco.
+- Verificato in browser (375×812; 360×640 per `?lungo` e `?vuoto`): 4 pasti visibili senza scorrere; Colazione→Salva (2 tocchi) con card attenuata e kcal che salgono; Mirtilli 80→85 (80 barrato in corallo, totale cambia); sostituzione Noci→Mandorle con un tocco; aggiungi Pane e toglilo con la X; storico: 2 su 4 = anello 0,25–0,75, completo pieno, nessuna legenda; Macro con tre tessere-legenda; `?vuoto` senza grafico settimanale; 24 px d'aria sopra il dock; zero errori in console.
+- Da provare su iPhone: trascinamento/chiusura dei fogli col dito; gli screenshot del pane erano fermi, quindi l'aspetto l'ho verificato da DOM e misure, non a occhio; «riduci animazioni»; Count delle kcal.
+- Scelte fatte: l'azione «Sostituisci» ha aria-label dell'icona; il prezzo del passo da 5 g resta `set` con limite 0–2000; le righe `.pt-gr` in fondo alla Dieta sono state tolte dal JSX (CSS non cancellato).
+- Attenzione per chi viene dopo: `FoodForm` ha la prop `instant`; `Cal` riceve `docId` e `total`; classi nuove `pt-nh*`, `pt-food-x`, `pt-food-n`, `pt-add`, `pt-food-q`, `pt-sh-k`; `Step` ha la prop `hot`.

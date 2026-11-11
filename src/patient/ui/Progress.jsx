@@ -54,7 +54,6 @@ export const KcalWeek = ({ log, goal, now = Date.now() }) => {
     const top = Math.max(goal || 0, ...days.map((x) => x.k)) * 1.12, H = 80, avg = Math.round(logged.reduce((t, x) => t + x.k, 0) / logged.length);
     return (
         <div className="pg-card">
-            <span className="pg-k">Kcal della settimana</span>
             <div className="pg-big"><b>{avg.toLocaleString('it-IT')}</b><small>media</small></div>
             <div className="pg-bars" style={{ height: H + 20 }}>
                 {goal > 0 && <i className="pg-goal" style={{ bottom: 20 + (goal / top) * H }} />}
@@ -204,8 +203,7 @@ export const MealsWeek = ({ log, docId, total, now = Date.now() }) => {
     const done = days.reduce((t, x) => t + x.n, 0);
     return (
         <div className="pg-card">
-            <span className="pg-k">Pasti registrati</span>
-            <div className="pg-big"><b>{done}</b><small>questa settimana</small></div>
+            <div className="pg-big"><Icon name="fork" size={18} /><b>{done}</b><small>/ {total * 7}</small></div>
             <div className="pg-caps">{days.map((x) => <div key={x.d} className={x.today ? 'is-today' : ''}><i><u style={{ height: (x.n / total) * 100 + '%' }} /></i><span>{x.lab}</span></div>)}</div>
         </div>
     );

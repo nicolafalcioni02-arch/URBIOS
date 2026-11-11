@@ -6,24 +6,23 @@ import { findFoods, loadFoods, GENERIC } from './foods.js';
 
 // Registra un pasto: grammatura corretta, alimento sostituito o aggiunto. Salvato solo sul telefono.
 const kc = (e) => (e.b ? Math.round(e.kcal * e.g / e.b) : 0);
-// Scelta dell'alimento: cerca nel prontuario, poi i grammi. Le kcal le calcola l'app.
-const FoodForm = ({ title, onDone, onCancel, target }) => {
+// Scelta dell'alimento: cerca nel prontuario. Con `instant` toccare un risultato lo sceglie subito (i grammi si correggono nella riga);
+// senza, dopo la scelta resta il passo grammi e «Salva». Le kcal le calcola l'app.
+const FoodForm = ({ title, onDone, onCancel, target, instant }) => {
     const [q, setQ] = useState(''), [f, setF] = useState(null), [g, setG] = useState(100);
     const [all, setAll] = useState(null);
     useEffect(() => { let on = true; loadFoods().then((l) => on && setAll(l)); return () => { on = false; }; }, []);
     const hits = f ? [] : findFoods(all, q);
     // Sostituzione: i grammi di partenza danno le stesse kcal dell'alimento tolto; altrimenti 100 g
-    const pick = (h) => { setF(h); setQ(''); setG(target && h.k ? Math.max(10, Math.min(1000, Math.round(target / h.k * 100 / 10) * 10)) : 100); };
-    const ok = f && g > 0;
+    const grams = (h) => (target && h.k ? Math.max(10, Math.min(1000, Math.round(target / h.k * 100 / 10) * 10)) : 100);
+    const pick = (h) => { if (instant) { const gg = grams(h); onDone({ n: h.n, g: gg, kcal: Math.round(h.k * gg / 100) }); return; } setF(h); setQ(''); setG(grams(h)); };
     return (
         <div className="pt-food-f">
-            <b>{title}</b>
             {f ? <div className="pt-food-sel"><span>{f.n}</span><button type="button" onClick={() => setF(null)}>Cambia</button></div>
-                : <input className="pt-input" placeholder="Cerca alimento" value={q} maxLength={40} autoFocus onChange={(e) => setQ(e.target.value)} />}
+                : <div className="pt-food-q"><input className="pt-input" placeholder="Cerca alimento" aria-label={title} value={q} maxLength={40} autoFocus onChange={(e) => setQ(e.target.value)} />{onCancel && <button type="button" aria-label="Annulla" onClick={onCancel}><Icon name="close" size={18} /></button>}</div>}
             {!f && hits.map((h) => <button key={h.n} type="button" className="pt-food-h" onClick={() => pick(h)}>{h.n}</button>)}
             {!f && q.trim() && all && !hits.length && <><span className="pt-food-no">Non lo trovo: scegli il più simile</span>{GENERIC.map((h) => <button key={h.n} type="button" className="pt-food-h" onClick={() => pick(h)}>{h.n}</button>)}</>}
-            {f && <><span className="pt-food-no">{target ? 'Quantità con le stesse calorie di prima: puoi cambiarla' : 'Quanti grammi'}</span><Step dark value={g} onChange={setG} step={10} min={10} max={2000} unit="g" label="Grammi" /></>}
-            <div><button type="button" className="pt-btn ghost" onClick={onCancel}>Annulla</button><button type="button" className="pt-btn" disabled={!ok} onClick={() => onDone({ n: f.n, g, kcal: Math.round(f.k * g / 100) })}>Conferma</button></div>
+            {f && <><Step dark value={g} onChange={setG} step={10} min={10} max={2000} unit="g" label="Grammi" /><button type="button" className="pt-cta" onClick={() => onDone({ n: f.n, g, kcal: Math.round(f.k * g / 100) })}>Salva</button></>}
         </div>
     );
 };
@@ -42,18 +41,20 @@ export const MealSheet = ({ rt, docId, d, m, date, onClose }) => {
         setList((a) => (form === 'add' ? [...a, e] : a.map((y, j) => (j === form ? { ...e, p: y.p, was: y.was || y.n } : y))));
         setForm(null);
     };
-    const FORM = <FoodForm target={typeof form === 'number' && list[form] ? kc(list[form]) : 0} title={form === 'add' ? 'Aggiungi un alimento' : 'Sostituisci con'} onDone={apply} onCancel={() => setForm(null)} />;
+    const FORM = <FoodForm instant target={typeof form === 'number' && list[form] ? kc(list[form]) : 0} title={form === 'add' ? 'Aggiungi un alimento' : 'Sostituisci con'} onDone={apply} onCancel={() => setForm(null)} />;
     return (
-        <Sheet title={meal.nome} onClose={onClose}>
+        <Sheet title={meal.nome} extra={<em className="pt-sh-k">{list.reduce((t, e) => t + kc(e), 0)} kcal</em>} onClose={onClose}>
                 {list.map((v, i) => (
                     form === i ? <React.Fragment key={i}>{FORM}</React.Fragment> : <div className="pt-food" key={i}>
-                        <div><b>{v.n}</b><span>{v.was ? `Al posto di ${v.was}` : v.p ? `Prescritti ${v.p} g` : 'Aggiunto da te'}</span>
-                            <span className="pt-food-a"><button type="button" onClick={() => setForm(i)}>Sostituisci</button>{v.p === null && !v.was && <button type="button" onClick={() => setList((a) => a.filter((_, j) => j !== i))}>Togli</button>}</span></div>
-                        <Step dark value={v.g} onChange={(x) => set(i, x)} step={5} min={0} max={2000} unit="g" label="Grammi" />
+                        {v.p === null && !v.was
+                            ? <button type="button" className="pt-food-x" aria-label="Togli" onClick={() => setList((a) => a.filter((_, j) => j !== i))}><Icon name="close" size={18} /></button>
+                            : <button type="button" className="pt-food-x" aria-label="Sostituisci" onClick={() => setForm(i)}><Icon name="swap" size={18} /></button>}
+                        <div className="pt-food-n"><b>{v.n}</b>{v.was ? <s>{v.was}</s> : null}{v.p && v.g !== v.p ? <s>{v.p} g</s> : null}</div>
+                        <Step dark hot={!!v.p && v.g !== v.p} value={v.g} onChange={(x) => set(i, x)} step={5} min={0} max={2000} unit="g" label="Grammi" />
                     </div>
                 ))}
-                {form === null ? <button type="button" className="pt-btn ghost wide" onClick={() => setForm('add')}>Aggiungi un alimento</button> : form === 'add' && FORM}
-                <button type="button" className="pt-cta" onClick={() => save(list)}>Conferma e salva nel diario</button>
+                {form === null ? <button type="button" className="pt-add" aria-label="Aggiungi un alimento" onClick={() => setForm('add')}><Icon name="plus" size={20} /></button> : form === 'add' && FORM}
+                <button type="button" className="pt-cta" onClick={() => save(list)}>Salva</button>
         </Sheet>
     );
 };
@@ -65,8 +66,7 @@ export const ExtraSheet = ({ rt, names, date, onClose }) => {
     const save = async (x) => { const dt = date || ymd(); await rt.log.update((l) => { (l.extras[dt] = l.extras[dt] || []).push({ n: x.n, g: x.g, kcal: Math.min(5000, x.kcal), when, at: Date.now() }); }); onClose(); };
     return (
         <Sheet title="Fuori piano" onClose={onClose}>
-                <b className="pt-when-t">Quando l'hai mangiato</b>
-                <div className="pt-when">{opts.map((o) => <button key={o} type="button" className={o === when ? 'is-on' : ''} onClick={() => setWhen(o)}>{o}</button>)}</div>
+                <div className="pt-when" role="group" aria-label="Quando l'hai mangiato">{opts.map((o) => <button key={o} type="button" className={o === when ? 'is-on' : ''} onClick={() => setWhen(o)}>{o}</button>)}</div>
                 <FoodForm title="Che cosa hai mangiato" onDone={save} onCancel={onClose} />
         </Sheet>
     );
