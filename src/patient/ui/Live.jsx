@@ -207,7 +207,6 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 {isRest && <div className="pt-rest-w" style={{ height: lvl + '%' }}><svg viewBox="0 0 800 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 15Q100 0 200 15T400 15T600 15T800 15V30H0Z" /></svg></div>}
                 {hit > 0 && <i className="pt-veil" key={hit} aria-hidden="true" />}
                 {isRest ? <>
-                    <b className="pt-rest-ex">{cur.name}</b>
                     <b className={'pt-rest-t' + (rest <= 3 ? ' is-end' : '')} key={rest <= 3 ? rest : 'n'} role="timer" aria-label="Riposo">{mmss(rest)}</b>
                     <div className="pt-live-row">{dots}</div>
                     {showNext && <div className="pt-nx2" aria-label={'Dopo: ' + nx.name}><Icon name="chev" size={16} /><b>{nx.name}</b><span>{Math.min(setNo + 1, nx.n)}/{nx.n}</span></div>}
