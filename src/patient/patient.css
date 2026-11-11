@@ -1571,3 +1571,12 @@ button.pt-shop-t { width: calc(100% - 8px); border: 0; background: transparent; 
 .pt-pf-e1 { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--u-lilla); color: var(--u-ink); font-weight: 700; font-size: 15px; } .pt-pf-e1:first-child { border-top: 0; }
 .pt-pf-e1 svg { flex: none; color: var(--u-viola); margin-top: 1px; }
 .pt-pf-e1 small { display: block; font-weight: 600; font-size: 13px; color: var(--u-grigio); }
+
+/* spesa: schede molto più stondate */
+.pt-shop, .pt-miss { border-radius: 44px; }
+.pt-by-r, .pt-lg, .pt-pf-i dl, .pt-pf-i section, .pt-pf-e { border-radius: 36px; }
+.pt-by-r { padding-left: 24px; } .pt-lg, .pt-pf-i section { padding-left: 24px; padding-right: 24px; } .pt-pf-i dl, .pt-pf-e { padding-left: 24px; padding-right: 24px; }
+.pt-sc2-v { border-radius: 40px; }
+.pt-by .pt-todo.is-sure { border-radius: 36px; }
+body:has(.pt-main) .pt-pf .pt-input, body:has(.pt-main) .pt-sc2-m .pt-input { border-radius: 999px; padding-left: 22px; padding-right: 22px; }
+.pt-pf-h span { padding: 9px 16px; }
