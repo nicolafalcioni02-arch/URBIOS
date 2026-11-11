@@ -70,7 +70,7 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
     const taken = items.filter((x) => shop[x.k]).length, all = taken === items.length && items.length > 0;
     const on = (x) => (lag === x.k ? !shop[x.k] : !!shop[x.k]);
     const rows = [...items].sort((a, b) => (on(a) - on(b)) || a.n.localeCompare(b.n, 'it'));
-    const extra = items.length ? (all ? <em className="pt-sh-k is-all"><Icon name="check" size={14} />{taken}/{items.length}</em> : <em className="pt-sh-k">{taken}/{items.length}</em>) : null;
+    const extra = items.length ? (all ? <em className="pt-sh-k is-all"><Icon name="check" size={14} />{taken}/{items.length}</em> : <em className="pt-sh-k is-n">{taken}/{items.length}</em>) : null;
     return (
         <Shell title="Spesa" extra={extra} onClose={onClose}>
             {items.length === 0 ? <p className="pt-muted">Quando riceverai la dieta, qui troverai gli alimenti da comprare.</p> : <>

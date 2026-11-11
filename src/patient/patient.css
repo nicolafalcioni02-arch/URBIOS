@@ -1500,3 +1500,12 @@ body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-ross
 .pt-todo-c button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
 body:has(.pt-main) .pt-todo-c .pt-todo-y { background: var(--u-rosso); color: #fff; }
 body:has(.pt-main) .pt-todo-c .pt-todo-n { background: var(--u-lilla-2); color: var(--u-ink); }
+/* spesa: regolatori a pillola, contatore neutro */
+.pt-dsheet header .pt-sh-k.is-n { color: var(--u-grigio-d); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pt-dsheet header .pt-sh-k.is-all { color: #0B0C0E; }
+.pt-shop-r { gap: 12px; margin-bottom: 16px; }
+.pt-shop-r > span { gap: 8px; }
+.pt-shop-r .pt-step { height: 48px; padding: 4px; border-radius: 999px; background: #fff; box-shadow: 0 3px 14px rgba(11,12,14,.05); align-items: center; }
+.pt-shop-r .pt-step button { width: 40px; height: 40px; border-radius: 50%; background: var(--u-lilla); color: var(--u-ink); }
+.pt-shop-r .pt-step > .pt-step-v.pt-step-v.pt-step-v { min-height: 40px; background: transparent; }
+.pt-shop-r .pt-step b { font-size: 18px; color: var(--u-ink); }
