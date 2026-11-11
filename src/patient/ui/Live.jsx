@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './bits.jsx';
 import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import { Clamp } from './Clamp.jsx';
-import { shareSummary } from './summaryPdf.js';
 import { arr, mmss, parseSets, parseRest, sessionKey, suggestLoad, fmtDay, fmtKg, ymd, workoutSummary, sessionDate, HYPE_END } from './logic.js';
 
 // Allenamento guidato, un esercizio alla volta. Ogni serie fatta (carico, RPE, nota) si salva SUBITO sul telefono, anche senza rete.
@@ -52,7 +51,6 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     const [paused, setPaused] = useState(false), [listOpen, setListOpen] = useState(false), [fin, setFin] = useState(false), [kg, setKg] = useState(() => kgOf(start.ex));
     const [rpe, setRpe] = useState(null), [note, setNote] = useState(''), [tab, setTab] = useState('oggi');
     const [hype, setHype] = useState(null);
-    const [sumBusy, setSumBusy] = useState(false), [sumMsg, setSumMsg] = useState('');
     useEffect(() => { if (!hype) return undefined; const t = setTimeout(() => setHype(null), 3200); return () => clearTimeout(t); }, [hype]);
     const [lastRpe, setLastRpe] = useState(null);                 // RPE della serie appena fatta (si cambia durante il riposo)
     const total = useRef(0), ac = useRef(null), lastSet = useRef(null);
@@ -132,11 +130,6 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     };
     const skipEx = () => { setPaused(false); if (!nextEx(ex)) setFin(true); };
 
-    const sendSummary = async () => {
-        if (sumBusy) return; setSumBusy(true); setSumMsg('');
-        try { const r = await shareSummary(rt); setSumMsg(r === 'saved' ? 'PDF salvato nei file' : r === 'shared' ? 'Riassunto inviato' : ''); } catch (e) { setSumMsg('Non sono riuscito a creare il PDF'); }
-        setSumBusy(false);
-    };
     if (fin) {
         const sm = workoutSummary(rt.log.get(), id, w, d, list, sDate), diff = sm.prevVol != null ? sm.vol - sm.prevVol : null;
         const msg = HYPE_END[(sm.vol + sm.sets) % HYPE_END.length];
@@ -150,7 +143,6 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 {sm.records.slice(0, 2).map((r) => <span key={r.name} className="pt-win-r">Nuovo record: {r.name}, {r.kg} kg</span>)}
                 <p>{msg}</p>
                 <button type="button" className="pt-cta" onClick={() => onExit(true)}>Torna alla dashboard</button>
-                <button type="button" className="pt-win-sum" disabled={sumBusy} onClick={sendSummary}>{sumBusy ? 'Creo il PDF…' : sumMsg || 'Invia il riassunto'}</button>
             </div>
         );
     }

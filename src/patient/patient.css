@@ -1057,8 +1057,6 @@ body:has(.pt-main) .pt-ab .pt-credits, body:has(.pt-main) .pt-ab-f { color: #6C7
 .pt-grid .pt-big.is-rest b { white-space: nowrap; }
 .pt-pause-c .pt-btn.ghost { color: #fff; border-color: rgba(255,255,255,.28); }
 
-/* UX-03: riassunto a fine allenamento, azione secondaria */
-.pt-win-sum { flex: none; min-height: 44px; margin-top: 12px; padding: 0 16px; border: 0; background: none; color: rgba(255,255,255,.7); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; overflow-wrap: anywhere; } .pt-win-sum:disabled { opacity: 1; cursor: default; }
 
 /* UX-05: riquadri nel tema lilla */
 body:has(.pt-main) .pt-cd, body:has(.pt-main) .pt-gr, body:has(.pt-main) .pt-ml, body:has(.pt-main) .pt-seg3, body:has(.pt-main) .pt-seg3.is-l, body:has(.pt-main) .pt-xt, body:has(.pt-main) .pt-lst-r, body:has(.pt-main) .pg-lt .pg-card, body:has(.pt-main) .pt-td-sc .pt-xc, body:has(.pt-main) .pt-td-sc .pt-xc.is-open, body:has(.pt-main) .pt-td-sc .pt-wk:not(.is-on), body:has(.pt-main) .pt-td-sc .pt-dsw { background: #F3EEFF; }
