@@ -5,7 +5,7 @@ const ex = (nome, serie, carico, rec, extra = {}) => ({ nome, ss: '', serie, car
 const DOCS = {
     t1: { docId: 't1', kind: 'training', title: 'Scheda forza (prova)', rev: 2, at: 1793000000, body: { settimane: [
         { titolo: 'Settimana 1', scarico: false, nota: 'Settimana di adattamento: lascia 2 ripetizioni di scorta.', giorni: [
-            { titolo: 'Lower body', nota: '', esercizi: [ex(SQ, '4x10', '70', '35s', { rpe: '8', tempo: '3-1-2-1', note: 'Schiena neutra, scendi sotto il parallelo.' }), ex('Stacco rumeno', '3x12', '50', '35s'), ex('Affondi con manubri', '3x10', '16', '35s', { tempo: '2-0-1' }), ex('Calf in piedi', '4x15', '40', '45s')] },
+            { titolo: 'Lower body', nota: '', esercizi: [ex(SQ, '4x10', '70', '35s', { rpe: '8', tempo: '3-1-2-1', note: 'Schiena neutra, scendi sotto il parallelo.' }), ex('Stacco rumeno', '3x12', '50', '35s', { rpe: '7', tempo: '1-1-1-1' }), ex('Affondi con manubri', '3x10', '16', '35s', { tempo: '2-0-1' }), ex('Calf in piedi', '4x15', '40', '45s')] },
             { titolo: 'Upper body', nota: '', esercizi: [ex('Panca piana', '4x8', '60', '2 min', { rpe: '8' }), ex('Rematore con manubrio', '3x10', '24', '35s'), ex('Military press', '3x8', '35', '35s'), ex('Curl con manubri', '3x12', '12', '35s')] },
             { titolo: 'Full body', nota: 'Veloce: 3 giri, riposo breve.', esercizi: [ex('Goblet squat', '3x12', '20', '45s'), ex('Piegamenti', '3x10', '', '45s'), ex('Plank', '3x1', '', '30s', { note: '40 secondi a serie.' })] },
         ] },
