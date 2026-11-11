@@ -1738,3 +1738,23 @@ body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc { margin-right: 4px; 
 html { background: #160C33; }
 html:has(.pt-main), html:has(.hm2) { background: #EFEAFF; }
 .pt-bg { top: 0; left: 0; right: 0; bottom: auto; height: 100lvh; min-height: 100%; }
+
+/* Accesso (benvenuto, consensi, passphrase, collegamento): stesso tema chiaro dell'app */
+body:has(.pt-auth) { --ink: #0B0C0E; --paper: #EFEAFF; --surface: #fff; --soft: #DCD2FF; --line: rgba(11,12,14,.08); --muted: #6C727F; background: #EFEAFF; color: #0B0C0E; color-scheme: light; }
+html:has(.pt-auth) { background: #EFEAFF; }
+body:has(.pt-auth) .pt-bg { background: #EFEAFF !important; } body:has(.pt-auth) .pt-bg canvas { display: none !important; }
+body:has(.pt-auth) .pt-bg-v { background: radial-gradient(90% 40% at 50% 0%, rgba(255,255,255,.85), rgba(255,255,255,0) 100%) !important; }
+body:has(.pt-auth) .pt-auth-logo { color: #0B0C0E; }
+body:has(.pt-auth) .pt-feat li, body:has(.pt-auth) .pt-auth .pt-check, body:has(.pt-auth) .pt-auth .pt-input, body:has(.pt-auth) .pt-auth .pt-sas, body:has(.pt-auth) .pt-auth .pt-card, body:has(.pt-auth) .pt-auth .pt-note { background: #fff; border: 0; box-shadow: 0 4px 18px rgba(11,12,14,.05); color: #0B0C0E; }
+body:has(.pt-auth) .pt-auth .pt-sas { color: #0B0C0E; }
+body:has(.pt-auth) .pt-auth .pt-input { color: #0B0C0E; }
+body:has(.pt-auth) .pt-steps i { background: rgba(11,12,14,.12); } body:has(.pt-auth) .pt-steps i.on, body:has(.pt-auth) .pt-steps i.done { background: #0B0C0E; }
+body:has(.pt-auth) .pt-auth .pt-check input { border-color: rgba(11,12,14,.3); }
+body:has(.pt-auth) .pt-auth .pt-check input:checked { background: #0B0C0E; border-color: #0B0C0E; } body:has(.pt-auth) .pt-auth .pt-check input:checked::after { border-color: #fff; }
+body:has(.pt-auth) .pt-auth .pt-check:has(input:checked) { box-shadow: inset 0 0 0 2px #0B0C0E, 0 4px 18px rgba(11,12,14,.05); }
+body:has(.pt-auth) .pt-auth .pt-list li::before { background: #0B0C0E; }
+body:has(.pt-auth) .pt-btn { background: #0B0C0E; color: #fff; border-color: #0B0C0E; } body:has(.pt-auth) .pt-btn.ghost { background: transparent; color: #0B0C0E; border-color: rgba(11,12,14,.2); } body:has(.pt-auth) .pt-btn.danger { background: transparent; color: #D14B43; border-color: #D14B43; }
+body:has(.pt-auth) .pt-cta:disabled { background: rgba(11,12,14,.08); color: rgba(11,12,14,.35); opacity: 1; }
+body:has(.pt-auth) .pt-feat li, body:has(.pt-auth) .pt-feat b, body:has(.pt-auth) .pt-feat svg { color: #0B0C0E; } body:has(.pt-auth) .pt-feat span { color: #6C727F; }
+body:has(.pt-auth) .pt-auth, body:has(.pt-auth) .pt-auth h1, body:has(.pt-auth) .pt-auth h2, body:has(.pt-auth) .pt-auth label { color: #0B0C0E; } body:has(.pt-auth) .pt-auth-s, body:has(.pt-auth) .pt-auth .pt-link { color: #6C727F; }
+body:has(.pt-auth) .pt-auth .pt-card p, body:has(.pt-auth) .pt-auth .pt-card li, body:has(.pt-auth) .pt-auth .pt-card h2, body:has(.pt-auth) .pt-auth .pt-card h3, body:has(.pt-auth) .pt-auth .pt-card b, body:has(.pt-auth) .pt-auth .pt-card strong { color: #0B0C0E; }
