@@ -120,7 +120,7 @@ const Facts = ({ i }) => {
 
 // Prodotto trovato (o da compilare a mano): prezzo e negozio li scrive il cliente; il prezzo vale per la confezione
 const PriceForm = ({ init, items, stores, pick, setPick, onSave }) => {
-    const [name, setName] = useState(init.name), [g, setG] = useState(init.g ? String(init.g) : ''), [price, setPrice] = useState(''), [store, setStore] = useState(stores[0] || ''), [key, setKey] = useState(() => guess(init.name, items) || '');
+    const [name, setName] = useState(init.name), [g, setG] = useState(init.g ? String(init.g) : ''), [price, setPrice] = useState(''), [store, setStore] = useState(stores[0] || ''), [key, setKey] = useState(() => init.k || guess(init.name, items) || '');
     const num = (v) => parseFloat(String(v).replace(',', '.')), ok = name.trim() && num(price) > 0 && (!key || num(g) > 0);   // il peso serve solo per la stima della voce
     if (pick) return (
         <div className="pt-pf">
@@ -164,14 +164,14 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
     const tl = toolsOf(rt.log.get()), cfg = tl.cfg, shop = tl.shop, buys = arr(tl.buys), stores = arr(tl.stores);
     const items = shopItems(docs, rt.docs.get, cfg.days, cfg.people);
     // Riordino ritardato: la riga spuntata resta dov'è per 250 ms, poi scende in fondo con una dissolvenza
-    const [pick, setPick] = useState(false), [lag, setLag] = useState(null), tm = useRef(0), [view, setView] = useState(null);   // view: null | 'scan' | 'load' | { form }
+    const [pick, setPick] = useState(false), [want, setWant] = useState(''), [lag, setLag] = useState(null), tm = useRef(0), [view, setView] = useState(null);   // view: null | 'scan' | 'load' | { form }
     useEffect(() => () => clearTimeout(tm.current), []);
     const setCfg = async (patch) => { await rt.log.update((l) => { Object.assign(toolsOf(l).cfg, patch); }); };
     const tog = async (k) => {
         setLag(k); clearTimeout(tm.current); tm.current = setTimeout(() => setLag(null), 250);
         await rt.log.update((l) => { const s = toolsOf(l).shop; if (s[k]) delete s[k]; else s[k] = 1; });
     };
-    const found = async (code) => { setView('load'); const p = await lookupEan(code); setView({ form: p || { ean: code, name: '', g: 0, miss: true } }); };
+    const found = async (code) => { setView('load'); const p = await lookupEan(code); setView({ form: { ...(p || { ean: code, name: '', g: 0, miss: true }), k: want } }); };
     // ogni acquisto va nel registro; se corrisponde a una voce della lista, quella risulta anche presa
     const savePrice = async (k, rec) => {
         await rt.log.update((l) => {
@@ -198,10 +198,10 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
                     <div className="pt-shop-r">
                         <span><Icon name="calendar" size={18} /><Step dark value={cfg.days} onChange={(v) => setCfg({ days: v })} step={1} min={1} max={30} label="Per quanti giorni" /></span>
                         <span><Icon name="user" size={18} /><Step dark value={cfg.people} onChange={(v) => setCfg({ people: v })} step={1} min={1} max={8} label="Per quante persone" /></span>
-                        <button type="button" className="pt-round pt-shop-bc" aria-label="Leggi il codice a barre" onClick={() => setView('scan')}><Icon name="barcode" size={22} /></button>
+                        <button type="button" className="pt-round pt-shop-bc" aria-label="Leggi il codice a barre" onClick={() => { setWant(''); setView('scan'); }}><Icon name="barcode" size={22} /></button>
                     </div>
                     {buys.length > 0 && <button type="button" className="pt-shop-t" aria-label="Acquisti" onClick={() => setView('buys')}><b>{eur(buys.reduce((t, b) => t + (b.price || 0), 0))}</b><span>{buys.length}</span><Icon name="chev" size={18} /></button>}
-                    {rows.map((x) => { const c = cost(x); return <button key={x.k} type="button" className={'pt-shop' + (shop[x.k] ? ' is-on' : '') + (lag === x.k ? ' is-lag' : '')} onClick={() => tog(x.k)}><span><Icon name="check" size={18} /></span><b>{x.n}</b><span className="pt-shop-q"><small>{qty(x.g)}</small>{c !== null && <em>{eur(c)}</em>}</span></button>; })}
+                    {rows.map((x) => { const c = cost(x); return <div key={x.k} className={'pt-shop' + (shop[x.k] ? ' is-on' : '') + (lag === x.k ? ' is-lag' : '')}><button type="button" className="pt-shop-m" onClick={() => tog(x.k)}><span className="pt-shop-c"><Icon name="check" size={18} /></span><b>{x.n}</b><span className="pt-shop-q"><small>{qty(x.g)}</small>{c !== null && <em>{eur(c)}</em>}</span></button><button type="button" className="pt-shop-sc" aria-label={'Leggi il codice a barre: ' + x.n} onClick={() => { setWant(x.k); setView('scan'); }}><Icon name="barcode" size={20} /></button></div>; })}
                 </>}
         </Shell>
     );
