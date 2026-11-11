@@ -79,6 +79,7 @@ export const AuthShell = ({ step, title, sub, children, big, fit }) => (
 // Fermo se la pagina è nascosta o se il telefono chiede «riduci animazioni». Nessun dato, nessuna rete.
 const W = 90, H = 160, SPEED = 0.6;   // 1 = velocità originale
 const paint = (ctx, img, t) => {
+    const light = document.body.classList.contains('pt-light-bg');
     const d = img.data;
     let p = 0;
     for (let j = 0; j < H; j++) {
@@ -93,16 +94,22 @@ const paint = (ctx, img, t) => {
             const glow = (Math.sin(x * 2.4 + y * 1.6 + t * 0.35) + 1) * 0.5;  // chiazze lente di luce
             const m = (Math.sin(x * 3 + t * 0.2) + 1) * 0.5;                 // dal turchese al lavanda
             const L = k * 0.34 + glow * 0.07;
-            d[p++] = 22 + L * (110 + 60 * m);
-            d[p++] = 12 + L * (215 - 60 * m);
-            d[p++] = 51 + L * (210 + 40 * m);
+            if (light) {   // tema chiaro: lilla statico (#EFEAFF) con riflessi bianchi e chiazze appena più lilla
+                const w = Math.min(1, k * 0.9), s = glow * 0.5;
+                d[p++] = 239 + w * 16 - s * 22; d[p++] = 234 + w * 21 - s * 26; d[p++] = 255;
+            } else {
+                d[p++] = 22 + L * (110 + 60 * m);
+                d[p++] = 12 + L * (215 - 60 * m);
+                d[p++] = 51 + L * (210 + 40 * m);
+            }
             d[p++] = 255;
         }
     }
     ctx.putImageData(img, 0, 0);
 };
 
-export const Backdrop = () => {
+export const Backdrop = ({ light }) => {
+    React.useEffect(() => { document.body.classList.toggle('pt-light-bg', !!light); return () => document.body.classList.remove('pt-light-bg'); }, [light]);
     const ref = React.useRef(null);
     React.useEffect(() => {
         const cv = ref.current, ctx = cv && cv.getContext && cv.getContext('2d');

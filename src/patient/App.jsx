@@ -53,7 +53,7 @@ export default function App() {
     const showSkip = import.meta.env.DEV && ['welcome', 'consent', 'setup', 'unlock'].includes(stage);
     return (
         <main className="pt-app">
-            <Backdrop />
+            <Backdrop light={stage !== 'main' && stage !== 'demo' && stage !== 'boot'} />
             {stage === 'demo' && rt && <><Shell rt={rt} onRefresh={() => {}} onReconnect={() => {}} onLock={lock} onForget={lock} /></>}
             {stage === 'welcome' && <Welcome onStart={() => setStage('consent')} />}
             {stage === 'consent' && <Consent onContinue={(c) => { setConsent(c); setStage('setup'); }} />}

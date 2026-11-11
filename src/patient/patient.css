@@ -1742,8 +1742,7 @@ html:has(.pt-main), html:has(.hm2) { background: #EFEAFF; }
 /* Accesso (benvenuto, consensi, passphrase, collegamento): stesso tema chiaro dell'app */
 body:has(.pt-auth) { --ink: #0B0C0E; --paper: #EFEAFF; --surface: #fff; --soft: #DCD2FF; --line: rgba(11,12,14,.08); --muted: #6C727F; background: #EFEAFF; color: #0B0C0E; color-scheme: light; }
 html:has(.pt-auth) { background: #EFEAFF; }
-body:has(.pt-auth) .pt-bg { background: #EFEAFF !important; } body:has(.pt-auth) .pt-bg canvas { display: none !important; }
-body:has(.pt-auth) .pt-bg-v { background: radial-gradient(90% 40% at 50% 0%, rgba(255,255,255,.85), rgba(255,255,255,0) 100%) !important; }
+body:has(.pt-auth) .pt-bg { background: #EFEAFF !important; } body:has(.pt-auth) .pt-bg-v { background: radial-gradient(90% 40% at 50% 0%, rgba(255,255,255,.85), rgba(255,255,255,0) 100%) !important; }
 body:has(.pt-auth) .pt-auth-logo { color: #0B0C0E; }
 body:has(.pt-auth) .pt-feat li, body:has(.pt-auth) .pt-auth .pt-check, body:has(.pt-auth) .pt-auth .pt-input, body:has(.pt-auth) .pt-auth .pt-sas, body:has(.pt-auth) .pt-auth .pt-card, body:has(.pt-auth) .pt-auth .pt-note { background: #fff; border: 0; box-shadow: 0 4px 18px rgba(11,12,14,.05); color: #0B0C0E; }
 body:has(.pt-auth) .pt-auth .pt-sas { color: #0B0C0E; }
