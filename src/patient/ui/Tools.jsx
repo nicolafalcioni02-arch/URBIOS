@@ -99,6 +99,7 @@ const Facts = ({ i }) => {
     const top = [i.brand, f.qty, f.cat].filter(Boolean);
     return (
         <div className="pt-pf-i">
+            <h3>Scheda prodotto</h3>
             {(top.length > 0 || f.nova > 0) && <div className="pt-pf-h">{top.map((x) => <span key={x}>{x}</span>)}{f.nova > 0 && <span>NOVA {f.nova}</span>}</div>}
             {f.ns && <Logo kind="ns" v={f.ns} text={NS[f.ns]} />}
             {(i.kcal != null || rows.length > 0) && <dl><div className="is-k"><dt>Energia · 100 g</dt><dd>{i.kcal != null ? i.kcal + ' kcal' : '—'}</dd></div>{rows.map((r) => <div key={r[0]} className={r[0].startsWith('di cui') ? 'is-s' : ''}><dt>{r[0]}</dt><dd>{r[1]}</dd></div>)}</dl>}
