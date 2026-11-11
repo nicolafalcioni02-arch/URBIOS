@@ -1733,3 +1733,9 @@ body:has(.pt-main) .pt-sp-top:has(.pt-sh-row) button.pt-sc { margin-right: 4px; 
 /* Live: timer di recupero a centro schermo */
 .pt-live.pt-lv2 .pt-lb2 > .pt-rest-t { position: absolute; left: 0; right: 0; top: 50%; margin: 0; transform: translateY(calc(-50% - 5px)); z-index: 2; }
 .pt-live.pt-lv2.is-rest .pt-lb2 > .pt-live-row { position: absolute; left: 0; right: 0; top: calc(50% + 52px); margin: 0; justify-content: center; }
+
+/* Sfondo fino ai bordi dello schermo (anche sotto le barre di Safari): stesso colore dell'onda, chiaro nelle schermate chiare */
+html { background: #160C33; }
+html:has(.pt-main), html:has(.hm2) { background: #EFEAFF; }
+body { min-height: 100lvh; }
+.pt-bg { top: 0; left: 0; right: 0; bottom: auto; height: 100lvh; min-height: 100%; }
