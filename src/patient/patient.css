@@ -1614,3 +1614,11 @@ body:has(.pt-main) .pt-pf .pt-input, body:has(.pt-main) .pt-sc2-m .pt-input { bo
 .pt-shop .pt-shop-m > b { flex: 1; min-width: 0; }
 .pt-shop .pt-shop-q { margin-right: 4px; }
 .pt-shop .pt-shop-sc { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--u-lilla); color: var(--u-viola); cursor: pointer; }
+
+/* macro dei prodotti scansionati */
+.pt-mm { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+.pt-mm span { padding: 8px 14px; border-radius: 999px; background: #fff; box-shadow: 0 3px 14px rgba(11,12,14,.05); font-size: 13px; font-weight: 600; color: var(--u-grigio); } .pt-mm b { font-size: 16px; font-weight: 800; color: var(--u-ink); }
+
+/* macro dei prodotti scansionati */
+.pt-mm { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+.pt-mm span { padding: 8px 14px; border-radius: 999px; background: #fff; box-shadow: 0 3px 14px rgba(11,12,14,.05); font-size: 13px; font-weight: 600; color: var(--u-grigio); } .pt-mm b { font-size: 16px; font-weight: 800; color: var(--u-ink); }

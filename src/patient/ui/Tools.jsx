@@ -139,7 +139,7 @@ const PriceForm = ({ init, items, stores, pick, setPick, onSave }) => {
             <input className="pt-input" aria-label="Negozio" placeholder="Negozio" maxLength={40} value={store} onChange={(e) => setStore(e.target.value)} />
             {stores.length > 1 && <div className="pt-pf-s">{stores.map((x) => <button key={x} type="button" className={x === store ? 'is-on' : ''} onClick={() => setStore(x)}>{x}</button>)}</div>}
             <button type="button" className="pt-pf-k" aria-label="Voce della lista" onClick={() => setPick(true)}><Icon name="cart" size={20} /><b>{(items.find((x) => x.k === key) || {}).n || 'Fuori lista'}</b><Icon name="chev" size={18} /></button>
-            <button type="button" className="pt-cta" disabled={!ok} onClick={() => onSave(key, { ean: init.ean || '', name: name.trim(), store: store.trim(), price: Math.round(num(price) * 100) / 100, g: Math.round(num(g) || 0) })}>Salva</button>
+            <button type="button" className="pt-cta" disabled={!ok} onClick={() => onSave(key, { ean: init.ean || '', name: name.trim(), store: store.trim(), price: Math.round(num(price) * 100) / 100, g: Math.round(num(g) || 0), prod: init.ean && init.kcal != null ? { ean: init.ean, n: name.trim().slice(0, 80), br: init.brand || '', kcal: init.kcal, p: (init.info && init.info.pro) || 0, c: (init.info && init.info.carb) || 0, f: (init.info && init.info.fat) || 0 } : null })}>Salva</button>
             {init.info && <Facts i={init} />}
         </div>
     );
@@ -174,8 +174,11 @@ export const ShopSheet = ({ rt, docs, onClose }) => {
     const found = async (code) => { setView('load'); const p = await lookupEan(code); setView({ form: { ...(p || { ean: code, name: '', g: 0, miss: true }), k: want } }); };
     // ogni acquisto va nel registro; se corrisponde a una voce della lista, quella risulta anche presa
     const savePrice = async (k, rec) => {
+        const { prod, ...buy } = rec;
         await rt.log.update((l) => {
-            const t = toolsOf(l); t.buys = [{ id: Date.now(), k, ...rec, at: Date.now() }, ...arr(t.buys)].slice(0, 300);
+            const t = toolsOf(l); t.buys = [{ id: Date.now(), k, ...buy, at: Date.now() }, ...arr(t.buys)].slice(0, 300);
+            // il prodotto entra negli alimenti dell'app; se è collegato a una voce della dieta, quella parte da lui
+            if (prod) { t.prods[prod.ean] = prod; if (Object.keys(t.prods).length > 200) delete t.prods[Object.keys(t.prods)[0]]; if (k) t.links[k.split('|').slice(1).join('|')] = prod.ean; }
             if (k) t.shop[k] = 1;
             if (rec.store) t.stores = [rec.store, ...arr(t.stores).filter((x) => x !== rec.store)].slice(0, 5);
         });

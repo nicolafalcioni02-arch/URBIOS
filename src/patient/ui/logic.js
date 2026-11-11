@@ -93,7 +93,7 @@ export const currentWeek = (log, docId, weeks) => {
     return Math.max(0, weeks.length - 1);
 };
 // Strumenti del paziente nel diario (visita, appunti, spesa): crea i campi se mancano (anche nella modalità prova)
-export const toolsOf = (log) => { const x = log.tools || (log.tools = {}); if (!Array.isArray(x.notes)) x.notes = []; if (!x.shop) x.shop = {}; if (x.visit === undefined) x.visit = null; if (x.dietDay === undefined) x.dietDay = null; if (!x.cfg) x.cfg = { days: 7, people: 1 }; return x; };
+export const toolsOf = (log) => { const x = log.tools || (log.tools = {}); if (!Array.isArray(x.notes)) x.notes = []; if (!x.shop) x.shop = {}; if (x.visit === undefined) x.visit = null; if (x.dietDay === undefined) x.dietDay = null; if (!x.cfg) x.cfg = { days: 7, people: 1 }; if (!x.prods) x.prods = {}; if (!x.links) x.links = {}; return x; };
 
 // Riepilogo di fine allenamento: kg sollevati (kg × ripetizioni prescritte, 10 se non indicate), confronto con l'ultima volta e nuovi record
 export const repsNum = (s) => { const m = /\d+/.exec(String(s || '')); return m ? +m[0] : 10; };
@@ -114,3 +114,10 @@ export const workoutSummary = (log, docId, w, d, list, date = ymd()) => {
 export const HYPE_START = ['Spingi al massimo e divertiti!', 'Oggi si va forte: dai che ci siamo!', 'Un esercizio alla volta. Tu ce la fai!', 'Scalda i muscoli: si parte!'];
 export const HYPE_BACK = ['Si riparte da dove eri: ottimo!', 'Bentrovati in palestra: continuiamo!'];
 export const HYPE_END = ['Grande lavoro, oggi hai fatto la differenza!', 'Un allenamento in più nel tuo diario: bravissimo!', 'Costanza e impegno: i risultati arrivano così!', 'Ce l\'hai fatta. Ora riposa e recupera!'];
+
+// Macro (proteine, carboidrati, grassi) delle voci che arrivano da un prodotto scansionato: `mm` è per 100 g, `g` i grammi mangiati.
+export const macrosOf = (list) => arr(list).reduce((t, e) => (e && e.mm ? { p: t.p + (e.mm.p || 0) * e.g / 100, c: t.c + (e.mm.c || 0) * e.g / 100, f: t.f + (e.mm.f || 0) * e.g / 100, n: t.n + 1 } : t), { p: 0, c: 0, f: 0, n: 0 });
+export const dayMacros = (log, date) => {
+    const l = []; Object.entries(log.meals || {}).forEach(([k, r]) => { if (k.endsWith('|' + date)) l.push(...arr(r.list)); });
+    l.push(...arr((log.extras || {})[date])); return macrosOf(l);
+};

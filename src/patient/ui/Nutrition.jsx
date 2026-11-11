@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Icon, Lst, Count } from './bits.jsx';
 import { Ring } from './Schede.jsx';
 import { KcalWeek, MealsWeek } from './Progress.jsx';
-import { arr, mealKcal, mealKey, ymd, fmtDay, dietDayToday, toolsOf } from './logic.js';
+import { arr, mealKcal, mealKey, ymd, fmtDay, dietDayToday, toolsOf, dayMacros } from './logic.js';
 
 
 const lastDays = (n) => Array.from({ length: n }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return ymd(d.getTime()); });
@@ -58,6 +58,7 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
     if (!doc || !doc.body) return <><header className="pt-top"><b className="pt-hi">Nutrizione</b></header><div className="pt-empty">Nessuna dieta ricevuta ancora.</div></>;
     const days = arr(doc.body.giorni), log = rt.log.get(), date = ymd(), di = di0 ?? dietDayToday(log, cur, days), day = days[Math.min(di, days.length - 1)], meals = arr(day.pasti);
     const o = doc.body.obiettivo, target = (o && o.kcal) || meals.reduce((t, m) => t + mealKcal(m), 0), eaten = dayKcal(log, date);
+    const tl = toolsOf(log), dm = dayMacros(log, date);
     const pct = target ? Math.min(100, Math.round(eaten / target * 100)) : 0;
     return (
         <div className="pt-sp">
@@ -75,11 +76,12 @@ export const Nutrition = ({ rt, id, onMeal, onExtra }) => {
             <div className="pt-sp-bot pt-td-bot"><svg className="pt-td-wave" viewBox="0 0 400 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30V15C40 -3 90 -3 135 13S230 31 275 14 360 -2 400 12V30Z" fill="#fff" /></svg><div className="pt-sp-scroll">
                 {docs.length > 1 && <div className="pt-seg3">{docs.map((x, i) => <button key={x.docId} type="button" className={x.docId === cur ? 'is-on' : ''} onClick={() => { setCur(x.docId); setDi(null); }}>Dieta {i + 1}</button>)}</div>}
                 {days.length > 1 && <div className="pt-seg3">{days.map((x, i) => <button key={i} type="button" className={i === di ? 'is-on' : ''} onClick={() => { setDi(i); rt.log.update((l) => { toolsOf(l).dietDay = { date: ymd(), docId: cur, d: i }; }); }}>{dayName(x.titolo)}</button>)}</div>}
+                {dm.n > 0 && <div className="pt-mm" aria-label="Macro dei prodotti di oggi"><span><b>{Math.round(dm.p)}</b> g proteine</span><span><b>{Math.round(dm.c)}</b> g carboidrati</span><span><b>{Math.round(dm.f)}</b> g grassi</span></div>}
                 {meals.map((m, i) => {
                     const rec = log.meals[mealKey(cur, di, i, date)];
                     return (
                         <button key={i} type="button" className={'pt-ml' + (rec ? ' is-done' : '')} onClick={() => onMeal({ docId: cur, d: di, m: i })}>
-                            <span className="pt-ml-t"><b>{m.nome}</b><small>{arr(m.voci).map((v) => v.n).join(', ')}</small></span>
+                            <span className="pt-ml-t"><b>{m.nome}</b><small>{(rec && rec.list ? rec.list.map((v) => v.n) : arr(m.voci).map((v) => { const pr = tl.prods[tl.links[v.n]]; return pr ? pr.n : v.n; })).join(', ')}</small></span>
                             <span className="pt-ml-k"><b>{rec ? rec.kcal : mealKcal(m)}</b> <small>kcal</small></span>
                             <span className={'pt-ml-ck' + (rec ? ' is-on' : '')}><Icon name={rec ? 'check' : 'plus'} size={18} /></span>
                         </button>

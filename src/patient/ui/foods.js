@@ -21,3 +21,6 @@ export const findFoods = (list, q, max = 6) => {
 // Alimento non trovato: stima prudente per categoria, scelta dal paziente.
 export const GENERIC = [{ n: 'Piatto di verdure', k: 40 }, { n: 'Piatto di carne o pesce', k: 180 }, { n: 'Piatto di pasta o riso', k: 160 }, { n: 'Dolce', k: 380 }, { n: 'Snack salato', k: 450 }];
 
+
+// Prodotti scansionati dal paziente (Spesa): valgono come alimenti, con i macro per 100 g, e compaiono per primi nella ricerca.
+export const prodFoods = (prods) => Object.values(prods || {}).filter((x) => x && x.n).map((x) => ({ n: x.br ? x.n + ' · ' + x.br : x.n, k: x.kcal || 0, f: true, mm: { p: x.p || 0, c: x.c || 0, f: x.f || 0 }, prod: true }));
