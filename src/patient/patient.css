@@ -1491,3 +1491,6 @@ body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-ross
 .pt-ruler-t { background-image: repeating-linear-gradient(90deg, var(--u-ink) 0 1.5px, transparent 1.5px 80px), repeating-linear-gradient(90deg, var(--u-grigio) 0 1.5px, transparent 1.5px 40px), repeating-linear-gradient(90deg, var(--u-lilla-2) 0 1.5px, transparent 1.5px 8px); background-size: 100% 28px, 100% 20px, 100% 13px; background-position: -.75px 10px, -.75px 10px, -.75px 10px; background-repeat: repeat-x; }
 .pt-ruler-t span { top: 46px; }
 .pt-ruler-i { top: 6px; bottom: auto; height: 36px; z-index: 1; }
+/* righello: il trascinamento orizzontale lo gestisce il codice (dito e mouse); la pagina resta scorrevole in verticale */
+.pt-ruler-s { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+.pt-ruler-s.is-drag { cursor: grabbing; scroll-behavior: auto; }
