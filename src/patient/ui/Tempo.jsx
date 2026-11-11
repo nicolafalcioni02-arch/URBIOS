@@ -31,6 +31,10 @@ export const TempoBar = ({ tempo, run, dark }) => {
             steps.push(`${r(x)}% { left: ${r(x)}%; top: ${r(y)}%; }`);
         }
     }
+    // un blocco per ogni secondo di ogni fase (almeno uno): la barra si «riempie» al passaggio del pallino
+    const blocks = [];
+    tempo.forEach((x, i) => { const n = Math.max(1, Math.round(w[i])); for (let k = 0; k < n; k++) blocks.push({ k: blocks.length, i, g: w[i] / n, at: f[i] + (f[i + 1] - f[i]) * k / n }); });
+    const bk = blocks.map((b) => `@keyframes ${name}b${b.k} { 0%, ${r(b.at * 100)}% { opacity: .3; } ${r(Math.min(99.9, b.at * 100 + 0.1))}%, 100% { opacity: 1; } }`).join(' ');
     return (
         <div className={'pt-tb pt-tg' + (dark ? ' is-dark' : '')} role="img" aria-label={`Tempi: giù ${tempo[0]}, fermo ${tempo[1]}, su ${tempo[2]}, fermo ${tempo[3]} secondi`}>
             <div className="pt-tg-in">
@@ -40,9 +44,11 @@ export const TempoBar = ({ tempo, run, dark }) => {
                     <path d="M0 0H100M0 100H100" className="g" />
                     {[0, 1, 2, 3].map((i) => <path key={i} d={seg(i)} className={'l l' + i} />)}
                 </svg>
-                {run && <><style>{`@keyframes ${name} { ${steps.join(' ')} }`}</style><i className="pt-tg-c" style={{ animationName: name, '--tb': total + 's' }} /></>}
+                {run && <><style>{`@keyframes ${name} { ${steps.join(' ')} } ${bk}`}</style><i className="pt-tg-c" style={{ animationName: name, '--tb': total + 's' }} /></>}
             </div>
-            <div className="pt-tg-t" style={{ '--w': W }} aria-hidden="true" />
+            <div className="pt-tg-b" aria-hidden="true">
+                {blocks.map((b) => <i key={b.k} className={'b' + b.i} style={{ flexGrow: b.g, ...(run ? { animationName: name + 'b' + b.k, '--tb': total + 's' } : null) }} />)}
+            </div>
             <div className="pt-tb-n">
                 {tempo.map((x, i) => <span key={i} className={'n' + i} style={{ flexGrow: w[i] }}>{i === 0 && <Icon name="down" size={12} />}{i === 2 && <Icon name="send" size={12} />}{x}</span>)}
             </div>

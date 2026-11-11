@@ -1472,3 +1472,12 @@ body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-ross
 .pt-tg .pt-tg-t { position: relative; height: 8px; margin: 14px 8px 0; border-right: 1.5px solid var(--tb-b); background-image: linear-gradient(90deg, var(--tb-b) 1.5px, transparent 1.5px); background-size: calc(100% / var(--w)) 100%; background-repeat: repeat-x; }
 .pt-tg .pt-tg-t::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1.5px; background: var(--tb-b); }
 .pt-tg .pt-tb-n { gap: 0; margin-top: 6px; } .pt-tg .pt-tb-n span { flex-basis: 0; font-size: 15px; font-weight: 800; }
+/* barra dei secondi a blocchi: un blocco per secondo, colore della fase, si accende al passaggio del pallino */
+.pt-tg .pt-tg-t { display: none; }
+.pt-tg .pt-tg-b { display: flex; gap: 4px; height: 10px; margin: 14px 8px 0; }
+.pt-tg .pt-tg-b i { flex-basis: 0; min-width: 6px; border-radius: 5px; background: var(--tb-b); }
+.pt-tg .pt-tg-b i.b0 { background: var(--tb-a); } .pt-tg .pt-tg-b i.b2 { background: var(--tb-c); }
+.pt-tg .pt-tg-b i[style*="animation-name"] { animation-duration: var(--tb); animation-timing-function: step-end; animation-iteration-count: infinite; }
+.pt-tg.is-paused .pt-tg-b i, .pt-lv2.is-paused .pt-tg-b i { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .pt-tg .pt-tg-b i { animation: none !important; opacity: 1; } }
+.pt-tg .pt-tb-n { margin-top: 8px; }
