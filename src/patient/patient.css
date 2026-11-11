@@ -1644,3 +1644,9 @@ body:has(.pt-main) .pt-shop-r .pt-step { justify-content: space-between; padding
 body:has(.pt-main) .pt-shop-r .pt-step button { width: 36px; height: 36px; flex: none; }
 body:has(.pt-main) .pt-shop-r .pt-step > .pt-step-v.pt-step-v.pt-step-v { flex: 1 1 auto; width: auto; min-width: 30px; height: 36px; min-height: 36px; display: grid; place-items: center; padding: 0; }
 body:has(.pt-main) .pt-shop-r .pt-step b { min-width: 0; font-size: 18px; line-height: 1; }
+body:has(.pt-main) .pt-shop-r { gap: 8px; }
+body:has(.pt-main) .pt-shop-r > span { gap: 6px; }
+body:has(.pt-main) .pt-shop-r .pt-shop-bc { width: 44px; height: 44px; }
+body:has(.pt-main) .pt-shop-r .pt-step { padding: 3px; overflow: hidden; }
+body:has(.pt-main) .pt-shop-r .pt-step button { width: 34px; height: 34px; }
+body:has(.pt-main) .pt-shop-r .pt-step > .pt-step-v.pt-step-v.pt-step-v { min-width: 24px; height: 34px; min-height: 34px; }
