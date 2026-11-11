@@ -1453,3 +1453,18 @@ body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-ross
 .pt-tg .pt-tg-in { height: 84px; margin-top: 12px; }
 .pt-tg.is-dark { --tb-b: rgba(255,255,255,.38); }
 .pt-xc-x .pt-tg .pt-tg-in { height: 56px; }
+
+/* tempo a grafico, seconda versione: curva morbida, area sfumata, pallino con alone */
+.pt-tg { padding: 14px 16px 12px; border-radius: 24px; background: var(--u-lilla); }
+.pt-tg.is-dark { background: rgba(255,255,255,.07); }
+.pt-tg .pt-tg-in { height: 96px; margin: 6px 8px 0; }
+.pt-tg-in > svg path { vector-effect: non-scaling-stroke; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.pt-tg-in > svg path.g { stroke: var(--tb-b); stroke-width: 1; stroke-dasharray: 2 5; opacity: .7; }
+.pt-tg-in > svg path.l { stroke-width: 5; stroke: var(--tb-b); } .pt-tg-in > svg path.l0 { stroke: var(--tb-a); } .pt-tg-in > svg path.l2 { stroke: var(--tb-c); }
+.pt-tg.is-dark { --tb-a: #A998FF; --tb-b: rgba(255,255,255,.4); }
+.pt-tg-c { width: 18px; height: 18px; background: #fff; box-shadow: 0 0 0 5px rgba(255,255,255,.2), 0 0 18px 4px var(--tb-c), 0 2px 6px rgba(0,0,0,.3); }
+.pt-tg:not(.is-dark) .pt-tg-c { background: var(--u-ink); box-shadow: 0 0 0 5px rgba(107,61,255,.18), 0 0 14px 2px var(--tb-a), 0 2px 6px rgba(0,0,0,.25); }
+.pt-tg .pt-tb-n { margin: 10px 8px 0; } .pt-tg .pt-tb-n span { font-size: 13px; color: var(--tb-b); }
+.pt-tg.is-dark .pt-tb-n span { color: rgba(255,255,255,.6); } .pt-tg .pt-tb-n .n0, .pt-tg .pt-tb-n .n2 { color: var(--tb-k); }
+.pt-tg.is-dark .pt-tb-n .n0 { color: #C9BEFF; } .pt-tg.is-dark .pt-tb-n .n2 { color: var(--u-lime); }
+.pt-xc-x .pt-tg .pt-tg-in { height: 64px; }
