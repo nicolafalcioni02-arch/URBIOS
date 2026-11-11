@@ -132,7 +132,7 @@ const PriceForm = ({ init, items, stores, onSave, onBack }) => {
             </div>
             <input className="pt-input" aria-label="Negozio" placeholder="Negozio" maxLength={40} value={store} onChange={(e) => setStore(e.target.value)} />
             {stores.length > 1 && <div className="pt-pf-s">{stores.map((x) => <button key={x} type="button" className={x === store ? 'is-on' : ''} onClick={() => setStore(x)}>{x}</button>)}</div>}
-            <select className="pt-input" aria-label="Voce della lista" value={key} onChange={(e) => setKey(e.target.value)}><option value="">Nessuna voce</option>{items.map((x) => <option key={x.k} value={x.k}>{x.n}</option>)}</select>
+            <div className="pt-pf-l" role="group" aria-label="Voce della lista">{[...items].sort((a, b) => (b.k === key) - (a.k === key)).map((x) => <button key={x.k} type="button" aria-pressed={x.k === key} className={x.k === key ? 'is-on' : ''} onClick={() => setKey(x.k === key ? '' : x.k)}>{x.n}</button>)}</div>
             <button type="button" className="pt-cta" disabled={!ok} onClick={() => onSave(key, { ean: init.ean || '', name: name.trim(), store: store.trim(), price: Math.round(num(price) * 100) / 100, g: Math.round(num(g) || 0) })}>Salva</button>
             {init.info && <Facts i={init} />}
         </div>
