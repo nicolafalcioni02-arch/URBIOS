@@ -70,6 +70,8 @@ export const dayStatus = (log, docId, w, d, day) => {
     if (part) return { state: 'part', date: partDate, done: part, tot };
     return { state: 'todo', done: 0, tot };
 };
+// Data della seduta da usare: se l'allenamento è iniziato (ieri o l'altro ieri) si riprende quella, altrimenti oggi.
+export const sessionDate = (log, docId, w, d, day) => { const st = dayStatus(log, docId, w, d, day); return st.state === 'part' ? st.date : ymd(); };
 // Settimana da mostrare: la prima con almeno un allenamento non fatto (altrimenti l'ultima).
 export const currentWeek = (log, docId, weeks) => {
     for (let w = 0; w < weeks.length; w++) if (arr(weeks[w].giorni).some((day, d) => dayStatus(log, docId, w, d, day).state !== 'done')) return w;
@@ -87,8 +89,9 @@ export const workoutSummary = (log, docId, w, d, list, date = ymd()) => {
     const prevVol = olds.length ? Math.round(volOf(log.sessions[olds[olds.length - 1]], list)) : null;
     const records = [];
     list.forEach((e) => {
-        const h = arr(log.hist[e.name]), today = h.find((x) => x.date === date), prev = h.filter((x) => x.date !== date).flatMap((x) => arr(x.sets).map((s) => s.kg)).filter(Number.isFinite);
-        const top = today ? Math.max(0, ...arr(today.sets).map((s) => s.kg).filter(Number.isFinite)) : 0;
+        // una seduta ripresa ha serie in due giorni (quello d'inizio e oggi): contano entrambi come «questa seduta»
+        const h = arr(log.hist[e.name]), mine = (x) => x.date === date || x.date === ymd(), prev = h.filter((x) => !mine(x)).flatMap((x) => arr(x.sets).map((s) => s.kg)).filter(Number.isFinite);
+        const top = Math.max(0, ...h.filter(mine).flatMap((x) => arr(x.sets).map((s) => s.kg)).filter(Number.isFinite));
         if (prev.length && top > Math.max(...prev)) records.push({ name: e.name, kg: top });
     });
     return { vol, prevVol, records, sets: Object.values((cur && cur.sets) || {}).reduce((t, a) => t + arr(a).length, 0) };

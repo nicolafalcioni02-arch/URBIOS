@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { Icon } from './bits.jsx';
 import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
-import { arr, estMinutes, parseSets, parseRest, sessionKey, daySets, suggestLoad, fmtKg, fmtDay, ymd, dayStatus } from './logic.js';
+import { arr, estMinutes, parseSets, parseRest, sessionKey, daySets, suggestLoad, fmtKg, fmtDay, ymd, dayStatus, sessionDate } from './logic.js';
 
 const TONES = ['#BDB2FF', '#F8A8D8', '#A0E7E5', '#FFF3B0', '#C5E1A5'];
 
@@ -37,7 +37,7 @@ export const TrainDetail = ({ rt, id, w0 = 0, d0 = 0, onBack, onStart }) => {
     if (!doc || !doc.body) return null;
     const weeks = arr(doc.body.settimane), wk = weeks[Math.min(w, weeks.length - 1)], days = arr(wk && wk.giorni), day = days[Math.min(d, days.length - 1)];
     if (!day) return null;
-    const log = rt.log.get(), st = dayStatus(log, id, w, d, day), key = sessionKey(id, w, d), sess = (log.sessions[key] || {}).sets || {};
+    const log = rt.log.get(), st = dayStatus(log, id, w, d, day), key = sessionKey(id, w, d, sessionDate(log, id, w, d, day)), sess = (log.sessions[key] || {}).sets || {};
     const exs = arr(day.esercizi), tot = daySets(day), done = Object.values(sess).reduce((t, a) => t + a.length, 0), pct = tot ? Math.min(1, done / tot) : 0;
     const pick = (fn) => (n) => { setOpen(null); fn(n); };
     return (

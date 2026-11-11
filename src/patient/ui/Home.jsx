@@ -47,8 +47,8 @@ export const Home = ({ rt, onNav, onAct, onReconnect }) => {
                     <div className="hm2-next">
                         <span className="hm2-k">{hero.st.state === 'done' ? 'Ultimo allenamento' : hero.st.state === 'part' ? 'Allenamento iniziato' : 'Prossimo allenamento'}</span>
                         <Clamp as="b" lines={2} title="Allenamento" text={hero.day.titolo} className={hero.day.titolo.length > 18 ? 'is-long' : ''} />
-                        <span className="hm2-s">{arr(hero.day.esercizi).length} esercizi, circa {estMinutes(hero.day)} min</span>
-                        <button type="button" className="hm2-go" onClick={() => onNav({ name: 'train', id: hero.meta.docId, w: hero.w, d: hero.di })}>{hero.st.state === 'part' ? 'Riprendi' : 'Inizia'} <Icon name="arrow" size={18} /></button>
+                        <span className="hm2-s">{hero.st.state === 'part' && daysTo(hero.st.date) < 0 ? (daysTo(hero.st.date) === -1 ? 'Iniziato ieri · scade domani' : "Iniziato l'altro ieri · scade oggi") : `${arr(hero.day.esercizi).length} esercizi, circa ${estMinutes(hero.day)} min`}</span>
+                        <button type="button" className="hm2-go" onClick={() => onNav({ name: hero.st.state === 'part' ? 'live' : 'train', id: hero.meta.docId, w: hero.w, d: hero.di })}>{hero.st.state === 'part' ? 'Riprendi' : 'Inizia'} <Icon name="arrow" size={18} /></button>
                     </div>
                 ) : hasDiet ? (
                     <div className="hm2-next">

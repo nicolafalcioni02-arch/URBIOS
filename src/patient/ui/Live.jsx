@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './bits.jsx';
 import { UrbiosLogo } from '../../brand/UrbiosLogo.jsx';
 import { Clamp } from './Clamp.jsx';
-import { arr, mmss, parseSets, parseRest, sessionKey, suggestLoad, fmtDay, fmtKg, ymd, workoutSummary, HYPE_END } from './logic.js';
+import { shareSummary } from './summaryPdf.js';
+import { arr, mmss, parseSets, parseRest, sessionKey, suggestLoad, fmtDay, fmtKg, ymd, workoutSummary, sessionDate, HYPE_END } from './logic.js';
 
 // Allenamento guidato, un esercizio alla volta. Ogni serie fatta (carico, RPE, nota) si salva SUBITO sul telefono, anche senza rete.
 // Non c'è video né calorie consumate: non fanno parte di ciò che il professionista invia. Il diario resta qui.
@@ -34,7 +35,8 @@ export const Live = ({ rt, id, w, d, onExit }) => {
         const s = parseSets(e.serie);
         return { name: e.nome, n: s.n, reps: s.reps, rest: parseRest(e.rec), kg0: parseFloat(String(e.carico).replace(',', '.')) || 0, note: e.note, rpe: e.rpe, tempo: e.tempo, pct: e.pct, ss: e.ss };
     }), [day]);
-    const key = sessionKey(id, w, d);
+    const sDate = useRef(sessionDate(rt.log.get(), id, w, d, day)).current;   // fissata all'apertura: la chiave non salta a metà seduta
+    const key = sessionKey(id, w, d, sDate);
     const sugOf = (i) => (list[i] ? suggestLoad(rt.log.get().hist, list[i].name, list[i].kg0) : null);
     const kgOf = (i) => { const s = sugOf(i); return s ? s.kg : (list[i] ? list[i].kg0 : 0); };
     const doneOf = (i) => ((rt.log.get().sessions[key] || {}).sets || {})[i] || [];
@@ -50,6 +52,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     const [paused, setPaused] = useState(false), [listOpen, setListOpen] = useState(false), [fin, setFin] = useState(false), [kg, setKg] = useState(() => kgOf(start.ex));
     const [rpe, setRpe] = useState(null), [note, setNote] = useState(''), [tab, setTab] = useState('oggi');
     const [hype, setHype] = useState(null);
+    const [sumBusy, setSumBusy] = useState(false), [sumMsg, setSumMsg] = useState('');
     useEffect(() => { if (!hype) return undefined; const t = setTimeout(() => setHype(null), 3200); return () => clearTimeout(t); }, [hype]);
     const [lastRpe, setLastRpe] = useState(null);                 // RPE della serie appena fatta (si cambia durante il riposo)
     const total = useRef(0), ac = useRef(null), lastSet = useRef(null);
@@ -129,8 +132,13 @@ export const Live = ({ rt, id, w, d, onExit }) => {
     };
     const skipEx = () => { setPaused(false); if (!nextEx(ex)) setFin(true); };
 
+    const sendSummary = async () => {
+        if (sumBusy) return; setSumBusy(true); setSumMsg('');
+        try { const r = await shareSummary(rt); setSumMsg(r === 'saved' ? 'PDF salvato nei file' : r === 'shared' ? 'Riassunto inviato' : ''); } catch (e) { setSumMsg('Non sono riuscito a creare il PDF'); }
+        setSumBusy(false);
+    };
     if (fin) {
-        const sm = workoutSummary(rt.log.get(), id, w, d, list), diff = sm.prevVol != null ? sm.vol - sm.prevVol : null;
+        const sm = workoutSummary(rt.log.get(), id, w, d, list, sDate), diff = sm.prevVol != null ? sm.vol - sm.prevVol : null;
         const msg = HYPE_END[(sm.vol + sm.sets) % HYPE_END.length];
         return (
             <div className="pt-live pt-win">
@@ -142,6 +150,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 {sm.records.slice(0, 2).map((r) => <span key={r.name} className="pt-win-r">Nuovo record: {r.name}, {r.kg} kg</span>)}
                 <p>{msg}</p>
                 <button type="button" className="pt-cta" onClick={() => onExit(true)}>Torna alla dashboard</button>
+                <button type="button" className="pt-win-sum" disabled={sumBusy} onClick={sendSummary}>{sumBusy ? 'Creo il PDF…' : sumMsg || 'Invia il riassunto'}</button>
             </div>
         );
     }

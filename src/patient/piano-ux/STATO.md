@@ -7,7 +7,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-00 Base: l'app funziona senza rete | fatto (runtime da provare, vedi blocco) |
 | UX-01 Live: tempi veri, schermo acceso, RPE dopo la serie | fatto (wake lock/audio da provare, vedi blocco) |
 | UX-02 Live: schermata leggibile | fatto |
-| UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | da fare |
+| UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
 | UX-04 Dieta: il giorno di oggi | da fare |
 | UX-05 Coerenza grafica e Profilo | da fare |
 
@@ -48,3 +48,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare su iPhone: nulla di specifico (solo aspetto).
 - Scelte fatte: nel demo «Piegamenti» ha uno storico finto (42,5 kg), quindi parte da lì e non da «Corpo libero»: ho provato il caso svuotando lo storico da console (compare «Corpo libero», + dà «2,5 kg»). Il nome `.pt-last` era già usato (pillola lilla): la nuova classe è `.pt-lastrow`. Gruppi separati da « · », oltre i due gruppi «…».
 - Attenzione per chi viene dopo: `lastT`/`lastG` in `Live.jsx` (ultima seduta ≠ oggi); classe `.pt-lastrow`; regole in fondo a `patient.css` sotto `/* UX-02 */`.
+
+## UX-03 — fatto il 11/11/2026
+- File toccati: `ui/logic.js`, `ui/TrainDetail.jsx`, `ui/Live.jsx`, `ui/Home.jsx`, `ui/Shell.jsx`, `App.jsx`, `patient.css` (solo in fondo), `README.md`, `MIGLIORIE.md`, questo file.
+- Cosa vede di diverso il paziente: un allenamento lasciato a metà ieri o l'altro ieri si riprende davvero (stessa seduta, stesse serie); la Home dice «Iniziato ieri · scade domani» / «Iniziato l'altro ieri · scade oggi» e «Riprendi» apre subito Live; dopo il blocco si rientra in Live; a fine allenamento c'è «Invia il riassunto» (testo, secondario).
+- Verificato in browser (375×812, `?prova`): «Fatto quando» 1-10 (riga di scadenza e Home senza scorrimento; Riprendi → Live alla terza serie da 05:00; chiave di ieri con 3 serie, nessuna chiave di oggi, storico di oggi con 1 serie; dettaglio «3/14» e «RIPRENDI ALLENAMENTO»; fine con kg > 0 e 14 serie, poi prossimo «Upper body»; `mk(2)`; `mk(3)` torna «Inizia»; flusso normale con riga «4 esercizi, circa 18 min»; uscita da Live → Home; riassunto «Creo il PDF…» → «PDF salvato nei file», nessun errore, 812 px senza scorrimento, `?lungo` senza overflow; `test:connect` 102/102). Il punto 11 (screenshot): Home, finale e `?lungo` fatti; screenshot del dettaglio non salvato, solo testo («3/14»).
+- Da provare su iPhone: rientro in Live dopo blocco e passphrase (in prova non c'è passphrase: verificato solo per lettura che `Shell` funzioni senza `initial`/`onWhere`); foglio di condivisione dalla schermata finale; allenamento a cavallo della mezzanotte.
+- Scelte fatte: nessuna deviazione dal brief. Limiti accettati: una seduta ripresa e finita risulta «fatta» alla data d'inizio; «Costanza» conta il giorno d'inizio.
+- Attenzione per chi viene dopo: `sessionDate` in `logic.js`; `sDate` in `Live.jsx`; `workoutSummary` 6° argomento = data della seduta; `Shell` prende `initial`/`onWhere`, `App.jsx` ha `resume` (useRef); classe `.pt-win-sum`.

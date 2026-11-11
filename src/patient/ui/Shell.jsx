@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Icon } from './bits.jsx';
 import { Home } from './Home.jsx';
 import { Schede } from './Schede.jsx';
@@ -13,10 +13,13 @@ import { nextMeal } from './logic.js';
 const TABS = [['home', 'Home', 'home'], ['diet', 'Dieta', 'apple'], ['train', 'Schede', 'dumbbell'], ['me', 'Profilo', 'user']];
 
 // Struttura dell'app paziente: 4 tab con dock a capsula, dettaglio scheda, allenamento guidato, dieta e registro pasto.
-export const Shell = ({ rt, onRefresh, onReconnect, onLock, onForget }) => {
-    const [tab, setTab] = useState('home'), [sub, setSub] = useState(null), [sheet, setSheet] = useState(null);
+export const Shell = ({ rt, onRefresh, onReconnect, onLock, onForget, initial, onWhere }) => {
+    // dopo il blocco si rientra nell'allenamento (se lasciato da meno di 30 minuti e il piano esiste ancora)
+    const [tab, setTab] = useState('home'), [sub, setSub] = useState(() => (initial && initial.name === 'live' && Date.now() - initial.at < 30 * 60000 && rt.docs.get(initial.id) ? initial : null)), [sheet, setSheet] = useState(null);
     const go = (t) => { setTab(t); setSub(null); };
     const nav = (n) => { if (n.name === 'diet') { setTab('diet'); setSub({ name: 'diet', id: n.id }); } else setSub(n); };
+    // il puntatore sta solo in memoria (useRef in App): mai salvato; niente pulizia, così sopravvive al blocco
+    useEffect(() => { if (onWhere) onWhere(sub && sub.name === 'live' ? { name: 'live', id: sub.id, w: sub.w, d: sub.d, at: Date.now() } : null); }, [sub]);
     if (sub && sub.name === 'live') return <Live rt={rt} id={sub.id} w={sub.w} d={sub.d} onExit={(done) => { setSub(null); if (done) setTab('home'); }} />;
     const docs = rt.docs.list();
     const act = (k) => {

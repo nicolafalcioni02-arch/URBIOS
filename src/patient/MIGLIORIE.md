@@ -16,8 +16,5 @@ Note prese passando le schermate. Palette attuale: sfondo lilla `#EFEAFF`, accen
 - Contrasto: testi grigi (#6C727F) piccoli su lilla chiaro, controllare la leggibilità.
 
 ## UX
-- Il riassunto PDF ora sta solo in Impostazioni: potrebbe servire un rimando dalla Home dopo ogni allenamento o a fine settimana.
 - Pasti e kcal usano sempre il primo giorno della dieta: serve il giorno davvero in corso.
-- Un allenamento iniziato scade dopo 2 giorni: avvisare il paziente prima che sparisca.
-- Dopo "Invia riassunto" non c'è conferma duratura: valutare un messaggio in pagina.
 - Le reps non vengono salvate, quindi non compaiono nel PDF.

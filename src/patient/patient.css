@@ -1056,3 +1056,6 @@ body:has(.pt-main) .pt-ab .pt-credits, body:has(.pt-main) .pt-ab-f { color: #6C7
 .pt-lastrow { margin: 0 0 12px; font-size: 15px; line-height: 1.4; color: #0B0C0E; overflow-wrap: anywhere; } .pt-lastrow span { color: #6C727F; } .pt-lastrow b { font-weight: 700; }
 .pt-grid .pt-big.is-rest b { white-space: nowrap; }
 .pt-pause-c .pt-btn.ghost { color: #fff; border-color: rgba(255,255,255,.28); }
+
+/* UX-03: riassunto a fine allenamento, azione secondaria */
+.pt-win-sum { flex: none; min-height: 44px; margin-top: 12px; padding: 0 16px; border: 0; background: none; color: rgba(255,255,255,.7); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; overflow-wrap: anywhere; } .pt-win-sum:disabled { opacity: 1; cursor: default; }

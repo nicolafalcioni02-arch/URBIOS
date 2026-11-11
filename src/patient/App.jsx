@@ -36,7 +36,7 @@ export default function App() {
     const [rt, setRt] = useState(null);
     const [consent, setConsent] = useState(null);
     const [, bump] = useReducer((x) => x + 1, 0);
-    const rtRef = useRef(null);
+    const rtRef = useRef(null), resume = useRef(null);   // dove eri (solo in memoria, mai salvato): serve a rientrare in Live dopo il blocco
 
     useEffect(() => { if (PROVA) { setRt(createDemoRuntime({ onChange: bump })); setView({ name: 'home' }); setStage('demo'); return; } hasVault(kv).then((v) => setStage(v ? 'unlock' : 'welcome')).catch(() => setStage('consent')); }, []);
     const open = async (master, c) => {
@@ -62,10 +62,10 @@ export default function App() {
                 onForgot={() => setView({ name: 'forgot' })} />}
             {stage === 'unlock' && view.name === 'forgot' && (
                 <Note tone="warn">Senza la passphrase i dati non si possono recuperare. Puoi cancellare questa app e ricollegarti al professionista, che ti invierà di nuovo i piani.
-                    <div className="pt-btns"><button type="button" className="pt-btn danger" onClick={async () => { for (const k of ['vault', 'identity', 'state', 'anchor']) await kv.delete(k); setView({ name: 'home' }); setStage('welcome'); }}>Cancella e ricomincia</button></div></Note>
+                    <div className="pt-btns"><button type="button" className="pt-btn danger" onClick={async () => { resume.current = null; for (const k of ['vault', 'identity', 'state', 'anchor']) await kv.delete(k); setView({ name: 'home' }); setStage('welcome'); }}>Cancella e ricomincia</button></div></Note>
             )}
             {stage === 'main' && rt && ((!rt.status().linked && rt.docs.list().length === 0) || view.name === 'pair' ? <Pair rt={rt} onDone={() => { setView({ name: 'home' }); bump(); }} /> : (
-                <Shell rt={rt} onRefresh={() => rt.sync().then(bump)} onReconnect={() => setView({ name: 'pair' })} onLock={lock} onForget={async () => { await rt.forgetAll(); rtRef.current = null; setRt(null); setStage('welcome'); }} />
+                <Shell rt={rt} initial={resume.current} onWhere={(x) => { resume.current = x; }} onRefresh={() => rt.sync().then(bump)} onReconnect={() => setView({ name: 'pair' })} onLock={lock} onForget={async () => { resume.current = null; await rt.forgetAll(); rtRef.current = null; setRt(null); setStage('welcome'); }} />
             ))}
             {showSkip && <button type="button" className="pt-skip" onClick={skip}>Salta (solo prova)</button>}
         </main>
