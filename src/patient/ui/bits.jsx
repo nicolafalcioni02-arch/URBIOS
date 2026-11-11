@@ -61,7 +61,7 @@ export const AuthShell = ({ step, title, sub, children, big, fit }) => (
         <div className={'pt-auth-logo' + (big ? ' is-big' : '')}><UrbiosLogo size={big ? 96 : 52} /></div>
         {big && <span className="pt-auth-word">URBIOS</span>}
         {step ? <div className="pt-steps" aria-label={`Passo ${step} di 3`}>{[1, 2, 3].map((i) => <i key={i} className={i === step ? 'on' : i < step ? 'done' : ''} />)}</div> : null}
-        <h1 className="pt-auth-t">{title}</h1>
+        {title ? <h1 className="pt-auth-t">{title}</h1> : null}
         {sub && <p className="pt-auth-s">{sub}</p>}
         {children}
     </section>
@@ -86,9 +86,9 @@ const paint = (ctx, img, t) => {
             const glow = (Math.sin(x * 2.4 + y * 1.6 + t * 0.35) + 1) * 0.5;  // chiazze lente di luce
             const m = (Math.sin(x * 3 + t * 0.2) + 1) * 0.5;                 // dal turchese al lavanda
             const L = k * 0.34 + glow * 0.07;
-            d[p++] = 8 + L * (110 + 60 * m);
-            d[p++] = 13 + L * (215 - 60 * m);
-            d[p++] = 22 + L * (210 + 40 * m);
+            d[p++] = 22 + L * (110 + 60 * m);
+            d[p++] = 12 + L * (215 - 60 * m);
+            d[p++] = 51 + L * (210 + 40 * m);
             d[p++] = 255;
         }
     }

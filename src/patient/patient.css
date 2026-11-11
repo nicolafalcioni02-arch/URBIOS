@@ -1400,3 +1400,30 @@ body:has(.pt-main) .pt-quick-4 button { background: var(--u-lilla); box-shadow: 
 body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-rosso); color: #fff; border-color: transparent; }
 .pt-prof { padding-bottom: 24px; }
 @media (prefers-reduced-motion: reduce) { .pt-prof .pt-set-r.is-busy .pt-set-e, .pt-prof .pt-set-r.is-spin > svg { animation: none; } }
+
+/* UX-06.9: accesso (sfondo notte, benvenuto, informativa, passphrase, collegamento) */
+.pt-bg { background: #160C33; }
+.pt-bg-v { background: radial-gradient(120% 90% at 50% 40%, rgba(22,12,51,0) 40%, rgba(22,12,51,.55) 100%); }
+.pt-auth .pt-feat { display: flex; justify-content: center; gap: 36px; margin: 12px 0 16px; text-align: center; }
+.pt-auth .pt-feat li { flex: none; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 64px; padding: 0; background: transparent; border: 0; border-radius: 0; }
+.pt-auth .pt-feat li > svg { color: var(--lime); }
+.pt-auth .pt-feat b { display: block; font-size: 13px; font-weight: 700; color: #fff; }
+.pt-auth:has(.pt-feat) .pt-auth-logo svg { animation: pt-logo-in 700ms cubic-bezier(.2,.7,.2,1) both; }
+@keyframes pt-logo-in { from { rotate: -200deg; scale: .8; opacity: 0; } to { rotate: 0deg; scale: 1; opacity: 1; } }
+.pt-auth .pt-waiver { position: relative; }
+.pt-waiver-t p { color: rgba(255,255,255,.72); margin-bottom: 20px; } .pt-waiver-t p:last-child { margin-bottom: 30px; } .pt-waiver-t p b { color: #fff; }
+.pt-auth.is-fit .pt-waiver-t p { margin-bottom: 20px; } .pt-auth.is-fit .pt-waiver-t p:last-child { margin-bottom: 30px; }
+.pt-waiver-p { position: absolute; left: 22px; right: 22px; top: 0; height: 3px; border-radius: 2px; background: var(--lime); transform-origin: 0 50%; scale: var(--p, 0) 1; transition: scale .12s linear; pointer-events: none; }
+.pt-waiver-d { position: absolute; right: 12px; bottom: 12px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--lime); color: #0B0C0E; display: grid; place-items: center; cursor: pointer; animation: pt-nudge 1.6s ease-in-out infinite; }
+@keyframes pt-nudge { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
+.pt-auth .pt-check:has(input:checked) { border-color: var(--line); }
+.pt-check.is-rd input { animation: pt-pulse 300ms ease-out 1; }
+@keyframes pt-pulse { 0%, 100% { scale: 1; } 50% { scale: 1.15; } }
+.pt-pw { position: relative; } .pt-pw .pt-input { padding-right: 52px; }
+.pt-pw-e { position: absolute; right: 4px; top: 6px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: rgba(255,255,255,.7); display: grid; place-items: center; cursor: pointer; }
+.pt-pwm { display: flex; gap: 4px; margin: 10px 4px 0; } .pt-pwm i { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,.16); transition: background .15s ease; } .pt-pwm i.on { background: var(--lime); }
+.pt-auth-s .pt-warn-s { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: 15px; font-weight: 600; } .pt-warn-s svg { flex: none; color: var(--warn); }
+.pt-pw.is-bad .pt-input { border-color: var(--bad); animation: pt-shake 360ms ease-in-out 1; }
+@keyframes pt-shake { 0%, 100% { translate: 0 0; } 20% { translate: -8px 0; } 40% { translate: 8px 0; } 60% { translate: -5px 0; } 80% { translate: 5px 0; } }
+.pt-auth .pt-cta.pt-cta-qr { display: flex; align-items: center; justify-content: center; gap: 8px; }
+@media (prefers-reduced-motion: reduce) { .pt-auth:has(.pt-feat) .pt-auth-logo svg, .pt-waiver-d, .pt-check.is-rd input, .pt-pw.is-bad .pt-input { animation: none; } .pt-waiver-p, .pt-pwm i { transition: none; } }

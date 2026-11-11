@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { startScan } from '../scan.js';
-import { AuthShell, Note } from './bits.jsx';
+import { AuthShell, Icon, Note } from './bits.jsx';
 
 // Collegamento al professionista: inquadra il QR mostrato in studio, confronta il codice, conferma.
 export const Pair = ({ rt, onDone }) => {
     const [mode, setMode] = useState('choose'); // choose | scan | pairing
-    const [text, setText] = useState(''), [err, setErr] = useState(null);
+    const [text, setText] = useState(''), [err, setErr] = useState(null), [paste, setPaste] = useState(false);
     const [ctl, setCtl] = useState(null), [view, setView] = useState({});
     const video = useRef(null), stopScan = useRef(null);
 
@@ -17,7 +17,7 @@ export const Pair = ({ rt, onDone }) => {
     const scan = async () => {
         setErr(null); setMode('scan');
         try { stopScan.current = await startScan(video.current, (t) => begin(t)); }
-        catch { setMode('choose'); setErr('Non riesco ad aprire la fotocamera. Puoi incollare il codice qui sotto.'); }
+        catch { setMode('choose'); setPaste(true); setErr('Non riesco ad aprire la fotocamera. Puoi incollare il codice qui sotto.'); }
     };
     useEffect(() => () => { if (stopScan.current) stopScan.current(); }, []);
     useEffect(() => {
@@ -29,13 +29,15 @@ export const Pair = ({ rt, onDone }) => {
     const answer = async (ok) => { await ctl.confirmSas(ok); setView({ state: ctl.state, sas: ctl.sas, error: ctl.error }); };
 
     return (
-        <AuthShell step={3} title="Collega il professionista" sub={mode === 'choose' ? 'Inquadra il QR mostrato dal professionista.' : null}>
+        <AuthShell step={3} title="Collega il professionista">
             {mode === 'choose' && (
                 <>
-                    <button type="button" className="pt-cta" onClick={scan}>Inquadra il codice</button>
-                    <label className="pt-label" htmlFor="qrtext">Oppure incolla il codice</label>
-                    <textarea id="qrtext" className="pt-input" value={text} onChange={(e) => setText(e.target.value)} autoComplete="off" spellCheck="false" />
-                    <button type="button" className="pt-btn ghost wide" disabled={!text.trim()} onClick={() => begin(text)}>Collega</button>
+                    <button type="button" className="pt-cta pt-cta-qr" onClick={scan}><Icon name="qr" size={20} />Inquadra il QR</button>
+                    {!paste && <button type="button" className="pt-link" onClick={() => setPaste(true)}>Incolla il codice</button>}
+                    {paste && <>
+                        <textarea id="qrtext" className="pt-input" aria-label="Codice" value={text} onChange={(e) => setText(e.target.value)} autoComplete="off" spellCheck="false" />
+                        <button type="button" className="pt-btn ghost wide" disabled={!text.trim()} onClick={() => begin(text)}>Collega</button>
+                    </>}
                     {err && <Note tone="bad">{err}</Note>}
                 </>
             )}

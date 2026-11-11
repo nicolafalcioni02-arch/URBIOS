@@ -10,7 +10,7 @@ Ogni agente aggiunge il proprio blocco in fondo, a lavoro finito. Non modificare
 | UX-03 Continuità: ripresa per 2 giorni, rientro dopo il blocco, riassunto | fatto (rientro dopo blocco da provare, vedi blocco) |
 | UX-04 Dieta: il giorno di oggi | fatto |
 | UX-05 Coerenza grafica e Profilo | fatto |
-| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | in corso: tappe 1-8 fatte |
+| UX-06 Restyling: colore, movimento, identità, meno testo (9 tappe, un blocco `UX-06.N` per tappa; brief `UX-06-restyling.md`) | fatto: tappe 1-9 (da provare su iPhone) |
 
 A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così:
 
@@ -137,3 +137,11 @@ A lavoro finito cambia la tua riga in «fatto» e aggiungi sotto un blocco così
 - Da provare su iPhone: rotazione dell'icona durante il PDF vero, giro di «Aggiorna», riga del consenso con un consenso reale, «Blocca» (non l'ho premuto: esce dalla prova), 360×640.
 - Scelte fatte: la riga «Aggiorna» scompare se manca `onRefresh`; le variabili `rows` inutilizzate di `Settings.jsx` sono rimaste; il vecchio blocco `.pt-about` resta nel CSS ma non nel JSX.
 - Attenzione per chi viene dopo: classi `pt-prof`, `pt-set*`, `pt-set-del*`, `pt-set-yes`.
+
+## UX-06.9 — fatto il 11/11/2026
+- File toccati: `ui/Welcome.jsx`, `ui/Consent.jsx`, `ui/Passphrase.jsx`, `ui/Pair.jsx`, `ui/bits.jsx` (`AuthShell` senza `<h1>` se il titolo è vuoto; `Backdrop` con le basi 22/12/51), `patient.css` (in fondo, `/* UX-06.9 */`), questo file. Testo legale invariato.
+- Cosa vede il paziente: sfondo viola notte; Benvenuto con tre icone lime e una parola ciascuna e il logo che entra ruotando; Informativa con barra lime di lettura, freccia «Scorri» che pulsa, caselle senza bordo lime e impulso a fine lettura, «Continua» sempre; Passphrase con 12 tacche, occhio in ogni campo, avviso con icona; sblocco senza titolo né etichetta, con scossa e bordo rosso se sbagliata; Collegamento con «Inquadra il QR» e «Incolla il codice» chiuso.
+- Verificato in browser senza `?prova` (375×812; sblocco anche a 360×640): tre colonne senza contenitore a 100 px di passo; barra 0→1, freccia +80% dell'altezza visibile e poi sparisce; «Continua» attivo solo con le due caselle; 7/12 e 12/12 tacche; occhio 44 px che cambia entrambi i campi; frase corta con lo stesso errore; passphrase sbagliata = classe di scossa, bordo `--bad`, nota; «Incolla il codice» apre l'area con `aria-label="Codice"`; nessuno scorrimento di pagina; Home in `?prova` con sfondo lilla identico. Console senza errori dell'app (solo l'avviso `vibrate`).
+- Da provare su iPhone: scansione vera del QR e fotocamera negata (apre da solo l'alternativa), schermata Informativa a 360×640 con tutte le righe, scossa e logo a occhio, «riduci animazioni», tastiera sopra i campi passphrase. Nel pane la vault del browser di anteprima ora ha una passphrase creata durante la prova.
+- Scelte fatte: l'animazione del logo è solo per la schermata con `.pt-feat` (Benvenuto), non per lo sblocco; l'impulso delle caselle parte quando diventano attive; la scossa solo allo sblocco.
+- Attenzione per chi viene dopo: classi `pt-waiver-p`, `pt-waiver-d`, `pt-pw`, `pt-pw-e`, `pt-pwm`, `pt-warn-s`, `pt-cta-qr`, stato `is-rd` sulle caselle. Tappe 1-9 finite.
