@@ -28,12 +28,14 @@ export const VisitSheet = ({ rt, onClose }) => {
 
 // Cose da dire al professionista al prossimo appuntamento
 export const NotesSheet = ({ rt, onClose }) => {
-    const notes = toolsOf(rt.log.get()).notes, [t, setT] = useState('');
+    const notes = toolsOf(rt.log.get()).notes, [t, setT] = useState(''), [sure, setSure] = useState(null);
     const add = async () => { const x = t.trim().slice(0, 300); if (!x) return; await rt.log.update((l) => { toolsOf(l).notes.push({ t: x, at: Date.now() }); }); setT(''); };
-    const del = async (i) => { await rt.log.update((l) => { toolsOf(l).notes.splice(i, 1); }); };
+    const del = async (i) => { setSure(null); await rt.log.update((l) => { toolsOf(l).notes.splice(i, 1); }); };
     return (
         <Shell title="Appunti" onClose={onClose}>
-            {notes.map((n, i) => <div className="pt-todo" key={n.at + '-' + i}><span>{n.t}</span><button type="button" className="pt-todo-x" aria-label="Togli" onClick={() => del(i)}><Icon name="close" size={16} /></button></div>)}
+            {notes.map((n, i) => sure === i
+                ? <div className="pt-todo is-sure" key={n.at + '-' + i} role="alertdialog" aria-label="Elimina appunto"><span>Eliminare l'appunto? Non si può annullare.</span><div className="pt-todo-c"><button type="button" className="pt-todo-y" onClick={() => del(i)}>Elimina</button><button type="button" className="pt-todo-n" onClick={() => setSure(null)}>Annulla</button></div></div>
+                : <div className="pt-todo" key={n.at + '-' + i}><span>{n.t}</span><button type="button" className="pt-todo-x" aria-label="Togli" onClick={() => setSure(i)}><Icon name="close" size={16} /></button></div>)}
             <div className="pt-ns">
                 <textarea className="pt-input pt-todo-in" rows={2} maxLength={300} placeholder="Per la prossima visita…" aria-label="Appunto" value={t} onChange={(e) => setT(e.target.value)} />
                 <button type="button" className="pt-note-send" aria-label="Aggiungi" disabled={!t.trim()} onClick={add}><Icon name="send" size={20} /></button>

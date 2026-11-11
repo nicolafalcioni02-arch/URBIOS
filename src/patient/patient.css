@@ -1494,3 +1494,9 @@ body:has(.pt-main) .pt-prof .pt-btn.danger.pt-set-yes { background: var(--u-ross
 /* righello: il trascinamento orizzontale lo gestisce il codice (dito e mouse); la pagina resta scorrevole in verticale */
 .pt-ruler-s { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
 .pt-ruler-s.is-drag { cursor: grabbing; scroll-behavior: auto; }
+/* appunti: conferma prima di eliminare */
+.pt-todo.is-sure { flex-direction: column; align-items: stretch; gap: 12px; }
+.pt-todo-c { display: flex; gap: 8px; }
+.pt-todo-c button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+body:has(.pt-main) .pt-todo-c .pt-todo-y { background: var(--u-rosso); color: #fff; }
+body:has(.pt-main) .pt-todo-c .pt-todo-n { background: var(--u-lilla-2); color: var(--u-ink); }
