@@ -1656,3 +1656,10 @@ body:has(.pt-main) .pt-shop-r .pt-shop-bc { width: 40px; height: 40px; }
 /* alimenti: lettura del codice a barre dentro la ricerca */
 .pt-food-q button:first-of-type { right: 48px; } .pt-food-q button + button { right: 6px; } .pt-food-q input { padding-right: 96px; }
 .pt-food-f .pt-sc2 { margin-top: 10px; }
+
+/* alimenti: campo di ricerca a pillola, tasti centrati */
+body:has(.pt-main) .pt-food-q { height: 52px; }
+body:has(.pt-main) .pt-food-q input.pt-input { margin: 0; height: 52px; box-sizing: border-box; border-radius: 999px; padding: 0 96px 0 22px; outline-offset: 0; }
+body:has(.pt-main) .pt-food-q button { top: 50%; width: 36px; height: 36px; padding: 0; }
+body:has(.pt-main) .pt-food-q button:first-of-type { right: 50px; } body:has(.pt-main) .pt-food-q button + button { right: 8px; }
+body:has(.pt-main) .pt-food-h, body:has(.pt-main) .pt-food-sel { border-radius: 999px; }
