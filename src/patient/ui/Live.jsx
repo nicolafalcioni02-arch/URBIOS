@@ -231,7 +231,7 @@ export const Live = ({ rt, id, w, d, onExit }) => {
                 {!isRest && <div className="pt-rk">{cur.reps ? <span className={'pt-reps' + (String(cur.reps).length > 3 ? ' is-s' : '')}><b>{cur.reps}</b><i>×</i></span> : null}{stepKg}</div>}
                 {!isRest && !edit && lastT && <button type="button" className="pt-lastb" onClick={() => setPanel('storia')}><span>{String(lastT.date).split('-').reverse().slice(0, 2).join('/')} · {fmtKg(lastKg)} kg</span><Icon name="chev" size={16} /></button>}
                 {!isRest && sug && sug.kg !== kg && <div className="pt-sug"><div><span>Suggerito</span><b>{fmtKg(sug.kg)} kg</b></div><button type="button" onClick={() => setKg(sug.kg)}>Usa</button></div>}
-                {rpeRow}
+                {!isRest && rpeRow}
                 {isRest && nx && <div className="pt-nxt" aria-label={'Prossimo: ' + nx.name}><Icon name="chev" size={18} /><b>{nx.name}</b><span>{Math.min(setNo + 1, nx.n)}/{nx.n}</span></div>}
                 <div className="pt-bt">
                     {isRest ? <button type="button" className="pt-rnd pt-rnd-t" aria-label="Quindici secondi in meno" onClick={() => adjRest(-15000)}>−15</button>
